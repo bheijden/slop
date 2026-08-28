@@ -22,7 +22,7 @@ Everything runs locally. Nothing is uploaded, including by the web pages.
 
 ---
 
-## Three ways to run it
+## Two ways to run it
 
 **CLI** — one engine, no dependencies:
 
@@ -35,18 +35,11 @@ git clone --depth 1 https://github.com/bheijden/slop
 node slop/js/cli.mjs check docs/ -r
 ```
 
-**The UI** — <https://bheijden.github.io/slop/>. Paste or drop a file,
-see findings highlighted with the fix on hover, toggle rule sets, load your
-own. Nothing is uploaded.
+**The web page** — <https://bheijden.github.io/slop/>. Drop a file or
+paste text, see findings highlighted with the fix on hover, read them beside
+the document, and copy them out as JSON. Nothing is uploaded.
 
-**The checker** — <https://bheijden.github.io/slop/web/check.html>. The
-same engine with no interface: give it a document in the URL and it renders the
-result, as text or `#format=json`. Nobody has to install anything, and it is
-readable three ways — the page itself, `window.slopResult`, and a
-`postMessage` to a parent frame — so a headless browser or an embedding page
-can use it as a zero-install checker.
-
-All three load the same `rules/*.json` and run the same `js/engine.mjs`.
+Both load the same `rules/*.json` and run the same `js/engine.mjs`.
 
 ---
 
@@ -96,7 +89,7 @@ ruff accepts both `E` and `E501`.
 | exit codes | `0` clean or within budget, `1` over budget, `2` bad usage or unreadable file. This is what makes it usable in CI or a pre-commit hook — the job fails on `1`. |
 | `--format json` | The full result as JSON: every finding with `file`, `line`, `col`, `rule`, `match`, `sentence`, `why` and `suggest`. For agents and scripts. |
 | `--format github` | GitHub Actions annotation lines (`::warning file=…,line=…::`). GitHub renders these as inline comments on the changed lines of a pull request. |
-| `--share` | Prints a **link** that opens the document in the web UI, with the file gzipped into the URL fragment. Nothing is uploaded — the fragment never leaves the browser. It is for handing a result to someone who has nothing installed. Point it at `check.html` with `--share-base` for the no-UI results page. |
+| `--share` | Prints a **link** that opens the document in the web UI, with the file gzipped into the URL fragment. Nothing is uploaded — the fragment never leaves the browser. It is for handing a result to someone who has nothing installed. |
 
 ### For a coding agent
 
@@ -134,10 +127,6 @@ two machines that already have it. A 3 KB markdown file becomes a 2.2 KB link.
 ```sh
 slop check --share docs/intro.md
 # https://bheijden.github.io/slop/#gz=H4sIAAAA…&kind=md&name=intro.md
-
-slop check --share --share-base https://bheijden.github.io/slop/web/check.html \
-                 --share-format json docs/intro.md
-# the same document, rendered as JSON with no interface
 ```
 
 Or build one by hand:
@@ -153,7 +142,6 @@ Or build one by hand:
 | `mode=fudge` | test rule sets instead of linting a document |
 
 | `name=` | a filename to label the result with |
-| `format=text\|json` | `check.html` only |
 
 `url=` needs the target site to allow cross-origin reads; the CLI has no such
 limit, so prefer `slop check <url> --share` when it does not.
@@ -379,8 +367,7 @@ rules/            rule sets as JSON  <- the shared artifact
   wikipedia-ai.json
   index.json      manifest for the web pages
 js/               engine.mjs  extract.mjs  config.mjs  fudge.mjs  cli.mjs
-web/              index.html   the UI
-                  check.html   the same engine, no interface, driven by the URL
+web/              index.html   the web page
                   worker.mjs   runs rules off the main thread, with a timeout
 skill/            SKILL.md     the agent skill
                   reference/   rule catalogue (generated) + authoring guide
@@ -393,10 +380,16 @@ One engine. `js/engine.mjs` and `js/extract.mjs` are what the CLI, the UI and
 the checker all run; the rule sets are data both they and any other
 implementation can read.
 
-### Web pages
+### Web page
 
-`web/index.html` is the UI, a static page with two voices: everything the linter says is
-monospace, everything you wrote is serif. Findings get a wavy underline rather
+`web/index.html` is a static page. Drop a file anywhere on it, or paste text —
+the input box grows and the results appear under it, beside the document.
+**copy JSON** puts the findings on the clipboard in exactly the shape
+`--format json` writes, so they paste straight into an issue, a diff review or
+an agent's context.
+
+Two voices carry the design: everything the linter says is monospace,
+everything you wrote is serif. Findings get a wavy underline rather
 than a highlight block, with a marker in the margin at the line it came from —
 and you can read them over the extracted prose or over your original source.
 

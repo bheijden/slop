@@ -29,13 +29,18 @@ function check({ src, kind, sets, active }) {
   const starts = lineIndex(src);
   const findings = analyze(text, rules).map((m) => {
     const srcStart = toSource(runs, m.start);
+    const srcEnd = toSource(runs, m.end);
     const a = lineCol(starts, srcStart);
+    const b = lineCol(starts, srcEnd);
     const [ss, se] = sentenceBounds(text, m.start, m.end);
     return {
-      line: a.line, col: a.col, srcStart, srcEnd: toSource(runs, m.end),
-      start: m.start, end: m.end, count: m.count ?? null,
-      rule: m.rule.id, set: m.rule.set, name: m.rule.name,
-      why: m.rule.description, suggest: m.rule.suggest || null,
+      line: a.line, col: a.col, endLine: b.line, endCol: b.col,
+      srcStart, srcEnd, start: m.start, end: m.end,
+      // Key order matches the CLI's --format json, so copied output is
+      // byte-identical to what the terminal writes.
+      rule: m.rule.id, set: m.rule.set, severity: m.rule.severity || 'warn',
+      name: m.rule.name, why: m.rule.description, suggest: m.rule.suggest || null,
+      count: m.count ?? null,
       match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
     };
   });

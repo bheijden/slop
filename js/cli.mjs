@@ -53,9 +53,7 @@ Files
   --skip-tables      drop markdown table rows
 
   --share            print a link that opens these files in the web viewer
-  --share-base URL   where that link points (default: the GitHub Pages site;
-                     use .../web/check.html for the no-UI results page)
-  --share-format FMT text or json, for the check.html results page
+  --share-base URL   where that link points (default: the GitHub Pages site)
   --config FILE      use this slop.json (default: nearest one up the tree)
   --no-config        ignore any slop.json
 
@@ -66,8 +64,7 @@ function parseArgs(argv) {
               all: false, format: 'human', context: true, suggest: true, quiet: false,
               max: null, maxPer1000: null, exitZero: false, recursive: false,
               indentCode: true, skipTables: false, config: undefined, noConfig: false,
-              share: false, shareBase: 'https://bheijden.github.io/slop/',
-              shareFormat: null, help: false };
+              share: false, shareBase: 'https://bheijden.github.io/slop/', help: false };
   const ids = (v) => v.split(/[,\s]+/).filter(Boolean);
   if (['list', 'explain', 'test-rules', 'fudge', 'check'].includes(argv[0])) o.cmd = argv.shift();
   for (let i = 0; i < argv.length; i++) {
@@ -94,7 +91,6 @@ function parseArgs(argv) {
       case '--config': o.config = next(); break;
       case '--share': o.share = true; break;
       case '--share-base': o.shareBase = next(); break;
-      case '--share-format': o.shareFormat = next(); break;
       case '--no-config': o.noConfig = true; break;
       case '--': argv.slice(i + 1).forEach((f) => o.args.push(f)); i = argv.length; break;
       default:
@@ -263,10 +259,7 @@ async function main() {
       if (cfg.select.length) p.set('select', cfg.select.join(','));
       if (cfg.ignore.length) p.set('ignore', cfg.ignore.join(','));
       for (const r of cfg.ruleSets) if (/^https?:\/\//i.test(r)) p.append('rules', r);
-      if (o.shareFormat) p.set('format', o.shareFormat);
-      // A base ending in a filename is used as-is; a bare directory gets a slash.
-      const base = /\.html?$/i.test(o.shareBase) ? o.shareBase : o.shareBase.replace(/\/?$/, '/');
-      const link = base + '#' + p.toString();
+      const link = o.shareBase.replace(/\/?$/, '/') + '#' + p.toString();
       process.stdout.write(files.length > 1 ? `${reports[i].file}\n  ${link}\n` : link + '\n');
     }
     return 0;

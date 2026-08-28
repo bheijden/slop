@@ -85,6 +85,10 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 .results{margin:26px 0 0}
 .rhead{display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px;flex-wrap:wrap}
 .rhead h2{font-family:var(--serif);font-size:22px;font-weight:400;margin:0;letter-spacing:-.015em}
+.rhead .chip{padding:3px 9px;font-size:11.5px}
+.rhead .chip.done{border-color:var(--blue);color:var(--blue)}
+#copy-fallback{width:100%;height:150px;margin-bottom:12px;font-family:var(--mono);font-size:11.5px;
+  border:1px solid var(--blue);border-radius:8px;background:var(--sunk);padding:10px;color:var(--ink)}
 .rhead .spacer{flex:1}
 .seg{display:flex;gap:2px}
 .seg button{background:none;border:0;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:11.5px}
@@ -262,7 +266,9 @@ body.resizing{cursor:col-resize;user-select:none}
         <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
       </div>
       <span class="spacer"></span>
+      <button class="chip" id="b-copy" hidden title="Copy the findings as JSON — the same shape as --format json">copy JSON</button>
     </div>
+    <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
     <div class="panes" id="panes" data-layout="split">
       <div class="pane" id="pane-doc">
         <div class="phead">
@@ -315,8 +321,6 @@ slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a
 <span class="p">#rules=</span>            a rule set URL, repeatable
 <span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
 <span class="p">#mode=fudge</span>        test rules instead</pre>
-        <p>Same keys work on <a href="./check.html">check.html</a> — the same checker with no interface, for when you want the result and not the page. It renders plain text or <code>#format=json</code>, sets <code>&lt;html data-status="done"&gt;</code>, exposes <code>window.slopResult</code>, and <code>postMessage</code>s the findings to a parent frame, so a headless browser or an embedding page can read it without installing anything.</p>
-<pre>slop check <span class="p">--share</span> <span class="p">--share-base</span> …/web/check.html <span class="p">--share-format</span> json doc.md</pre>
       </div>
     </details>
     <details>
@@ -366,7 +370,7 @@ Then lint docs/ and fix what it reports.</span></pre>
 <script type="module">
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md',
+const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md', name:'input',
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')) };
@@ -422,6 +426,7 @@ async function readHash() {
       note('');
     } catch (e) { note(`could not fetch that URL (${e.message}) — the site must allow cross-origin reads`); }
   }
+  if (p.get('name')) S.name = p.get('name');
   if (src) { $('input').value = src; $('kind').value = S.kind; }
 }
 
@@ -497,6 +502,8 @@ function renderResults() {
     res.hidden = false;
     $('views').hidden = true;
     $('nav').hidden = true;
+    $('b-copy').hidden = true;
+    $('copy-fallback').hidden = true;
     $('divider').hidden = true;
     $('panes').dataset.layout = 'text';
     renderFudge();
@@ -523,6 +530,8 @@ function renderResults() {
   applyLayout();
   $('list-head').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'findings';
   $('nav').hidden = !n;
+  $('b-copy').hidden = !n;
+  if (!n) { $('copy-fallback').hidden = true; }
   $('n-count').textContent = n ? (S.sel >= 0 ? `${S.sel + 1} / ${n}` : `– / ${n}`) : '';
   $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
       <span class="loc">${f.line}:${f.col}</span>
@@ -531,6 +540,40 @@ function renderResults() {
         ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
   for (const li of $('list').querySelectorAll('li')) li.onclick = () => select(+li.dataset.i);
 }
+
+// The copied object is the same shape the CLI writes with --format json, so it
+// can be pasted wherever that output would go.
+function resultJson() {
+  const strip = ({ srcStart, srcEnd, start, end, ...keep }) => ({ file: S.name, ...keep });
+  const words = S.text ? (S.text.match(/\S+/g) || []).length : 0;
+  return JSON.stringify({
+    files: [{ file: S.name, words, findings: S.findings.map(strip) }],
+    total: S.findings.length,
+    words,
+    per1000: words ? +(S.findings.length / words * 1000).toFixed(2) : 0,
+    rules: [...S.active]
+  }, null, 2);
+}
+
+async function copyJson() {
+  const text = resultJson();
+  const btn = $('b-copy');
+  try {
+    await navigator.clipboard.writeText(text);
+    btn.textContent = 'copied';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'copy JSON'; btn.classList.remove('done'); }, 1600);
+  } catch {
+    // No clipboard permission (or an insecure context): show it to copy by hand.
+    const ta = $('copy-fallback');
+    ta.value = text;
+    ta.hidden = false;
+    ta.focus();
+    ta.select();
+    btn.textContent = 'select and copy';
+  }
+}
+$('b-copy').onclick = copyJson;
 
 function showTip(el, f) {
   const t = $('tip');
@@ -671,7 +714,7 @@ function run() {
 }
 
 /* wiring */
-$('input').addEventListener('input', () => { grow(); run(); });
+$('input').addEventListener('input', () => { $('copy-fallback').hidden = true; grow(); run(); });
 $('kind').addEventListener('change', () => { S.kind = $('kind').value; run(); });
 $('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
 $('v-source').onclick = () => { S.view = 'source'; renderResults(); };
@@ -741,6 +784,7 @@ for (const [id, mode] of [['m-check','check'],['m-fudge','fudge']]) $(id).onclic
 };
 $('b-example').onclick = () => {
   $('kind').value = S.kind = 'md';
+  S.name = 'example.md';
   $('input').value = `# Release notes
 
 It is important to note that the rollout happened in stages. No sign-ups, no
@@ -755,6 +799,7 @@ That's the whole point, and you already know the answer.`;
 $('b-file').onclick = () => pickFile('.md,.markdown,.mdx,.html,.htm,.txt,.text', loadFile);
 async function loadFile(f) {
   $('input').value = await f.text();
+  S.name = f.name;
   S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
   $('kind').value = S.kind;
   grow(); run();
