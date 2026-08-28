@@ -2,24 +2,50 @@
 
 **[Try it in your browser →](https://bheijden.github.io/slop/)**
 
-A linter for prose. It flags stock LLM phrasing — `"it is important to note
-that"`, `"no X, no Y, no Z"`, three sentences opening on the same word — in
-`.md`, `.html`, `.txt` and `.rst`, and reports each one at `file:line:col` with
-a suggested fix.
+You asked a model for release notes. It gave you this:
 
-Rules are **data, not code**. A rule set is a versioned JSON file that carries
-its own test examples, so adding rules never means touching the linter.
+<!-- slop-ignore-start -->
+> It is important to note that the rollout happened in stages. No sign-ups, no
+> downloads, no hassle. Community feedback plays a pivotal role in every
+> release, underscoring the value of an ever-evolving landscape.
+>
+> The parser is a tiny state machine. The renderer is a tiny state machine.
+<!-- slop-ignore-end -->
 
-```
-docs/intro.md (3385 words, 2 findings)
-  42:7      note-that             It is important to note that
-            It is important to note that timing matters.
+It reads fine and says almost nothing. `slop` shows you where, and what to do
+about it:
+
+```console
+$ slop check release-notes.md
+
+release-notes.md (49 words, 5 findings)
+  3:1       note-that             It is important to note that
             fix: Delete the hedge and state the fact.
-  194:86    no-chain          ×3  no residual, no convergence concept
+  3:62      no-chain          ×3  No sign-ups, no downloads, no hassle
             fix: Say what it does have. A denial chain lists absences instead of substance.
+  4:42      crucial-role          plays a pivotal role
+            fix: Say what it actually does.
+  4:79      participle-tail       , underscoring the value of an ever-evolving landscape
+            fix: End the sentence. The participle tail adds commentary, not information.
+  7:1       echo-triad        ×2  The parser is a tiny state machine. The renderer is …
+            fix: Merge the parallel sentences into one, or vary the structure.
+
+5 findings in 1 file, 49 words — 102.04 per 1000 words
 ```
 
-Everything runs locally. Nothing is uploaded, including by the web page.
+Or drop the file on **[the page](https://bheijden.github.io/slop/)** and read it
+the same way — same engine, same rules, nothing uploaded:
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/img/slop-dark.png">
+    <img src="docs/img/slop-light.png" alt="slop in the browser: a document with findings highlighted, and a list beside it giving the rule and the fix for each" width="900">
+  </picture>
+</p>
+
+It works on `.md`, `.html`, `.txt` and `.rst`, and on a whole directory. Rules
+are **data, not code**: a rule set is a versioned JSON file carrying its own
+test examples, so adding rules never means touching the linter.
 
 ## Run it
 
@@ -32,9 +58,7 @@ git clone --depth 1 https://github.com/bheijden/slop
 node slop/js/cli.mjs check docs/ -r
 ```
 
-No dependencies; the clone is 380 KB and needs only Node. Or drop a file, a
-folder or a `.zip` on **[the web page](https://bheijden.github.io/slop/)**,
-which runs the same engine and rule files.
+No dependencies; the clone is 380 KB and needs only Node.
 
 Findings never fail a run on their own — they are style smells, not errors. Set
 a budget when you want CI to gate on them:
@@ -119,6 +143,10 @@ can read.
 - **Markdown tables can trip `echo-triad`.** Set `"skipTables": true` in
   `slop.json`, as this repo does.
 - **`.rtf` is not supported.** Convert to `.md` or `.txt` first.
+
+To quote bad prose on purpose — as this README does above — wrap it in
+`<!-- slop-ignore-start -->` and `<!-- slop-ignore-end -->`. Works in markdown
+and HTML.
 
 ## Provenance and license
 

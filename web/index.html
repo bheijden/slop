@@ -255,13 +255,34 @@ body.resizing{cursor:col-resize;user-select:none}
 .docs .body{padding:2px 0 18px 18px}
 .docs p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0 0 11px;max-width:64ch}
 .docs p code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--ink)}
-.docs pre{background:var(--sunk);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;line-height:1.7;margin:0 0 11px}
+.docs pre{position:relative;background:var(--sunk);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;line-height:1.7;margin:0 0 11px}
+.copy-pre{
+  position:absolute;top:6px;right:6px;z-index:2;
+  border:1px solid var(--hair);background:var(--paper);color:var(--muted);
+  border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;
+  opacity:0;transition:opacity .12s;
+}
+.docs pre:hover .copy-pre,.copy-pre:focus-visible{opacity:1}
+.copy-pre:hover{border-color:var(--blue);color:var(--ink)}
+.copy-pre.done{opacity:1;border-color:var(--blue);color:var(--blue)}
+@media (hover:none){.copy-pre{opacity:1}}
 .docs pre .c{color:var(--muted)} .docs pre .p{color:var(--flag)} .docs pre .k{color:var(--blue)}
 .docs a{color:var(--blue)}
 .rulebox{max-height:330px;overflow:auto}
-.rulebox h3{margin:12px 0 5px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500;display:flex;gap:8px;align-items:center}
-.rulebox h3:first-child{margin-top:0}
-.rulebox h3 button{margin-left:auto;background:none;border:0;color:var(--blue);cursor:pointer;font-size:11px;padding:0}
+.rset{border-bottom:1px solid var(--hair)}
+.rset:first-child{border-top:1px solid var(--hair)}
+.rset summary{
+  cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center;
+  padding:8px 2px;font-size:12px;
+}
+.rset summary::-webkit-details-marker{display:none}
+.rset summary::before{content:"+";color:var(--blue);width:9px;flex:none;font-size:11px}
+.rset[open] summary::before{content:"−"}
+.rset summary .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rset summary .hits{color:var(--flag);font-weight:600;font-variant-numeric:tabular-nums}
+.rset summary .cnt{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.rset summary button{background:none;border:0;color:var(--blue);cursor:pointer;font-size:11px;padding:0 2px}
+.rlist{padding:2px 0 9px 17px}
 .rulebox label{display:flex;gap:8px;align-items:baseline;padding:2.5px 0;cursor:pointer;font-size:12px}
 .rulebox label input{margin:0;flex:none;accent-color:var(--blue)}
 .rulebox label .id{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -382,21 +403,6 @@ node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</sp
       </div>
     </details>
     <details>
-      <summary>Open this page from a link<span class="hint">#gz=…</span></summary>
-      <div class="body">
-        <p>Everything is in the fragment, which browsers never send to a server. <code>--share</code> writes the link and gzips the file into it.</p>
-<pre><span class="p">#gz=</span> <span class="p">#text=</span>       one document, base64url
-<span class="p">#bundle=</span>           several files, base64url of gzipped JSON
-<span class="p">#url=</span>              fetch a page and lint it
-<span class="p">#kind=</span>             md · html · txt
-<span class="p">#name=</span>             a label for the result
-<span class="p">#rules=</span>            a rule set URL, repeatable
-<span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
-<span class="p">#mode=fudge</span>        test rules instead</pre>
-        <p><code>--share</code> on a directory writes a single <code>#bundle=</code> link, so the page opens the whole tree rather than the reader juggling one link per file.</p>
-      </div>
-    </details>
-    <details>
       <summary>Writing and testing rules<span class="hint">the fudger</span></summary>
       <div class="body">
         <p>A rule set is JSON. Each rule carries its own examples, and those examples are what makes it testable.</p>
@@ -450,6 +456,7 @@ const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
+            setOpen:{},
             tree:store('pc-tree', 'open'),
             treeW:parseFloat(store('pc-treew', '220')) };
 
@@ -814,20 +821,36 @@ function renderRules() {
   for (const f of S.flat) counts[f.rule] = (counts[f.rule] || 0) + 1;
   const el = $('rules');
   el.innerHTML = S.sets.map((set) => {
-    const allOn = set.rules.every((r) => S.active.has(r.id));
-    return `<h3>${esc(set.title || set.name)}<button data-set="${esc(set.name)}">${allOn?'none':'all'}</button></h3>` +
-      set.rules.map((r) => `<label title="${esc(r.description||'')}">
-        <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id)?' checked':''}>
-        <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id]||''}</span></label>`).join('');
+    const on = set.rules.filter((r) => S.active.has(r.id)).length;
+    const hits = set.rules.reduce((a, r) => a + (counts[r.id] || 0), 0);
+    const allOn = on === set.rules.length;
+    return `<details class="rset"${S.setOpen[set.name] ? ' open' : ''} data-set="${esc(set.name)}">
+      <summary>
+        <span class="nm">${esc(set.title || set.name)}</span>
+        ${hits ? `<span class="hits">${hits}</span>` : ''}
+        <span class="cnt">${on}/${set.rules.length}</span>
+        <button data-toggle="${esc(set.name)}">${allOn ? 'none' : 'all'}</button>
+      </summary>
+      <div class="rlist">${set.rules.map((r) => `<label title="${esc(r.description || '')}">
+        <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id) ? ' checked' : ''}>
+        <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id] || ''}</span></label>`).join('')}</div>
+    </details>`;
   }).join('') + `<div class="load">
       <input type="url" data-url placeholder="https://…/house-style.json">
       <div class="row"><button data-add>Add rule set</button><button data-file>Choose file…</button></div>
       <div class="err" data-err></div></div>`;
-  const q = (s) => el.querySelector(s);
-  for (const c of el.querySelectorAll('input[data-rule]'))
+
+  const q = (sel) => el.querySelector(sel);
+  for (const d of el.querySelectorAll('details.rset')) {
+    d.addEventListener('toggle', () => { S.setOpen[d.dataset.set] = d.open; });
+  }
+  for (const c of el.querySelectorAll('input[data-rule]')) {
     c.onchange = () => { c.checked ? S.active.add(c.dataset.rule) : S.active.delete(c.dataset.rule); run(); };
-  for (const b of el.querySelectorAll('button[data-set]')) b.onclick = () => {
-    const set = S.sets.find((x) => x.name === b.dataset.set);
+  }
+  for (const b of el.querySelectorAll('button[data-toggle]')) b.onclick = (e) => {
+    // the button lives in a <summary>; do not let the click fold the block
+    e.preventDefault(); e.stopPropagation();
+    const set = S.sets.find((x) => x.name === b.dataset.toggle);
     const allOn = set.rules.every((r) => S.active.has(r.id));
     set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
     run();
@@ -845,66 +868,8 @@ function renderRules() {
       addSet(set); q('[data-err]').textContent = ''; run();
     } catch (e) { q('[data-err]').textContent = e.message; }
   });
-  const total = S.sets.reduce((a,s) => a + s.rules.length, 0);
+  const total = S.sets.reduce((a, s2) => a + s2.rules.length, 0);
   $('rule-hint').textContent = `${S.active.size} of ${total} on`;
-}
-
-const TEXTY = /\.(md|markdown|mdown|mdx|html?|xhtml|txt|text|rst)$/i;
-const kindOf = (n) => /\.(html?|xhtml)$/i.test(n) ? 'html'
-                    : /\.(md|markdown|mdown|mdx)$/i.test(n) ? 'md' : 'txt';
-
-// Everything that can arrive — a paste, one file, several, a folder, a zip —
-// ends up as this same list, so the rest of the page has one shape to render.
-async function loadDocs(docs, skipped = 0) {
-  S.docs = docs;
-  S.skipped = skipped;
-  S.doc = 0;
-  S.sel = -1;
-  if (docs.length === 1) { $('input').value = docs[0].src; S.kind = docs[0].kind; $('kind').value = S.kind; }
-  $('io').hidden = docs.length > 1;
-  grow();
-  run();
-}
-
-async function filesToDocs(files) {
-  const docs = [];
-  let skipped = 0;
-  for (const f of files) {
-    const name = f.path || f.name;
-    if (/\.zip$/i.test(name)) {
-      try {
-        for (const e of await readZip(await f.arrayBuffer())) {
-          if (!TEXTY.test(e.name)) { skipped++; continue; }
-          docs.push({ name: e.name, kind: kindOf(e.name), src: await e.text() });
-        }
-      } catch (err) { note(`${name}: ${err.message}`); }
-      continue;
-    }
-    if (!TEXTY.test(name)) { skipped++; continue; }
-    docs.push({ name, kind: kindOf(name), src: await f.text() });
-  }
-  docs.sort((a, b) => a.name.localeCompare(b.name));
-  return { docs, skipped };
-}
-
-// A dropped folder arrives as a directory entry, not a file list.
-async function entryToFiles(entry, out = [], prefix = '') {
-  if (entry.isFile) {
-    const f = await new Promise((res, rej) => entry.file(res, rej));
-    f.path = prefix + f.name;
-    out.push(f);
-  } else if (entry.isDirectory) {
-    const reader = entry.createReader();
-    for (;;) {
-      const batch = await new Promise((res, rej) => reader.readEntries(res, rej));
-      if (!batch.length) break;
-      for (const e of batch) {
-        if (e.name.startsWith('.')) continue;
-        await entryToFiles(e, out, prefix + entry.name + '/');
-      }
-    }
-  }
-  return out;
 }
 
 function pickFile(accept, cb) {
@@ -960,6 +925,34 @@ function run() {
     $('meta').textContent = `${words} words`;
     renderResults(); renderRules();
   }, 160);
+}
+
+// Every code block gets a copy button — the skill installer especially, which
+// is meant to be pasted into a terminal or handed to an agent.
+for (const pre of document.querySelectorAll('.docs pre')) {
+  const btn = document.createElement('button');
+  btn.className = 'copy-pre';
+  btn.type = 'button';
+  btn.textContent = 'copy';
+  btn.title = 'Copy this block';
+  btn.onclick = async () => {
+    // innerText, not textContent: it keeps the line breaks the block shows.
+    const text = [...pre.childNodes].filter((n) => n !== btn).map((n) => n.textContent).join('').trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.textContent = 'copied';
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents(pre);
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      btn.textContent = 'select all — ⌘C';
+    }
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('done'); }, 1600);
+  };
+  pre.appendChild(btn);
 }
 
 /* wiring */

@@ -164,15 +164,18 @@ export function extractHtml(src, opts = {}) {
   const mapper = new Mapper(opts.wrap);
   HTML_TOKEN.lastIndex = 0;
   let last = 0;
+  let ignoring = false;
   let m;
   while ((m = HTML_TOKEN.exec(src))) {
-    if (m.index > last) copyHtmlText(mapper, src.slice(last, m.index), last);
+    if (m.index > last && !ignoring) copyHtmlText(mapper, src.slice(last, m.index), last);
     last = m.index + m[0].length;
     const name = m[1];
     if (!name) {
       // A comment is inline: "<p>a <!-- x --> b</p>" is one sentence. Doctype
       // and processing instructions sit between blocks.
-      if (!m[0].startsWith('<!--')) mapper.brk(m.index);
+      if (IGNORE_START.test(m[0])) { ignoring = true; mapper.brk(m.index); }
+      else if (IGNORE_END.test(m[0])) { ignoring = false; mapper.brk(m.index); }
+      else if (!m[0].startsWith('<!--')) mapper.brk(m.index);
       continue;
     }
     const closing = m[0][1] === '/';
@@ -191,11 +194,17 @@ export function extractHtml(src, opts = {}) {
     }
     if (BLOCK_EL.test(name)) mapper.brk(m.index);
   }
-  if (last < src.length) copyHtmlText(mapper, src.slice(last), last);
+  if (last < src.length && !ignoring) copyHtmlText(mapper, src.slice(last), last);
   return mapper.build();
 }
 
 // ---------------------------------------------------------------- Markdown
+
+// Documentation often quotes bad prose on purpose. These markers skip a
+// region, the way any linter's disable comments do. They work in markdown and
+// in HTML, since both are just comments.
+const IGNORE_START = /<!--\s*slop-ignore-start\s*-->/i;
+const IGNORE_END = /<!--\s*slop-ignore-end\s*-->/i;
 
 const FENCE = /^(\s{0,3})(`{3,}|~{3,})(.*)$/;
 const SETEXT = /^\s{0,3}(?:=+|-{2,})\s*$/;
@@ -323,10 +332,15 @@ export function extractMarkdown(src, opts = {}) {
   let open = false;       // a prose line is emitted and awaiting its separator
   let prevEndsBlock = true;
   let pending = null;     // a code span opened on an earlier line
+  let ignoring = false;
   const close = (off) => { if (open) { mapper.sub('\n', off); open = false; } };
 
   for (; i < lines.length; i++) {
     const { text: line, off } = lines[i];
+
+    if (IGNORE_START.test(line)) { ignoring = true; close(off); continue; }
+    if (IGNORE_END.test(line)) { ignoring = false; close(off); continue; }
+    if (ignoring) { close(off); continue; }
 
     if (fence) {
       const f = line.match(FENCE);

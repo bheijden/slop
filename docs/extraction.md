@@ -1,5 +1,9 @@
 # How a file is read
 
+To exclude a region deliberately — a quoted example of bad prose, a block you do
+not want linted — wrap it in `<!-- slop-ignore-start -->` and
+`<!-- slop-ignore-end -->`. Both markdown and HTML honour it.
+
 
 
 Extraction turns a source file into prose plus a map back to source offsets, so
