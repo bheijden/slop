@@ -38,6 +38,7 @@ Rule library
   slop sets                    what is installed, active, and passing
   slop add <url>               download a rule set into .slop/rules/
   slop update [name]           re-fetch from the recorded source (--check to only report)
+                                     a set failing its own tests is held back; --force installs it anyway
   slop remove <name>           delete an installed set
   slop restore [lock.json]     reinstall everything a lock file names
   cat draft.md | slop -
@@ -58,6 +59,7 @@ Budget
   --max N            fail above N findings         (off by default)
   --max-per-1000 N   fail above N findings per 1000 words (off by default)
   --exit-zero        always exit 0
+  -f, --force        install a rule set even when it fails its own tests
 
 Files
   -r, --recursive    walk directories
@@ -105,6 +107,7 @@ function parseArgs(argv) {
       case '--share': o.share = true; break;
       case '--share-base': o.shareBase = next(); break;
       case '--check': o.checkOnly = true; break;
+      case '-f': case '--force': o.force = true; break;
       case '--no-config': o.noConfig = true; break;
       case '--': argv.slice(i + 1).forEach((f) => o.args.push(f)); i = argv.length; break;
       default:
@@ -238,6 +241,7 @@ async function main() {
 
   if (o.cmd === 'add') {
     if (!o.args.length) { process.stderr.write('slop: add needs a URL or a path\n'); return 2; }
+    let added = 0;
     for (const src of o.args) {
       let fetched;
       try { fetched = await fetchSets(src); }
@@ -247,12 +251,19 @@ async function main() {
         try { info = inspect(f.json, f.name); }
         catch (e) { process.stderr.write(`slop: ${f.src}: ${e.message}\n`); return 2; }
         const shadows = fs.existsSync(path.join(BUILTIN, info.name + '.json'));
+        if (info.failing && !o.force) {
+          process.stdout.write(`${C.red('not added')} ${C.bold(info.name)} ${C.dim('v' + info.version)}  `
+            + `${C.red(info.failing + ' failing')} ${C.dim('— run `fudge` on it, or --force to install anyway')}\n`);
+          continue;
+        }
         install(f.json, info, f.src);
-        report(C.green('added'), info, shadows ? C.dim(' (shadows the built-in)') : '');
+        added++;
+        report(C.green(info.failing ? 'added (forced)' : 'added'), info,
+               shadows ? C.dim(' (shadows the built-in)') : '');
       }
     }
-    process.stdout.write(C.dim('active now; turn one off with --ignore <name>\n'));
-    return 0;
+    if (added) process.stdout.write(C.dim('active now; turn one off with --ignore <name>\n'));
+    return added ? 0 : 1;
   }
 
   if (o.cmd === 'update') {
@@ -271,16 +282,18 @@ async function main() {
       try { info = inspect(match.json, name); }
       catch (e) { process.stdout.write(`${C.red('failed')} ${name} — ${e.message}\n`); continue; }
 
-      if (info.sha256 === rec.sha256) {
+      // Unchanged means the same rules *and* the same version; a version bump
+      // with identical rules is still worth recording.
+      if (info.sha256 === rec.sha256 && info.version === rec.version) {
         process.stdout.write(`${C.dim('current')} ${name} ${C.dim('v' + rec.version)}\n`);
         continue;
       }
       const dir = compareVersions(info.version, rec.version);
       const arrow = `${rec.version} → ${info.version}${dir < 0 ? C.yellow(' (older!)') : ''}`;
-      // A candidate that fails its own tests is reported and not installed.
-      if (info.failing) {
+      // A candidate that fails its own tests is held back unless forced.
+      if (info.failing && !o.force) {
         process.stdout.write(`${C.red('held back')} ${name} ${C.dim(arrow)}  `
-          + `${C.red(info.failing + ' failing')} ${C.dim('— not installed')}\n`);
+          + `${C.red(info.failing + ' failing')} ${C.dim('— --force to install anyway')}\n`);
         continue;
       }
       if (o.checkOnly) {
@@ -288,7 +301,7 @@ async function main() {
         continue;
       }
       install(match.json, info, match.src);
-      report(C.green('updated'), info, C.dim(`  ${arrow}`));
+      report(C.green(info.failing ? 'updated (forced)' : 'updated'), info, C.dim(`  ${arrow}`));
       changed++;
     }
     if (o.checkOnly) return 0;
@@ -321,10 +334,15 @@ async function main() {
       catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)} — ${e.message}\n`); continue; }
       const match = fetched.find((f) => (f.json.name || f.name) === name) || fetched[0];
       const info = inspect(match.json, name);
-      install(match.json, info, match.src);
       const drift = info.sha256 !== rec.sha256
         ? C.yellow(`  differs from the lock (${rec.version} → ${info.version})`) : '';
-      report(C.green('restored'), info, drift);
+      if (info.failing && !o.force) {
+        process.stdout.write(`${C.red('skipped')} ${name} ${C.dim('v' + info.version)}  `
+          + `${C.red(info.failing + ' failing')}${drift} ${C.dim('— --force to install anyway')}\n`);
+        continue;
+      }
+      install(match.json, info, match.src);
+      report(C.green(info.failing ? 'restored (forced)' : 'restored'), info, drift);
     }
     return 0;
   }

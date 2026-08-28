@@ -115,9 +115,10 @@ A project can install more. Rule sets are versioned packages, recorded in
 ... restore shared.lock.json   # rebuild a library elsewhere
 ```
 
-An update that fails its own tests is never installed. Check `sets` before
-assuming a finding came from a built-in rule — a project's own set can shadow
-one of ours.
+Every rule carries its own examples in the same file, so `add`, `update` and
+`restore` run them before installing and hold back a set that fails. `--force`
+installs it anyway. Check `sets` before assuming a finding came from a built-in
+rule — a project's own set can shadow one of ours.
 
 ## Writing or fixing a rule
 

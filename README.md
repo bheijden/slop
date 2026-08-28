@@ -82,6 +82,7 @@ docs/intro.md (3385 words, 2 findings)
 | `--max N` / `--max-per-1000 N` | fail only above a budget |
 | `-r`, `--exclude SUBSTR` | walking a tree |
 | `--share` | print a link that opens these files in the web page |
+| `-f`, `--force` | install a rule set even though it fails its own tests |
 
 `--select` and `--ignore` take a **set name** or a **single rule id**, the way
 ruff accepts both `E` and `E501`.
@@ -256,17 +257,32 @@ slop update house-style  # just one
 update  house-style 1.0.0 → 1.1.0  tests pass
 ```
 
-**A candidate that fails its own tests is never installed.** It is reported and
-the working version stays:
+**A candidate that fails is held back.** The working version stays:
 
 ```
-held back house-style 1.0.0 → 1.2.0  2 failing — not installed
+held back house-style 1.0.0 → 1.2.0  2 failing — --force to install anyway
 ```
 
-That is the point of shipping tests inside a rule set: an update from a source
-you do not control is checked before it can affect your CI. A set built against
-a newer `slop` than yours is flagged too, since it may use a detector kind
-this engine does not have.
+Failing *what*, exactly: every rule in a set carries its own `tests.hit` and
+`tests.miss` examples in the same JSON file, so the examples travel with the
+rule. Anyone who fetches the set can run them — that is what `add`, `update`
+and `restore` do before installing, and what `slop fudge` does on demand.
+You do not have to write tests for someone else's rules to know whether they
+work on your machine.
+
+So an update from a source you do not control is checked before it can reach
+your CI. `add` and `restore` hold back the same way, and `--force` overrides all
+three when you want a work-in-progress set anyway:
+
+```sh
+slop add --force ./draft-rules.json
+```
+
+A forced install is labelled and its failure is recorded in the lock, so
+`sets` keeps showing it as failing rather than quietly passing.
+
+A set built against a newer `slop` than yours is flagged too, since it may
+use a detector kind this engine does not have.
 
 ### Sharing a library
 
@@ -277,8 +293,9 @@ slop restore                     # from .slop/rules.lock.json
 slop restore shared.lock.json    # from anywhere
 ```
 
-Each set is re-fetched from its recorded source and tested. If the source now
-serves something different from what the lock recorded, you are told:
+Each set is re-fetched from its recorded source and tested; one that fails is
+skipped unless you pass `--force`. If the source now serves something different
+from what the lock recorded, you are told:
 
 ```
 restored house-style v1.1.0 2 rules  differs from the lock (1.0.0 → 1.1.0)

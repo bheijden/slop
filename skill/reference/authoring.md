@@ -9,8 +9,11 @@
 
 ## Rule format
 
-A rule set is one JSON file. Each rule carries its own examples, and those
-examples are what makes it testable.
+A rule set is one JSON file. Each rule carries its own `tests.hit` and
+`tests.miss` examples in that same file, so the examples travel with the rule:
+anyone who installs the set can verify it works without writing tests for
+someone else's rules. `add`, `update` and `restore` run them automatically and
+hold back a set that fails.
 
 ```json
 {
