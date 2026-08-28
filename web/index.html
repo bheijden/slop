@@ -872,6 +872,65 @@ function renderRules() {
   $('rule-hint').textContent = `${S.active.size} of ${total} on`;
 }
 
+const TEXTY = /\.(md|markdown|mdown|mdx|html?|xhtml|txt|text|rst)$/i;
+const kindOf = (n) => /\.(html?|xhtml)$/i.test(n) ? 'html'
+                    : /\.(md|markdown|mdown|mdx)$/i.test(n) ? 'md' : 'txt';
+
+// Everything that can arrive — a paste, one file, several, a folder, a zip —
+// ends up as this same list, so the rest of the page has one shape to render.
+function loadDocs(docs, skipped = 0) {
+  S.docs = docs;
+  S.skipped = skipped;
+  S.doc = 0;
+  S.cur = 0;
+  S.sel = -1;
+  if (docs.length === 1) { $('input').value = docs[0].src; S.kind = docs[0].kind; $('kind').value = S.kind; }
+  $('io').hidden = docs.length > 1;
+  grow();
+  run();
+}
+
+async function filesToDocs(files) {
+  const docs = [];
+  let skipped = 0;
+  for (const f of files) {
+    const name = f.path || f.name;
+    if (/\.zip$/i.test(name)) {
+      try {
+        for (const e of await readZip(await f.arrayBuffer())) {
+          if (!TEXTY.test(e.name)) { skipped++; continue; }
+          docs.push({ name: e.name, kind: kindOf(e.name), src: await e.text() });
+        }
+      } catch (err) { note(`${name}: ${err.message}`); }
+      continue;
+    }
+    if (!TEXTY.test(name)) { skipped++; continue; }
+    docs.push({ name, kind: kindOf(name), src: await f.text() });
+  }
+  docs.sort((a, b) => a.name.localeCompare(b.name));
+  return { docs, skipped };
+}
+
+// A dropped folder arrives as a directory entry, not a file list.
+async function entryToFiles(entry, out = [], prefix = '') {
+  if (entry.isFile) {
+    const f = await new Promise((res, rej) => entry.file(res, rej));
+    f.path = prefix + f.name;
+    out.push(f);
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    for (;;) {
+      const batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+      if (!batch.length) break;
+      for (const e of batch) {
+        if (e.name.startsWith('.')) continue;
+        await entryToFiles(e, out, prefix + entry.name + '/');
+      }
+    }
+  }
+  return out;
+}
+
 function pickFile(accept, cb) {
   const i = Object.assign(document.createElement('input'), { type:'file', accept });
   i.onchange = () => i.files[0] && cb(i.files[0]);

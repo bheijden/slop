@@ -7,10 +7,12 @@
     "slop": "./js/cli.mjs"
   },
   "scripts": {
-    "test": "node tests/run.mjs",
+    "test": "node tests/run.mjs && node tests/web.mjs",
     "lint": "node js/cli.mjs check -r .",
     "build-rules": "node tools/build-rules.mjs",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python3 -m http.server 8000",
+    "test:rules": "node tests/run.mjs",
+    "test:web": "node tests/web.mjs"
   },
   "files": [
     "js/",

@@ -123,6 +123,7 @@ js/               engine.mjs  extract.mjs  config.mjs  fudge.mjs
 web/              index.html  worker.mjs      static, no server
 skill/            SKILL.md  reference/        the agent skill
 tests/            run.mjs                     conformance + fudging
+                  web.mjs                     headless smoke test for the page
 tools/            build-rules.mjs             regenerate rules/ from vendor/
 .slop/      rules/  rules.lock.json     installed sets, per project
 ```
