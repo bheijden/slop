@@ -268,6 +268,34 @@ function mdInline(mapper, line, base, depth) {
   if (last < line.length) mapper.copy(line.slice(last), base + last);
 }
 
+// A code span may open on one line and close on the next, because markdown
+// paragraphs soft-wrap. Processing line by line would miss the closing run and
+// mangle everything after it, so an unclosed run is carried to the next line.
+const TICKS = /`+/g;
+
+function unclosedRun(line) {
+  TICKS.lastIndex = 0;
+  const runs = [];
+  let m;
+  while ((m = TICKS.exec(line))) runs.push({ i: m.index, run: m[0] });
+  let k = 0;
+  while (k < runs.length) {
+    const open = runs[k];
+    let j = k + 1;
+    while (j < runs.length && runs[j].run.length !== open.run.length) j += 1;
+    if (j < runs.length) k = j + 1;
+    else return open;
+  }
+  return null;
+}
+
+function findClose(line, run) {
+  TICKS.lastIndex = 0;
+  let m;
+  while ((m = TICKS.exec(line))) if (m[0].length === run.length) return m.index;
+  return -1;
+}
+
 export function extractMarkdown(src, opts = {}) {
   const mapper = new Mapper(opts.wrap);
   const indentCode = opts.indentCode !== false;
@@ -294,6 +322,7 @@ export function extractMarkdown(src, opts = {}) {
   let recentList = 0;
   let open = false;       // a prose line is emitted and awaiting its separator
   let prevEndsBlock = true;
+  let pending = null;     // a code span opened on an earlier line
   const close = (off) => { if (open) { mapper.sub('\n', off); open = false; } };
 
   for (; i < lines.length; i++) {
@@ -306,9 +335,9 @@ export function extractMarkdown(src, opts = {}) {
       continue;
     }
     const f = line.match(FENCE);
-    if (f) { fence = f[2]; close(off); continue; }
+    if (f) { fence = f[2]; close(off); pending = null; continue; }
 
-    if (!line.trim()) { close(off); continue; }
+    if (!line.trim()) { close(off); pending = null; continue; }
 
     // Indented code: 4+ spaces, not a list continuation.
     if (indentCode && /^(?: {4,}|\t)/.test(line) && recentList === 0) { close(off); continue; }
@@ -337,9 +366,23 @@ export function extractMarkdown(src, opts = {}) {
     if (open) mapper.sub(startsBlock || prevEndsBlock ? '\n' : ' ', off);
 
     let body = line.slice(start);
+    let bodyOff = off + start;
     // Table cells become spaces so a row reads as one line of prose.
     if (isTable) body = body.replace(/\|/g, ' ');
-    mdInline(mapper, body, off + start, 0);
+
+    // Finish a code span opened on an earlier line, then open one that does not
+    // close on this line. Its contents are dropped either way.
+    if (pending) {
+      const at = findClose(body, pending.run);
+      if (at === -1) { if (open) mapper.sub(' ', off); continue; }
+      bodyOff += at + pending.run.length;
+      body = body.slice(at + pending.run.length);
+      pending = null;
+    }
+    const unclosed = unclosedRun(body);
+    if (unclosed) { pending = unclosed; body = body.slice(0, unclosed.i); }
+
+    mdInline(mapper, body, bodyOff, 0);
     open = true;
     prevEndsBlock = isHeading || isTable || /(?: {2,}|\\)$/.test(line);
   }

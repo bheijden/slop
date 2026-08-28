@@ -1,4 +1,29 @@
-# What fudging found
+# How a file is read
+
+
+
+Extraction turns a source file into prose plus a map back to source offsets, so
+a match found in stripped text still reports the line it came from in the
+original file. Three rules, all of them learned from failing fudge variants:
+
+1. **Inline markup is deleted, not blanked.** Blanking turns
+   `in<b>ter</b>nal` into three tokens and the rule stops matching.
+2. **Block boundaries emit a newline; inline whitespace does not.** HTML
+   collapses whitespace and markdown soft-wraps, so a source newline inside a
+   paragraph is a *space*. Treating it as a line break puts a false sentence
+   boundary at every hard-wrap column — which silently breaks every
+   sentence-based rule on any file wrapped at 80 characters.
+3. **Long unbroken lines are hard-wrapped.** The sentence detectors rescan from
+   every start position, so text with no terminator is O(n²): 8000 words on one
+   line takes 4.3 s, the same words split into lines take 31 ms. A 200 KB
+   single-paragraph file goes from 89 s to 1.3 s.
+
+Skipped entirely: `<script>`, `<style>`, `<pre>`, `<code>`, fenced and indented
+code blocks, front matter, link destinations and reference definitions.
+
+---
+
+## What fudging found
 
 The first run of `slop fudge` over the built-in rule sets failed 17 of
 3083 variants. All four causes were real bugs, not test artifacts.
