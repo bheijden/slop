@@ -37,6 +37,11 @@ function findChrome() {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
+  // WebSocket became a global in Node 22; the CDP connection needs it.
+  if (typeof WebSocket === 'undefined') {
+    console.log(`web smoke test: skipped (Node ${process.versions.node} has no global WebSocket; needs 22+)`);
+    return 0;
+  }
   const chrome = findChrome();
   if (!chrome) {
     console.log('web smoke test: skipped (no Chrome found; set CHROME=/path/to/chrome)');

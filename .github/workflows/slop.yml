@@ -16,8 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Node 22 for the global WebSocket the CDP connection uses. The tool
+      # itself runs on 18+; only this test needs 22.
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
+        with: { node-version: '22' }
       # ubuntu-latest ships Chrome; the test skips cleanly if it ever does not.
       - run: node tests/web.mjs
 
