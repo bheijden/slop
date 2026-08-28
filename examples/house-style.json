@@ -1,0 +1,28 @@
+{
+  "name": "house-style",
+  "title": "Our house style",
+  "description": "Team-specific prose rules.",
+  "rules": [
+    {
+      "id": "utilise",
+      "name": "\"utilise\" for \"use\"",
+      "kind": "regex",
+      "pattern": "\\butili[sz]e[sd]?\\b",
+      "flags": "gi",
+      "severity": "error",
+      "description": "\"Utilise\" is never better than \"use\".",
+      "suggest": "Write \"use\".",
+      "tests": { "hit": ["We utilise the cache for lookups."], "miss": ["The utility ran overnight."] }
+    },
+    {
+      "id": "chatgpt-refs",
+      "name": "ChatGPT citation debris",
+      "kind": "regex",
+      "pattern": "\\bfilecite\\S*|turn\\d+file\\d+",
+      "flags": "g",
+      "description": "Citation markers pasted straight out of ChatGPT.",
+      "suggest": "Delete the marker and cite the source properly.",
+      "tests": { "hit": ["See fileciteturn0file0 for the derivation."], "miss": ["The file cite was correct."] }
+    }
+  ]
+}

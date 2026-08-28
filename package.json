@@ -1,0 +1,15 @@
+{
+  "name": "slop",
+  "version": "0.1.0",
+  "description": "Prose linting with pluggable rule sets, for .md / .html / .txt",
+  "type": "module",
+  "bin": { "slop": "./js/cli.mjs" },
+  "scripts": {
+    "test": "node tests/run.mjs && python3 tests/test_rules.py",
+    "lint": "node js/cli.mjs check -r .",
+    "build-rules": "node tools/build-rules.mjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "files": ["js/", "rules/", "web/", "tests/"],
+  "license": "Apache-2.0"
+}

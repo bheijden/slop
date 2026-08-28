@@ -1,0 +1,580 @@
+{
+  "name": "llm-cliches",
+  "title": "LLM cliches",
+  "description": "Stock phrasings and rhythms that language models overproduce. Collected by Simon Willison for the LLM cliche highlighter.",
+  "source": "https://tools.simonwillison.net/llm-cliche-highlighter",
+  "rules": [
+    {
+      "id": "no-chain",
+      "name": "“No X, no Y” chains",
+      "severity": "warn",
+      "description": "Two or more “no …” items in a row, e.g. “No fluff, no filler, no jargon.” The badge counts the “no” items.",
+      "suggest": "Say what it does have. A denial chain lists absences instead of substance.",
+      "kind": "chain",
+      "pattern": "\\bno[-\\s][^,.;:!?\\n\\u2013\\u2014\\u2026]*(?:(?:\\s*,\\s*(?:and\\s+|or\\s+)?|\\s+(?:and|or)\\s+|\\s*[;&\\u2013\\u2014]\\s*(?:and\\s+|or\\s+)?|\\s+-{1,2}\\s+)no[-\\s][^,.;:!?\\n\\u2013\\u2014\\u2026]*)+",
+      "flags": "gi",
+      "headTest": "^no[-\\s]",
+      "itemLabel": "“no” item",
+      "tests": {
+        "hit": [
+          "No sign-ups, no downloads, no hassle — just paste and go.",
+          "The plan has no hidden fees and no long-term contracts.",
+          "No fluff, no filler, no jargon, no corporate buzzwords.",
+          "It ships with no bells and whistles, no fluff.",
+          "NO FEES, NO CONTRACTS, NO SURPRISES",
+          "no fluff; no filler",
+          "no time, no money, no way to say no thanks",
+          "no-code, no-fuss setup",
+          "No fluff, no filler.\nNo ads here."
+        ],
+        "miss": [
+          "There is no catch here, honestly.",
+          "No, no, I insist.",
+          "no no no",
+          "with no list patterns at all, so nothing lights up.",
+          "I know nothing, notice nothing."
+        ]
+      }
+    },
+    {
+      "id": "whole",
+      "name": "“That’s the whole …”",
+      "severity": "warn",
+      "description": "“That / this is the whole point, game, thing …”",
+      "suggest": "Name the thing directly instead of gesturing at its totality.",
+      "kind": "regex",
+      "pattern": "\\b(?:that|this)(?:['\\u2019]s|\\s+(?:is|was))\\s+the\\s+whole\\b(?:\\s+\\w+)?",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "That's the whole point.",
+          "This is the whole game, really.",
+          "That was the whole pitch."
+        ],
+        "miss": [
+          "The whole team showed up."
+        ]
+      }
+    },
+    {
+      "id": "did-not-chain",
+      "name": "“Did not X, did not Y” chains",
+      "severity": "warn",
+      "description": "Two or more “did not …” or “didn’t …” items in a row. The badge counts the items.",
+      "suggest": "Collapse the negations into one concrete statement of what happened.",
+      "kind": "chain",
+      "pattern": "\\b(?:did\\s+not|didn['\\u2019]t)\\s[^,.;:!?\\n\\u2013\\u2014\\u2026]*(?:(?:\\s*,\\s*(?:and\\s+|or\\s+)?|\\s+(?:and|or)\\s+|\\s*[;&\\u2013\\u2014]\\s*(?:and\\s+|or\\s+)?|\\s+-{1,2}\\s+)(?:did\\s+not|didn['\\u2019]t)\\s[^,.;:!?\\n\\u2013\\u2014\\u2026]*)+",
+      "flags": "gi",
+      "headTest": "^(?:did\\s+not|didn['\\u2019]t)\\s",
+      "itemLabel": "“did not” item",
+      "tests": {
+        "hit": [
+          "Did not flinch, did not blink, did not apologize.",
+          "He didn't call and didn't write.",
+          "Did not know why, did not care."
+        ],
+        "miss": [
+          "She did not go."
+        ]
+      }
+    },
+    {
+      "id": "dont-verb-it",
+      "name": "“Don’t VERB it … VERB it”",
+      "severity": "warn",
+      "description": "“Don’t call it X. Call it Y.” — a negated verb + “it”, then the same verb + “it” again.",
+      "suggest": "Drop the setup and keep the reframing, or cut both.",
+      "kind": "regex",
+      "pattern": "\\b(?:do\\s+not|don['\\u2019]t)\\s+(?:just\\s+|simply\\s+|merely\\s+)?(\\w+)(?:\\s+(?:of|about|at|on|for|with|to))?\\s+it\\b[^.!?\\n]*?[.!?;,:\\u2013\\u2014]['\"\\u201d\\u2019]*\\s*(?:just\\s+|simply\\s+|merely\\s+)?\\1(?:\\s+(?:of|about|at|on|for|with|to))?\\s+it\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Don't call it a comeback. Call it a return.",
+          "Do not think of it as a burden. Think of it as fuel.",
+          "Don’t call it \"luck.\" Call it preparation.",
+          "Don't just read it — read it aloud."
+        ],
+        "miss": [
+          "Don't fear it. Name it.",
+          "Don't overthink it."
+        ]
+      }
+    },
+    {
+      "id": "sit-with",
+      "name": "“Sit with that”",
+      "severity": "warn",
+      "description": "The reflective “sit with that / this / it (for a moment)”, plus “sit with the discomfort” and friends.",
+      "suggest": "Say what the reader should conclude, not that they should dwell.",
+      "kind": "regex",
+      "pattern": "\\bsit(?:s|ting)?\\s+with\\s+(?:that|this|it|(?:the|your)\\s+(?:discomfort|feelings?|tension|weight|uncertainty|ambiguity|grief|silence|unease))\\b(?:\\s+for\\s+a\\s+\\w+)?",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Sit with that for a moment.",
+          "Just sit with it.",
+          "She was sitting with the discomfort."
+        ],
+        "miss": [
+          "Come sit with us at lunch."
+        ]
+      }
+    },
+    {
+      "id": "already-know",
+      "name": "“You already know”",
+      "severity": "warn",
+      "description": "“You already know” — the answer, what to do, or standing alone before a full stop.",
+      "suggest": "Either state the answer or ask a real question. Do not flatter.",
+      "kind": "regex",
+      "pattern": "\\byou\\s+already\\s+knows?\\s+(?:the\\s+answer|what|how|why|this|that|it|who|where)\\b|\\byou\\s+already\\s+knows?\\b(?![ \\t]+\\w)",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "You already know the answer.",
+          "Deep down, you already know.",
+          "You already know what to do.",
+          "Part of you already knows it."
+        ],
+        "miss": [
+          "If you already know Python, skip ahead."
+        ]
+      }
+    },
+    {
+      "id": "is-the-entire",
+      "name": "“Is the entire …”",
+      "severity": "warn",
+      "description": "“X is the entire point / game / business model.”",
+      "suggest": "Replace the totalising claim with the specific mechanism.",
+      "kind": "regex",
+      "pattern": "(?:\\b(?:is|was|are|were)|['\\u2019]s)\\s+the\\s+entire\\b(?:\\s+\\w+)?",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Consistency is the entire game.",
+          "That's the entire business model."
+        ],
+        "miss": [
+          "He toured the entire factory."
+        ]
+      }
+    },
+    {
+      "id": "the-entire-is",
+      "name": "“The entire … is”",
+      "severity": "warn",
+      "description": "“The entire point / game / business model is …” — the flipped twin of “is the entire”.",
+      "suggest": "Replace the totalising claim with the specific mechanism.",
+      "kind": "regex",
+      "pattern": "\\bthe\\s+entire\\s+[\\w'\\u2019-]+(?:\\s+[\\w'\\u2019-]+){0,4}?\\s+(?:is|was|are|were)\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "The entire point is that nobody reads.",
+          "The entire business model is built on churn.",
+          "The entire point of the exercise is repetition.",
+          "The entire team was exhausted."
+        ],
+        "miss": [
+          "He ate the entire pizza.",
+          "The entire history of the modern industrial world economy is complex."
+        ]
+      }
+    },
+    {
+      "id": "is-real",
+      "name": "“Is real … and / not”",
+      "severity": "warn",
+      "description": "“The X is real, and / not …”, including “is the real … and it”. Skips “real estate”, “real time”, and similar.",
+      "suggest": "Cut \"is real\". Give the evidence that makes it real.",
+      "kind": "regex",
+      "pattern": "\\bis\\s+(?:(?:the|a)\\s+real\\b(?![\\s-]+(?:estate|time|life|world|quick)\\b)[^.!?\\n]*?\\b(?:and|not)\\s+it\\b|real\\b(?![\\s-]+(?:estate|time|life|world|quick)\\b)[^.!?\\n]*?\\b(?:and|not)\\b)",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "The improvement is real, and it's not subtle.",
+          "This is the real work, and it never ends.",
+          "The demand is real and growing."
+        ],
+        "miss": [
+          "He is a real estate agent and it shows.",
+          "Is it real? And does it matter?",
+          "The painting is real, but stolen."
+        ]
+      }
+    },
+    {
+      "id": "punchline",
+      "name": "“The punchline is”",
+      "severity": "warn",
+      "description": "“The punchline is …”, “the punchline:”, or “the punchline?”.",
+      "suggest": "Deliver the point without announcing that a point is coming.",
+      "kind": "regex",
+      "pattern": "\\bthe\\s+punchline(?:\\s+(?:is|was|being)\\b|\\s*[:?])",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "The punchline is that nobody laughed.",
+          "The punchline: nothing changed.",
+          "And the punchline? You knew."
+        ],
+        "miss": [
+          "He forgot the punchline entirely."
+        ]
+      }
+    },
+    {
+      "id": "worth-naming",
+      "name": "“Worth naming”",
+      "severity": "warn",
+      "description": "The therapist-voiced “that loss is real and it’s worth naming”, “it’s worth naming that …”, or a “Worth naming:” opener. Skips “naming names”.",
+      "suggest": "Name it, or cut it. Announcing that something deserves naming is not naming it.",
+      "kind": "regex",
+      "pattern": "(?:\\b(?:is|are|was|were|feels?|felt|seems?|seemed)|['\\u2019]s)\\s+(?:\\w+\\s+){0,2}?worth\\s+naming\\b(?!\\s+names\\b)|\\bworth\\s+naming\\s*:",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "That loss is real and it's worth naming.",
+          "It’s worth naming that this hurts.",
+          "The grief here is worth naming.",
+          "That anger feels worth naming out loud.",
+          "Worth naming: nobody asked for this."
+        ],
+        "miss": [
+          "It's not worth naming names here.",
+          "They spent the meeting naming the new mascot.",
+          "The naming convention is worth documenting."
+        ]
+      }
+    },
+    {
+      "id": "not-nothing",
+      "name": "“That’s not nothing”",
+      "severity": "warn",
+      "description": "“That is not nothing” / “that’s not nothing”, plus the “this / it / which is not nothing” variants.",
+      "suggest": "Quantify it. \"Not nothing\" concedes and asserts at once, saying neither.",
+      "kind": "regex",
+      "pattern": "\\b(?:that|this|it|which)(?:['\\u2019]s|\\s+(?:is|was))\\s+not\\s+nothing\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "That's not nothing.",
+          "Ten sign-ups in a week — that is not nothing.",
+          "It's not nothing, even if it's not everything.",
+          "The launch drew a small crowd, which was not nothing."
+        ],
+        "miss": [
+          "She insisted that nothing was wrong.",
+          "There is nothing left to say."
+        ]
+      }
+    },
+    {
+      "id": "is-the-whole",
+      "name": "“Is the whole …”",
+      "severity": "warn",
+      "description": "Any subject + “is the whole point / trick / pitch / idea”, plus the “here is the whole …” opener. The twin of “is the entire …”, and a generalisation of “That’s the whole …” to subjects other than that/this.",
+      "suggest": "Name the thing directly instead of gesturing at its totality.",
+      "kind": "regex",
+      "pattern": "(?:\\b(?:is|was|are|were)|['’]s)\\s+the\\s+whole\\b(?:\\s+\\w+)?|\\bhere(?:['’]s|\\s+is)\\s+the\\s+whole\\b(?:\\s+\\w+)?",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Distribution is the whole game.",
+          "Here's the whole pitch in one slide.",
+          "That was the whole point of the meeting."
+        ],
+        "miss": [
+          "The whole team showed up."
+        ]
+      }
+    },
+    {
+      "id": "echo-triad",
+      "name": "Echoing sentence runs",
+      "severity": "warn",
+      "description": "Consecutive sentences built on the same repeated skeleton — “A shopping cart is an object in the system. A chat room is an object in the system.” The badge counts the echoing sentences.",
+      "suggest": "Merge the parallel sentences into one, or vary the structure.",
+      "kind": "echo",
+      "params": {
+        "minGram": 4,
+        "minRun": 2
+      },
+      "tests": {
+        "hit": [
+          "A shopping cart is an object in the system. A chat room is an object in the system.",
+          "The parser is a state machine. The renderer is a state machine. The scheduler is a state machine."
+        ],
+        "miss": [
+          "The parser is fast today. The renderer is fast today.",
+          "The parser is fast. The tests are slow."
+        ]
+      }
+    },
+    {
+      "id": "performative-honesty",
+      "name": "Performative honesty",
+      "severity": "warn",
+      "description": "Sincerity announced rather than demonstrated: “I won’t pretend”, “I’ll be honest”, “let’s be honest”, “to be clear”, and sentence-initial “Honestly,” or “Look,”.",
+      "suggest": "Delete the preamble. Honest writing does not announce itself.",
+      "kind": "regex",
+      "pattern": "\\bI\\s+(?:will\\s+not|won['’]t)\\s+pretend\\b|\\b(?:I['’]ll|let['’]s|to)\\s+be\\s+(?:honest|clear|blunt|real)\\b|(?:^|[.!?–—]\\s+|\\n)(?:Honestly|Look|Truthfully|Frankly)\\s*,",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "I won't pretend the migration was painless.",
+          "Let's be honest: nobody reads the docs.",
+          "To be clear, the API is unchanged.",
+          "Honestly, it was fine."
+        ],
+        "miss": [
+          "She answered honestly.",
+          "Look at the diagram."
+        ]
+      }
+    },
+    {
+      "id": "thats-the-part",
+      "name": "“That’s the part …”",
+      "severity": "warn",
+      "description": "Gesturing at a favoured detail instead of stating it: “that is the part a counter can’t reach”, “the part that makes me trust the rest”, “my favourite part of …”.",
+      "suggest": "State the detail instead of pointing at it.",
+      "kind": "regex",
+      "pattern": "\\b(?:that|this|it)(?:['’]s|\\s+(?:is|was))\\s+the\\s+part\\b|\\bthe\\s+part\\s+that\\s+(?:makes|made|gets|got|keeps|kept)\\s+(?:me|you|us|it)\\b|\\bmy\\s+favou?rite\\s+part\\s+of\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "That's the part a counter can't reach.",
+          "The part that makes me trust the rest is the errata.",
+          "My favorite part of the demo was the undo."
+        ],
+        "miss": [
+          "He played the part of the villain."
+        ]
+      }
+    },
+    {
+      "id": "the-only-i-trust",
+      "name": "“The only X I trust”",
+      "severity": "warn",
+      "description": "The narrowing superlative reveal: “the only marketing I trust”, “the only thing it needs”, “the only X that matters”.",
+      "suggest": "Drop the superlative framing and give the actual reason.",
+      "kind": "regex",
+      "pattern": "\\bthe\\s+only\\s+[\\w'’-]+(?:\\s+[\\w'’-]+){0,2}?\\s+(?:I|you|we|it|he|she|they)\\s+(?:trust|need|needs|care|want|wants|use|uses|believe)\\b|\\bthe\\s+only\\s+[\\w'’-]+\\s+that\\s+(?:matters|counts|works|survives)\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "It’s the only marketing I trust.",
+          "The only benchmark that matters is retention.",
+          "The only thing it needs is a cache."
+        ],
+        "miss": [
+          "She was the only engineer on call."
+        ]
+      }
+    },
+    {
+      "id": "take-my-word",
+      "name": "“Don’t take my word for it”",
+      "severity": "warn",
+      "description": "The stock invitation to verify: “you don’t have to take my word for it”, “don’t take my word for any of this”.",
+      "suggest": "Just link the evidence.",
+      "kind": "regex",
+      "pattern": "\\b(?:you\\s+)?(?:do\\s+not|don['’]t)\\s+(?:have\\s+to\\s+)?take\\s+my\\s+word\\s+for\\s+(?:it|any\\s+of\\s+(?:it|this|that))\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "You don't have to take my word for it.",
+          "Don't take my word for any of this."
+        ],
+        "miss": [
+          "He kept his word."
+        ]
+      }
+    },
+    {
+      "id": "turns-out",
+      "name": "“Turns out …”",
+      "severity": "warn",
+      "description": "The casual-revelation opener, almost always bolted to a tidy conclusion: “Turns out X”, “it turns out that X”.",
+      "suggest": "State the finding without the casual-reveal framing.",
+      "kind": "regex",
+      "pattern": "(?:^|[.!?–—]\\s+|\\n)Turns\\s+out\\b|\\bit\\s+turns\\s+out\\s+that\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Turns out the cache was never warm.",
+          "It turns out that nobody tested it."
+        ],
+        "miss": [
+          "She turns out solid work every week."
+        ]
+      }
+    },
+    {
+      "id": "fits-in-your-head",
+      "name": "“Fits in your head”",
+      "severity": "warn",
+      "description": "Dev-blog boilerplate for simplicity: “small enough to hold in your head”, “batteries included”, “it just works”, “zero config”, “sane defaults”.",
+      "suggest": "Give the concrete measure - lines of code, number of concepts, setup steps.",
+      "kind": "regex",
+      "pattern": "\\b(?:hold|fit|fits|holds|held)\\s+(?:it\\s+)?in\\s+your\\s+head\\b|\\bbatteries[-\\s]included\\b|\\bit\\s+just\\s+works\\b|\\bzero[-\\s]config(?:uration)?\\b|\\bsane\\s+defaults\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "The design is small enough to hold in your head.",
+          "It ships with sane defaults and zero config.",
+          "Install it and it just works."
+        ],
+        "miss": [
+          "We choose boring technology on purpose.",
+          "The helmet fits your head."
+        ]
+      }
+    },
+    {
+      "id": "stacked-questions",
+      "name": "Stacked rhetorical questions",
+      "severity": "warn",
+      "description": "Two or more questions fired in a row, usually fragments after the first: “Do I know how it works? Where it breaks? Which corners it cut?” The badge counts the questions.",
+      "suggest": "Keep one question, or convert them to statements.",
+      "kind": "question-chain",
+      "params": {
+        "minRun": 2
+      },
+      "tests": {
+        "hit": [
+          "Do I know how it works? Where it breaks? Which corners it cut?",
+          "Was it worth it? Would I do it again?"
+        ],
+        "miss": [
+          "Did it work? Yes, and then some.",
+          "What changed?"
+        ]
+      }
+    },
+    {
+      "id": "sentence-anaphora",
+      "name": "Repeated sentence openers",
+      "severity": "warn",
+      "description": "Three or more consecutive sentences starting on the same word — “Maybe nobody needed it. Maybe it introduced … Maybe a small convenience …” Pronouns and articles are ignored. The badge counts the sentences.",
+      "suggest": "Vary the sentence openings or combine into one sentence.",
+      "kind": "anaphora",
+      "params": {
+        "minRun": 3
+      },
+      "tests": {
+        "hit": [
+          "Maybe nobody needed it. Maybe the timing was off. Maybe both.",
+          "Everything changed. Everything slowed down. Everything cost more."
+        ],
+        "miss": [
+          "Maybe nobody needed it. Maybe the timing was off.",
+          "The parser is small. The renderer is small. The scheduler is small."
+        ]
+      }
+    },
+    {
+      "id": "colon-triple",
+      "name": "Colon into a triple",
+      "severity": "warn",
+      "description": "A colon opening onto three or more comma-separated items: “separate ports, processes, and local state”. The most common shape LLM prose uses to sound concrete. Noisy in technical writing — leave it off by default if your corpus is documentation.",
+      "suggest": "Fine in a real list. Suspect when it is prose padding out to three items.",
+      "kind": "regex",
+      "pattern": ":\\s+[^.!?;:\\n]{2,40},\\s+[^.!?;:\\n]{2,40},\\s+(?:and\\s+|or\\s+)?[^.!?;:\\n]{2,40}(?=[.!?\\n])",
+      "flags": "g",
+      "tests": {
+        "hit": [
+          "The fix needs three things: separate ports, separate processes, and separate state.",
+          "Each service gets its own everything: ports, processes, local state."
+        ],
+        "miss": [
+          "The recipe calls for flour, butter, and sugar.",
+          "Note: the flag is off by default."
+        ]
+      },
+      "default": "off"
+    },
+    {
+      "id": "heres-the-twist",
+      "name": "“Here’s the twist”",
+      "severity": "warn",
+      "description": "The stage-managed reveal: “here’s the twist”, “here’s the thing”, “here’s the catch / kicker / rub”, “here’s the first example:”.",
+      "suggest": "Cut the stage direction and give the content.",
+      "kind": "regex",
+      "pattern": "\\bhere(?:['’]s|\\s+is)\\s+(?:the|a|my|one)\\s+(?:twist|thing|catch|kicker|rub|problem|first|second|third|next|recent|real|best|worst|surprising|interesting|key|important)\\b[\\w\\s-]{0,20}[:.]",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Here's the twist: nobody clicked it.",
+          "Here is the thing. The demo was fake.",
+          "Here's a surprising result: it got faster."
+        ],
+        "miss": [
+          "Here's the door code."
+        ]
+      }
+    },
+    {
+      "id": "x-is-dead",
+      "name": "“X is dead”",
+      "severity": "warn",
+      "description": "The obituary headline and its sequel: “peer code review is dead”, “botd is dead; long live botd”.",
+      "suggest": "Say what changed and for whom, instead of the obituary headline.",
+      "kind": "regex",
+      "pattern": "\\b[\\w\\s]{3,30}\\s+(?:is|are)\\s+dead\\b|\\blong\\s+live\\s+\\w+",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "Peer code review is dead.",
+          "The old importer is dead; long live the importer.",
+          "Long live the king."
+        ],
+        "miss": [
+          "He played dead until the bear left."
+        ]
+      }
+    },
+    {
+      "id": "thats-why-mattered",
+      "name": "“That’s why X mattered”",
+      "severity": "warn",
+      "description": "Retroactively assigning significance: “that’s why being able to open the environment mattered”, “this is why preserving every conversation mattered”.",
+      "suggest": "State the consequence directly rather than asserting significance.",
+      "kind": "regex",
+      "pattern": "\\b(?:that|this)(?:['’]s|\\s+(?:is|was))\\s+why\\b[^.!?\\n]{0,80}?\\b(?:matter(?:s|ed)?|count(?:s|ed)?)\\b",
+      "flags": "gi",
+      "tests": {
+        "hit": [
+          "That's why being able to open the environment mattered.",
+          "This is why preserving every conversation mattered.",
+          "That's why the deadline counts."
+        ],
+        "miss": [
+          "That is why we left early."
+        ]
+      }
+    },
+    {
+      "id": "stranded-auxiliary",
+      "name": "Stranded auxiliary contrast",
+      "severity": "warn",
+      "description": "A clause that lands on a bare auxiliary for the reversal: “The tool died; the data didn’t.”, “Reading mostly passed … Writing didn’t”, “Maybe it wouldn’t have.”",
+      "suggest": "Complete the clause. The bare auxiliary is a rhythm trick, not information.",
+      "kind": "regex",
+      "pattern": "[;:,]\\s+[^.;:!?\\n]{2,50}\\s(?:did|does|do|was|were|is|are|has|have|had|can|could|would|will)(?:n['’]t)?\\s*[.;]|\\b(?:Maybe|Perhaps)\\s+\\w+[^.!?\\n]{0,40}\\s(?:would|could|might|should|did|had|was|is)(?:n['’]t)?\\s+(?:have\\s*)?\\.",
+      "flags": "g",
+      "tests": {
+        "hit": [
+          "The tool died; the data didn't.",
+          "Reading mostly passed, writing didn't.",
+          "Maybe it wouldn't have."
+        ],
+        "miss": [
+          "The test passed and the build was green."
+        ]
+      }
+    }
+  ]
+}

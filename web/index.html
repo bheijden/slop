@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slop</title>
+<style>
+:root {
+  --bg: #fbfaf8; --panel: #fff; --ink: #1d1b17; --muted: #6e6a62;
+  --line: #e4e0d8; --accent: #7c5cff; --mark: #fcd34d; --mark-ink: #3a2f00;
+  --code: #f4f2ee; --ok: #2f7d32; --warn: #b4530a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16161a; --panel: #1d1d22; --ink: #e9e7e2; --muted: #9a958c;
+    --line: #32323a; --accent: #a68bff; --mark: #8a6d00; --mark-ink: #ffeaa0;
+    --code: #24242b; --ok: #6fbf73; --warn: #e08a4a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.55;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+header { border-bottom: 1px solid var(--line); padding: 22px 20px; }
+header .wrap, main { max-width: 1180px; margin: 0 auto; }
+h1 { margin: 0 0 4px; font-size: 21px; letter-spacing: -.01em; }
+h1 span { color: var(--accent); }
+.sub { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+main { padding: 20px; display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.card + .card { margin-top: 14px; }
+h2 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+label.rule { display: flex; gap: 8px; align-items: baseline; font-size: 13px; padding: 2px 0; cursor: pointer; }
+label.rule input { margin: 0; flex: none; }
+label.rule .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+label.rule.hit .n { color: var(--warn); font-weight: 600; }
+.setname { font-weight: 600; font-size: 13px; margin: 12px 0 4px; display: flex; gap: 8px; align-items: center; }
+.setname:first-of-type { margin-top: 0; }
+.setname button { font-size: 11px; margin-left: auto; }
+button, .btn {
+  font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+textarea {
+  width: 100%; min-height: 190px; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 11px; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--code); color: var(--ink); resize: vertical;
+}
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.row .grow { flex: 1; }
+select, input[type=text] { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.drop { border: 2px dashed var(--line); border-radius: 10px; padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
+.drop.over { border-color: var(--accent); color: var(--accent); }
+pre.view {
+  margin: 0; padding: 13px; border-radius: 8px; background: var(--code);
+  font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap; word-break: break-word; max-height: 460px; overflow: auto;
+}
+mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; cursor: pointer; }
+mark.on { outline: 2px solid var(--accent); }
+.finding { border-top: 1px solid var(--line); padding: 9px 0; font-size: 13px; }
+.finding:first-child { border-top: 0; }
+.finding .loc { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
+.finding .rid { color: var(--accent); font-weight: 600; }
+.finding .m { font: 13px ui-monospace, Menlo, monospace; }
+.finding .fix { color: var(--muted); font-size: 12.5px; }
+.stat { font-size: 13px; color: var(--muted); }
+.stat b { color: var(--ink); }
+.tabs { display: flex; gap: 4px; margin-bottom: 9px; }
+.tabs button[aria-selected=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+details.help { margin-top: 14px; }
+details.help summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+details.help pre { background: var(--code); padding: 11px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; }
+.err { color: #c0392b; font-size: 13px; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>prose<span>check</span></h1>
+  <p class="sub">Paste or drop a <code>.md</code>, <code>.html</code> or <code>.txt</code> file. Markup is stripped, the selected rule sets run over the prose, and every hit is mapped back to the line it came from. Nothing leaves your browser.</p>
+</div></header>
+
+<main>
+  <div>
+    <div class="card">
+      <h2>Rule sets</h2>
+      <div id="rules"></div>
+    </div>
+    <div class="card">
+      <h2>Your rules</h2>
+      <p class="stat" style="margin:0 0 8px">Load a rule set JSON. Same format as the built-ins.</p>
+      <input type="file" id="rulefile" accept=".json" style="font-size:12px;width:100%">
+      <div id="ruleerr" class="err"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Input</h2>
+      <div class="drop" id="drop">drop a file here, or paste below</div>
+      <div class="row">
+        <select id="kind">
+          <option value="md">markdown</option>
+          <option value="html">html</option>
+          <option value="txt">plain text</option>
+        </select>
+        <span class="stat" id="fname"></span>
+        <span class="grow"></span>
+        <button id="sample">load example</button>
+      </div>
+      <div class="row"><textarea id="input" placeholder="Paste prose, markdown or HTML…" spellcheck="false"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button id="tab-src" aria-selected="true">source</button>
+        <button id="tab-prose" aria-selected="false">extracted prose</button>
+        <span class="grow"></span>
+        <span class="stat" id="stat"></span>
+      </div>
+      <pre class="view" id="view"></pre>
+    </div>
+
+    <div class="card">
+      <h2>Findings</h2>
+      <div id="findings" class="stat">Nothing yet.</div>
+    </div>
+
+    <details class="help" open>
+      <summary>Using this from a terminal or a coding agent</summary>
+      <p class="stat">The page and the CLI run the same rule files, so a finding here is a finding there.</p>
+<pre># lint files, directories and URLs
+slop README.md docs/ -r
+slop https://example.com/post
+
+# machine-readable, for an agent to act on
+slop --format json docs/ -r
+
+# each finding carries what broke and how to fix it:
+# { "file": "docs/intro.md", "line": 42, "col": 7,
+#   "rule": "note-that", "set": "wikipedia-ai", "severity": "warn",
+#   "match": "It is important to note that",
+#   "sentence": "It is important to note that timing matters.",
+#   "why":    "Didactic hedging ...",
+#   "suggest":"Delete the hedge and state the fact." }
+
+# pick rule sets, drop noisy rules, add your own
+slop --select wikipedia-ai --ignore promo docs/ -r
+slop --rules rules/house-style.json --select house-style docs/ -r
+
+# check a rule set you are writing (conformance + markup fudging)
+slop test-rules rules/house-style.json</pre>
+    </details>
+  </div>
+</main>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const state = { sets: [], active: new Set(), findings: [], text: '', tab: 'src', sel: -1 };
+
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+async function loadSets() {
+  const manifest = await (await fetch('../rules/index.json')).json();
+  for (const f of manifest.sets) {
+    const set = await (await fetch('../rules/' + f)).json();
+    state.sets.push(set);
+    for (const r of set.rules) if (r.default !== 'off') state.active.add(r.id);
+  }
+  renderRules();
+}
+
+function renderRules() {
+  const counts = {};
+  for (const f of state.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
+  const el = $('rules');
+  el.innerHTML = '';
+  for (const set of state.sets) {
+    const h = document.createElement('div');
+    h.className = 'setname';
+    h.innerHTML = `<span>${esc(set.title || set.name)}</span>`;
+    const b = document.createElement('button');
+    const allOn = set.rules.every((r) => state.active.has(r.id));
+    b.textContent = allOn ? 'none' : 'all';
+    b.onclick = () => {
+      for (const r of set.rules) allOn ? state.active.delete(r.id) : state.active.add(r.id);
+      run();
+    };
+    h.appendChild(b);
+    el.appendChild(h);
+    for (const r of set.rules) {
+      const l = document.createElement('label');
+      l.className = 'rule' + (counts[r.id] ? ' hit' : '');
+      l.title = r.description;
+      const c = document.createElement('input');
+      c.type = 'checkbox';
+      c.checked = state.active.has(r.id);
+      c.onchange = () => { c.checked ? state.active.add(r.id) : state.active.delete(r.id); run(); };
+      l.appendChild(c);
+      l.appendChild(Object.assign(document.createElement('span'), { textContent: r.id }));
+      l.appendChild(Object.assign(document.createElement('span'), { className: 'n', textContent: counts[r.id] || '' }));
+      el.appendChild(l);
+    }
+  }
+}
+
+// Rules run in a worker so a runaway pattern can be killed instead of freezing
+// the tab. Two seconds is far more than any sane rule needs.
+let worker = null;
+let timer = null;
+function analyze(src, kind) {
+  return new Promise((resolve) => {
+    if (worker) worker.terminate();
+    worker = new Worker('./worker.mjs', { type: 'module' });
+    timer = setTimeout(() => {
+      worker.terminate();
+      worker = null;
+      resolve({ ok: false, error: 'timed out after 2s — a rule is probably backtracking' });
+    }, 2000);
+    worker.onmessage = (e) => { clearTimeout(timer); resolve(e.data); };
+    worker.onerror = (e) => { clearTimeout(timer); resolve({ ok: false, error: e.message }); };
+    worker.postMessage({ src, kind, sets: state.sets, active: [...state.active] });
+  });
+}
+
+function marks(source, ranges) {
+  const sorted = ranges.slice().sort((a, b) => a[0] - b[0]);
+  const merged = [];
+  for (const [s, e, i] of sorted) {
+    if (merged.length && s < merged[merged.length - 1][1]) continue;
+    merged.push([s, e, i]);
+  }
+  let out = '';
+  let last = 0;
+  for (const [s, e, i] of merged) {
+    out += esc(source.slice(last, s));
+    out += `<mark data-i="${i}"${i === state.sel ? ' class="on"' : ''}>${esc(source.slice(s, e))}</mark>`;
+    last = e;
+  }
+  return out + esc(source.slice(last));
+}
+
+function render() {
+  const src = $('input').value;
+  const useSrc = state.tab === 'src';
+  const body = useSrc ? src : state.text;
+  const ranges = state.findings.map((f, i) => useSrc ? [f.srcStart, f.srcEnd, i] : [f.start, f.end, i]);
+  $('view').innerHTML = body ? marks(body, ranges) : '<span class="stat">Nothing to show.</span>';
+  for (const m of $('view').querySelectorAll('mark')) {
+    m.onclick = () => { state.sel = +m.dataset.i; render(); renderFindings(); };
+  }
+  $('tab-src').setAttribute('aria-selected', String(useSrc));
+  $('tab-prose').setAttribute('aria-selected', String(!useSrc));
+}
+
+function renderFindings() {
+  const el = $('findings');
+  if (!state.findings.length) { el.className = 'stat'; el.textContent = 'No findings.'; return; }
+  el.className = '';
+  el.innerHTML = '';
+  state.findings.forEach((f, i) => {
+    const d = document.createElement('div');
+    d.className = 'finding';
+    if (i === state.sel) d.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
+    d.innerHTML = `<div><span class="loc">${f.line}:${f.col}</span> <span class="rid">${esc(f.rule)}</span>`
+      + (f.count ? ` <span class="loc">×${f.count}</span>` : '')
+      + `</div><div class="m">${esc(f.match)}</div>`
+      + (f.suggest ? `<div class="fix">fix: ${esc(f.suggest)}</div>` : '');
+    d.onclick = () => { state.sel = i; render(); renderFindings(); };
+    el.appendChild(d);
+  });
+}
+
+let debounce = null;
+function run() {
+  clearTimeout(debounce);
+  debounce = setTimeout(async () => {
+    const src = $('input').value;
+    const kind = $('kind').value;
+    const res = await analyze(src, kind);
+    if (!res.ok) {
+      $('stat').innerHTML = `<span class="err">${esc(res.error)}</span>`;
+      return;
+    }
+    state.findings = res.findings;
+    state.text = res.text;
+    state.sel = -1;
+    const per = res.words ? (res.findings.length / res.words * 1000).toFixed(1) : '0.0';
+    $('stat').innerHTML = `<b>${res.findings.length}</b> findings · ${res.words} words · ${per} per 1000`;
+    render(); renderFindings(); renderRules();
+  }, 160);
+}
+
+$('input').addEventListener('input', run);
+$('kind').addEventListener('change', run);
+$('tab-src').onclick = () => { state.tab = 'src'; render(); };
+$('tab-prose').onclick = () => { state.tab = 'prose'; render(); };
+
+const drop = $('drop');
+for (const ev of ['dragenter', 'dragover']) drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); });
+for (const ev of ['dragleave', 'drop']) drop.addEventListener(ev, () => drop.classList.remove('over'));
+drop.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  $('input').value = await file.text();
+  $('kind').value = /\.html?$/i.test(file.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(file.name) ? 'md' : 'txt';
+  $('fname').textContent = file.name;
+  run();
+});
+
+$('rulefile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const set = JSON.parse(await file.text());
+    if (!Array.isArray(set.rules)) throw new Error('no "rules" array');
+    state.sets = state.sets.filter((s) => s.name !== set.name);
+    state.sets.push(set);
+    for (const r of set.rules) if (r.default !== 'off') state.active.add(r.id);
+    $('ruleerr').textContent = '';
+    renderRules(); run();
+  } catch (err) { $('ruleerr').textContent = err.message; }
+});
+
+$('sample').onclick = async () => {
+  $('kind').value = 'md';
+  $('input').value = `# Release notes
+
+It is important to note that the rollout happened in stages. No sign-ups, no
+downloads, no hassle. Community feedback plays a pivotal role in every release,
+underscoring the value of an ever-evolving landscape.
+
+The parser is a tiny state machine. The renderer is a tiny state machine.
+
+That's the whole point, and you already know the answer.`;
+  $('fname').textContent = 'example.md';
+  run();
+};
+
+await loadSets();
+run();
+</script>
+</body>
+</html>
