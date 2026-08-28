@@ -204,6 +204,48 @@ and hardware lists rather than prose. Tightening the rule beat disabling it — 
 hits, all genuine, with full recall on the examples. See
 [docs/calibration.md](docs/calibration.md) for the method.
 
+### Installing rule sets
+
+`add` downloads a rule set into `.slop/rules/` beside your
+`slop.json`. It is checked and tested on the way in, then active
+immediately without a flag or a config edit.
+
+```sh
+slop add https://example.com/house-style.json
+slop add https://example.com/rules/index.json    # a manifest: several sets at once
+slop add ./local-set.json
+
+slop sets            # what is installed, active and passing
+slop remove broken-demo
+```
+
+```
+SET                    RULES  ACTIVE  TESTS       SOURCE
+llm-cliches               27  all     pass        built-in
+wikipedia-ai              11  all     pass        built-in
+house-style                2  all     pass        https://example.com/house-style.json
+draft-voice                5  off     3 failing   https://example.com/draft-voice.json
+
+library: .slop/rules/
+```
+
+A URL can hold one set, an array of sets, or a `{"sets": [...]}` manifest
+listing files beside it — the shape this repo's own `rules/index.json` uses, so
+`slop add <that url>` works.
+
+Turn one off with `--ignore <name>`, or in `slop.json`:
+
+```json
+{ "ignore": ["draft-voice"] }
+```
+
+An installed set **shadows** a built-in of the same name, so you can pin or
+customise the rules that ship here by installing your own `llm-cliches`.
+
+Commit `.slop/rules/` and everyone on the project gets the same rules.
+`slop fudge` tests the built-ins, everything installed, and anything in
+`ruleSets` — your rules get exactly the checks ours do.
+
 ### Writing your own
 
 A rule set is a JSON file. Copy [`examples/house-style.json`](examples/house-style.json):
@@ -386,6 +428,7 @@ web/              index.html   the web page
 skill/            SKILL.md     the agent skill
                   reference/   rule catalogue (generated) + authoring guide
 tests/            run.mjs      conformance + fudging
+.slop/      rules/       sets installed with `slop add` (per project)
 tools/            build-rules.mjs   regenerate rules/ from vendor/
 examples/         a rule set to copy
 ```

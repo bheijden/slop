@@ -14,7 +14,11 @@ import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { analyze, sentenceBounds, countWords } from './engine.mjs';
-import { resolveRules, findConfig, loadConfig, mergeConfig, fetchSetUrl } from './config.mjs';
+import { resolveRules, findConfig, loadConfig, mergeConfig, fetchSetUrl,
+         libraryDir, loadLibrarySets, loadSetFile } from './config.mjs';
+import { compileRuleSet } from './engine.mjs';
+import { BUILTIN_DIR as BUILTIN } from './config.mjs';
+import { testRules } from './fudge.mjs';
 import { extractorFor, extractHtml, extractMarkdown, toSource } from './extract.mjs';
 
 process.stdout.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); throw e; });
@@ -27,6 +31,11 @@ const HELP = `slop - prose linting with pluggable rule sets
   slop [check] <file|dir|url> ...
   slop list | explain <rule>
   slop test-rules [set.json]   (alias: fudge) - check a rule set
+
+Rule library
+  slop sets                    what is installed, active, and passing
+  slop add <url>               download a rule set into .slop/rules/
+  slop remove <name>           delete an installed set
   cat draft.md | slop -
 
 Rule selection (a name works for a whole set or a single rule id)
@@ -66,7 +75,7 @@ function parseArgs(argv) {
               indentCode: true, skipTables: false, config: undefined, noConfig: false,
               share: false, shareBase: 'https://bheijden.github.io/slop/', help: false };
   const ids = (v) => v.split(/[,\s]+/).filter(Boolean);
-  if (['list', 'explain', 'test-rules', 'fudge', 'check'].includes(argv[0])) o.cmd = argv.shift();
+  if (['list', 'explain', 'test-rules', 'fudge', 'check', 'add', 'remove', 'sets'].includes(argv[0])) o.cmd = argv.shift();
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => { if (i + 1 >= argv.length) throw new Error(`${a} needs a value`); return argv[++i]; };
@@ -99,7 +108,7 @@ function parseArgs(argv) {
     }
   }
   // The subcommand may also follow flags: `slop --config x list`.
-  if (o.cmd === 'check' && ['list', 'explain', 'test-rules', 'fudge'].includes(o.args[0])) o.cmd = o.args.shift();
+  if (o.cmd === 'check' && ['list', 'explain', 'test-rules', 'fudge', 'add', 'remove', 'sets'].includes(o.args[0])) o.cmd = o.args.shift();
   if (!['human', 'json', 'github', 'tsv'].includes(o.format)) throw new Error(`unknown --format ${o.format}`);
   return o;
 }
@@ -109,6 +118,9 @@ const C = process.stdout.isTTY && !process.env.NO_COLOR
       yellow: (s) => `\x1b[33m${s}\x1b[0m`, cyan: (s) => `\x1b[36m${s}\x1b[0m`,
       red: (s) => `\x1b[31m${s}\x1b[0m`, green: (s) => `\x1b[32m${s}\x1b[0m` }
   : new Proxy({}, { get: () => (s) => s });
+
+// Pad to a visible width, ignoring the ANSI colour codes in the string.
+const pad = (s, n) => s + ' '.repeat(Math.max(1, n - s.replace(/\x1b\[[0-9;]*m/g, '').length));
 
 const oneLine = (s, n = 100) => {
   const c = s.replace(/\s+/g, ' ').trim();
@@ -137,6 +149,32 @@ async function readSource(target) {
     return { name: target, src: await res.text(), kind: /html/i.test(ct) ? 'html' : /markdown/i.test(ct) ? 'md' : 'html' };
   }
   return { name: target, src: fs.readFileSync(target, 'utf8'), kind: null };
+}
+
+// A URL may hold one set, an array of sets, or a manifest listing set files
+// beside it — the same shape this repo's own rules/index.json uses.
+async function fetchSets(src) {
+  const read = async (u) => {
+    if (!/^https?:\/\//i.test(u)) return JSON.parse(fs.readFileSync(u, 'utf8'));
+    const res = await fetch(u, { headers: { accept: 'application/json' }, redirect: 'follow' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
+  const base = (u, f) => /^https?:\/\//i.test(u) ? new URL(f, u).href : path.join(path.dirname(u), f);
+  const stem = (u) => decodeURIComponent(u.split(/[?#]/)[0].split('/').pop() || '').replace(/\.json$/, '');
+
+  const json = await read(src);
+  if (Array.isArray(json)) return json.map((j, i) => ({ name: j.name || `${stem(src)}-${i + 1}`, json: j }));
+  if (Array.isArray(json.sets)) {
+    const out = [];
+    for (const f of json.sets) {
+      const u = base(src, f);
+      out.push({ name: stem(u), json: await read(u) });
+    }
+    return out;
+  }
+  if (Array.isArray(json.rules)) return [{ name: json.name || stem(src), json }];
+  throw new Error('not a rule set: expected "rules", an array of sets, or a "sets" manifest');
 }
 
 function lineIndex(src) {
@@ -208,6 +246,69 @@ async function main() {
     const t = r.tests || {};
     if (t.hit?.length) { process.stdout.write(`\n  ${C.yellow('flags:')}\n`); t.hit.forEach((x) => process.stdout.write(`    ${x}\n`)); }
     if (t.miss?.length) { process.stdout.write(`\n  ${C.green('allows:')}\n`); t.miss.forEach((x) => process.stdout.write(`    ${x}\n`)); }
+    return 0;
+  }
+
+  // ---- rule library ------------------------------------------------------
+  if (o.cmd === 'add') {
+    if (!o.args.length) { process.stderr.write('slop: add needs a URL or a path\n'); return 2; }
+    const dir = libraryDir();
+    fs.mkdirSync(dir, { recursive: true });
+    let added = 0;
+    for (const src of o.args) {
+      let fetched;
+      try { fetched = await fetchSets(src); }
+      catch (e) { process.stderr.write(`slop: ${src}: ${e.message}\n`); return 2; }
+      for (const { name, json } of fetched) {
+        let compiled;
+        try { compiled = compileRuleSet(json, name); }
+        catch (e) { process.stderr.write(`slop: ${src}: ${e.message}\n`); return 2; }
+        // A set that fails its own tests is still installed, but you are told.
+        const t = testRules(compiled.rules, { md: extractMarkdown, html: extractHtml });
+        const bad = t.conform.fail + t.fudge.fail;
+        json.source = /^https?:\/\//i.test(src) ? src : path.resolve(src);
+        const file = path.join(dir, compiled.name + '.json');
+        fs.writeFileSync(file, JSON.stringify(json, null, 2) + '\n');
+        added++;
+        const shadowed = fs.existsSync(path.join(BUILTIN, compiled.name + '.json'));
+        process.stdout.write(`${C.green('added')} ${C.bold(compiled.name)}${shadowed ? C.dim(' (shadows the built-in set)') : ''} `
+          + `${C.dim(`${compiled.rules.length} rules → ${path.relative(process.cwd(), file)}`)}`
+          + (bad ? `  ${C.red(bad + ' failing')}` : `  ${C.dim('tests ok')}`) + '\n');
+      }
+    }
+    if (added) process.stdout.write(C.dim('active now; turn one off with --ignore <name> or "ignore" in slop.json\n'));
+    return 0;
+  }
+
+  if (o.cmd === 'remove') {
+    if (!o.args.length) { process.stderr.write('slop: remove needs a set name\n'); return 2; }
+    const dir = libraryDir();
+    for (const name of o.args) {
+      const file = path.join(dir, name + '.json');
+      if (!fs.existsSync(file)) { process.stderr.write(`slop: no installed set "${name}"\n`); return 2; }
+      fs.unlinkSync(file);
+      process.stdout.write(`${C.red('removed')} ${name}\n`);
+    }
+    return 0;
+  }
+
+  if (o.cmd === 'sets') {
+    const active = new Set(rules.map((r) => r.id));
+    const installed = loadLibrarySets();
+    process.stdout.write(`${'SET'.padEnd(22)}${'RULES'.padStart(6)}  ${'ACTIVE'.padEnd(8)}${'TESTS'.padEnd(12)}SOURCE\n`);
+    for (const set of resolved.sets) {
+      const on = set.rules.filter((r) => active.has(r.id)).length;
+      const t = testRules(set.rules, { md: extractMarkdown, html: extractHtml });
+      const bad = t.conform.fail + t.fudge.fail;
+      const state = on === set.rules.length ? C.green('all') : on ? C.yellow(`${on}/${set.rules.length}`) : C.dim('off');
+      const tests = bad ? C.red(`${bad} failing`) : C.green('pass');
+      const inst = installed.find((i) => i.name === set.name);
+      const from = inst ? (set.source || path.relative(process.cwd(), inst.installed)) : C.dim('built-in');
+      const note = set.shadows ? C.dim('  (shadows built-in)') : '';
+      process.stdout.write(`${set.name.padEnd(22)}${String(set.rules.length).padStart(6)}  `
+        + `${pad(state, 8)}${pad(tests, 12)}${from}${note}\n`);
+    }
+    process.stdout.write(`\n${C.dim(`library: ${path.relative(process.cwd(), libraryDir()) || '.'}/`)}\n`);
     return 0;
   }
 

@@ -99,3 +99,47 @@ export function variants(example, s, e) {
 }
 
 export const LOSSLESS_ONLY = (v) => v.lossless;
+
+/**
+ * Run both phases over a list of compiled rules: every tests.hit example must
+ * match and every tests.miss must not, then each hit example is rewritten with
+ * markup and must still fire.
+ *
+ * @param {object[]} rules   compiled rules (each with .find and .tests)
+ * @param {{md: Function, html: Function}} extract
+ */
+export function testRules(rules, extract) {
+  const out = { conform: { ok: 0, fail: 0 }, fudge: { ok: 0, fail: 0, lossy: 0 },
+                failures: [], fragile: {} };
+  for (const rule of rules) {
+    const t = rule.tests || {};
+    if (!(t.hit || []).length) {
+      out.conform.fail++;
+      out.failures.push({ rule: rule.id, kind: 'no examples', detail: 'every rule needs a tests.hit example' });
+    }
+    for (const ex of t.miss || []) {
+      if (rule.find(ex).length === 0) out.conform.ok++;
+      else { out.conform.fail++; out.failures.push({ rule: rule.id, kind: 'false positive', detail: ex }); }
+    }
+    for (const ex of t.hit || []) {
+      const hits = rule.find(ex);
+      if (!hits.length) {
+        out.conform.fail++;
+        out.failures.push({ rule: rule.id, kind: 'example does not match', detail: ex });
+        continue;
+      }
+      out.conform.ok++;
+      for (const v of variants(ex, hits[0].start, hits[0].end)) {
+        const { text } = extract[v.format](v.source, {});
+        if (rule.find(text).length) { if (v.lossless) out.fudge.ok++; }
+        else if (!v.lossless) out.fudge.lossy++;
+        else {
+          out.fudge.fail++;
+          out.fragile[v.name] = (out.fragile[v.name] || 0) + 1;
+          out.failures.push({ rule: rule.id, kind: `fragile: ${v.name}`, detail: v.source });
+        }
+      }
+    }
+  }
+  return out;
+}

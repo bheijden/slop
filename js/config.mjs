@@ -14,6 +14,9 @@ import { compileRuleSet } from './engine.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BUILTIN_DIR = path.join(HERE, '..', 'rules');
 export const CONFIG_NAME = 'slop.json';
+// Rule sets fetched with `slop add` live here, beside the config, so a
+// project can commit them and everyone gets the same rules.
+export const LIBRARY_DIR = '.slop/rules';
 
 export function loadSetFile(file) {
   let json;
@@ -32,6 +35,25 @@ export async function fetchSetUrl(url) {
   const res = await fetch(url, { headers: { accept: 'application/json' }, redirect: 'follow' });
   if (!res.ok) throw new Error(`cannot load rule set ${url}: HTTP ${res.status}`);
   return compileRuleSet(await res.json(), url.replace(/^.*\//, '').replace(/\.json$/, ''));
+}
+
+// Where downloaded sets live for this project: beside slop.json if there
+// is one, otherwise under the working directory.
+export function libraryDir(from = process.cwd()) {
+  const cfg = findConfig(from);
+  return path.join(cfg ? path.dirname(cfg) : path.resolve(from), LIBRARY_DIR);
+}
+
+export function loadLibrarySets(dir = libraryDir()) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()
+    .map((f) => {
+      const set = loadSetFile(path.join(dir, f));
+      set.installed = path.join(dir, f);
+      return set;
+    });
 }
 
 export function loadBuiltinSets(dir = BUILTIN_DIR) {
@@ -74,15 +96,20 @@ export function loadConfig(file) {
 export function resolveRules({ select = [], ignore = [], ruleSets = [], all = false, rulesDir, extraSets = [] } = {}) {
   const sets = [
     ...loadBuiltinSets(rulesDir),
+    ...loadLibrarySets(),
     ...ruleSets.filter((r) => !/^https?:\/\//i.test(r)).map(loadSetFile),
     ...extraSets
   ];
+  // Later sources shadow earlier ones by name, so an installed or explicitly
+  // pointed-at set can replace a built-in of the same name. That is how you pin
+  // or customise the rules that ship here.
   const byName = new Map();
   for (const s of sets) {
-    if (byName.has(s.name)) throw new Error(`duplicate rule set name "${s.name}"`);
+    if (byName.has(s.name)) s.shadows = byName.get(s.name);
     byName.set(s.name, s);
   }
-  const everyRule = sets.flatMap((s) => s.rules);
+  const active = [...byName.values()];
+  const everyRule = active.flatMap((s) => s.rules);
   const byId = new Map(everyRule.map((r) => [r.id, r]));
 
   const check = (names, what) => {
@@ -114,7 +141,7 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
     return true;
   });
 
-  return { rules, sets, available: everyRule };
+  return { rules, sets: active, available: everyRule };
 }
 
 // Merge a config file with CLI flags. CLI wins; lists concatenate.

@@ -12,9 +12,9 @@
 //                  markup; lossless markup must not turn a HIT into a MISS
 
 import process from 'node:process';
-import { loadBuiltinSets, loadSetFile, findConfig, loadConfig } from '../js/config.mjs';
+import { loadBuiltinSets, loadLibrarySets, loadSetFile, findConfig, loadConfig } from '../js/config.mjs';
 import { extractMarkdown, extractHtml } from '../js/extract.mjs';
-import { variants } from '../js/fudge.mjs';
+import { testRules } from '../js/fudge.mjs';
 
 const EXTRACT = { md: extractMarkdown, html: extractHtml };
 
@@ -29,10 +29,13 @@ try {
     sets = files.map(loadSetFile);
   } else {
     // Your own rule sets get the same tests as the built-in ones, so
-    // `slop fudge` covers everything the linter would actually run.
+    // `slop fudge` covers everything the linter would actually run:
+    // what ships here, what `add` installed, and what the config points at.
     const cfg = loadConfig(findConfig());
     const local = (cfg.ruleSets || []).filter((r) => !/^https?:\/\//i.test(r));
-    sets = [...loadBuiltinSets(), ...local.map(loadSetFile)];
+    const seen = new Set();
+    sets = [...loadBuiltinSets(), ...loadLibrarySets(), ...local.map(loadSetFile)]
+      .reverse().filter((x) => !seen.has(x.name) && seen.add(x.name)).reverse();
   }
 } catch (err) {
   process.stderr.write(`slop: ${err.message}\n`);
@@ -46,43 +49,16 @@ let fudgeBad = 0;
 let lossyMiss = 0;
 const failures = [];
 const fragile = new Map();
+const EXTRACT = { md: extractMarkdown, html: extractHtml };
 
 for (const set of sets) {
-  for (const rule of set.rules) {
-    if (ruleFilter && rule.id !== ruleFilter) continue;
-    const t = rule.tests || { hit: [], miss: [] };
-    if (!t.hit.length) {
-      failures.push([rule.id, 'no examples', 'every rule needs at least one tests.hit example']);
-      conformBad++;
-    }
-
-    for (const ex of t.miss || []) {
-      if (rule.find(ex).length === 0) conformOk++;
-      else { conformBad++; failures.push([rule.id, 'false positive', JSON.stringify(ex)]); }
-    }
-
-    for (const ex of t.hit || []) {
-      const hits = rule.find(ex);
-      if (!hits.length) {
-        conformBad++;
-        failures.push([rule.id, 'example does not match', JSON.stringify(ex)]);
-        continue;
-      }
-      conformOk++;
-      const { start, end } = hits[0];
-      for (const v of variants(ex, start, end)) {
-        const { text } = EXTRACT[v.format](v.source, {});
-        const still = rule.find(text).length > 0;
-        if (still) { if (v.lossless) fudgeOk++; }
-        else if (!v.lossless) lossyMiss++;
-        else {
-          fudgeBad++;
-          fragile.set(v.name, (fragile.get(v.name) || 0) + 1);
-          failures.push([rule.id, `fragile: ${v.name}`, JSON.stringify(v.source.slice(0, 72))]);
-        }
-      }
-    }
-  }
+  const rules = ruleFilter ? set.rules.filter((r) => r.id === ruleFilter) : set.rules;
+  if (!rules.length) continue;
+  const t = testRules(rules, EXTRACT);
+  conformOk += t.conform.ok; conformBad += t.conform.fail;
+  fudgeOk += t.fudge.ok; fudgeBad += t.fudge.fail; lossyMiss += t.fudge.lossy;
+  for (const f of t.failures) failures.push([f.rule, f.kind, JSON.stringify(String(f.detail).slice(0, 72))]);
+  for (const [k, v] of Object.entries(t.fragile)) fragile.set(k, (fragile.get(k) || 0) + v);
 }
 
 const n = sets.reduce((a, s) => a + s.rules.length, 0);

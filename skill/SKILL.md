@@ -105,6 +105,17 @@ read this before deciding a finding is wrong.
 Two sets ship: `llm-cliches` (27 rules) and `wikipedia-ai` (11). The full
 catalogue is in [reference/rules.md](reference/rules.md).
 
+A project can install more. `sets` shows what is installed, active and passing;
+`add` downloads one into `.slop/rules/` and activates it:
+
+```bash
+... sets
+... add https://example.com/house-style.json
+```
+
+Check `sets` before assuming a finding came from a built-in rule — a project's
+own set can shadow one of ours.
+
 ## Writing or fixing a rule
 
 A rule that fires constantly usually needs a constraint it does not have, not
