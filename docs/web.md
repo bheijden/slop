@@ -19,10 +19,12 @@ continuous scroll, the findings pane runs through all of them grouped by file,
 and next/prev crosses file boundaries. A file list on the left shows which file
 you are in as you scroll and jumps you to any of them.
 
-Which rules run is a control, not documentation: the **rules** button in the bar
-opens a panel of the loaded sets, each collapsible, with per-rule finding counts
-and a URL box for adding another. The button carries the state — `38 rules`, or
-`11/38 rules` once you turn some off.
+The input is one card: the text, the buttons that fill it, and the **rules**
+control that decides what runs over it. The rules button opens a panel of the
+loaded sets, each collapsible, with per-rule finding counts and a URL box for
+adding another. It carries the state — `38 rules`, or `11/38 rules` once you
+turn some off. Load a directory and the text area gives way to a summary, so the
+card and its controls stay put.
 
 Three columns — files, document, findings — separated by dividers you can drag
 to resize or step left and right to collapse. A theme control in the bar chooses
