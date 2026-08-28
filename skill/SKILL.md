@@ -1,0 +1,88 @@
+---
+name: linting-prose
+description: Lints prose in markdown, HTML and text files for stock language-model phrasing - hedges such as "it is important to note that", "no X, no Y" denial chains, repeated sentence openings, participle tails - and reports each hit as file:line:col with a suggested rewrite. Use when reviewing, editing or proofreading documentation, READMEs, release notes, blog posts or reports; when asked to make writing sound less AI-generated; or when the user mentions slop.
+---
+
+# Linting prose
+
+`slop` finds stock LLM phrasing in `.md`, `.html`, `.txt` and `.rst` and
+reports it as `file:line:col` with a suggested fix. Rules are JSON files, so a
+project can add its own.
+
+## Run it
+
+No install step:
+
+```bash
+npx --yes github:bheijden/slop check docs/ -r
+```
+
+Use `--format json` whenever you intend to act on the findings:
+
+```bash
+npx --yes github:bheijden/slop check --format json docs/ -r
+```
+
+Each finding carries everything needed to fix it:
+
+```json
+{ "file": "docs/intro.md", "line": 42, "col": 7,
+  "rule": "note-that", "set": "wikipedia-ai", "severity": "warn",
+  "match": "It is important to note that",
+  "sentence": "It is important to note that timing matters.",
+  "why": "Didactic hedging: \"it is important to note that\" ...",
+  "suggest": "Delete the hedge and state the fact." }
+```
+
+Replace the span in `match`. Use `sentence` for the surrounding context, and
+follow `suggest` for the rewrite.
+
+## Fixing findings
+
+1. Run with `--format json` over the files in question.
+2. Rewrite each flagged sentence so the span is gone, following `suggest`. The
+   goal is to say the thing plainly, not to paraphrase around the pattern.
+3. Re-run. A finding that survives means the rewrite kept the shape.
+
+Do not silence a finding by disabling its rule unless it is a genuine false
+positive.
+
+## Not every finding is a defect
+
+These are style smells, not errors. `ai-vocab` firing once is coincidence;
+several times is a tell. Leave a hit alone when the flagged phrasing is
+genuinely the clearest option, and say why rather than rewriting into something
+worse.
+
+Prefer a budget over demanding zero:
+
+```bash
+npx --yes github:bheijden/slop check --max-per-1000 2 docs/ -r
+```
+
+Exit codes: `0` within budget, `1` over budget, `2` usage or read error. In CI,
+use `--format github` to get inline pull-request annotations.
+
+## Choosing rules
+
+`--select` and `--ignore` take a rule-set name or a single rule id:
+
+```bash
+npx --yes github:bheijden/slop check --select wikipedia-ai --ignore promo docs/ -r
+npx --yes github:bheijden/slop check --rules ./house-style.json docs/ -r
+```
+
+`list` shows every rule and whether it is active. `explain <rule-id>` shows one
+in full, including examples of what it flags and what it deliberately allows —
+read this before deciding a finding is wrong.
+
+Two sets ship: `llm-cliches` (27 rules) and `wikipedia-ai` (11). The full
+catalogue is in [reference/rules.md](reference/rules.md).
+
+## Writing or fixing a rule
+
+A rule that fires constantly usually needs a constraint it does not have, not
+deletion. Read twenty of its hits before concluding it is noise.
+[reference/authoring.md](reference/authoring.md) covers the rule format, the
+five detector kinds, and the markup fudger that checks a rule still fires when
+its example is wrapped in bold, italics, inline tags or a soft-wrapped line.

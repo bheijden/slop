@@ -57,7 +57,9 @@ button,select,textarea,input{font:inherit;color:inherit}
 .score .err{color:var(--flag)}
 
 /* page */
-.page{max-width:780px;margin:0 auto;padding:28px 20px 80px}
+.page{max-width:1140px;margin:0 auto;padding:28px 20px 80px}
+/* Only the results go wide; everything else stays a readable column. */
+.hero,.io,.docs,.colophon{max-width:780px}
 .hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
 .hero h1 em{font-style:italic;color:var(--flag)}
 .hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
@@ -80,11 +82,30 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 
 /* results */
 .results{margin:26px 0 0}
-.rhead{display:flex;align-items:baseline;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px}
+.rhead{display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px;flex-wrap:wrap}
 .rhead h2{font-family:var(--serif);font-size:22px;font-weight:400;margin:0;letter-spacing:-.015em}
-.rhead .views{margin-left:auto;display:flex;gap:2px}
-.rhead .views button{background:none;border:0;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:11.5px}
-.rhead .views button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+.rhead .spacer{flex:1}
+.seg{display:flex;gap:2px}
+.seg button{background:none;border:0;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:11.5px}
+.seg button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+.nav{display:flex;align-items:center;gap:3px}
+.nav button{background:none;border:1px solid var(--hair);border-radius:5px;width:23px;height:21px;padding:0;
+            cursor:pointer;color:var(--muted);line-height:1;font-size:11px}
+.nav button:hover{border-color:var(--blue);color:var(--ink)}
+.nav #n-count{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
+
+/* panes */
+.panes{display:grid;gap:0}
+.panes[data-layout=split]{grid-template-columns:minmax(0,1fr) 330px;gap:0 22px}
+.panes[data-layout=split] .pane{height:min(70vh,680px);overflow:auto;scrollbar-width:thin}
+.panes[data-layout=split] #pane-list{border-left:1px solid var(--hair);padding-left:18px}
+.panes[data-layout=text] #pane-list,.panes[data-layout=list] #pane-doc{display:none}
+.panes[data-layout=text] #doc{max-width:70ch}
+@media(max-width:820px){
+  .panes[data-layout=split]{grid-template-columns:1fr;gap:18px}
+  .panes[data-layout=split] .pane{height:auto;overflow:visible}
+  .panes[data-layout=split] #pane-list{border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:8px}
+}
 
 #doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
 #doc.prose p{margin:0 0 .8em}
@@ -98,9 +119,10 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 }
 #doc mark:hover,#doc mark.on{background:var(--mark-on)}
 
-.list{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--hair)}
-.list li{display:grid;grid-template-columns:58px 1fr;gap:12px;padding:9px 4px;border-bottom:1px solid var(--hair);cursor:pointer}
-.list li:hover,.list li.on{background:var(--sunk)}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:9px 6px;border-bottom:1px solid var(--hair);cursor:pointer;border-radius:6px}
+.list li:hover{background:var(--sunk)}
+.list li.on{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
 .list .loc{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right}
 .list .rid{color:var(--flag);font-weight:500}
 .list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
@@ -200,13 +222,26 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
   <div class="results" id="results" hidden>
     <div class="rhead">
       <h2 id="r-title"></h2>
-      <div class="views" id="views">
+      <div class="nav" id="nav" hidden>
+        <button id="n-prev" title="Previous finding (k or ↑)" aria-label="Previous finding">↑</button>
+        <span id="n-count">–</span>
+        <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
+      </div>
+      <span class="spacer"></span>
+      <div class="seg" id="views">
         <button id="v-prose" aria-pressed="true">prose</button>
         <button id="v-source" aria-pressed="false">source</button>
       </div>
+      <div class="seg" id="layout">
+        <button id="l-text" aria-pressed="false" title="Text only">text</button>
+        <button id="l-split" aria-pressed="true" title="Text and findings side by side">split</button>
+        <button id="l-list" aria-pressed="false" title="Findings only">findings</button>
+      </div>
     </div>
-    <div id="doc" class="prose"></div>
-    <ol class="list" id="list"></ol>
+    <div class="panes" id="panes" data-layout="split">
+      <div class="pane" id="pane-doc"><div id="doc" class="prose"></div></div>
+      <div class="pane" id="pane-list"><ol class="list" id="list"></ol></div>
+    </div>
   </div>
 
   <div class="docs">
@@ -258,6 +293,25 @@ It is important\nto note that this works.      <span class="c">md:soft-wrap</spa
         <p>A variant that turns a hit into a miss is a bug — in extraction, or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
       </div>
     </details>
+    <details>
+      <summary>Install as an agent skill<span class="hint">SKILL.md</span></summary>
+      <div class="body">
+        <p>The repo ships a <a href="https://github.com/bheijden/slop/blob/main/skill/SKILL.md">SKILL.md</a> so a coding agent picks this up on its own when it is editing prose, without being told to run anything. Copy it into your skills directory:</p>
+<pre>D=~/.claude/skills/linting-prose        <span class="c"># or .claude/skills/… for one project</span>
+R=https://raw.githubusercontent.com/bheijden/slop/main/skill
+
+mkdir -p $D/reference
+curl -sL $R/SKILL.md -o $D/SKILL.md
+for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; done</pre>
+        <p>Or hand the instruction to the agent and let it install itself:</p>
+<pre><span class="c">Install the slop skill from
+github.com/bheijden/slop/tree/main/skill into
+~/.claude/skills/linting-prose/, keeping the reference/ files.
+Then lint docs/ and fix what it reports.</span></pre>
+        <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
+        <p>A skill gives an agent instructions it will act on, so read one before installing it — this one runs <code>npx</code> against this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
+      </div>
+    </details>
   </div>
 
   <p class="colophon">Markup is stripped before the rules run and every offset maps back, so a finding points at the line in your file. <a href="https://github.com/bheijden/slop">Source and rule format</a> · Apache-2.0 · patterns from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
@@ -269,7 +323,8 @@ It is important\nto note that this works.      <span class="c">md:soft-wrap</spa
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md',
-            view:'prose', mode:'check', sel:-1, fudge:null };
+            view:'prose', mode:'check', sel:-1, fudge:null,
+            layout:(() => { try { return localStorage.getItem('pc-layout') || 'split'; } catch { return 'split'; } })() };
 
 /* theme — the toggle wins over the OS, because a browser forced to dark for
    every site should not force it here too. */
@@ -390,8 +445,15 @@ function marked(body, ranges, keepBlank) {
 
 function renderResults() {
   const res = $('results');
-  if (S.mode === 'fudge') { res.hidden = false; $('views').hidden = true; renderFudge(); return; }
-  $('views').hidden = false;
+  if (S.mode === 'fudge') {
+    res.hidden = false;
+    $('views').hidden = $('layout').hidden = true;
+    $('nav').hidden = true;
+    $('panes').dataset.layout = 'text';
+    renderFudge();
+    return;
+  }
+  $('views').hidden = $('layout').hidden = false;
   if (!$('input').value.trim()) { res.hidden = true; return; }
   res.hidden = false;
   const n = S.findings.length;
@@ -409,6 +471,11 @@ function renderResults() {
   }
   $('v-prose').setAttribute('aria-pressed', String(!useSrc));
   $('v-source').setAttribute('aria-pressed', String(useSrc));
+  $('panes').dataset.layout = S.layout;
+  for (const [id, l] of [['l-text','text'],['l-split','split'],['l-list','list']])
+    $(id).setAttribute('aria-pressed', String(S.layout === l));
+  $('nav').hidden = !n;
+  $('n-count').textContent = n ? (S.sel >= 0 ? `${S.sel + 1} / ${n}` : `– / ${n}`) : '';
   $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
       <span class="loc">${f.line}:${f.col}</span>
       <span><span class="rid">${esc(f.rule)}</span>${f.count ? ` <span class="loc">×${f.count}</span>` : ''}
@@ -431,9 +498,21 @@ const hideTip = () => $('tip').classList.remove('on');
 function select(i) {
   S.sel = i;
   renderResults();
+  // Bring the finding into view in whichever panes are showing. scrollIntoView
+  // targets the nearest scrolling ancestor, so this works both when a pane
+  // scrolls on its own and when the page does.
+  const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
   const m = $('doc').querySelector(`mark[data-i="${i}"]`);
-  if (m) m.scrollIntoView({ block:'center', behavior:'smooth' });
+  if (m && S.layout !== 'list') m.scrollIntoView({ block:'center', behavior });
+  const li = $('list').querySelector(`li[data-i="${i}"]`);
+  if (li && S.layout !== 'text') li.scrollIntoView({ block:'nearest', behavior });
 }
+
+const step = (d) => {
+  if (!S.findings.length) return;
+  select(S.sel < 0 ? (d > 0 ? 0 : S.findings.length - 1)
+                   : (S.sel + d + S.findings.length) % S.findings.length);
+};
 
 function renderFudge() {
   $('r-title').textContent = 'Rule tests';
@@ -548,6 +627,14 @@ $('input').addEventListener('input', () => { grow(); run(); });
 $('kind').addEventListener('change', () => { S.kind = $('kind').value; run(); });
 $('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
 $('v-source').onclick = () => { S.view = 'source'; renderResults(); };
+$('n-prev').onclick = () => step(-1);
+$('n-next').onclick = () => step(1);
+for (const [id, l] of [['l-text','text'],['l-split','split'],['l-list','list']]) $(id).onclick = () => {
+  S.layout = l;
+  try { localStorage.setItem('pc-layout', l); } catch {}
+  renderResults();
+  if (S.sel >= 0) select(S.sel);
+};
 for (const [id, mode] of [['m-check','check'],['m-fudge','fudge']]) $(id).onclick = () => {
   S.mode = mode;
   $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
@@ -590,8 +677,8 @@ addEventListener('drop', async (e) => {
 addEventListener('keydown', (e) => {
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
   if (!S.findings.length) return;
-  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); select((S.sel + 1) % S.findings.length); }
-  if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); select((S.sel - 1 + S.findings.length) % S.findings.length); }
+  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); step(1); }
+  if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
 });
 addEventListener('scroll', hideTip, true);
 
