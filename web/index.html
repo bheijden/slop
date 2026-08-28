@@ -95,16 +95,42 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 .nav #n-count{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
 
 /* panes */
-.panes{display:grid;gap:0}
-.panes[data-layout=split]{grid-template-columns:minmax(0,1fr) 330px;gap:0 22px}
-.panes[data-layout=split] .pane{height:min(70vh,680px);overflow:auto;scrollbar-width:thin}
-.panes[data-layout=split] #pane-list{border-left:1px solid var(--hair);padding-left:18px}
+/* Two panes and a divider you can drag, or step left/right to collapse a side. */
+.panes{display:grid;grid-template-columns:var(--split,60%) 44px minmax(0,1fr);
+       height:min(70vh,680px);align-items:stretch}
+.panes[data-layout=text]{grid-template-columns:minmax(0,1fr) 44px 0}
+.panes[data-layout=list]{grid-template-columns:0 44px minmax(0,1fr)}
 .panes[data-layout=text] #pane-list,.panes[data-layout=list] #pane-doc{display:none}
+.pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative}
+.phead{position:sticky;top:0;z-index:2;background:var(--paper);padding:0 0 7px;
+       display:flex;align-items:center;gap:8px;min-height:26px}
+#pane-list .phead{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-left:2px}
+#pane-list{padding-left:16px}
+#pane-doc{padding-right:4px}
 .panes[data-layout=text] #doc{max-width:70ch}
+
+/* The control sits at the middle of the divider, where you would reach for it. */
+.divider{position:relative;user-select:none}
+.grip{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:7px;
+      border-radius:4px;background:var(--hair);cursor:col-resize;transition:background .12s}
+.grip:hover,.grip:focus-visible,body.resizing .grip{background:var(--blue)}
+.dctl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;
+      display:flex;gap:2px;padding:3px;border-radius:8px;
+      background:var(--paper);border:1px solid var(--hair)}
+.divider .arrow{
+  background:none;border:0;border-radius:5px;width:16px;height:22px;padding:0;
+  cursor:pointer;color:var(--muted);line-height:1;font-size:13px;
+}
+.divider .arrow:hover:not(:disabled){background:var(--sunk);color:var(--ink)}
+.divider .arrow:disabled{opacity:.25;cursor:default}
+body.resizing{cursor:col-resize;user-select:none}
+
 @media(max-width:820px){
-  .panes[data-layout=split]{grid-template-columns:1fr;gap:18px}
+  .panes,.panes[data-layout=text],.panes[data-layout=list]{grid-template-columns:1fr;height:auto}
   .panes[data-layout=split] .pane{height:auto;overflow:visible}
-  .panes[data-layout=split] #pane-list{border-left:0;padding-left:0;border-top:1px solid var(--hair);padding-top:8px}
+  .divider{height:34px}
+  .grip{top:50%;bottom:auto;left:0;right:0;transform:translateY(-50%);width:auto;height:7px;cursor:default}
+  #pane-list{padding-left:0;border-top:1px solid var(--hair);padding-top:10px}
 }
 
 #doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
@@ -228,19 +254,29 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
         <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
       </div>
       <span class="spacer"></span>
-      <div class="seg" id="views">
-        <button id="v-prose" aria-pressed="true">prose</button>
-        <button id="v-source" aria-pressed="false">source</button>
-      </div>
-      <div class="seg" id="layout">
-        <button id="l-text" aria-pressed="false" title="Text only">text</button>
-        <button id="l-split" aria-pressed="true" title="Text and findings side by side">split</button>
-        <button id="l-list" aria-pressed="false" title="Findings only">findings</button>
-      </div>
     </div>
     <div class="panes" id="panes" data-layout="split">
-      <div class="pane" id="pane-doc"><div id="doc" class="prose"></div></div>
-      <div class="pane" id="pane-list"><ol class="list" id="list"></ol></div>
+      <div class="pane" id="pane-doc">
+        <div class="phead">
+          <div class="seg" id="views">
+            <button id="v-prose" aria-pressed="true">prose</button>
+            <button id="v-source" aria-pressed="false">source</button>
+          </div>
+        </div>
+        <div id="doc" class="prose"></div>
+      </div>
+      <div class="divider" id="divider">
+        <div class="grip" id="grip" role="separator" aria-orientation="vertical"
+             tabindex="0" aria-label="Resize panes — drag, or use the arrow keys"></div>
+        <div class="dctl">
+          <button class="arrow" id="d-left" title="Move the divider left (findings only)">‹</button>
+          <button class="arrow" id="d-right" title="Move the divider right (text only)">›</button>
+        </div>
+      </div>
+      <div class="pane" id="pane-list">
+        <div class="phead"><span id="list-head">findings</span></div>
+        <ol class="list" id="list"></ol>
+      </div>
     </div>
   </div>
 
@@ -324,7 +360,11 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md',
             view:'prose', mode:'check', sel:-1, fudge:null,
-            layout:(() => { try { return localStorage.getItem('pc-layout') || 'split'; } catch { return 'split'; } })() };
+            layout:store('pc-layout', 'split'),
+            split:parseFloat(store('pc-split', '60')) };
+
+function store(k, dflt) { try { return localStorage.getItem(k) ?? dflt; } catch { return dflt; } }
+function remember(k, v) { try { localStorage.setItem(k, v); } catch {} }
 
 /* theme — the toggle wins over the OS, because a browser forced to dark for
    every site should not force it here too. */
@@ -447,13 +487,14 @@ function renderResults() {
   const res = $('results');
   if (S.mode === 'fudge') {
     res.hidden = false;
-    $('views').hidden = $('layout').hidden = true;
+    $('views').hidden = true;
     $('nav').hidden = true;
+    $('divider').hidden = true;
     $('panes').dataset.layout = 'text';
     renderFudge();
     return;
   }
-  $('views').hidden = $('layout').hidden = false;
+  $('views').hidden = $('divider').hidden = false;
   if (!$('input').value.trim()) { res.hidden = true; return; }
   res.hidden = false;
   const n = S.findings.length;
@@ -471,9 +512,8 @@ function renderResults() {
   }
   $('v-prose').setAttribute('aria-pressed', String(!useSrc));
   $('v-source').setAttribute('aria-pressed', String(useSrc));
-  $('panes').dataset.layout = S.layout;
-  for (const [id, l] of [['l-text','text'],['l-split','split'],['l-list','list']])
-    $(id).setAttribute('aria-pressed', String(S.layout === l));
+  applyLayout();
+  $('list-head').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'findings';
   $('nav').hidden = !n;
   $('n-count').textContent = n ? (S.sel >= 0 ? `${S.sel + 1} / ${n}` : `– / ${n}`) : '';
   $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
@@ -629,12 +669,62 @@ $('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
 $('v-source').onclick = () => { S.view = 'source'; renderResults(); };
 $('n-prev').onclick = () => step(-1);
 $('n-next').onclick = () => step(1);
-for (const [id, l] of [['l-text','text'],['l-split','split'],['l-list','list']]) $(id).onclick = () => {
+
+// The divider is the layout control: drag it, or step it left and right to
+// collapse a side. Order runs findings-only <- split -> text-only.
+const ORDER = ['list', 'split', 'text'];
+function applyLayout() {
+  const panes = $('panes');
+  panes.dataset.layout = S.layout;
+  panes.style.setProperty('--split', S.split + '%');
+  const i = ORDER.indexOf(S.layout);
+  $('d-left').disabled = i <= 0;
+  $('d-right').disabled = i >= ORDER.length - 1;
+  $('grip').setAttribute('aria-valuenow', Math.round(S.split));
+}
+function setLayout(l) {
   S.layout = l;
-  try { localStorage.setItem('pc-layout', l); } catch {}
-  renderResults();
+  remember('pc-layout', l);
+  applyLayout();
   if (S.sel >= 0) select(S.sel);
+}
+const stepLayout = (d) => {
+  const i = ORDER.indexOf(S.layout) + d;
+  if (i >= 0 && i < ORDER.length) setLayout(ORDER[i]);
 };
+$('d-left').onclick = () => stepLayout(-1);
+$('d-right').onclick = () => stepLayout(1);
+
+function setSplit(pct) {
+  S.split = Math.max(20, Math.min(80, pct));
+  if (S.layout !== 'split') { S.layout = 'split'; remember('pc-layout', 'split'); }
+  applyLayout();
+}
+let dragging = false;
+$('grip').addEventListener('pointerdown', (e) => {
+  if (innerWidth <= 820) return;
+  dragging = true;
+  document.body.classList.add('resizing');
+  try { $('grip').setPointerCapture(e.pointerId); } catch {}
+});
+addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  const r = $('panes').getBoundingClientRect();
+  setSplit((e.clientX - r.left) / r.width * 100);
+});
+for (const ev of ['pointerup', 'pointercancel']) addEventListener(ev, () => {
+  if (!dragging) return;
+  dragging = false;
+  document.body.classList.remove('resizing');
+  remember('pc-split', S.split);
+});
+$('grip').addEventListener('dblclick', () => { setSplit(60); remember('pc-split', 60); });
+$('grip').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); setSplit(S.split - 4); remember('pc-split', S.split); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); setSplit(S.split + 4); remember('pc-split', S.split); }
+  if (e.key === 'Home') { e.preventDefault(); setLayout('list'); }
+  if (e.key === 'End') { e.preventDefault(); setLayout('text'); }
+});
 for (const [id, mode] of [['m-check','check'],['m-fudge','fudge']]) $(id).onclick = () => {
   S.mode = mode;
   $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
