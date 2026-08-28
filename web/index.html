@@ -4,195 +4,163 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>slop</title>
-<meta name="description" content="A prose linter for markdown, HTML and text. Rules are JSON, not code.">
+<meta name="description" content="A linter for prose. Markdown, HTML and text. Rules are JSON, not code.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='25' font-size='26' font-family='Georgia,serif' fill='%23C2403C'%3E%C2%B6%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ── Two voices ───────────────────────────────────────────────────────────
-   Everything the linter says is monospace. Everything you wrote is serif.
-   The split is the whole visual system: machine on the left and below,
-   prose in the middle.                                                    */
-:root {
-  --paper:#FBFBF8; --ink:#16181C; --muted:#7A7D85; --hair:#E5E5DE;
-  --flag:#C2403C; --wash:rgba(194,64,60,.09); --blue:#2D5BD6; --sunk:#F3F3EE;
+/* Two voices: everything the linter says is monospace, everything you wrote
+   is serif. Light is the default; the toggle in the bar wins over the OS. */
+:root{
+  --paper:#FCFCFA; --card:#fff; --ink:#17191E; --muted:#767982; --hair:#E6E6E0;
+  --sunk:#F4F4EF; --blue:#2D5BD6; --flag:#C2403C;
+  --mark:#FFEFA8; --mark-edge:#E0B93C; --mark-on:#FFE066; --mark-ink:#17191E;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
-  color-scheme:light dark;
+  color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
-  :root{ --paper:#131418; --ink:#E9E9E4; --muted:#888B93; --hair:#292B31;
-         --flag:#E4665C; --wash:rgba(228,102,92,.13); --blue:#7FA2FF; --sunk:#1A1C21; }
+  :root:not([data-theme=light]){
+    --paper:#15171B; --card:#1B1D22; --ink:#E9E9E4; --muted:#8C8F97; --hair:#2B2E35;
+    --sunk:#20232A; --blue:#82A4FF; --flag:#E4665C;
+    --mark:rgba(255,214,102,.22); --mark-edge:#B8912E; --mark-on:rgba(255,214,102,.42); --mark-ink:#F4EFDF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme=dark]{
+  --paper:#15171B; --card:#1B1D22; --ink:#E9E9E4; --muted:#8C8F97; --hair:#2B2E35;
+  --sunk:#20232A; --blue:#82A4FF; --flag:#E4665C;
+  --mark:rgba(255,214,102,.22); --mark-edge:#B8912E; --mark-on:rgba(255,214,102,.42); --mark-ink:#F4EFDF;
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; background:var(--paper); color:var(--ink);
-  font-family:var(--mono); font-size:13px; line-height:1.5;
-  display:flex; flex-direction:column;
-  -webkit-font-smoothing:antialiased;
-}
-button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,select,textarea,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
+[hidden]{display:none!important}
 
-/* ── bar ───────────────────────────────────────────────────────────────── */
-.bar{
-  display:flex; align-items:center; gap:18px; padding:0 18px; height:46px;
-  border-bottom:1px solid var(--hair); flex:none; position:relative; z-index:20;
-}
-.wordmark{font-weight:600;letter-spacing:-.02em;font-size:14px}
+/* bar */
+.bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;height:46px;padding:0 18px;
+     background:var(--paper);border-bottom:1px solid var(--hair)}
+.wordmark{font-weight:600;font-size:14px;letter-spacing:-.02em}
 .wordmark b{color:var(--flag);font-weight:600}
 .modes{display:flex;gap:2px}
-.modes button{
-  background:none;border:0;padding:4px 9px;border-radius:5px;cursor:pointer;
-  color:var(--muted);font-size:12px;
-}
+.modes button{background:none;border:0;padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:12px}
 .modes button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
 .spacer{flex:1}
-.bar .ghost{
-  background:none;border:1px solid var(--hair);border-radius:6px;
-  padding:4px 10px;cursor:pointer;font-size:12px;color:var(--muted);
-}
-.bar .ghost:hover{border-color:var(--blue);color:var(--ink)}
+.chip{background:none;border:1px solid var(--hair);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:var(--muted)}
+.chip:hover{border-color:var(--blue);color:var(--ink)}
 .score{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .score b{color:var(--ink);font-weight:600}
 .score.zero b{color:var(--blue)}
+.score .err{color:var(--flag)}
 
-/* ── rules popover ─────────────────────────────────────────────────────── */
-.pop{
-  position:absolute;top:44px;right:14px;width:330px;max-height:74vh;overflow:auto;
-  background:var(--paper);border:1px solid var(--hair);border-radius:9px;
-  box-shadow:0 14px 40px -12px rgba(0,0,0,.28); padding:12px; z-index:30;
-}
-.pop[hidden]{display:none}
-.pop h3{
-  margin:12px 0 5px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--muted);font-weight:500;display:flex;align-items:center;gap:8px;
-}
-.pop h3:first-child{margin-top:2px}
-.pop h3 button{margin-left:auto;background:none;border:0;color:var(--blue);cursor:pointer;font-size:11px;padding:0}
-.pop label{display:flex;gap:8px;align-items:baseline;padding:2.5px 0;cursor:pointer;font-size:12px}
-.pop label input{margin:0;flex:none;accent-color:var(--blue)}
-.pop label .id{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pop label .n{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
-.pop .load{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair)}
-.pop .load p{margin:0 0 7px;color:var(--muted);font-size:11.5px;line-height:1.45}
-.pop .load input[type=url]{width:100%;padding:5px 8px;border:1px solid var(--hair);border-radius:6px;background:var(--sunk);font-size:11.5px}
-.pop .load .row{display:flex;gap:6px;margin-top:6px}
-.pop .load button{flex:none;border:1px solid var(--hair);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11.5px}
+/* page */
+.page{max-width:780px;margin:0 auto;padding:28px 20px 80px}
+.hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
+.hero h1 em{font-style:italic;color:var(--flag)}
+.hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
+.hero .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
+.hero .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
 
-/* ── the sheet ─────────────────────────────────────────────────────────── */
-.sheet{flex:1;overflow:auto;position:relative}
-.inner{max-width:940px;margin:0 auto;padding:34px 24px 64px;display:grid;grid-template-columns:34px 1fr;gap:0 14px}
-.gutter{position:relative}
-.tick{
-  position:absolute;right:0;width:22px;height:15px;border:0;background:none;cursor:pointer;
-  color:var(--flag);font-size:10.5px;text-align:right;padding:0;font-family:var(--mono);
-  opacity:.6;transition:opacity .12s;
+/* input — one box that grows. It never gets replaced. */
+.io{margin:22px 0 0}
+#input{
+  display:block;width:100%;min-height:132px;max-height:52vh;overflow:auto;resize:vertical;
+  border:1.5px dashed var(--hair);border-radius:10px;background:var(--card);padding:14px 16px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;transition:border-color .12s,background .12s;
 }
-.tick:hover,.tick.on{opacity:1;font-weight:600}
-.tick::after{content:"";position:absolute;right:-14px;top:6px;width:8px;height:1.5px;background:currentColor}
+#input:focus{outline:none;border-style:solid;border-color:var(--blue)}
+#input::placeholder{color:var(--muted)}
+body.dragging #input{border-color:var(--blue);background:var(--sunk)}
+.tools{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.tools select{background:var(--card);border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px}
+.tools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
 
-#doc{min-width:0}
-#doc.prose{font-family:var(--serif);font-size:19px;line-height:1.62;letter-spacing:-.003em}
-#doc.prose p{margin:0 0 .85em}
+/* results */
+.results{margin:26px 0 0}
+.rhead{display:flex;align-items:baseline;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px}
+.rhead h2{font-family:var(--serif);font-size:22px;font-weight:400;margin:0;letter-spacing:-.015em}
+.rhead .views{margin-left:auto;display:flex;gap:2px}
+.rhead .views button{background:none;border:0;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:11.5px}
+.rhead .views button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+
+#doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
+#doc.prose p{margin:0 0 .8em}
 #doc.source{font-family:var(--mono);font-size:12.5px;line-height:1.75}
 #doc.source p{margin:0;white-space:pre-wrap;word-break:break-word;min-height:1.75em}
 #doc p{word-break:break-word}
 #doc mark{
-  background:none;color:inherit;
-  text-decoration:underline wavy var(--flag);
-  text-decoration-thickness:1.5px; text-underline-offset:4px;
-  cursor:pointer;border-radius:2px;
+  background:var(--mark);color:var(--mark-ink);
+  box-shadow:inset 0 -2px 0 var(--mark-edge);
+  border-radius:2px;padding:.5px 1px;cursor:pointer;
 }
-#doc mark:hover{background:var(--wash)}
-#doc mark.on{background:var(--wash);text-decoration-thickness:2.5px}
-#edit{
-  width:100%;min-height:58vh;border:1px solid var(--hair);border-radius:8px;background:var(--sunk);
-  padding:14px;font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical;
-}
-/* landing */
-.land{grid-column:1/-1;max-width:640px}
-.land h1{font-family:var(--serif);font-size:44px;font-weight:400;letter-spacing:-.028em;margin:6px 0 8px;line-height:1}
-.land h1 em{font-style:italic;color:var(--flag)}
-.land .lede{font-family:var(--serif);font-size:21px;line-height:1.45;margin:0 0 10px;max-width:34ch}
-.land .sub{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0;max-width:60ch}
-.land .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
-.drop{
-  margin:24px 0 28px;border:1.5px dashed var(--hair);border-radius:10px;padding:18px;
-  text-align:center;color:var(--muted);font-size:12.5px;
-}
-.drop .cta{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-.drop button{border:1px solid var(--hair);background:var(--paper);border-radius:7px;padding:6px 13px;cursor:pointer;font-size:12px}
-.drop button:first-child{border-color:var(--blue);color:var(--blue)}
-.land details{border-top:1px solid var(--hair)}
-.land details:last-of-type{border-bottom:1px solid var(--hair)}
-.land summary{cursor:pointer;padding:11px 2px;font-size:12.5px;list-style:none;display:flex;gap:9px;align-items:baseline}
-.land summary::-webkit-details-marker{display:none}
-.land summary::before{content:"+";color:var(--blue);width:9px;flex:none}
-.land details[open] summary::before{content:"−"}
-.land summary .hint{margin-left:auto;color:var(--muted);font-size:11.5px}
-.land .body{padding:2px 0 18px 18px}
-.land p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0 0 11px;max-width:64ch}
-.land p code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--ink)}
-.land pre{background:var(--sunk);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;line-height:1.7;margin:0 0 11px}
-.land pre .c{color:var(--muted)}
-.land pre .p{color:var(--flag)}
-.land pre .k{color:var(--blue)}
-.land .colophon{color:var(--muted);font-size:11.5px;line-height:1.6;margin:20px 0 0;max-width:64ch}
-.land a{color:var(--blue)}
-.rulebox{max-height:340px;overflow:auto;border-top:1px solid var(--hair);padding-top:10px}
-.sheet.over{background:var(--sunk);outline:2px dashed var(--blue);outline-offset:-10px}
+#doc mark:hover,#doc mark.on{background:var(--mark-on)}
 
-/* ── fudge report ──────────────────────────────────────────────────────── */
-.fudge{grid-column:1/-1}
-.fudge .top{display:flex;gap:22px;align-items:baseline;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--hair)}
-.fudge .big{font-size:29px;font-family:var(--serif);letter-spacing:-.02em}
-.fudge .big.bad{color:var(--flag)}
-.fudge .lbl{color:var(--muted);font-size:11.5px}
-.frow{display:grid;grid-template-columns:1fr 96px 96px;gap:14px;padding:4px 0;border-bottom:1px solid var(--hair);align-items:baseline}
-.frow.head{border-bottom:1px solid var(--ink);padding-bottom:6px;margin-bottom:2px}
+.list{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--hair)}
+.list li{display:grid;grid-template-columns:58px 1fr;gap:12px;padding:9px 4px;border-bottom:1px solid var(--hair);cursor:pointer}
+.list li:hover,.list li.on{background:var(--sunk)}
+.list .loc{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right}
+.list .rid{color:var(--flag);font-weight:500}
+.list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
+.list .fix{color:var(--muted);font-size:11.5px;line-height:1.55}
+
+/* hover card */
+.tip{
+  position:fixed;z-index:60;max-width:340px;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--card);border:1px solid var(--hair);border-radius:8px;padding:9px 11px;
+  box-shadow:0 10px 30px -10px rgba(0,0,0,.35);font-size:11.5px;line-height:1.55;
+}
+.tip.on{opacity:1}
+.tip .rid{color:var(--flag);font-weight:600}
+.tip .set{color:var(--muted)}
+.tip .fix{color:var(--ink);margin-top:5px}
+
+/* fudge */
+.frow{display:grid;grid-template-columns:1fr 92px 92px;gap:14px;padding:5px 0;border-bottom:1px solid var(--hair);align-items:baseline}
+.frow.head{border-bottom:1px solid var(--ink);padding-bottom:6px}
 .frow.head span{color:var(--muted);font-size:11px;letter-spacing:.07em;text-transform:uppercase}
-.frow:last-child{border-bottom:0}
-.frow .rid{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .frow .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
-.frow.bad{color:var(--flag)}
-.frow.bad .num{color:var(--flag)}
+.frow.bad,.frow.bad .num{color:var(--flag)}
 .frow .why{grid-column:1/-1;color:var(--flag);font-size:11.5px;padding-left:12px;border-left:2px solid var(--flag);margin:3px 0 5px;white-space:pre-wrap;word-break:break-word}
+.tallies{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:18px}
+.tallies .big{font-family:var(--serif);font-size:26px;letter-spacing:-.02em}
+.tallies .big.bad{color:var(--flag)}
+.tallies .lbl{color:var(--muted);font-size:11.5px}
 
-/* ── detail strip ──────────────────────────────────────────────────────── */
-.detail{border-top:1px solid var(--hair);flex:none;background:var(--paper)}
-.detail[hidden]{display:none}
-.detail .in{max-width:940px;margin:0 auto;padding:12px 24px 14px 72px}
-.detail .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.detail .rid{color:var(--flag);font-weight:600}
-.detail .loc,.detail .set{color:var(--muted);font-size:11.5px}
-.detail .nav{margin-left:auto;display:flex;gap:4px}
-.detail .nav button{background:none;border:1px solid var(--hair);border-radius:5px;width:24px;height:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0}
-.detail q{display:block;font-family:var(--serif);font-size:17px;margin:7px 0 5px;quotes:'"' '"'}
-.detail .fix{color:var(--muted);font-size:12px;max-width:80ch}
-.detail .fix b{color:var(--ink);font-weight:500}
-
-/* ── footer ────────────────────────────────────────────────────────────── */
-.foot{border-top:1px solid var(--hair);flex:none}
-.foot details{max-width:940px;margin:0 auto;padding:0 24px}
-.foot summary{cursor:pointer;padding:10px 0;color:var(--muted);font-size:11.5px;list-style:none}
-.foot summary::-webkit-details-marker{display:none}
-.foot summary::before{content:"+ ";color:var(--blue)}
-.foot details[open] summary::before{content:"− "}
-.foot pre{background:var(--sunk);border-radius:7px;padding:12px 14px;overflow-x:auto;font-size:11.5px;line-height:1.65;margin:0 0 14px}
-.foot .k{color:var(--flag)}
-.foot p{color:var(--muted);font-size:11.5px;max-width:78ch;line-height:1.6}
-.foot a{color:var(--blue)}
-.err{color:var(--flag)}
-@media (max-width:720px){
-  .inner{grid-template-columns:20px 1fr;padding:22px 14px 48px}
-  #doc.prose{font-size:17px}
-  .detail .in{padding-left:38px}
-  .pop{right:8px;left:8px;width:auto}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* disclosures */
+.docs{margin:34px 0 0}
+.docs details{border-top:1px solid var(--hair)}
+.docs details:last-of-type{border-bottom:1px solid var(--hair)}
+.docs summary{cursor:pointer;padding:11px 2px;font-size:12.5px;list-style:none;display:flex;gap:9px;align-items:baseline}
+.docs summary::-webkit-details-marker{display:none}
+.docs summary::before{content:"+";color:var(--blue);width:9px;flex:none}
+.docs details[open] summary::before{content:"−"}
+.docs summary .hint{margin-left:auto;color:var(--muted);font-size:11.5px}
+.docs .body{padding:2px 0 18px 18px}
+.docs p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0 0 11px;max-width:64ch}
+.docs p code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--ink)}
+.docs pre{background:var(--sunk);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;line-height:1.7;margin:0 0 11px}
+.docs pre .c{color:var(--muted)} .docs pre .p{color:var(--flag)} .docs pre .k{color:var(--blue)}
+.docs a{color:var(--blue)}
+.rulebox{max-height:330px;overflow:auto}
+.rulebox h3{margin:12px 0 5px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500;display:flex;gap:8px;align-items:center}
+.rulebox h3:first-child{margin-top:0}
+.rulebox h3 button{margin-left:auto;background:none;border:0;color:var(--blue);cursor:pointer;font-size:11px;padding:0}
+.rulebox label{display:flex;gap:8px;align-items:baseline;padding:2.5px 0;cursor:pointer;font-size:12px}
+.rulebox label input{margin:0;flex:none;accent-color:var(--blue)}
+.rulebox label .id{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rulebox label .n{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
+.load{margin-top:12px;padding-top:11px;border-top:1px solid var(--hair)}
+.load input[type=url]{width:100%;padding:5px 8px;border:1px solid var(--hair);border-radius:6px;background:var(--card);font-size:11.5px}
+.load .row{display:flex;gap:6px;margin-top:6px}
+.load .row button{border:1px solid var(--hair);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11.5px}
+.err{color:var(--flag);font-size:11.5px}
+.colophon{color:var(--muted);font-size:11.5px;line-height:1.6;margin:22px 0 0;max-width:66ch}
+.colophon a{color:var(--blue)}
+@media (max-width:640px){.page{padding:20px 14px 60px}.hero h1{font-size:32px}#doc.prose{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -204,72 +172,123 @@ button,select,input{font:inherit;color:inherit}
     <button id="m-fudge" aria-pressed="false">test rules</button>
   </div>
   <span class="spacer"></span>
-  <button class="ghost" id="btn-view" hidden>prose</button>
-  <button class="ghost" id="btn-edit" hidden>edit</button>
-  <button class="ghost" id="btn-rules" aria-expanded="false">rules</button>
+  <button class="chip" id="btn-theme" title="Light, dark or follow the system">auto</button>
   <span class="score" id="score"></span>
 </div>
 
-<div class="pop" id="pop" hidden></div>
-
-<div class="sheet" id="sheet">
-  <div class="inner">
-    <div class="gutter" id="gutter"></div>
-    <div id="doc" class="prose"></div>
+<div class="page">
+  <div class="hero">
+    <h1>prose<em>check</em></h1>
+    <p class="lede">A linter for prose.</p>
+    <p class="sub">Flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code> — at the line it came from, with the fix. Nothing leaves your browser.</p>
   </div>
-</div>
 
-<div class="detail" id="detail" hidden>
-  <div class="in">
-    <div class="head">
-      <span class="rid" id="d-rule"></span>
-      <span class="loc" id="d-loc"></span>
-      <span class="set" id="d-set"></span>
-      <span class="nav"><button id="d-prev" title="Previous finding">↑</button><button id="d-next" title="Next finding">↓</button></span>
+  <div class="io" id="io">
+    <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop a .md, .html or .txt file anywhere on the page."></textarea>
+    <div class="tools">
+      <button class="chip" id="b-example">Load an example</button>
+      <button class="chip" id="b-file">Choose a file</button>
+      <select id="kind" aria-label="How to parse the input">
+        <option value="md">markdown</option>
+        <option value="html">html</option>
+        <option value="txt">plain text</option>
+      </select>
+      <span class="n" id="meta"></span>
     </div>
-    <q id="d-match"></q>
-    <div class="fix" id="d-fix"></div>
   </div>
+
+  <div class="results" id="results" hidden>
+    <div class="rhead">
+      <h2 id="r-title"></h2>
+      <div class="views" id="views">
+        <button id="v-prose" aria-pressed="true">prose</button>
+        <button id="v-source" aria-pressed="false">source</button>
+      </div>
+    </div>
+    <div id="doc" class="prose"></div>
+    <ol class="list" id="list"></ol>
+  </div>
+
+  <div class="docs">
+    <details>
+      <summary>Rule sets<span class="hint" id="rule-hint"></span></summary>
+      <div class="body"><div class="rulebox" id="rules"></div></div>
+    </details>
+    <details>
+      <summary>Command line<span class="hint">for agents and CI</span></summary>
+      <div class="body">
+<pre>uv tool install <span class="k">git+https://github.com/bheijden/slop#subdirectory=py</span>
+
+slop check docs/ <span class="p">-r</span>                    <span class="c"># a tree, a file, a URL, stdin</span>
+slop check <span class="p">--format</span> json docs/ <span class="p">-r</span>     <span class="c"># match, sentence, why, suggest</span>
+slop check <span class="p">--select</span> wikipedia-ai .    <span class="c"># a set name or one rule id</span>
+slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a link to this page</span></pre>
+        <p>Same engine, same rule files. Exit <code>0</code> clean, <code>1</code> over budget, <code>2</code> error.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Open this page from a link<span class="hint">#gz=…</span></summary>
+      <div class="body">
+        <p>Everything is in the fragment, which browsers never send to a server. <code>--share</code> writes the link and gzips the file into it.</p>
+<pre><span class="p">#gz=</span> <span class="p">#text=</span>       the document, base64url
+<span class="p">#url=</span>              fetch a page and lint it
+<span class="p">#kind=</span>             md · html · txt
+<span class="p">#rules=</span>            a rule set URL, repeatable
+<span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
+<span class="p">#mode=fudge</span>        test rules instead</pre>
+      </div>
+    </details>
+    <details>
+      <summary>Writing and testing rules<span class="hint">the fudger</span></summary>
+      <div class="body">
+        <p>A rule set is JSON. Each rule carries its own examples, and those examples are what makes it testable.</p>
+<pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
+  <span class="p">"pattern"</span>: "\\butili[sz]e[sd]?\\b", <span class="p">"flags"</span>: "gi",
+  <span class="p">"suggest"</span>: "Write \"use\".",
+  <span class="p">"tests"</span>: { <span class="p">"hit"</span>: ["We utilise the cache."],
+             <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
+        <p><b>Test rules</b> above — <code>slop fudge mine.json</code> — checks every example, then rewrites each one 27 ways with the markup real files carry and requires the rule to still fire:</p>
+<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
+It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
+It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
+&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
+&lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
+        <p>A variant that turns a hit into a miss is a bug — in extraction, or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
+      </div>
+    </details>
+  </div>
+
+  <p class="colophon">Markup is stripped before the rules run and every offset maps back, so a finding points at the line in your file. <a href="https://github.com/bheijden/slop">Source and rule format</a> · Apache-2.0 · patterns from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
 </div>
 
-<div class="foot" id="foot" hidden>
-  <details>
-    <summary>Open this page from a script, an agent or a CI job</summary>
-    <p>Everything is in the URL fragment, which browsers never send to a server. The document travels with the link; nothing is uploaded.</p>
-<pre># the CLI writes the link for you — the file is gzipped into the fragment
-slop check --share docs/intro.md
-
-# or build one yourself
-<span class="k">#url=</span>https://example.com/post          fetch and lint a page
-<span class="k">#text=</span>&lt;base64url&gt;<span class="k">&amp;kind=</span>md              lint text you encoded
-<span class="k">#gz=</span>&lt;base64url of gzip&gt;<span class="k">&amp;kind=</span>html      same, compressed
-<span class="k">#rules=</span>https://example.com/house.json  load a rule set over https
-<span class="k">#select=</span>wikipedia-ai<span class="k">&amp;ignore=</span>promo      choose rules
-<span class="k">#mode=</span>fudge<span class="k">&amp;rules=</span>...                 test a rule set instead
-
-# an agent working in a terminal should use the CLI directly:
-slop check --format json -r docs/     # match, sentence, why, suggest
-slop fudge rules/house-style.json     # conformance + markup fudging</pre>
-    <p><a href="https://github.com/bheijden/slop">Source and rule format</a> · rules run in a Web Worker with a 2s timeout, so a rule set fetched from someone else's repo cannot hang this tab.</p>
-  </details>
-</div>
+<div class="tip" id="tip"></div>
 
 <script type="module">
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const S = { sets:[], active:new Set(), findings:[], text:'', src:'', kind:'md',
-            view:'prose', mode:'check', sel:-1, editing:false, fudge:null, lastSrc:null };
+const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md',
+            view:'prose', mode:'check', sel:-1, fudge:null };
 
-/* ── URL ─────────────────────────────────────────────────────────────── */
+/* theme — the toggle wins over the OS, because a browser forced to dark for
+   every site should not force it here too. */
+const THEMES = ['auto','light','dark'];
+let theme = (() => { try { return localStorage.getItem('pc-theme') || 'auto'; } catch { return 'auto'; } })();
+function applyTheme() {
+  if (theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  $('btn-theme').textContent = theme;
+  try { localStorage.setItem('pc-theme', theme); } catch {}
+}
+$('btn-theme').onclick = () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(); };
+applyTheme();
+
+/* URL */
 const b64urlToBytes = (s) => {
   const b = atob(s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'='));
   return Uint8Array.from(b, (c) => c.charCodeAt(0));
 };
-async function gunzip(bytes) {
-  const ds = new DecompressionStream('gzip');
-  const r = new Blob([bytes]).stream().pipeThrough(ds);
-  return new Response(r).text();
-}
+const gunzip = async (bytes) =>
+  new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
 
 async function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
@@ -277,34 +296,31 @@ async function readHash() {
   if (p.get('kind')) S.kind = p.get('kind');
   for (const url of p.getAll('rules')) await addRemoteSet(url).catch((e) => note(e.message));
   const sel = (p.get('select') || '').split(',').filter(Boolean);
-  const ign = (p.get('ignore') || '').split(',').filter(Boolean);
   if (sel.length) {
     S.active = new Set();
     for (const s of S.sets) for (const r of s.rules) if (sel.includes(s.name) || sel.includes(r.id)) S.active.add(r.id);
   }
-  for (const i of ign) {
+  for (const i of (p.get('ignore') || '').split(',').filter(Boolean)) {
     const set = S.sets.find((s) => s.name === i);
-    if (set) set.rules.forEach((r) => S.active.delete(r.id));
-    else S.active.delete(i);
+    if (set) set.rules.forEach((r) => S.active.delete(r.id)); else S.active.delete(i);
   }
-  if (p.get('gz')) S.src = await gunzip(b64urlToBytes(p.get('gz')));
-  else if (p.get('text')) S.src = new TextDecoder().decode(b64urlToBytes(p.get('text')));
+  let src = '';
+  if (p.get('gz')) src = await gunzip(b64urlToBytes(p.get('gz')));
+  else if (p.get('text')) src = new TextDecoder().decode(b64urlToBytes(p.get('text')));
   else if (p.get('url')) {
-    const u = p.get('url');
-    note('fetching ' + u + ' …');
+    note('fetching ' + p.get('url') + ' …');
     try {
-      const res = await fetch(u, { redirect:'follow' });
+      const res = await fetch(p.get('url'), { redirect:'follow' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      S.src = await res.text();
-      S.kind = /html/i.test(res.headers.get('content-type') || '') ? 'html' : S.kind;
+      src = await res.text();
+      if (/html/i.test(res.headers.get('content-type') || '')) S.kind = 'html';
       note('');
-    } catch (e) {
-      note(`could not fetch that URL (${e.message}). The site must allow cross-origin reads — the CLI has no such limit.`);
-    }
+    } catch (e) { note(`could not fetch that URL (${e.message}) — the site must allow cross-origin reads`); }
   }
+  if (src) { $('input').value = src; $('kind').value = S.kind; }
 }
 
-/* ── rule sets ───────────────────────────────────────────────────────── */
+/* rule sets */
 async function addRemoteSet(url) {
   const res = await fetch(url, { headers:{accept:'application/json'} });
   if (!res.ok) throw new Error(`rule set ${url}: HTTP ${res.status}`);
@@ -312,7 +328,6 @@ async function addRemoteSet(url) {
   if (!Array.isArray(set.rules)) throw new Error(`rule set ${url}: no "rules" array`);
   set.name = set.name || url.split('/').pop().replace(/\.json$/, '');
   addSet(set);
-  return set;
 }
 function addSet(set) {
   S.sets = S.sets.filter((s) => s.name !== set.name);
@@ -324,17 +339,13 @@ async function loadBuiltins() {
   for (const f of m.sets) addSet(await (await fetch('../rules/' + f)).json());
 }
 
-/* ── worker ──────────────────────────────────────────────────────────── */
-// One worker, kept alive across runs so its modules load once. The timeout
-// starts only after the worker reports ready, so it measures rule execution
-// rather than network latency. A rule that runs away gets the worker
-// terminated; the next run builds a fresh one.
+/* worker — kept alive, so the timeout measures rule execution, not module load */
 let worker = null, ready = null;
 function spawn() {
   worker = new Worker('./worker.mjs', { type:'module' });
   ready = new Promise((res) => {
-    const first = (e) => { if (e.data && e.data.ready) { worker.removeEventListener('message', first); res(); } };
-    worker.addEventListener('message', first);
+    const f = (e) => { if (e.data && e.data.ready) { worker.removeEventListener('message', f); res(); } };
+    worker.addEventListener('message', f);
   });
 }
 async function ask(msg, ms = 5000) {
@@ -342,92 +353,21 @@ async function ask(msg, ms = 5000) {
   await ready;
   return new Promise((resolve) => {
     const w = worker;
-    const done = (v) => { w.removeEventListener('message', onMsg); w.removeEventListener('error', onErr); clearTimeout(t); resolve(v); };
-    const onMsg = (e) => done(e.data);
-    const onErr = (e) => done({ ok:false, error:e.message });
+    const done = (v) => { w.removeEventListener('message', m); w.removeEventListener('error', x); clearTimeout(t); resolve(v); };
+    const m = (e) => done(e.data), x = (e) => done({ ok:false, error:e.message });
     const t = setTimeout(() => {
       w.terminate(); if (worker === w) worker = null;
-      done({ ok:false, error:`no result after ${ms/1000}s — a rule is backtracking. Rules run in a worker, so this cannot freeze the page.` });
+      done({ ok:false, error:`no result after ${ms/1000}s — a rule is backtracking` });
     }, ms);
-    w.addEventListener('message', onMsg);
-    w.addEventListener('error', onErr);
-    w.postMessage(msg);
+    w.addEventListener('message', m); w.addEventListener('error', x); w.postMessage(msg);
   });
 }
 
-
-const LANDING = `<div class="land">
-  <h1>prose<em>check</em></h1>
-  <p class="lede">A linter for prose.</p>
-  <p class="sub">Flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code> — at the line it came from, with the fix. Markdown, HTML or plain text. Nothing leaves your browser.</p>
-
-  <div class="drop">
-    Drop a file
-    <div class="cta">
-      <button id="e-sample">Load an example</button>
-      <button id="e-file">Choose a file</button>
-      <button id="e-paste">Paste text</button>
-    </div>
-  </div>
-
-  <details>
-    <summary>Rule sets<span class="hint">38 rules, or add your own</span></summary>
-    <div class="body"><div class="rulebox" id="adv-rules"></div></div>
-  </details>
-
-  <details>
-    <summary>Command line<span class="hint">for agents and CI</span></summary>
-    <div class="body">
-<pre>uv tool install <span class="k">git+https://github.com/bheijden/slop#subdirectory=py</span>
-
-slop check docs/ <span class="p">-r</span>                    <span class="c"># a tree, a file, a URL, stdin</span>
-slop check <span class="p">--format</span> json docs/ <span class="p">-r</span>     <span class="c"># match, sentence, why, suggest</span>
-slop check <span class="p">--select</span> wikipedia-ai .    <span class="c"># a set name or one rule id</span>
-slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a link to this page</span></pre>
-      <p>Same engine, same rule files. Exit <code>0</code> clean, <code>1</code> over budget, <code>2</code> error.</p>
-    </div>
-  </details>
-
-  <details>
-    <summary>Open this page from a link<span class="hint">#gz=…</span></summary>
-    <div class="body">
-      <p>Everything is in the fragment, which browsers never send to a server. <code>--share</code> writes the link and gzips the file into it.</p>
-<pre><span class="p">#gz=</span> <span class="p">#text=</span>       the document, base64url
-<span class="p">#url=</span>              fetch a page and lint it
-<span class="p">#kind=</span>             md · html · txt
-<span class="p">#rules=</span>            a rule set URL, repeatable
-<span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
-<span class="p">#mode=fudge</span>        test rules instead</pre>
-    </div>
-  </details>
-
-  <details>
-    <summary>Writing and testing rules<span class="hint">the fudger</span></summary>
-    <div class="body">
-      <p>A rule set is JSON. Each rule carries its own examples, and those examples are what makes it testable.</p>
-<pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
-  <span class="p">"pattern"</span>: "\\\\butili[sz]e[sd]?\\\\b", <span class="p">"flags"</span>: "gi",
-  <span class="p">"suggest"</span>: "Write \\"use\\".",
-  <span class="p">"tests"</span>: { <span class="p">"hit"</span>: ["We utilise the cache."],
-             <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
-      <p><b>Test rules</b> above — <code>slop fudge mine.json</code> — checks every example, then rewrites each one 27 ways with the markup real files carry and requires the rule to still fire:</p>
-<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
-It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
-It is important\\nto note that this works.      <span class="c">md:soft-wrap</span>
-&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
-&lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
-      <p>A variant that turns a hit into a miss is a bug — in extraction, or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
-    </div>
-  </details>
-
-  <p class="colophon">Markup is stripped before the rules run and every offset maps back, so a finding points at the line in your file. <a href="https://github.com/bheijden/slop">Source and rule format</a> · Apache-2.0 · patterns from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
-</div>`;
-
-/* ── render ──────────────────────────────────────────────────────────── */
-function note(msg) { $('score').innerHTML = msg ? `<span class="err">${esc(msg)}</span>` : ''; }
+/* render */
+const note = (m) => { $('score').innerHTML = m ? `<span class="err">${esc(m)}</span>` : ''; };
 
 function marked(body, ranges, keepBlank) {
-  const ok = ranges.slice().sort((a, b) => a[0] - b[0]).filter((r, i, a) => i === 0 || r[0] >= a[i-1][1]);
+  const ok = ranges.slice().sort((a,b) => a[0]-b[0]).filter((r,i,a) => i === 0 || r[0] >= a[i-1][1]);
   const out = [];
   let pos = 0;
   for (const line of body.split('\n')) {
@@ -441,121 +381,87 @@ function marked(body, ranges, keepBlank) {
       html += esc(body.slice(last, a)) + `<mark data-i="${i}"${i === S.sel ? ' class="on"' : ''}>${esc(body.slice(a, b))}</mark>`;
       last = b;
     }
-    html += esc(body.slice(last, e));
-    out.push(`<p>${html || '<br>'}</p>`);
+    out.push(`<p>${html + esc(body.slice(last, e)) || '<br>'}</p>`);
   }
   return out.join('');
 }
 
-function renderDoc() {
-  const doc = $('doc'), gut = $('gutter');
-  $('btn-view').hidden = $('btn-edit').hidden = (S.mode !== 'check' || !S.src);
-  $('btn-rules').hidden = (S.mode === 'check' && !S.src);
-  $('foot').hidden = (S.mode === 'check' && !S.src);
-  $('btn-view').textContent = S.view === 'prose' ? 'source' : 'prose';
-  $('btn-view').title = S.view === 'prose' ? 'Show the file as written' : 'Show the prose the rules ran on';
-
-  if (S.mode === 'fudge') { renderFudge(); return; }
-  if (S.editing) {
-    doc.className = ''; gut.innerHTML = '';
-    doc.innerHTML = '<textarea id="edit" spellcheck="false"></textarea>';
-    const ta = $('edit');
-    ta.value = S.src; ta.focus();
-    ta.oninput = () => { S.src = ta.value; run(); };
-    return;
-  }
-  if (!S.src) {
-    doc.className = ''; gut.innerHTML = '';
-    doc.innerHTML = LANDING;
-    $('e-sample').onclick = loadSample;
-    $('e-paste').onclick = () => { S.editing = true; renderDoc(); };
-    $('e-file').onclick = pickDoc;
-    renderRules($('adv-rules'));
-    return;
-  }
+function renderResults() {
+  const res = $('results');
+  if (S.mode === 'fudge') { res.hidden = false; $('views').hidden = true; renderFudge(); return; }
+  $('views').hidden = false;
+  if (!$('input').value.trim()) { res.hidden = true; return; }
+  res.hidden = false;
+  const n = S.findings.length;
+  $('r-title').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'No findings';
   const useSrc = S.view === 'source';
+  const body = useSrc ? $('input').value : S.text;
+  const doc = $('doc');
   doc.className = useSrc ? 'source' : 'prose';
-  const body = useSrc ? S.src : S.text;
-  doc.innerHTML = marked(body, S.findings.map((f, i) => useSrc ? [f.srcStart, f.srcEnd, i] : [f.start, f.end, i]), useSrc);
-  for (const m of doc.querySelectorAll('mark')) m.onclick = () => select(+m.dataset.i);
-  placeTicks();
-}
-
-// The gutter is measured, not guessed: each tick sits at the marked span's
-// own offsetTop, so the margin reads like a proof sheet's marks.
-function placeTicks() {
-  const gut = $('gutter'); gut.innerHTML = '';
-  const marks = [...$('doc').querySelectorAll('mark')];
-  const top = $('doc').getBoundingClientRect().top;
-  let lastY = -99;
-  for (const m of marks) {
-    const i = +m.dataset.i;
-    const y = m.getBoundingClientRect().top - top;
-    if (y - lastY < 13) continue;
-    lastY = y;
-    const b = document.createElement('button');
-    b.className = 'tick' + (i === S.sel ? ' on' : '');
-    b.style.top = y + 'px';
-    b.textContent = S.findings[i].line;
-    b.title = S.findings[i].rule;
-    b.onclick = () => select(i);
-    gut.appendChild(b);
+  doc.innerHTML = marked(body, S.findings.map((f,i) => useSrc ? [f.srcStart,f.srcEnd,i] : [f.start,f.end,i]), useSrc);
+  for (const m of doc.querySelectorAll('mark')) {
+    const f = S.findings[+m.dataset.i];
+    m.onclick = () => select(+m.dataset.i);
+    m.onmouseenter = () => showTip(m, f);
+    m.onmouseleave = hideTip;
   }
+  $('v-prose').setAttribute('aria-pressed', String(!useSrc));
+  $('v-source').setAttribute('aria-pressed', String(useSrc));
+  $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
+      <span class="loc">${f.line}:${f.col}</span>
+      <span><span class="rid">${esc(f.rule)}</span>${f.count ? ` <span class="loc">×${f.count}</span>` : ''}
+        <div class="m">${esc(f.match)}</div>
+        ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
+  for (const li of $('list').querySelectorAll('li')) li.onclick = () => select(+li.dataset.i);
 }
 
-function select(i, scroll = true) {
+function showTip(el, f) {
+  const t = $('tip');
+  t.innerHTML = `<span class="rid">${esc(f.rule)}</span> <span class="set">${esc(f.set)}</span>
+    <div class="fix">${esc(f.suggest || f.why || '')}</div>`;
+  t.classList.add('on');
+  const r = el.getBoundingClientRect(), tr = t.getBoundingClientRect();
+  t.style.left = Math.max(8, Math.min(r.left, innerWidth - tr.width - 8)) + 'px';
+  t.style.top = (r.top > tr.height + 12 ? r.top - tr.height - 8 : r.bottom + 8) + 'px';
+}
+const hideTip = () => $('tip').classList.remove('on');
+
+function select(i) {
   S.sel = i;
-  const f = S.findings[i];
-  $('detail').hidden = !f;
-  if (f) {
-    $('d-rule').textContent = f.rule;
-    $('d-loc').textContent = `${f.line}:${f.col}` + (f.count ? ` · ${f.count} items` : '');
-    $('d-set').textContent = f.set;
-    $('d-match').textContent = f.sentence.trim() || f.match;
-    $('d-fix').innerHTML = (f.suggest ? `<b>${esc(f.suggest)}</b> ` : '') + esc(f.why || '');
-  }
-  renderDoc();
-  if (!scroll) return;
+  renderResults();
   const m = $('doc').querySelector(`mark[data-i="${i}"]`);
-  if (m) m.scrollIntoView({ block:'center', behavior: S.lastSrc === S.src && S.sel >= 0 ? 'smooth' : 'auto' });
+  if (m) m.scrollIntoView({ block:'center', behavior:'smooth' });
 }
 
 function renderFudge() {
-  $('gutter').innerHTML = '';
+  $('r-title').textContent = 'Rule tests';
+  $('list').innerHTML = '';
   const d = $('doc'); d.className = '';
-  if (!S.fudge) { d.innerHTML = '<div class="empty"><h2>Testing rules…</h2></div>'; return; }
-  const t = S.fudge.reduce((a, r) => ({
-    cok:a.cok+r.conform.ok, cbad:a.cbad+r.conform.fail,
-    fok:a.fok+r.fudge.ok, fbad:a.fbad+r.fudge.fail, lossy:a.lossy+r.fudge.lossy
-  }), {cok:0,cbad:0,fok:0,fbad:0,lossy:0});
+  if (!S.fudge) { d.innerHTML = '<p class="err" style="color:var(--muted)">Testing…</p>'; return; }
+  const t = S.fudge.reduce((a,r) => ({ cok:a.cok+r.conform.ok, cbad:a.cbad+r.conform.fail,
+    fok:a.fok+r.fudge.ok, fbad:a.fbad+r.fudge.fail, lossy:a.lossy+r.fudge.lossy }),
+    {cok:0,cbad:0,fok:0,fbad:0,lossy:0});
   const bad = t.cbad + t.fbad;
-  d.innerHTML = `<div class="fudge">
-    <div class="top">
-      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${S.sets.map((s)=>s.name).join(' · ')}</div></div>
+  d.innerHTML = `<div class="tallies">
+      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${S.sets.map(s=>s.name).join(' · ')}</div></div>
       <div><div class="big">${t.cok}</div><div class="lbl">examples matched</div></div>
       <div><div class="big">${t.fok}</div><div class="lbl">survived markup</div></div>
       <div><div class="big">${t.lossy}</div><div class="lbl">expected misses</div></div>
     </div>
     <div class="frow head"><span>rule</span><span class="num">examples</span><span class="num">markup</span></div>
-    ${S.fudge.slice().sort((a, b) =>
-        (b.conform.fail + b.fudge.fail) - (a.conform.fail + a.fudge.fail)).map((r) => {
+    ${S.fudge.slice().sort((a,b) => (b.conform.fail+b.fudge.fail)-(a.conform.fail+a.fudge.fail)).map((r) => {
       const rb = r.conform.fail + r.fudge.fail;
-      return `<div class="frow${rb?' bad':''}">
-        <span class="rid">${esc(r.rule)}</span>
+      return `<div class="frow${rb?' bad':''}"><span>${esc(r.rule)}</span>
         <span class="num">${r.conform.ok}/${r.conform.ok+r.conform.fail}</span>
         <span class="num">${r.fudge.ok}/${r.fudge.ok+r.fudge.fail}</span>
-        ${r.failures.map((f)=>`<div class="why">${esc(f.kind)} — ${esc(String(f.detail).slice(0,150))}</div>`).join('')}
-      </div>`;
-    }).join('')}</div>`;
+        ${r.failures.map(f=>`<div class="why">${esc(f.kind)} — ${esc(String(f.detail).slice(0,150))}</div>`).join('')}</div>`;
+    }).join('')}`;
 }
 
-// One implementation of the rule controls, rendered into either the bar
-// popover or the Advanced section on the landing page. Queries are scoped to
-// the container so both can exist without colliding.
-function renderRules(el) {
-  if (!el) return;
+function renderRules() {
   const counts = {};
   for (const f of S.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
+  const el = $('rules');
   el.innerHTML = S.sets.map((set) => {
     const allOn = set.rules.every((r) => S.active.has(r.id));
     return `<h3>${esc(set.title || set.name)}<button data-set="${esc(set.name)}">${allOn?'none':'all'}</button></h3>` +
@@ -563,23 +469,18 @@ function renderRules(el) {
         <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id)?' checked':''}>
         <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id]||''}</span></label>`).join('');
   }).join('') + `<div class="load">
-      <p>Add a rule set from a URL or a file. Same JSON format as the built-ins.</p>
       <input type="url" data-url placeholder="https://…/house-style.json">
-      <div class="row"><button data-add>Add</button><button data-file>Choose file…</button></div>
-      <div class="err" data-err></div>
-    </div>`;
-  const q = (sel) => el.querySelector(sel);
-  for (const c of el.querySelectorAll('input[data-rule]')) {
+      <div class="row"><button data-add>Add rule set</button><button data-file>Choose file…</button></div>
+      <div class="err" data-err></div></div>`;
+  const q = (s) => el.querySelector(s);
+  for (const c of el.querySelectorAll('input[data-rule]'))
     c.onchange = () => { c.checked ? S.active.add(c.dataset.rule) : S.active.delete(c.dataset.rule); run(); };
-  }
-  for (const b of el.querySelectorAll('button[data-set]')) {
-    b.onclick = () => {
-      const set = S.sets.find((x) => x.name === b.dataset.set);
-      const allOn = set.rules.every((r) => S.active.has(r.id));
-      set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
-      run();
-    };
-  }
+  for (const b of el.querySelectorAll('button[data-set]')) b.onclick = () => {
+    const set = S.sets.find((x) => x.name === b.dataset.set);
+    const allOn = set.rules.every((r) => S.active.has(r.id));
+    set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
+    run();
+  };
   q('[data-add]').onclick = async () => {
     const u = q('[data-url]').value.trim(); if (!u) return;
     try { await addRemoteSet(u); q('[data-err]').textContent = ''; run(); }
@@ -593,6 +494,8 @@ function renderRules(el) {
       addSet(set); q('[data-err]').textContent = ''; run();
     } catch (e) { q('[data-err]').textContent = e.message; }
   });
+  const total = S.sets.reduce((a,s) => a + s.rules.length, 0);
+  $('rule-hint').textContent = `${S.active.size} of ${total} on`;
 }
 
 function pickFile(accept, cb) {
@@ -601,51 +504,57 @@ function pickFile(accept, cb) {
   i.click();
 }
 
-function pickDoc() {
-  pickFile('.md,.markdown,.mdx,.html,.htm,.txt,.text', async (f) => {
-    S.src = await f.text(); S.editing = false;
-    S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
-    run();
-  });
+function grow() {
+  const t = $('input');
+  t.style.height = 'auto';
+  t.style.height = Math.max(132, Math.min(t.scrollHeight + 4, innerHeight * 0.52)) + 'px';
 }
 
-/* ── run ─────────────────────────────────────────────────────────────── */
-let t = null;
+/* run */
+let timer = null;
 function run() {
-  clearTimeout(t);
-  t = setTimeout(async () => {
-    renderRules($('pop'));
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
+    renderRules();
+    $('io').hidden = S.mode === 'fudge';
     if (S.mode === 'fudge') {
-      S.fudge = null; renderDoc();
+      S.fudge = null; renderResults();
       const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
       if (!res.ok) return note(res.error);
       S.fudge = res.results;
-      const bad = res.results.reduce((a, r) => a + r.conform.fail + r.fudge.fail, 0);
+      const bad = res.results.reduce((a,r) => a + r.conform.fail + r.fudge.fail, 0);
       $('score').className = 'score' + (bad ? '' : ' zero');
-      $('score').innerHTML = `<b>${bad || 0}</b> failing`;
-      $('detail').hidden = true;
-      renderDoc();
+      $('score').innerHTML = `<b>${bad}</b> failing`;
+      renderResults();
       return;
     }
-    if (!S.src) { S.findings = []; $('score').textContent = ''; $('detail').hidden = true; renderDoc(); return; }
-    const res = await ask({ mode:'check', src:S.src, kind:S.kind, sets:S.sets, active:[...S.active] });
+    const src = $('input').value;
+    if (!src.trim()) { S.findings = []; $('score').textContent = ''; $('meta').textContent = ''; renderResults(); return; }
+    const res = await ask({ mode:'check', src, kind:S.kind, sets:S.sets, active:[...S.active] });
     if (!res.ok) return note(res.error);
     S.findings = res.findings; S.text = res.text; S.sel = -1;
     const per = res.words ? (res.findings.length / res.words * 1000).toFixed(1) : '0.0';
     $('score').className = 'score' + (res.findings.length ? '' : ' zero');
-    $('score').innerHTML = `<b>${res.findings.length}</b> · ${per}/1k · ${res.words}w`;
-    renderDoc(); renderRules($('pop'));
-    // Arriving on a link should land on the first finding. Re-running while
-    // editing should not yank the page around.
-    const arrived = S.src !== S.lastSrc;
-    S.lastSrc = S.src;
-    if (S.findings.length) select(0, arrived && !S.editing); else $('detail').hidden = true;
-  }, 140);
+    $('score').innerHTML = `<b>${res.findings.length}</b> · ${per}/1k`;
+    $('meta').textContent = `${res.words} words`;
+    renderResults(); renderRules();
+  }, 160);
 }
 
-function loadSample() {
-  S.kind = 'md'; S.editing = false;
-  S.src = `# Release notes
+/* wiring */
+$('input').addEventListener('input', () => { grow(); run(); });
+$('kind').addEventListener('change', () => { S.kind = $('kind').value; run(); });
+$('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
+$('v-source').onclick = () => { S.view = 'source'; renderResults(); };
+for (const [id, mode] of [['m-check','check'],['m-fudge','fudge']]) $(id).onclick = () => {
+  S.mode = mode;
+  $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
+  $('m-fudge').setAttribute('aria-pressed', String(mode === 'fudge'));
+  run();
+};
+$('b-example').onclick = () => {
+  $('kind').value = S.kind = 'md';
+  $('input').value = `# Release notes
 
 It is important to note that the rollout happened in stages. No sign-ups, no
 downloads, no hassle. Community feedback plays a pivotal role in every release,
@@ -654,61 +563,42 @@ underscoring the value of an ever-evolving landscape.
 The parser is a tiny state machine. The renderer is a tiny state machine.
 
 That's the whole point, and you already know the answer.`;
-  run();
-}
-
-/* ── wiring ──────────────────────────────────────────────────────────── */
-$('btn-rules').onclick = () => {
-  const open = $('pop').hidden;
-  $('pop').hidden = !open; $('btn-rules').setAttribute('aria-expanded', String(open));
-  if (open) renderRules($('pop'));
+  grow(); run();
 };
-document.addEventListener('click', (e) => {
-  if (!$('pop').hidden && !$('pop').contains(e.target) && e.target !== $('btn-rules')) {
-    $('pop').hidden = true; $('btn-rules').setAttribute('aria-expanded', 'false');
-  }
-});
-$('btn-view').onclick = () => { S.view = S.view === 'prose' ? 'source' : 'prose'; renderDoc(); };
-$('btn-edit').onclick = () => { S.editing = !S.editing; renderDoc(); };
-for (const [id, mode] of [['m-check','check'], ['m-fudge','fudge']]) {
-  $(id).onclick = () => {
-    S.mode = mode; S.editing = false;
-    $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
-    $('m-fudge').setAttribute('aria-pressed', String(mode === 'fudge'));
-    run();
-  };
+$('b-file').onclick = () => pickFile('.md,.markdown,.mdx,.html,.htm,.txt,.text', loadFile);
+async function loadFile(f) {
+  $('input').value = await f.text();
+  S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
+  $('kind').value = S.kind;
+  grow(); run();
 }
-const step = (d) => { if (S.findings.length) select((S.sel + d + S.findings.length) % S.findings.length); };
-$('d-next').onclick = () => step(1);
-$('d-prev').onclick = () => step(-1);
-addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
-  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); step(1); }
-  if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
-  if (e.key === 'Escape') { $('pop').hidden = true; $('detail').hidden = true; S.sel = -1; renderDoc(); }
-});
-const sheet = $('sheet');
-for (const ev of ['dragenter','dragover']) sheet.addEventListener(ev, (e) => { e.preventDefault(); sheet.classList.add('over'); });
-for (const ev of ['dragleave','drop']) sheet.addEventListener(ev, () => sheet.classList.remove('over'));
-sheet.addEventListener('drop', async (e) => {
-  e.preventDefault();
+// The whole page is a drop target, so you never have to aim.
+let depth = 0;
+addEventListener('dragenter', (e) => { e.preventDefault(); if (++depth === 1) document.body.classList.add('dragging'); });
+addEventListener('dragover', (e) => e.preventDefault());
+addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; document.body.classList.remove('dragging'); } });
+addEventListener('drop', async (e) => {
+  e.preventDefault(); depth = 0; document.body.classList.remove('dragging');
   const f = e.dataTransfer.files[0]; if (!f) return;
   if (/\.json$/i.test(f.name)) {
     try { const set = JSON.parse(await f.text()); set.name = set.name || f.name.replace(/\.json$/,''); addSet(set); run(); }
     catch (err) { note(err.message); }
-    return;
-  }
-  S.src = await f.text(); S.editing = false;
-  S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
-  run();
+  } else loadFile(f);
 });
-addEventListener('resize', () => { if (S.mode === 'check' && !S.editing && S.src) placeTicks(); });
+addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (!S.findings.length) return;
+  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); select((S.sel + 1) % S.findings.length); }
+  if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); select((S.sel - 1 + S.findings.length) % S.findings.length); }
+});
+addEventListener('scroll', hideTip, true);
 
 await loadBuiltins();
 await readHash();
+S.kind = $('kind').value = S.kind;
 $('m-check').setAttribute('aria-pressed', String(S.mode === 'check'));
 $('m-fudge').setAttribute('aria-pressed', String(S.mode === 'fudge'));
-run();
+grow(); run();
 </script>
 </body>
 </html>
