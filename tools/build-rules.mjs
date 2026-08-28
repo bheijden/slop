@@ -158,15 +158,24 @@ for (const p of api.patterns) {
   sets[setName].push(rule);
 }
 
+// Rule sets carry their own version, plus the engine version they were built
+// against, so an installed copy can be compared with a newer one from the same
+// source and with the engine trying to run it.
+const ENGINE = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
+
 const META = {
   'llm-cliches': {
     name: 'llm-cliches',
+    version: '1.0.0',
+    slop: ENGINE,
     title: 'LLM cliches',
     description: 'Stock phrasings and rhythms that language models overproduce. Collected by Simon Willison for the LLM cliche highlighter.',
     source: 'https://tools.simonwillison.net/llm-cliche-highlighter'
   },
   'wikipedia-ai': {
     name: 'wikipedia-ai',
+    version: '1.0.0',
+    slop: ENGINE,
     title: 'Signs of AI writing (Wikipedia)',
     description: 'Tells catalogued by Wikipedia editors reviewing AI-generated article text.',
     source: 'https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing'

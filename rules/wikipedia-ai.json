@@ -1,5 +1,7 @@
 {
   "name": "wikipedia-ai",
+  "version": "1.0.0",
+  "slop": "0.1.0",
   "title": "Signs of AI writing (Wikipedia)",
   "description": "Tells catalogued by Wikipedia editors reviewing AI-generated article text.",
   "source": "https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing",

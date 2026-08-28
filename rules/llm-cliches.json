@@ -1,5 +1,7 @@
 {
   "name": "llm-cliches",
+  "version": "1.0.0",
+  "slop": "0.1.0",
   "title": "LLM cliches",
   "description": "Stock phrasings and rhythms that language models overproduce. Collected by Simon Willison for the LLM cliche highlighter.",
   "source": "https://tools.simonwillison.net/llm-cliche-highlighter",

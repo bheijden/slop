@@ -151,7 +151,22 @@ export function compileRule(rule, setName) {
 export function compileRuleSet(json, fallbackName) {
   const name = json.name || fallbackName;
   if (!Array.isArray(json.rules)) throw new Error(`rule set "${name}" has no rules array`);
-  return { ...json, name, rules: json.rules.map((r) => compileRule(r, name)) };
+  return {
+    ...json, name,
+    version: json.version || '0.0.0',
+    rules: json.rules.map((r) => compileRule(r, name))
+  };
+}
+
+/** Compare dotted versions. Returns -1, 0 or 1. Missing parts count as zero. */
+export function compareVersions(a, b) {
+  const pa = String(a ?? '0').split('.').map((n) => parseInt(n, 10) || 0);
+  const pb = String(b ?? '0').split('.').map((n) => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const d = (pa[i] || 0) - (pb[i] || 0);
+    if (d) return d > 0 ? 1 : -1;
+  }
+  return 0;
 }
 
 // ---- analysis -------------------------------------------------------------

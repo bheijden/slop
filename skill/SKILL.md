@@ -105,16 +105,19 @@ read this before deciding a finding is wrong.
 Two sets ship: `llm-cliches` (27 rules) and `wikipedia-ai` (11). The full
 catalogue is in [reference/rules.md](reference/rules.md).
 
-A project can install more. `sets` shows what is installed, active and passing;
-`add` downloads one into `.slop/rules/` and activates it:
+A project can install more. Rule sets are versioned packages, recorded in
+`.slop/rules.lock.json` with their source and test status:
 
 ```bash
-... sets
+... sets                       # version, rules, active, tests, source
 ... add https://example.com/house-style.json
+... update --check             # what is available from each source
+... restore shared.lock.json   # rebuild a library elsewhere
 ```
 
-Check `sets` before assuming a finding came from a built-in rule — a project's
-own set can shadow one of ours.
+An update that fails its own tests is never installed. Check `sets` before
+assuming a finding came from a built-in rule — a project's own set can shadow
+one of ours.
 
 ## Writing or fixing a rule
 

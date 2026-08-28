@@ -16,9 +16,11 @@ import { pathToFileURL } from 'node:url';
 import { analyze, sentenceBounds, countWords } from './engine.mjs';
 import { resolveRules, findConfig, loadConfig, mergeConfig, fetchSetUrl,
          libraryDir, loadLibrarySets, loadSetFile } from './config.mjs';
-import { compileRuleSet } from './engine.mjs';
+import { compareVersions } from './engine.mjs';
 import { BUILTIN_DIR as BUILTIN } from './config.mjs';
 import { testRules } from './fudge.mjs';
+import { ENGINE_VERSION, fetchSets, inspect, install, uninstall,
+         readLock, writeLock, lockPath } from './library.mjs';
 import { extractorFor, extractHtml, extractMarkdown, toSource } from './extract.mjs';
 
 process.stdout.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); throw e; });
@@ -35,7 +37,9 @@ const HELP = `slop - prose linting with pluggable rule sets
 Rule library
   slop sets                    what is installed, active, and passing
   slop add <url>               download a rule set into .slop/rules/
+  slop update [name]           re-fetch from the recorded source (--check to only report)
   slop remove <name>           delete an installed set
+  slop restore [lock.json]     reinstall everything a lock file names
   cat draft.md | slop -
 
 Rule selection (a name works for a whole set or a single rule id)
@@ -75,7 +79,7 @@ function parseArgs(argv) {
               indentCode: true, skipTables: false, config: undefined, noConfig: false,
               share: false, shareBase: 'https://bheijden.github.io/slop/', help: false };
   const ids = (v) => v.split(/[,\s]+/).filter(Boolean);
-  if (['list', 'explain', 'test-rules', 'fudge', 'check', 'add', 'remove', 'sets'].includes(argv[0])) o.cmd = argv.shift();
+  if (['list', 'explain', 'test-rules', 'fudge', 'check', 'add', 'remove', 'sets', 'update', 'restore'].includes(argv[0])) o.cmd = argv.shift();
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const next = () => { if (i + 1 >= argv.length) throw new Error(`${a} needs a value`); return argv[++i]; };
@@ -100,6 +104,7 @@ function parseArgs(argv) {
       case '--config': o.config = next(); break;
       case '--share': o.share = true; break;
       case '--share-base': o.shareBase = next(); break;
+      case '--check': o.checkOnly = true; break;
       case '--no-config': o.noConfig = true; break;
       case '--': argv.slice(i + 1).forEach((f) => o.args.push(f)); i = argv.length; break;
       default:
@@ -108,7 +113,7 @@ function parseArgs(argv) {
     }
   }
   // The subcommand may also follow flags: `slop --config x list`.
-  if (o.cmd === 'check' && ['list', 'explain', 'test-rules', 'fudge', 'add', 'remove', 'sets'].includes(o.args[0])) o.cmd = o.args.shift();
+  if (o.cmd === 'check' && ['list', 'explain', 'test-rules', 'fudge', 'add', 'remove', 'sets', 'update', 'restore'].includes(o.args[0])) o.cmd = o.args.shift();
   if (!['human', 'json', 'github', 'tsv'].includes(o.format)) throw new Error(`unknown --format ${o.format}`);
   return o;
 }
@@ -149,32 +154,6 @@ async function readSource(target) {
     return { name: target, src: await res.text(), kind: /html/i.test(ct) ? 'html' : /markdown/i.test(ct) ? 'md' : 'html' };
   }
   return { name: target, src: fs.readFileSync(target, 'utf8'), kind: null };
-}
-
-// A URL may hold one set, an array of sets, or a manifest listing set files
-// beside it — the same shape this repo's own rules/index.json uses.
-async function fetchSets(src) {
-  const read = async (u) => {
-    if (!/^https?:\/\//i.test(u)) return JSON.parse(fs.readFileSync(u, 'utf8'));
-    const res = await fetch(u, { headers: { accept: 'application/json' }, redirect: 'follow' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-  };
-  const base = (u, f) => /^https?:\/\//i.test(u) ? new URL(f, u).href : path.join(path.dirname(u), f);
-  const stem = (u) => decodeURIComponent(u.split(/[?#]/)[0].split('/').pop() || '').replace(/\.json$/, '');
-
-  const json = await read(src);
-  if (Array.isArray(json)) return json.map((j, i) => ({ name: j.name || `${stem(src)}-${i + 1}`, json: j }));
-  if (Array.isArray(json.sets)) {
-    const out = [];
-    for (const f of json.sets) {
-      const u = base(src, f);
-      out.push({ name: stem(u), json: await read(u) });
-    }
-    return out;
-  }
-  if (Array.isArray(json.rules)) return [{ name: json.name || stem(src), json }];
-  throw new Error('not a rule set: expected "rules", an array of sets, or a "sets" manifest');
 }
 
 function lineIndex(src) {
@@ -250,65 +229,126 @@ async function main() {
   }
 
   // ---- rule library ------------------------------------------------------
+  const report = (verb, info, extra = '') => {
+    const warn = info.newerEngine ? C.yellow(`  built for slop ${info.newerEngine}, this is ${ENGINE_VERSION}`) : '';
+    process.stdout.write(`${verb} ${C.bold(info.name)} ${C.dim('v' + info.version)} `
+      + `${C.dim(`${info.rules} rules`)}${extra}`
+      + (info.failing ? `  ${C.red(info.failing + ' failing')}` : `  ${C.dim('tests pass')}`) + warn + '\n');
+  };
+
   if (o.cmd === 'add') {
     if (!o.args.length) { process.stderr.write('slop: add needs a URL or a path\n'); return 2; }
-    const dir = libraryDir();
-    fs.mkdirSync(dir, { recursive: true });
-    let added = 0;
     for (const src of o.args) {
       let fetched;
       try { fetched = await fetchSets(src); }
       catch (e) { process.stderr.write(`slop: ${src}: ${e.message}\n`); return 2; }
-      for (const { name, json } of fetched) {
-        let compiled;
-        try { compiled = compileRuleSet(json, name); }
-        catch (e) { process.stderr.write(`slop: ${src}: ${e.message}\n`); return 2; }
-        // A set that fails its own tests is still installed, but you are told.
-        const t = testRules(compiled.rules, { md: extractMarkdown, html: extractHtml });
-        const bad = t.conform.fail + t.fudge.fail;
-        json.source = /^https?:\/\//i.test(src) ? src : path.resolve(src);
-        const file = path.join(dir, compiled.name + '.json');
-        fs.writeFileSync(file, JSON.stringify(json, null, 2) + '\n');
-        added++;
-        const shadowed = fs.existsSync(path.join(BUILTIN, compiled.name + '.json'));
-        process.stdout.write(`${C.green('added')} ${C.bold(compiled.name)}${shadowed ? C.dim(' (shadows the built-in set)') : ''} `
-          + `${C.dim(`${compiled.rules.length} rules → ${path.relative(process.cwd(), file)}`)}`
-          + (bad ? `  ${C.red(bad + ' failing')}` : `  ${C.dim('tests ok')}`) + '\n');
+      for (const f of fetched) {
+        let info;
+        try { info = inspect(f.json, f.name); }
+        catch (e) { process.stderr.write(`slop: ${f.src}: ${e.message}\n`); return 2; }
+        const shadows = fs.existsSync(path.join(BUILTIN, info.name + '.json'));
+        install(f.json, info, f.src);
+        report(C.green('added'), info, shadows ? C.dim(' (shadows the built-in)') : '');
       }
     }
-    if (added) process.stdout.write(C.dim('active now; turn one off with --ignore <name> or "ignore" in slop.json\n'));
+    process.stdout.write(C.dim('active now; turn one off with --ignore <name>\n'));
+    return 0;
+  }
+
+  if (o.cmd === 'update') {
+    const lock = readLock();
+    const names = o.args.length ? o.args : Object.keys(lock.sets);
+    if (!names.length) { process.stdout.write('nothing installed\n'); return 0; }
+    let changed = 0;
+    for (const name of names) {
+      const rec = lock.sets[name];
+      if (!rec) { process.stderr.write(`slop: "${name}" is not installed\n`); return 2; }
+      let fetched;
+      try { fetched = await fetchSets(rec.source); }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)} — ${e.message}\n`); continue; }
+      const match = fetched.find((f) => (f.json.name || f.name) === name) || fetched[0];
+      let info;
+      try { info = inspect(match.json, name); }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name} — ${e.message}\n`); continue; }
+
+      if (info.sha256 === rec.sha256) {
+        process.stdout.write(`${C.dim('current')} ${name} ${C.dim('v' + rec.version)}\n`);
+        continue;
+      }
+      const dir = compareVersions(info.version, rec.version);
+      const arrow = `${rec.version} → ${info.version}${dir < 0 ? C.yellow(' (older!)') : ''}`;
+      // A candidate that fails its own tests is reported and not installed.
+      if (info.failing) {
+        process.stdout.write(`${C.red('held back')} ${name} ${C.dim(arrow)}  `
+          + `${C.red(info.failing + ' failing')} ${C.dim('— not installed')}\n`);
+        continue;
+      }
+      if (o.checkOnly) {
+        process.stdout.write(`${C.yellow('update')} ${name} ${C.dim(arrow)}  ${C.dim('tests pass')}\n`);
+        continue;
+      }
+      install(match.json, info, match.src);
+      report(C.green('updated'), info, C.dim(`  ${arrow}`));
+      changed++;
+    }
+    if (o.checkOnly) return 0;
+    if (!changed) process.stdout.write(C.dim('nothing to do\n'));
     return 0;
   }
 
   if (o.cmd === 'remove') {
     if (!o.args.length) { process.stderr.write('slop: remove needs a set name\n'); return 2; }
-    const dir = libraryDir();
     for (const name of o.args) {
-      const file = path.join(dir, name + '.json');
-      if (!fs.existsSync(file)) { process.stderr.write(`slop: no installed set "${name}"\n`); return 2; }
-      fs.unlinkSync(file);
+      if (!uninstall(name)) { process.stderr.write(`slop: no installed set "${name}"\n`); return 2; }
       process.stdout.write(`${C.red('removed')} ${name}\n`);
+    }
+    return 0;
+  }
+
+  if (o.cmd === 'restore') {
+    const file = o.args[0] || lockPath();
+    let lock;
+    try { lock = JSON.parse(fs.readFileSync(file, 'utf8')); }
+    catch (e) { process.stderr.write(`slop: cannot read ${file}: ${e.message}\n`); return 2; }
+    const entries = Object.entries(lock.sets || {});
+    if (!entries.length) { process.stdout.write('nothing to restore\n'); return 0; }
+    if (compareVersions(lock.slop, ENGINE_VERSION) > 0) {
+      process.stdout.write(C.yellow(`lock written by slop ${lock.slop}, this is ${ENGINE_VERSION}\n`));
+    }
+    for (const [name, rec] of entries) {
+      let fetched;
+      try { fetched = await fetchSets(rec.source); }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)} — ${e.message}\n`); continue; }
+      const match = fetched.find((f) => (f.json.name || f.name) === name) || fetched[0];
+      const info = inspect(match.json, name);
+      install(match.json, info, match.src);
+      const drift = info.sha256 !== rec.sha256
+        ? C.yellow(`  differs from the lock (${rec.version} → ${info.version})`) : '';
+      report(C.green('restored'), info, drift);
     }
     return 0;
   }
 
   if (o.cmd === 'sets') {
     const active = new Set(rules.map((r) => r.id));
-    const installed = loadLibrarySets();
-    process.stdout.write(`${'SET'.padEnd(22)}${'RULES'.padStart(6)}  ${'ACTIVE'.padEnd(8)}${'TESTS'.padEnd(12)}SOURCE\n`);
+    const lock = readLock();
+    process.stdout.write(`${pad('SET', 22)}${pad('VERSION', 10)}${'RULES'.padStart(5)}  `
+      + `${pad('ACTIVE', 8)}${pad('TESTS', 12)}SOURCE\n`);
     for (const set of resolved.sets) {
+      const rec = lock.sets[set.name];
       const on = set.rules.filter((r) => active.has(r.id)).length;
       const t = testRules(set.rules, { md: extractMarkdown, html: extractHtml });
       const bad = t.conform.fail + t.fudge.fail;
       const state = on === set.rules.length ? C.green('all') : on ? C.yellow(`${on}/${set.rules.length}`) : C.dim('off');
       const tests = bad ? C.red(`${bad} failing`) : C.green('pass');
-      const inst = installed.find((i) => i.name === set.name);
-      const from = inst ? (set.source || path.relative(process.cwd(), inst.installed)) : C.dim('built-in');
-      const note = set.shadows ? C.dim('  (shadows built-in)') : '';
-      process.stdout.write(`${set.name.padEnd(22)}${String(set.rules.length).padStart(6)}  `
-        + `${pad(state, 8)}${pad(tests, 12)}${from}${note}\n`);
+      const from = rec ? rec.source : C.dim('built-in');
+      const note = set.shadows ? C.dim(' (shadows built-in)') : '';
+      process.stdout.write(`${pad(set.name, 22)}${pad(C.dim('v' + (set.version || '0.0.0')), 10)}`
+        + `${String(set.rules.length).padStart(5)}  ${pad(state, 8)}${pad(tests, 12)}${from}${note}\n`);
     }
-    process.stdout.write(`\n${C.dim(`library: ${path.relative(process.cwd(), libraryDir()) || '.'}/`)}\n`);
+    process.stdout.write(`\n${C.dim(`library: ${path.relative(process.cwd(), libraryDir()) || '.'}/`)}`
+      + `  ${C.dim(`lock: ${path.relative(process.cwd(), lockPath())}`)}`
+      + `  ${C.dim(`engine: slop ${ENGINE_VERSION}`)}\n`);
     return 0;
   }
 

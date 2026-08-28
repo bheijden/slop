@@ -206,45 +206,97 @@ hits, all genuine, with full recall on the examples. See
 
 ### Installing rule sets
 
-`add` downloads a rule set into `.slop/rules/` beside your
-`slop.json`. It is checked and tested on the way in, then active
-immediately without a flag or a config edit.
+A rule set is a package. It carries its own `name` and `version`, and the
+`slop` version it was built against:
+
+```json
+{ "name": "house-style", "version": "1.1.0", "slop": "0.1.0",
+  "title": "Our house style", "rules": [ … ] }
+```
+
+`add` downloads one into `.slop/rules/`, beside your `slop.json`.
+It is compiled and run through its own tests on the way in, then becomes active
+immediately — you do not pass a flag or edit the config:
 
 ```sh
 slop add https://example.com/house-style.json
-slop add https://example.com/rules/index.json    # a manifest: several sets at once
+slop add https://example.com/rules/index.json    # a manifest: several at once
 slop add ./local-set.json
+```
 
-slop sets            # what is installed, active and passing
-slop remove broken-demo
+A URL can hold one set, an array of sets, or a `{"sets": [...]}` manifest naming
+files beside it — the shape this repo's own `rules/index.json` uses, so
+`slop add <that url>` installs both of ours.
+
+```sh
+slop sets                # version, rule count, active, tests, source
 ```
 
 ```
-SET                    RULES  ACTIVE  TESTS       SOURCE
-llm-cliches               27  all     pass        built-in
-wikipedia-ai              11  all     pass        built-in
-house-style                2  all     pass        https://example.com/house-style.json
-draft-voice                5  off     3 failing   https://example.com/draft-voice.json
+SET                   VERSION   RULES  ACTIVE  TESTS       SOURCE
+llm-cliches           v1.0.0       27  all     pass        built-in
+wikipedia-ai          v1.0.0       11  all     pass        built-in
+house-style           v1.1.0        2  all     pass        https://example.com/house-style.json
 
-library: .slop/rules/
+library: .slop/rules/  lock: .slop/rules.lock.json  engine: slop 0.1.0
 ```
 
-A URL can hold one set, an array of sets, or a `{"sets": [...]}` manifest
-listing files beside it — the shape this repo's own `rules/index.json` uses, so
-`slop add <that url>` works.
+### Updating
+
+`.slop/rules.lock.json` records where each set came from, its version, a
+hash of its rules, and whether it passed. `update` re-fetches from that source:
+
+```sh
+slop update --check      # report what is available, change nothing
+slop update              # take the ones that pass
+slop update house-style  # just one
+```
+
+```
+update  house-style 1.0.0 → 1.1.0  tests pass
+```
+
+**A candidate that fails its own tests is never installed.** It is reported and
+the working version stays:
+
+```
+held back house-style 1.0.0 → 1.2.0  2 failing — not installed
+```
+
+That is the point of shipping tests inside a rule set: an update from a source
+you do not control is checked before it can affect your CI. A set built against
+a newer `slop` than yours is flagged too, since it may use a detector kind
+this engine does not have.
+
+### Sharing a library
+
+The lock file is the portable artifact. Commit it, or hand it to someone:
+
+```sh
+slop restore                     # from .slop/rules.lock.json
+slop restore shared.lock.json    # from anywhere
+```
+
+Each set is re-fetched from its recorded source and tested. If the source now
+serves something different from what the lock recorded, you are told:
+
+```
+restored house-style v1.1.0 2 rules  differs from the lock (1.0.0 → 1.1.0)
+```
+
+Committing `.slop/rules/` as well pins the exact files; committing only
+the lock keeps them fresh. `slop fudge` tests the built-ins, the library
+and anything in `ruleSets` together, so installed rules get the same checks
+ours do.
+
+An installed set **shadows** a built-in of the same name, so you can pin or
+customise the rules that ship here by installing your own `llm-cliches`.
 
 Turn one off with `--ignore <name>`, or in `slop.json`:
 
 ```json
 { "ignore": ["draft-voice"] }
 ```
-
-An installed set **shadows** a built-in of the same name, so you can pin or
-customise the rules that ship here by installing your own `llm-cliches`.
-
-Commit `.slop/rules/` and everyone on the project gets the same rules.
-`slop fudge` tests the built-ins, everything installed, and anything in
-`ruleSets` — your rules get exactly the checks ours do.
 
 ### Writing your own
 
