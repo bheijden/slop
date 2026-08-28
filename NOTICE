@@ -1,0 +1,15 @@
+slop
+Copyright 2026 Bas van der Heijden
+
+This product includes software developed by Simon Willison
+(https://github.com/simonw/tools), licensed under the Apache License 2.0.
+
+The cliché-detection patterns in rules/llm-cliches.json and
+rules/wikipedia-ai.json, together with their test cases, are derived from
+llm-cliche-highlighter.html in that project. A pinned copy of the original file
+is kept at vendor/llm-cliche-highlighter.html, and tools/build-rules.mjs
+regenerates the rule sets from it.
+
+The wikipedia-ai rule set is adapted there from Wikipedia's "Signs of AI
+writing" (https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing),
+available under CC BY-SA 4.0.

@@ -307,6 +307,11 @@ lives in `vendor/`; `node tools/build-rules.mjs` regenerates the rule sets from
 it. The `wikipedia-ai` set is adapted there from Wikipedia's
 [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing).
 
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The rule patterns are
+derived from [simonw/tools](https://github.com/simonw/tools), also Apache 2.0.
+
 ## Limits
 
 - **English only.** The patterns are hard-coded English. Prose in another
