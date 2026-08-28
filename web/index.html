@@ -13,9 +13,12 @@
 /* Two voices: everything the linter says is monospace, everything you wrote
    is serif. Light is the default; the toggle in the bar wins over the OS. */
 :root{
-  --paper:#FCFCFA; --card:#fff; --ink:#17191E; --muted:#767982; --hair:#E6E6E0;
-  --sunk:#F4F4EF; --blue:#2D5BD6; --flag:#C2403C;
-  --mark:#FFEFA8; --mark-edge:#E0B93C; --mark-on:#FFE066; --mark-ink:#17191E;
+  /* Three clear surfaces rather than three near-identical ones: the page sits
+     back, cards come forward, code blocks recess. */
+  --paper:#EDEDE9; --card:#FDFDFC; --sunk:#E0E0DA; --hair:#D4D4CC;
+  --ink:#14161A; --muted:#5C5F66; --blue:#2D5BD6; --flag:#B93B37;
+  --mark:#FCE79B; --mark-edge:#D4A62E; --mark-on:#F9DA6B; --mark-ink:#14161A;
+  --lift:0 1px 2px rgba(20,22,26,.05), 0 1px 1px rgba(20,22,26,.04);
   /* Side margin grows with the window up to a cap, then the content takes the
      rest of the width rather than sitting in a fixed column. */
   --gutter:clamp(16px, 4vw, 112px);
@@ -25,16 +28,18 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme=light]){
-    --paper:#15171B; --card:#1B1D22; --ink:#E9E9E4; --muted:#8C8F97; --hair:#2B2E35;
-    --sunk:#20232A; --blue:#82A4FF; --flag:#E4665C;
-    --mark:rgba(255,214,102,.22); --mark-edge:#B8912E; --mark-on:rgba(255,214,102,.42); --mark-ink:#F4EFDF;
+    --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
+    --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60;
+    --mark:rgba(250,208,105,.20); --mark-edge:#A8842A; --mark-on:rgba(250,208,105,.40); --mark-ink:#F6F0E0;
+    --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
     color-scheme:dark;
   }
 }
 :root[data-theme=dark]{
-  --paper:#15171B; --card:#1B1D22; --ink:#E9E9E4; --muted:#8C8F97; --hair:#2B2E35;
-  --sunk:#20232A; --blue:#82A4FF; --flag:#E4665C;
-  --mark:rgba(255,214,102,.22); --mark-edge:#B8912E; --mark-on:rgba(255,214,102,.42); --mark-ink:#F4EFDF;
+  --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
+  --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60;
+  --mark:rgba(250,208,105,.20); --mark-edge:#A8842A; --mark-on:rgba(250,208,105,.40); --mark-ink:#F6F0E0;
+  --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -46,7 +51,7 @@ button,select,textarea,input{font:inherit;color:inherit}
 /* bar */
 .bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;height:46px;
      padding:0 var(--gutter);
-     background:var(--paper);border-bottom:1px solid var(--hair)}
+     background:var(--card);border-bottom:1px solid var(--hair)}
 .wordmark{font-weight:600;font-size:14px;letter-spacing:-.02em}
 .wordmark b{color:var(--flag);font-weight:600}
 .modes{display:flex;gap:2px}
@@ -74,8 +79,8 @@ button,select,textarea,input{font:inherit;color:inherit}
 /* input — one card: the text, what to do with it, and which rules run. */
 .io{margin:22px 0 0}
 #input-card{
-  position:relative;border:1.5px dashed var(--hair);border-radius:10px;background:var(--card);
-  transition:border-color .12s,background .12s;
+  position:relative;border:1px solid var(--hair);border-radius:10px;background:var(--card);
+  box-shadow:var(--lift);transition:border-color .12s,background .12s;
 }
 #input-card:focus-within{border-style:solid;border-color:var(--blue)}
 body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
@@ -90,7 +95,8 @@ body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
 .loaded b{color:var(--ink);font-weight:500}
 .tools{
   display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-  padding:9px 12px;border-top:1px solid var(--hair);
+  padding:9px 12px;border-top:1px solid var(--hair);background:var(--sunk);
+  border-radius:0 0 9px 9px;
 }
 .tools select{background:var(--paper);border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px}
 .tools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
@@ -250,7 +256,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .tip{
   position:fixed;z-index:60;max-width:340px;pointer-events:none;opacity:0;transition:opacity .1s;
   background:var(--card);border:1px solid var(--hair);border-radius:8px;padding:9px 11px;
-  box-shadow:0 10px 30px -10px rgba(0,0,0,.35);font-size:11.5px;line-height:1.55;
+  box-shadow:0 12px 32px -10px rgba(0,0,0,.30);font-size:11.5px;line-height:1.55;
 }
 .tip.on{opacity:1}
 .tip-head{display:flex;gap:8px;align-items:baseline}
