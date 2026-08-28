@@ -155,8 +155,11 @@ Or in `slop.json`, found by walking up from the working directory:
 The Python CLI also reads `[tool.slop]` from a `pyproject.toml` passed
 with `--config`.
 
-One rule ships off by default: `colon-triple`. That decision was measured, not
-guessed — see [docs/calibration.md](docs/calibration.md).
+Every rule ships enabled. `colon-triple` nearly did not: it produced 45% of all
+findings on a real corpus, and 16 of its 21 hits were docstrings, matrix algebra
+and hardware lists rather than prose. Tightening the rule beat disabling it — 5
+hits, all genuine, with full recall on the examples. See
+[docs/calibration.md](docs/calibration.md) for the method.
 
 ### Writing your own
 

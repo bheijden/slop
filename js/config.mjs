@@ -25,6 +25,15 @@ export function loadSetFile(file) {
   return compileRuleSet(json, path.basename(file).replace(/\.json$/, ''));
 }
 
+// A rule set can live on someone else's site. Fetching one runs their patterns
+// on your text, so read it first: the browser caps a runaway rule with a worker
+// timeout, the CLI does not.
+export async function fetchSetUrl(url) {
+  const res = await fetch(url, { headers: { accept: 'application/json' }, redirect: 'follow' });
+  if (!res.ok) throw new Error(`cannot load rule set ${url}: HTTP ${res.status}`);
+  return compileRuleSet(await res.json(), url.replace(/^.*\//, '').replace(/\.json$/, ''));
+}
+
 export function loadBuiltinSets(dir = BUILTIN_DIR) {
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir)
@@ -62,8 +71,12 @@ export function loadConfig(file) {
  * @param {boolean}  o.all      include rules marked "default":"off"
  * @returns {{rules: object[], sets: object[], available: object[]}}
  */
-export function resolveRules({ select = [], ignore = [], ruleSets = [], all = false, rulesDir } = {}) {
-  const sets = [...loadBuiltinSets(rulesDir), ...ruleSets.map(loadSetFile)];
+export function resolveRules({ select = [], ignore = [], ruleSets = [], all = false, rulesDir, extraSets = [] } = {}) {
+  const sets = [
+    ...loadBuiltinSets(rulesDir),
+    ...ruleSets.filter((r) => !/^https?:\/\//i.test(r)).map(loadSetFile),
+    ...extraSets
+  ];
   const byName = new Map();
   for (const s of sets) {
     if (byName.has(s.name)) throw new Error(`duplicate rule set name "${s.name}"`);

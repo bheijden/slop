@@ -33,6 +33,51 @@ const ALGO = {
   'sentence-anaphora': { kind: 'anaphora',      params: { minRun: 3 } }
 };
 
+// Local corrections to upstream rules. Kept here so `node tools/build-rules.mjs`
+// does not silently revert them the next time vendor/ is refreshed.
+//
+// colon-triple: upstream's item body is `[^.!?;:\n]{2,40}`, which matches any
+// three comma-separated things. Over 29k words of technical writing that fired
+// 21 times and only 5 were real -- the rest were docstrings, matrix algebra,
+// hardware lists and Title-Case component names. Two changes fix it without
+// losing recall: items may not contain code, math or path characters, and each
+// item must start lowercase (prose items do; proper-noun enumerations do not).
+// Measured after the change: 5 hits over the same corpus, all true positives,
+// and every upstream example still passes.
+const COLON_TECH = String.raw`=\[\]\(\)\{\}"'\/\\|_~^%*+<>&#@$\u2192\u21d2\u2194\u00b0`;
+const COLON_ITEM = String.raw`[a-z][^.!?;:\n,${COLON_TECH}]{1,39}`;
+
+const OVERRIDES = {
+  'colon-triple': {
+    pattern: String.raw`:\s+${COLON_ITEM},\s+${COLON_ITEM},\s+(?:and\s+|or\s+)?${COLON_ITEM}(?=[.!?\n])`,
+    description: 'A colon opening onto three or more comma-separated prose items: \u201cseparate ports, processes, and local state\u201d. The most common shape LLM prose uses to sound concrete. Tightened from upstream: items must read as prose, not as code, measurements or proper-noun lists.',
+    tests: {
+      hit: [
+        'The fix needs three things: separate ports, separate processes, and separate state.',
+        'Each service gets its own everything: ports, processes, local state.',
+        'It splits into three: the core, the accumulated solver craft, and the agent harness around it.',
+        'What it buys: continuous calibration against live data, regression gates on every model edit, and drift alarms that fire early.'
+      ],
+      miss: [
+        'The recipe calls for flour, butter, and sugar.',
+        'Note: the flag is off by default.',
+        'svd_mode: SVD mode ("truncate", "damp", or None).',
+        'Returns: theta_opt, cost_history, primary_rms_history.',
+        'Chipset: Intel CNVi, hci0, BlueZ 5.',
+        'Exit codes: clean, findings over budget, usage/read error.',
+        'Reroot k: B=per[k], per[0]=I, per[j]=B-1per[j].',
+        'Checks: oracle, gauge-invariance, FK/residual/J parity.',
+        'Units: vessels, exchangers, columns, reactors.',
+        'Four layers: Frontend Experience, API & Gateway, Cognitive Orchestration, Physical Execution.',
+        'The stack: UI, visualization, local SDK in one place.',
+        'Pipeline: Perception, Planning, Actuation, Orchestration.',
+        'Laptop: Alienware m15 R4, Intel Wi-Fi 6 AX200, Ubuntu 20.',
+        'iw shows HE-MCS 11 at 1 Gbps, signal -30 to -40 dBm, 0% packet loss.'
+      ]
+    }
+  }
+};
+
 const SUGGEST = {
   'no-chain': 'Say what it does have. A denial chain lists absences instead of substance.',
   'whole': 'Name the thing directly instead of gesturing at its totality.',
@@ -109,6 +154,7 @@ for (const p of api.patterns) {
     Object.assign(rule, ALGO[p.id]);
   }
   rule.tests = casesFor(p.id);
+  if (OVERRIDES[p.id]) Object.assign(rule, OVERRIDES[p.id]);
   sets[setName].push(rule);
 }
 
@@ -127,9 +173,9 @@ const META = {
   }
 };
 
-// Rules that fire constantly on ordinary technical prose. Measured, not guessed
-// - see docs/calibration.md.
-const OFF_BY_DEFAULT = new Set(['colon-triple']);
+// Rules off by default. Measured, not guessed - see docs/calibration.md.
+// colon-triple used to be here; it was fixed instead (see OVERRIDES above).
+const OFF_BY_DEFAULT = new Set([]);
 
 // The web page cannot list a directory, so ship a manifest alongside the sets.
 fs.writeFileSync(path.join(ROOT, 'rules', 'index.json'),

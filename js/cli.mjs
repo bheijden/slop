@@ -9,11 +9,12 @@
 //   slop test-rules rules/mine.json      conformance + markup fudging
 
 import fs from 'node:fs';
+import zlib from 'node:zlib';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { analyze, sentenceBounds, countWords } from './engine.mjs';
-import { resolveRules, findConfig, loadConfig, mergeConfig } from './config.mjs';
+import { resolveRules, findConfig, loadConfig, mergeConfig, fetchSetUrl } from './config.mjs';
 import { extractorFor, extractHtml, extractMarkdown, toSource } from './extract.mjs';
 
 process.stdout.on('error', (e) => { if (e.code === 'EPIPE') process.exit(0); throw e; });
@@ -31,8 +32,8 @@ const HELP = `slop - prose linting with pluggable rule sets
 Rule selection (a name works for a whole set or a single rule id)
   --select IDS       only these rule sets or rules      (default: every built-in set)
   --ignore IDS       drop these rule sets or rules
-  --rules FILE       load an extra rule set JSON (repeatable)
-  --all              include rules marked "default": "off"
+  --rules FILE|URL   load an extra rule set, from disk or over https (repeatable)
+  --all              include rules marked "default": "off" (currently none)
 
 Output
   --format FMT       human (default), json, tsv, github
@@ -51,6 +52,8 @@ Files
   --no-indent-code   keep 4-space indented markdown blocks
   --skip-tables      drop markdown table rows
 
+  --share            print a link that opens these files in the web viewer
+  --share-base URL   where that link points (default: the GitHub Pages site)
   --config FILE      use this slop.json (default: nearest one up the tree)
   --no-config        ignore any slop.json
 
@@ -60,7 +63,8 @@ function parseArgs(argv) {
   const o = { cmd: 'check', args: [], select: [], ignore: [], ruleSets: [], exclude: [],
               all: false, format: 'human', context: true, suggest: true, quiet: false,
               max: null, maxPer1000: null, exitZero: false, recursive: false,
-              indentCode: true, skipTables: false, config: undefined, noConfig: false, help: false };
+              indentCode: true, skipTables: false, config: undefined, noConfig: false,
+              share: false, shareBase: 'https://bheijden.github.io/slop/', help: false };
   const ids = (v) => v.split(/[,\s]+/).filter(Boolean);
   if (['list', 'explain', 'test-rules', 'fudge', 'check'].includes(argv[0])) o.cmd = argv.shift();
   for (let i = 0; i < argv.length; i++) {
@@ -85,6 +89,8 @@ function parseArgs(argv) {
       case '--no-indent-code': o.indentCode = false; break;
       case '--skip-tables': o.skipTables = true; break;
       case '--config': o.config = next(); break;
+      case '--share': o.share = true; break;
+      case '--share-base': o.shareBase = next(); break;
       case '--no-config': o.noConfig = true; break;
       case '--': argv.slice(i + 1).forEach((f) => o.args.push(f)); i = argv.length; break;
       default:
@@ -172,7 +178,10 @@ async function main() {
   let cfg, resolved;
   try {
     cfg = mergeConfig(loadConfig(cfgPath), o);
-    resolved = resolveRules(cfg);
+    const remote = cfg.ruleSets.filter((r) => /^https?:\/\//i.test(r));
+    const extraSets = [];
+    for (const url of remote) extraSets.push(await fetchSetUrl(url));
+    resolved = resolveRules({ ...cfg, extraSets });
   } catch (e) { process.stderr.write(`slop: ${e.message}\n`); return 2; }
   const rules = resolved.rules;
 
@@ -232,6 +241,28 @@ async function main() {
   const all = reports.flatMap((r) => r.findings);
   const words = reports.reduce((a, r) => a + r.words, 0);
   const per1000 = words ? +(all.length / words * 1000).toFixed(2) : 0;
+
+  // --share turns a local file into a link that opens the same text, the same
+  // rule sets and the same findings in the web viewer. The document travels in
+  // the URL fragment, which browsers never send to a server.
+  if (o.share) {
+    for (let i = 0; i < files.length; i++) {
+      const target = files[i];
+      const p = new URLSearchParams();
+      if (isUrl(target)) p.set('url', target);
+      else {
+        const src = fs.readFileSync(target === '-' ? 0 : target, 'utf8');
+        p.set('gz', zlib.gzipSync(Buffer.from(src, 'utf8')).toString('base64url'));
+        p.set('kind', /\.html?$/i.test(target) ? 'html' : /\.(md|markdown|mdx)$/i.test(target) ? 'md' : 'txt');
+      }
+      if (cfg.select.length) p.set('select', cfg.select.join(','));
+      if (cfg.ignore.length) p.set('ignore', cfg.ignore.join(','));
+      for (const r of cfg.ruleSets) if (/^https?:\/\//i.test(r)) p.append('rules', r);
+      const link = o.shareBase.replace(/\/?$/, '/') + '#' + p.toString();
+      process.stdout.write(files.length > 1 ? `${reports[i].file}\n  ${link}\n` : link + '\n');
+    }
+    return 0;
+  }
 
   if (o.format === 'json') {
     process.stdout.write(JSON.stringify({

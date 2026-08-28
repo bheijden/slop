@@ -9,8 +9,8 @@ import sys
 import urllib.request
 from pathlib import Path
 
-from .config import (CONFIG_NAME, find_config, load_config, merge_config,
-                     resolve_rules)
+from .config import (CONFIG_NAME, fetch_set_url, find_config, load_config,
+                     merge_config, resolve_rules)
 from .engine import analyze, count_words, sentence_bounds
 from .extract import (extract_html, extract_markdown, extractor_for,
                       to_source)
@@ -114,8 +114,8 @@ Rule selection takes a set name ("llm-cliches") or a single rule id
                         "or files, directories and URLs to lint")
     p.add_argument("--select", action="append", default=[], metavar="IDS")
     p.add_argument("--ignore", action="append", default=[], metavar="IDS")
-    p.add_argument("--rules", action="append", default=[], metavar="FILE",
-                   help="extra rule set JSON (repeatable)")
+    p.add_argument("--rules", action="append", default=[], metavar="FILE|URL",
+                   help="extra rule set, from disk or over https (repeatable)")
     p.add_argument("--all", action="store_true", help='include rules marked "default": "off"')
     p.add_argument("--format", default="human", choices=["human", "json", "tsv", "github"])
     p.add_argument("--no-context", dest="context", action="store_false")
@@ -128,6 +128,9 @@ Rule selection takes a set name ("llm-cliches") or a single rule id
     p.add_argument("--exclude", action="append", default=[], metavar="SUBSTR")
     p.add_argument("--no-indent-code", dest="indent_code", action="store_false")
     p.add_argument("--skip-tables", action="store_true")
+    p.add_argument("--share", action="store_true",
+                   help="print a link that opens these files in the web viewer")
+    p.add_argument("--share-base", default="https://bheijden.github.io/slop/")
     p.add_argument("--config", default=None)
     p.add_argument("--no-config", action="store_true")
     return p
@@ -164,9 +167,11 @@ def main(argv=None) -> int:
             "max": opts.max, "max_per_1000": opts.max_per_1000,
             "skip_tables": opts.skip_tables, "indent_code": opts.indent_code,
         })
+        extra = [fetch_set_url(u) for u in cfg["rule_sets"]
+                 if u.startswith(("http://", "https://"))]
         rules, sets, every = resolve_rules(
             select=cfg["select"], ignore=cfg["ignore"],
-            rule_sets=cfg["rule_sets"], all_rules=cfg["all_rules"])
+            rule_sets=cfg["rule_sets"], all_rules=cfg["all_rules"], extra_sets=extra)
     except ValueError as exc:
         print(f"slop: {exc}", file=sys.stderr)
         return 2
@@ -232,6 +237,34 @@ def main(argv=None) -> int:
             print(f"slop: cannot read {f}: {exc}", file=sys.stderr)
             return 2
         reports.append(lint_source(name, src, kind, rules, cfg))
+
+    # --share turns a local file into a link that opens the same text, the same
+    # rule sets and the same findings in the web viewer. The document travels in
+    # the URL fragment, which browsers never send to a server.
+    if opts.share:
+        import base64
+        import gzip
+        from urllib.parse import urlencode
+        for target, report in zip(files, reports):
+            pairs = []
+            if is_url(target):
+                pairs.append(("url", target))
+            else:
+                raw = Path(target).read_bytes() if target != "-" else sys.stdin.buffer.read()
+                pairs.append(("gz", base64.urlsafe_b64encode(gzip.compress(raw)).decode().rstrip("=")))
+                ext = Path(target).suffix.lower()
+                pairs.append(("kind", "html" if ext in (".html", ".htm") else
+                              "md" if ext in (".md", ".markdown", ".mdx") else "txt"))
+            if cfg["select"]:
+                pairs.append(("select", ",".join(cfg["select"])))
+            if cfg["ignore"]:
+                pairs.append(("ignore", ",".join(cfg["ignore"])))
+            for r in cfg["rule_sets"]:
+                if r.startswith(("http://", "https://")):
+                    pairs.append(("rules", r))
+            link = opts.share_base.rstrip("/") + "/#" + urlencode(pairs)
+            print(f"{report['file']}\n  {link}" if len(files) > 1 else link)
+        return 0
 
     all_f = [f for r in reports for f in r["findings"]]
     words = sum(r["words"] for r in reports)

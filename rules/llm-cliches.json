@@ -479,22 +479,35 @@
       "id": "colon-triple",
       "name": "Colon into a triple",
       "severity": "warn",
-      "description": "A colon opening onto three or more comma-separated items: “separate ports, processes, and local state”. The most common shape LLM prose uses to sound concrete. Noisy in technical writing — leave it off by default if your corpus is documentation.",
+      "description": "A colon opening onto three or more comma-separated prose items: “separate ports, processes, and local state”. The most common shape LLM prose uses to sound concrete. Tightened from upstream: items must read as prose, not as code, measurements or proper-noun lists.",
       "suggest": "Fine in a real list. Suspect when it is prose padding out to three items.",
       "kind": "regex",
-      "pattern": ":\\s+[^.!?;:\\n]{2,40},\\s+[^.!?;:\\n]{2,40},\\s+(?:and\\s+|or\\s+)?[^.!?;:\\n]{2,40}(?=[.!?\\n])",
+      "pattern": ":\\s+[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39},\\s+[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39},\\s+(?:and\\s+|or\\s+)?[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39}(?=[.!?\\n])",
       "flags": "g",
       "tests": {
         "hit": [
           "The fix needs three things: separate ports, separate processes, and separate state.",
-          "Each service gets its own everything: ports, processes, local state."
+          "Each service gets its own everything: ports, processes, local state.",
+          "It splits into three: the core, the accumulated solver craft, and the agent harness around it.",
+          "What it buys: continuous calibration against live data, regression gates on every model edit, and drift alarms that fire early."
         ],
         "miss": [
           "The recipe calls for flour, butter, and sugar.",
-          "Note: the flag is off by default."
+          "Note: the flag is off by default.",
+          "svd_mode: SVD mode (\"truncate\", \"damp\", or None).",
+          "Returns: theta_opt, cost_history, primary_rms_history.",
+          "Chipset: Intel CNVi, hci0, BlueZ 5.",
+          "Exit codes: clean, findings over budget, usage/read error.",
+          "Reroot k: B=per[k], per[0]=I, per[j]=B-1per[j].",
+          "Checks: oracle, gauge-invariance, FK/residual/J parity.",
+          "Units: vessels, exchangers, columns, reactors.",
+          "Four layers: Frontend Experience, API & Gateway, Cognitive Orchestration, Physical Execution.",
+          "The stack: UI, visualization, local SDK in one place.",
+          "Pipeline: Perception, Planning, Actuation, Orchestration.",
+          "Laptop: Alienware m15 R4, Intel Wi-Fi 6 AX200, Ubuntu 20.",
+          "iw shows HE-MCS 11 at 1 Gbps, signal -30 to -40 dBm, 0% packet loss."
         ]
-      },
-      "default": "off"
+      }
     },
     {
       "id": "heres-the-twist",

@@ -38,6 +38,20 @@ def load_set_file(path: str | os.PathLike) -> RuleSet:
     return RuleSet(data, path.stem)
 
 
+def fetch_set_url(url: str) -> RuleSet:
+    """Load a rule set from a URL.
+
+    Fetching one runs someone else's patterns on your text, so read it first:
+    the browser caps a runaway rule with a worker timeout, the CLI does not.
+    """
+    import urllib.request
+    req = urllib.request.Request(url, headers={"accept": "application/json",
+                                               "user-agent": "slop"})
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        data = json.loads(resp.read().decode(resp.headers.get_content_charset() or "utf-8"))
+    return RuleSet(data, url.rsplit("/", 1)[-1].removesuffix(".json"))
+
+
 def load_builtin_sets(directory: Path | None = None) -> list[RuleSet]:
     directory = Path(directory or BUILTIN_DIR)
     if not directory.is_dir():
@@ -72,9 +86,12 @@ def load_config(path: str | os.PathLike | None) -> dict:
         raise ValueError(f"cannot read {path}: {exc}") from exc
 
 
-def resolve_rules(select=(), ignore=(), rule_sets=(), all_rules=False, rules_dir=None):
+def resolve_rules(select=(), ignore=(), rule_sets=(), all_rules=False, rules_dir=None,
+                  extra_sets=()):
     """Returns (active_rules, all_sets, every_rule)."""
-    sets = load_builtin_sets(rules_dir) + [load_set_file(p) for p in rule_sets]
+    sets = (load_builtin_sets(rules_dir)
+            + [load_set_file(p) for p in rule_sets if not p.startswith(("http://", "https://"))]
+            + list(extra_sets))
     by_name: dict[str, RuleSet] = {}
     for s in sets:
         if s.name in by_name:

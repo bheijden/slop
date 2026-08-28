@@ -1,10 +1,11 @@
 // Rules run in a worker so the page can kill a runaway one.
 //
 // This is not hypothetical: the sentence detectors are quadratic on text with
-// no terminator, and a user-supplied regex can backtrack forever. A worker is
-// the only way to terminate that without freezing the tab.
+// no terminator, and a rule set fetched from someone else's repo can backtrack
+// forever. A worker is the only way to terminate that without freezing the tab.
 import { analyze, sentenceBounds, countWords, compileRuleSet } from '../js/engine.mjs';
 import { extractHtml, extractMarkdown, extractPlain, toSource } from '../js/extract.mjs';
+import { variants } from '../js/fudge.mjs';
 
 const EXTRACT = { html: extractHtml, md: extractMarkdown, txt: extractPlain };
 
@@ -19,31 +20,64 @@ function lineCol(starts, off) {
   return { line: lo + 1, col: off - starts[lo] + 1 };
 }
 
-self.onmessage = (e) => {
-  const { src, kind, sets, active } = e.data;
-  try {
-    const rules = [];
-    for (const raw of sets) {
-      for (const r of compileRuleSet(raw, raw.name).rules) {
-        if (active.includes(r.id)) rules.push(r);
+function check({ src, kind, sets, active }) {
+  const rules = [];
+  for (const raw of sets) {
+    for (const r of compileRuleSet(raw, raw.name).rules) if (active.includes(r.id)) rules.push(r);
+  }
+  const { text, runs } = (EXTRACT[kind] || extractPlain)(src, {});
+  const starts = lineIndex(src);
+  const findings = analyze(text, rules).map((m) => {
+    const srcStart = toSource(runs, m.start);
+    const a = lineCol(starts, srcStart);
+    const [ss, se] = sentenceBounds(text, m.start, m.end);
+    return {
+      line: a.line, col: a.col, srcStart, srcEnd: toSource(runs, m.end),
+      start: m.start, end: m.end, count: m.count ?? null,
+      rule: m.rule.id, set: m.rule.set, name: m.rule.name,
+      why: m.rule.description, suggest: m.rule.suggest || null,
+      match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
+    };
+  });
+  return { findings, text, words: countWords(text) };
+}
+
+// The same two phases the CLI runs: every tests.hit example must match on plain
+// text, then survive 26 markup rewrites. A lossless variant that stops matching
+// is a bug in the rule or in extraction.
+function fudge({ sets }) {
+  const out = [];
+  for (const raw of sets) {
+    for (const rule of compileRuleSet(raw, raw.name).rules) {
+      const t = rule.tests || { hit: [], miss: [] };
+      const row = { rule: rule.id, set: rule.set, name: rule.name,
+                    conform: { ok: 0, fail: 0 }, fudge: { ok: 0, fail: 0, lossy: 0 }, failures: [] };
+      if (!(t.hit || []).length) row.failures.push({ kind: 'no examples', detail: 'every rule needs a tests.hit example' });
+      for (const ex of t.miss || []) {
+        if (rule.find(ex).length === 0) row.conform.ok++;
+        else { row.conform.fail++; row.failures.push({ kind: 'false positive', detail: ex }); }
       }
+      for (const ex of t.hit || []) {
+        const hits = rule.find(ex);
+        if (!hits.length) { row.conform.fail++; row.failures.push({ kind: 'example does not match', detail: ex }); continue; }
+        row.conform.ok++;
+        for (const v of variants(ex, hits[0].start, hits[0].end)) {
+          const { text } = EXTRACT[v.format](v.source, {});
+          if (rule.find(text).length) { if (v.lossless) row.fudge.ok++; }
+          else if (!v.lossless) row.fudge.lossy++;
+          else { row.fudge.fail++; row.failures.push({ kind: v.name, detail: v.source }); }
+        }
+      }
+      out.push(row);
     }
-    const { text, runs } = (EXTRACT[kind] || extractPlain)(src, {});
-    const starts = lineIndex(src);
-    const findings = analyze(text, rules).map((m) => {
-      const srcStart = toSource(runs, m.start);
-      const srcEnd = toSource(runs, m.end);
-      const a = lineCol(starts, srcStart);
-      const [ss, se] = sentenceBounds(text, m.start, m.end);
-      return {
-        line: a.line, col: a.col, srcStart, srcEnd,
-        start: m.start, end: m.end, count: m.count ?? null,
-        rule: m.rule.id, set: m.rule.set, name: m.rule.name,
-        why: m.rule.description, suggest: m.rule.suggest || null,
-        match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
-      };
-    });
-    self.postMessage({ ok: true, findings, text, words: countWords(text) });
+  }
+  return { results: out };
+}
+
+self.onmessage = (e) => {
+  try {
+    const data = e.data.mode === 'fudge' ? fudge(e.data) : check(e.data);
+    self.postMessage({ ok: true, mode: e.data.mode || 'check', ...data });
   } catch (err) {
     self.postMessage({ ok: false, error: err.message });
   }
