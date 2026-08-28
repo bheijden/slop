@@ -66,7 +66,7 @@ button,select,textarea,input{font:inherit;color:inherit}
    of prose. */
 .page{margin:0 auto;padding:28px var(--gutter) 80px}
 .hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
-.hero h1 em{font-style:italic;color:var(--flag)}
+.hero h1 em{font-style:normal;color:var(--flag)}
 .hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
 .hero .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
 .hero .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
@@ -280,7 +280,7 @@ body.resizing{cursor:col-resize;user-select:none}
 <body>
 
 <div class="bar">
-  <span class="wordmark">prose<b>check</b></span>
+  <span class="wordmark">slop<b>.</b></span>
   <div class="modes" role="group" aria-label="Mode">
     <button id="m-check" aria-pressed="true">check</button>
     <button id="m-fudge" aria-pressed="false">test rules</button>
@@ -292,7 +292,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <div class="page">
   <div class="hero">
-    <h1>prose<em>check</em></h1>
+    <h1>slop<em>.</em></h1>
     <p class="lede">A linter for prose.</p>
     <p class="sub">Flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code> — at the line it came from, with the fix. Nothing leaves your browser.</p>
   </div>
