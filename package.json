@@ -1,7 +1,7 @@
 {
   "name": "slop",
   "version": "0.1.0",
-  "description": "Prose linting with pluggable rule sets, for .md / .html / .txt",
+  "description": "A linter for prose: flags stock LLM phrasing, with pluggable rule sets",
   "type": "module",
   "bin": {
     "slop": "./js/cli.mjs"
