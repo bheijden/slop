@@ -220,6 +220,22 @@ body.resizing{cursor:col-resize;user-select:none}
 .list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
 .list .fix{color:var(--muted);font-size:11.5px;line-height:1.55}
 
+/* the rules control: a panel under the bar, not a documentation section */
+.pop{
+  position:fixed;top:52px;right:var(--gutter);z-index:40;width:340px;max-width:calc(100vw - 24px);
+  max-height:min(70vh,620px);overflow:auto;scrollbar-width:thin;
+  background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:12px 14px;
+  box-shadow:0 16px 44px -14px rgba(0,0,0,.30);
+}
+.pop[hidden]{display:none}
+.pop-head{
+  display:flex;gap:8px;align-items:baseline;padding-bottom:8px;margin-bottom:4px;
+  border-bottom:1px solid var(--hair);
+  font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+}
+.pop-head span{margin-left:auto;text-transform:none;letter-spacing:0}
+.chip[aria-expanded=true]{border-color:var(--blue);color:var(--ink)}
+
 /* hover card */
 .tip{
   position:fixed;z-index:60;max-width:340px;pointer-events:none;opacity:0;transition:opacity .1s;
@@ -271,7 +287,7 @@ body.resizing{cursor:col-resize;user-select:none}
 @media (hover:none){.copy-pre{opacity:1}}
 .docs pre .c{color:var(--muted)} .docs pre .p{color:var(--flag)} .docs pre .k{color:var(--blue)}
 .docs a{color:var(--blue)}
-.rulebox{max-height:330px;overflow:auto}
+.rulebox{}
 .rset{border-bottom:1px solid var(--hair)}
 .rset:first-child{border-top:1px solid var(--hair)}
 .rset summary{
@@ -310,6 +326,7 @@ body.resizing{cursor:col-resize;user-select:none}
     <button id="m-fudge" aria-pressed="false">test rules</button>
   </div>
   <span class="spacer"></span>
+  <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
   <button class="chip" id="btn-theme" title="Light, dark or follow the system">auto</button>
   <span class="score" id="score"></span>
 </div>
@@ -385,10 +402,6 @@ body.resizing{cursor:col-resize;user-select:none}
 
   <div class="docs">
     <details>
-      <summary>Rule sets<span class="hint" id="rule-hint"></span></summary>
-      <div class="body"><div class="rulebox" id="rules"></div></div>
-    </details>
-    <details>
       <summary>Command line<span class="hint">for agents and CI</span></summary>
       <div class="body">
 <pre><span class="c"># one-off, nothing installed</span>
@@ -447,6 +460,11 @@ github.com/bheijden/slop/tree/main/skill into
   <p class="colophon">Markup is stripped before the rules run and every offset maps back, so a finding points at the line in your file. <a href="https://github.com/bheijden/slop">Source and rule format</a> · Apache-2.0 · patterns from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
 </div>
 
+<div class="pop" id="rules-pop" hidden>
+  <div class="pop-head">Rules <span id="rule-hint"></span></div>
+  <div class="rulebox" id="rules"></div>
+</div>
+
 <div class="tip" id="tip"></div>
 
 <script type="module">
@@ -477,6 +495,24 @@ function applyTheme() {
   try { localStorage.setItem('pc-theme', theme); } catch {}
 }
 $('btn-theme').onclick = () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(); };
+$('b-rules').onclick = (e) => {
+  e.stopPropagation();
+  const open = $('rules-pop').hidden;
+  $('rules-pop').hidden = !open;
+  $('b-rules').setAttribute('aria-expanded', String(open));
+};
+document.addEventListener('click', (e) => {
+  if (!$('rules-pop').hidden && !$('rules-pop').contains(e.target) && e.target !== $('b-rules')) {
+    $('rules-pop').hidden = true;
+    $('b-rules').setAttribute('aria-expanded', 'false');
+  }
+});
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !$('rules-pop').hidden) {
+    $('rules-pop').hidden = true;
+    $('b-rules').setAttribute('aria-expanded', 'false');
+  }
+});
 applyTheme();
 
 /* URL */
@@ -892,6 +928,7 @@ function renderRules() {
   });
   const total = S.sets.reduce((a, s2) => a + s2.rules.length, 0);
   $('rule-hint').textContent = `${S.active.size} of ${total} on`;
+  $('b-rules').textContent = S.active.size === total ? `${total} rules` : `${S.active.size}/${total} rules`;
 }
 
 const TEXTY = /\.(md|markdown|mdown|mdx|html?|xhtml|txt|text|rst)$/i;
