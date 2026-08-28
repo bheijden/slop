@@ -37,9 +37,14 @@ node slop/js/cli.mjs check docs/ -r
 
 **The web page** — <https://bheijden.github.io/slop/>. Paste text, or drop
 a file, several files, a folder or a `.zip`. Findings are highlighted with the
-fix on hover and listed beside the document; a file tree appears for more than
-one document, with a per-file count and non-text files skipped. **copy JSON**
-puts the whole result on the clipboard. Nothing is uploaded.
+fix on hover and listed beside the document.
+
+Several files read like a diff view: every document renders in one continuous
+scroll, the findings pane runs straight through all of them, and next/prev
+crosses file boundaries. A file list on the left shows which file you are in as
+you scroll, and jumps you to any of them. All three columns collapse from the
+dividers between them. **copy JSON** puts the whole result on the clipboard.
+Nothing is uploaded.
 
 Both load the same `rules/*.json` and run the same `js/engine.mjs`.
 

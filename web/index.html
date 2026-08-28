@@ -57,10 +57,10 @@ button,select,textarea,input{font:inherit;color:inherit}
 .score .err{color:var(--flag)}
 
 /* page */
-/* One column width for the whole page, so the panes line up with everything
-   under them. Individual blocks cap their own measure in ch, so widening the
-   container never widens a line of prose past comfortable reading. */
-.page{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+/* The page grows with the window. Individual blocks cap their own measure in
+   ch, so a wider window gives more room to the panes rather than longer lines
+   of prose. */
+.page{margin:0 auto;padding:28px 24px 80px}
 .hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
 .hero h1 em{font-style:italic;color:var(--flag)}
 .hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
@@ -103,8 +103,14 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 /* A file tree appears beside the panes only when more than one document is
    loaded, so the single-document layout is untouched. */
 .workspace{display:grid;grid-template-columns:minmax(0,1fr)}
-.workspace[data-multi]{grid-template-columns:216px minmax(0,1fr);gap:0 18px}
-.tree{height:min(70vh,680px);overflow:auto;scrollbar-width:thin;border-right:1px solid var(--hair);padding-right:12px}
+.workspace[data-multi]{grid-template-columns:var(--tree,220px) 44px minmax(0,1fr)}
+.workspace[data-multi][data-tree=closed]{grid-template-columns:0 44px minmax(0,1fr)}
+/* Pinned columns, so hiding the list does not slide the panes across. */
+.workspace[data-multi] > .tree{grid-column:1}
+.workspace[data-multi] > #tdivider{grid-column:2}
+.workspace[data-multi] > .panes{grid-column:3}
+.workspace[data-tree=closed] .tree{display:none}
+.tree{height:min(70vh,680px);overflow:auto;scrollbar-width:thin;padding-right:8px}
 .tree .thead{position:sticky;top:0;background:var(--paper);z-index:2;padding:0 0 7px;min-height:26px;
   color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;display:flex;gap:8px;align-items:baseline}
 .tree .dir{color:var(--muted);font-size:11px;margin:9px 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -118,8 +124,10 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 .tree button.f.clean .ct{color:var(--muted);font-weight:400}
 .tree .skipped{color:var(--muted);font-size:11px;margin-top:12px;padding-top:8px;border-top:1px solid var(--hair)}
 @media(max-width:820px){
-  .workspace[data-multi]{grid-template-columns:1fr}
-  .tree{height:auto;max-height:200px;border-right:0;border-bottom:1px solid var(--hair);padding:0 0 10px;margin-bottom:12px}
+  .workspace[data-multi],.workspace[data-multi][data-tree=closed]{grid-template-columns:1fr}
+  .workspace[data-multi] > .tree,.workspace[data-multi] > #tdivider,.workspace[data-multi] > .panes{grid-column:1}
+  .tree{height:auto;max-height:200px;border-bottom:1px solid var(--hair);padding:0 0 10px;margin-bottom:12px}
+  #tdivider{display:none}
 }
 
 /* Two panes and a divider you can drag, or step left/right to collapse a side. */
@@ -172,6 +180,26 @@ body.resizing{cursor:col-resize;user-select:none}
 #doc.source{font-family:var(--mono);font-size:12.5px;line-height:1.75}
 #doc.source p{margin:0;white-space:pre-wrap;word-break:break-word;min-height:1.75em}
 #doc p{word-break:break-word}
+.filesec + .filesec{margin-top:26px;padding-top:4px}
+.fname{
+  position:sticky;top:0;z-index:1;margin:0 0 10px;padding:5px 0 6px;
+  background:var(--paper);border-bottom:1px solid var(--hair);
+  display:flex;gap:10px;align-items:baseline;
+  font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--muted);
+}
+.fname .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
+.fname .ct{color:var(--flag);font-variant-numeric:tabular-nums}
+.fname .ct.clean{color:var(--muted);font-weight:400}
+.list li.fgroup{
+  display:block;position:sticky;top:0;z-index:1;background:var(--paper);cursor:default;
+  border-bottom:1px solid var(--hair);color:var(--muted);font-size:11.5px;
+  padding:6px 6px 5px;margin-top:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  direction:rtl;text-align:left;border-radius:0;
+}
+.list li.fgroup:first-child{margin-top:0}
+.list li.fgroup:hover{background:var(--paper)}
+.list li.none{display:block;color:var(--muted);font-size:11.5px;padding:7px 6px;cursor:default}
+.list li.none:hover{background:none}
 #doc mark{
   background:var(--mark);color:var(--mark-ink);
   box-shadow:inset 0 -2px 0 var(--mark-edge);
@@ -293,6 +321,14 @@ body.resizing{cursor:col-resize;user-select:none}
     <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
     <div class="workspace" id="workspace">
     <aside class="tree" id="tree" hidden></aside>
+    <div class="divider" id="tdivider" hidden>
+      <div class="grip" id="tgrip" role="separator" aria-orientation="vertical"
+           tabindex="0" aria-label="Resize the file list — drag, or use the arrow keys"></div>
+      <div class="dctl">
+        <button class="arrow" id="t-left" title="Hide the file list">‹</button>
+        <button class="arrow" id="t-right" title="Show the file list">›</button>
+      </div>
+    </div>
     <div class="panes" id="panes" data-layout="split">
       <div class="pane" id="pane-doc">
         <div class="phead">
@@ -400,11 +436,13 @@ import { readZip } from '../js/zip.mjs';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const S = { sets:[], active:new Set(), docs:[], doc:0, skipped:0,
-            findings:[], text:'', kind:'md', name:'input',
+const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:0, skipped:0,
+            kind:'md', name:'input',
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
-            split:parseFloat(store('pc-split', '60')) };
+            split:parseFloat(store('pc-split', '60')),
+            tree:store('pc-tree', 'open'),
+            treeW:parseFloat(store('pc-treew', '220')) };
 
 function store(k, dflt) { try { return localStorage.getItem(k) ?? dflt; } catch { return dflt; } }
 function remember(k, v) { try { localStorage.setItem(k, v); } catch {} }
@@ -547,50 +585,89 @@ function renderResults() {
   const res = $('results');
   if (S.mode === 'fudge') {
     res.hidden = false;
-    $('views').hidden = true;
-    $('nav').hidden = true;
-    $('b-copy').hidden = true;
-    $('copy-fallback').hidden = true;
-    $('divider').hidden = true;
+    $('views').hidden = $('nav').hidden = $('b-copy').hidden = true;
+    $('copy-fallback').hidden = $('divider').hidden = true;
     $('panes').dataset.layout = 'text';
+    $('workspace').removeAttribute('data-multi');
+    $('tree').hidden = true;
     renderFudge();
     return;
   }
   $('views').hidden = $('divider').hidden = false;
   if (!currentDocs().some((d) => d.src.trim())) { res.hidden = true; return; }
   res.hidden = false;
-  const n = S.findings.length;
-  const multi = (S.results || []).length > 1;
-  const total = multi ? S.results.reduce((a, r) => a + r.findings.length, 0) : n;
-  $('r-title').textContent = multi
-    ? `${total} finding${total === 1 ? '' : 's'} in ${S.results.length} files`
-    : (n ? `${n} finding${n === 1 ? '' : 's'}` : 'No findings');
-  renderTree();
+
+  const results = S.results || [];
+  const total = S.flat.length;
+  const multi = results.length > 1;
   const useSrc = S.view === 'source';
-  const body = useSrc ? currentSrc() : S.text;
-  const doc = $('doc');
-  doc.className = useSrc ? 'source' : 'prose';
-  doc.innerHTML = marked(body, S.findings.map((f,i) => useSrc ? [f.srcStart,f.srcEnd,i] : [f.start,f.end,i]), useSrc);
-  for (const m of doc.querySelectorAll('mark')) {
-    const f = S.findings[+m.dataset.i];
+  const srcs = currentDocs();
+  $('r-title').textContent = multi
+    ? `${total} finding${total === 1 ? '' : 's'} in ${results.length} files`
+    : (total ? `${total} finding${total === 1 ? '' : 's'}` : 'No findings');
+
+  // Documents render in sequence so scrolling runs from one file straight into
+  // the next, the way a diff view does.
+  const byDoc = results.map(() => []);
+  S.flat.forEach((f, gi) => byDoc[f.doc].push([f, gi]));
+
+  $('doc').className = useSrc ? 'source' : 'prose';
+  $('doc').innerHTML = results.map((r, di) => {
+    const body = useSrc ? ((srcs[di] || {}).src || '') : r.text;
+    const ranges = byDoc[di].map(([f, gi]) => useSrc ? [f.srcStart, f.srcEnd, gi] : [f.start, f.end, gi]);
+    const head = multi ? `<h3 class="fname"><span class="nm">${esc(r.name)}</span>`
+      + `<span class="ct${r.findings.length ? '' : ' clean'}">${r.findings.length || 'clean'}</span></h3>` : '';
+    return `<section class="filesec" data-doc="${di}">${head}<div class="fbody">${marked(body, ranges, useSrc)}</div></section>`;
+  }).join('');
+  for (const m of $('doc').querySelectorAll('mark')) {
+    const f = S.flat[+m.dataset.i];
     m.onclick = () => select(+m.dataset.i);
     m.onmouseenter = () => showTip(m, f);
     m.onmouseleave = hideTip;
   }
+
+  $('list-head').textContent = total ? `${total} finding${total === 1 ? '' : 's'}` : 'findings';
+  $('list').innerHTML = results.map((r, di) => {
+    const rows = byDoc[di].map(([f, gi]) => `<li data-i="${gi}"${gi === S.sel ? ' class="on"' : ''}>
+        <span class="loc">${f.line}:${f.col}</span>
+        <span><span class="rid">${esc(f.rule)}</span>${f.count ? ` <span class="loc">×${f.count}</span>` : ''}
+          <div class="m">${esc(f.match)}</div>
+          ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
+    if (!multi) return rows;
+    return `<li class="fgroup" data-doc="${di}">${esc(r.name)}</li>` + (rows || '<li class="none">no findings</li>');
+  }).join('');
+  for (const li of $('list').querySelectorAll('li[data-i]')) li.onclick = () => select(+li.dataset.i);
+
   $('v-prose').setAttribute('aria-pressed', String(!useSrc));
   $('v-source').setAttribute('aria-pressed', String(useSrc));
   applyLayout();
-  $('list-head').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'findings';
-  $('nav').hidden = !n;
-  $('b-copy').hidden = !(S.results || []).length;
-  if (!$('b-copy').hidden === false) { $('copy-fallback').hidden = true; }
-  $('n-count').textContent = n ? (S.sel >= 0 ? `${S.sel + 1} / ${n}` : `– / ${n}`) : '';
-  $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
-      <span class="loc">${f.line}:${f.col}</span>
-      <span><span class="rid">${esc(f.rule)}</span>${f.count ? ` <span class="loc">×${f.count}</span>` : ''}
-        <div class="m">${esc(f.match)}</div>
-        ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
-  for (const li of $('list').querySelectorAll('li')) li.onclick = () => select(+li.dataset.i);
+  $('nav').hidden = !total;
+  $('b-copy').hidden = !results.length;
+  $('n-count').textContent = total ? (S.sel >= 0 ? `${S.sel + 1} / ${total}` : `– / ${total}`) : '';
+  renderTree();
+}
+
+// The tree shows where you are, driven by the document pane's scroll: the last
+// file that has started above a probe line near the top of the pane.
+function currentDocFromScroll() {
+  const probe = $('pane-doc').getBoundingClientRect().top + 60;
+  let cur = 0;
+  for (const sec of $('doc').querySelectorAll('.filesec')) {
+    if (sec.getBoundingClientRect().top <= probe) cur = +sec.dataset.doc; else break;
+  }
+  return cur;
+}
+
+function markCurrentDoc(i, pin) {
+  if (pin) S.pinned = Date.now() + 900;
+  else if (Date.now() < (S.pinned || 0)) return;
+  if (i === S.cur) return;
+  S.cur = i;
+  for (const b of $('tree').querySelectorAll('button.f')) {
+    b.setAttribute('aria-current', String(+b.dataset.i === i));
+  }
+  const on = $('tree').querySelector('button.f[aria-current=true]');
+  if (on) on.scrollIntoView({ block: 'nearest' });
 }
 
 // The copied object is the same shape the CLI writes with --format json, so it
@@ -642,23 +719,25 @@ function showTip(el, f) {
 }
 const hideTip = () => $('tip').classList.remove('on');
 
-function select(i) {
+function select(i, scroll = true) {
   S.sel = i;
+  const f = S.flat[i];
   renderResults();
-  // Bring the finding into view in whichever panes are showing. scrollIntoView
-  // targets the nearest scrolling ancestor, so this works both when a pane
-  // scrolls on its own and when the page does.
+  if (f) markCurrentDoc(f.doc, true);
+  if (!scroll) return;
+  // scrollIntoView targets the nearest scrolling ancestor, so this works for a
+  // pane that scrolls on its own and for the page.
   const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
   const m = $('doc').querySelector(`mark[data-i="${i}"]`);
-  if (m && S.layout !== 'list') m.scrollIntoView({ block:'center', behavior });
+  if (m && S.layout !== 'list') m.scrollIntoView({ block: 'center', behavior });
   const li = $('list').querySelector(`li[data-i="${i}"]`);
-  if (li && S.layout !== 'text') li.scrollIntoView({ block:'nearest', behavior });
+  if (li && S.layout !== 'text') li.scrollIntoView({ block: 'nearest', behavior });
 }
 
 const step = (d) => {
-  if (!S.findings.length) return;
-  select(S.sel < 0 ? (d > 0 ? 0 : S.findings.length - 1)
-                   : (S.sel + d + S.findings.length) % S.findings.length);
+  if (!S.flat.length) return;
+  select(S.sel < 0 ? (d > 0 ? 0 : S.flat.length - 1)
+                   : (S.sel + d + S.flat.length) % S.flat.length);
 };
 
 function renderFudge() {
@@ -690,9 +769,11 @@ function renderFudge() {
 // layout it had.
 function renderTree() {
   const multi = (S.results || []).length > 1;
-  $('workspace').toggleAttribute('data-multi', multi);
-  $('tree').hidden = !multi;
+  const ws = $('workspace');
+  ws.toggleAttribute('data-multi', multi);
+  $('tree').hidden = $('tdivider').hidden = !multi;
   if (!multi) return;
+  applyTree();
   let html = '<div class="thead">files</div>';
   let dir = null;
   S.results.forEach((r, i) => {
@@ -701,27 +782,27 @@ function renderTree() {
     const d = parts.join('/');
     if (d !== dir) { dir = d; html += `<div class="dir">${esc(d || './')}</div>`; }
     const n = r.findings.length;
-    html += `<button class="f${n ? '' : ' clean'}" data-i="${i}" aria-current="${i === S.doc}"
+    html += `<button class="f${n ? '' : ' clean'}" data-i="${i}" aria-current="${i === S.cur}"
       title="${esc(r.name)}"><span class="nm">${esc(base)}</span><span class="ct">${n || '·'}</span></button>`;
   });
   if (S.skipped) html += `<div class="skipped">${S.skipped} file${S.skipped === 1 ? '' : 's'} skipped (not text)</div>`;
   $('tree').innerHTML = html;
-  for (const b of $('tree').querySelectorAll('button.f')) b.onclick = () => selectDoc(+b.dataset.i);
+  for (const b of $('tree').querySelectorAll('button.f')) b.onclick = () => scrollToDoc(+b.dataset.i);
 }
 
-function selectDoc(i) {
-  S.doc = i;
-  const cur = S.results[i];
-  S.findings = cur.findings; S.text = cur.text; S.sel = -1;
-  S.kind = cur.kind;
-  renderResults();
-  $('pane-doc').scrollTop = 0;
-  $('pane-list').scrollTop = 0;
+// Jump to a file without leaving the continuous scroll.
+function scrollToDoc(i) {
+  markCurrentDoc(i, true);
+  const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  const sec = $('doc').querySelector(`.filesec[data-doc="${i}"]`);
+  if (sec && S.layout !== 'list') sec.scrollIntoView({ block: 'start', behavior });
+  const grp = $('list').querySelector(`li.fgroup[data-doc="${i}"]`);
+  if (grp && S.layout !== 'text') grp.scrollIntoView({ block: 'start', behavior });
 }
 
 function renderRules() {
   const counts = {};
-  for (const f of S.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
+  for (const f of S.flat) counts[f.rule] = (counts[f.rule] || 0) + 1;
   const el = $('rules');
   el.innerHTML = S.sets.map((set) => {
     const allOn = set.rules.every((r) => S.active.has(r.id));
@@ -850,16 +931,18 @@ function run() {
     }
     const docs = currentDocs();
     if (!docs.some((d) => d.src.trim())) {
-      S.results = []; S.findings = []; $('score').textContent = ''; $('meta').textContent = '';
+      S.results = []; S.flat = []; $('score').textContent = ''; $('meta').textContent = '';
       renderResults(); return;
     }
     const res = await ask({ mode:'check', docs, sets:S.sets, active:[...S.active] }, 20000);
     if (!res.ok) return note(res.error);
     S.results = res.results;
-    S.doc = Math.min(S.doc, S.results.length - 1);
-    const cur = S.results[S.doc];
-    S.findings = cur.findings; S.text = cur.text; S.sel = -1;
-    const total = S.results.reduce((a, r) => a + r.findings.length, 0);
+    // One list across every file, in document order, so next/prev and the
+    // findings pane run straight through the whole set.
+    S.flat = S.results.flatMap((r, doc) => r.findings.map((f) => ({ ...f, doc })));
+    S.cur = Math.min(S.cur, Math.max(0, S.results.length - 1));
+    S.sel = -1;
+    const total = S.flat.length;
     const words = S.results.reduce((a, r) => a + r.words, 0);
     const per = words ? (total / words * 1000).toFixed(1) : '0.0';
     $('score').className = 'score' + (total ? '' : ' zero');
@@ -900,6 +983,41 @@ const stepLayout = (d) => {
   const i = ORDER.indexOf(S.layout) + d;
   if (i >= 0 && i < ORDER.length) setLayout(ORDER[i]);
 };
+// The file list collapses the same way the panes do.
+function applyTree() {
+  const ws = $('workspace');
+  ws.dataset.tree = S.tree;
+  ws.style.setProperty('--tree', S.treeW + 'px');
+  $('t-left').disabled = S.tree === 'closed';
+  $('t-right').disabled = S.tree === 'open';
+}
+function setTree(state) { S.tree = state; remember('pc-tree', state); applyTree(); }
+$('t-left').onclick = () => setTree('closed');
+$('t-right').onclick = () => setTree('open');
+
+let tdrag = false;
+$('tgrip').addEventListener('pointerdown', (e) => {
+  if (innerWidth <= 820) return;
+  tdrag = true; document.body.classList.add('resizing');
+  try { $('tgrip').setPointerCapture(e.pointerId); } catch {}
+});
+addEventListener('pointermove', (e) => {
+  if (!tdrag) return;
+  const left = $('workspace').getBoundingClientRect().left;
+  S.treeW = Math.max(120, Math.min(420, e.clientX - left));
+  if (S.tree !== 'open') S.tree = 'open';
+  applyTree();
+});
+for (const ev of ['pointerup', 'pointercancel']) addEventListener(ev, () => {
+  if (!tdrag) return;
+  tdrag = false; document.body.classList.remove('resizing');
+  remember('pc-treew', S.treeW); remember('pc-tree', S.tree);
+});
+$('tgrip').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') { e.preventDefault(); S.treeW = Math.max(120, S.treeW - 20); applyTree(); remember('pc-treew', S.treeW); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); S.treeW = Math.min(420, S.treeW + 20); applyTree(); remember('pc-treew', S.treeW); }
+});
+
 $('d-left').onclick = () => stepLayout(-1);
 $('d-right').onclick = () => stepLayout(1);
 
@@ -998,11 +1116,16 @@ addEventListener('drop', async (e) => {
 });
 addEventListener('keydown', (e) => {
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
-  if (!S.findings.length) return;
+  if (!S.flat.length) return;
   if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); step(1); }
   if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
 });
 addEventListener('scroll', hideTip, true);
+let scrollTick = null;
+$('pane-doc').addEventListener('scroll', () => {
+  if (scrollTick) return;
+  scrollTick = requestAnimationFrame(() => { scrollTick = null; markCurrentDoc(currentDocFromScroll()); });
+});
 
 await loadBuiltins();
 await readHash();
