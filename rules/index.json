@@ -1,6 +1,6 @@
 {
   "sets": [
-    "llm-cliches.json",
+    "simonwillison.json",
     "wikipedia-ai.json"
   ]
 }

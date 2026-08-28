@@ -105,7 +105,7 @@ use `--format github` for inline pull-request annotations.
 in full, including examples of what it flags and what it deliberately allows —
 read this before deciding a finding is wrong.
 
-Two sets ship: `llm-cliches` (27 rules) and `wikipedia-ai` (11). The full
+Two sets ship: `simonwillison` (27 rules) and `wikipedia-ai` (11). The full
 catalogue is in [reference/rules.md](reference/rules.md).
 
 A project can install more. Rule sets are versioned packages, recorded in

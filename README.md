@@ -87,7 +87,7 @@ Two ship, both enabled:
 
 | set | rules | |
 |---|---|---|
-| `llm-cliches` | 27 | Stock phrasings models overproduce, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
+| `simonwillison` | 27 | Stock phrasings models overproduce, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
 
 Install more, write your own, and keep them up to date:

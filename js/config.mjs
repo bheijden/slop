@@ -3,7 +3,7 @@
 // Precedence, lowest to highest:
 //   built-in sets in rules/  ->  slop.json  ->  command-line flags
 //
-// `select` and `ignore` both accept either a SET NAME ("llm-cliches") or a
+// `select` and `ignore` both accept either a SET NAME ("simonwillison") or a
 // RULE ID ("colon-triple"), the way ruff accepts both "E" and "E501".
 
 import fs from 'node:fs';

@@ -129,9 +129,9 @@ const casesFor = (id) => {
   return { hit, miss };
 };
 
-const sets = { 'llm-cliches': [], 'wikipedia-ai': [] };
+const sets = { 'simonwillison': [], 'wikipedia-ai': [] };
 for (const p of api.patterns) {
-  const setName = p.group ? 'wikipedia-ai' : 'llm-cliches';
+  const setName = p.group ? 'wikipedia-ai' : 'simonwillison';
   const f = p.find;
   const rule = {
     id: p.id,
@@ -164,12 +164,12 @@ for (const p of api.patterns) {
 const ENGINE = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')).version;
 
 const META = {
-  'llm-cliches': {
-    name: 'llm-cliches',
+  'simonwillison': {
+    name: 'simonwillison',
     version: '1.0.0',
     slop: ENGINE,
-    title: 'LLM cliches',
-    description: 'Stock phrasings and rhythms that language models overproduce. Collected by Simon Willison for the LLM cliche highlighter.',
+    title: 'Simon Willison',
+    description: 'Stock phrasings and rhythms that language models overproduce, collected by Simon Willison for the LLM cliche highlighter.',
     source: 'https://tools.simonwillison.net/llm-cliche-highlighter'
   },
   'wikipedia-ai': {

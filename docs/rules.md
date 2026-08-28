@@ -9,7 +9,7 @@ sharing and writing them.
 
 | set | rules | what it covers |
 |---|---|---|
-| `llm-cliches` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
+| `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 
 ```sh
@@ -31,7 +31,7 @@ Or in `slop.json`, found by walking up from the working directory:
 
 ```json
 {
-  "select": ["llm-cliches", "wikipedia-ai"],
+  "select": ["simonwillison", "wikipedia-ai"],
   "ignore": ["colon-triple"],
   "ruleSets": ["./rules/house-style.json"],
   "exclude": ["vendor/", "node_modules/"],
@@ -76,7 +76,7 @@ slop sets                # version, rule count, active, tests, source
 
 ```
 SET                   VERSION   RULES  ACTIVE  TESTS       SOURCE
-llm-cliches           v1.0.0       27  all     pass        built-in
+simonwillison           v1.0.0       27  all     pass        built-in
 wikipedia-ai          v1.0.0       11  all     pass        built-in
 house-style           v1.1.0        2  all     pass        https://example.com/house-style.json
 
@@ -150,7 +150,7 @@ and anything in `ruleSets` together. Installed rules face the same two phases
 that ours face.
 
 An installed set **shadows** a built-in of the same name, so you can pin or
-customise the rules that ship here by installing your own `llm-cliches`.
+customise the rules that ship here by installing your own `simonwillison`.
 
 Turn one off with `--ignore <name>`, or in `slop.json`:
 
@@ -234,7 +234,7 @@ The web page runs the same thing under **test rules**, with failures sorted to
 the top — useful while you are still writing the pattern.
 
 ```
-rule sets: llm-cliches, wikipedia-ai  (38 rules)
+rule sets: simonwillison, wikipedia-ai  (38 rules)
 conformance: 182 pass, 0 fail
 fudging:     3066 pass, 0 fail  (86 expected misses on lossy markup)
 ```

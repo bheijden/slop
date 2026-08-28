@@ -227,9 +227,12 @@ body.resizing{cursor:col-resize;user-select:none}
   box-shadow:0 10px 30px -10px rgba(0,0,0,.35);font-size:11.5px;line-height:1.55;
 }
 .tip.on{opacity:1}
+.tip-head{display:flex;gap:8px;align-items:baseline}
 .tip .rid{color:var(--flag);font-weight:600}
-.tip .set{color:var(--muted)}
-.tip .fix{color:var(--ink);margin-top:5px}
+.tip .set{color:var(--muted);font-size:11px;margin-left:auto}
+.tip-name{font-family:var(--serif);font-size:15px;line-height:1.3;margin:3px 0 5px;color:var(--ink)}
+.tip-why{color:var(--muted);line-height:1.5}
+.tip-fix{color:var(--ink);margin-top:6px;padding-top:6px;border-top:1px solid var(--hair)}
 
 /* fudge */
 .frow{display:grid;grid-template-columns:1fr 92px 92px;gap:14px;padding:5px 0;border-bottom:1px solid var(--hair);align-items:baseline}
@@ -456,7 +459,7 @@ const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
-            setOpen:{},
+            setOpen:{}, byId:{},
             tree:store('pc-tree', 'open'),
             treeW:parseFloat(store('pc-treew', '220')) };
 
@@ -534,7 +537,11 @@ async function addRemoteSet(url) {
 function addSet(set) {
   S.sets = S.sets.filter((s) => s.name !== set.name);
   S.sets.push(set);
-  for (const r of set.rules) if (r.default !== 'off') S.active.add(r.id);
+  for (const r of set.rules) {
+    if (r.default !== 'off') S.active.add(r.id);
+    S.byId[r.id] = { id: r.id, rule: r.id, set: set.name, name: r.name,
+                     why: r.description, suggest: r.suggest };
+  }
 }
 async function loadBuiltins() {
   const m = await (await fetch('../rules/index.json')).json();
@@ -652,7 +659,12 @@ function renderResults() {
     if (!multi) return rows;
     return `<li class="fgroup" data-doc="${di}">${esc(r.name)}</li>` + (rows || '<li class="none">no findings</li>');
   }).join('');
-  for (const li of $('list').querySelectorAll('li[data-i]')) li.onclick = () => select(+li.dataset.i);
+  for (const li of $('list').querySelectorAll('li[data-i]')) {
+    const f = S.flat[+li.dataset.i];
+    li.onclick = () => select(+li.dataset.i);
+    li.onmouseenter = () => showTip(li, f);
+    li.onmouseleave = hideTip;
+  }
 
   $('v-prose').setAttribute('aria-pressed', String(!useSrc));
   $('v-source').setAttribute('aria-pressed', String(useSrc));
@@ -724,10 +736,16 @@ async function copyJson() {
 }
 $('b-copy').onclick = copyJson;
 
-function showTip(el, f) {
+// One card for every hover surface: a mark in the document, a row in the
+// findings list, a rule in the rule sets. It answers "what is this rule".
+function showTip(el, info) {
+  if (!info) return;
   const t = $('tip');
-  t.innerHTML = `<span class="rid">${esc(f.rule)}</span> <span class="set">${esc(f.set)}</span>
-    <div class="fix">${esc(f.suggest || f.why || '')}</div>`;
+  t.innerHTML = `<div class="tip-head"><span class="rid">${esc(info.rule || info.id)}</span>`
+    + `<span class="set">${esc(info.set || '')}</span></div>`
+    + (info.name ? `<div class="tip-name">${esc(info.name)}</div>` : '')
+    + (info.why ? `<div class="tip-why">${esc(info.why)}</div>` : '')
+    + (info.suggest ? `<div class="tip-fix">${esc(info.suggest)}</div>` : '');
   t.classList.add('on');
   const r = el.getBoundingClientRect(), tr = t.getBoundingClientRect();
   t.style.left = Math.max(8, Math.min(r.left, innerWidth - tr.width - 8)) + 'px';
@@ -831,7 +849,7 @@ function renderRules() {
         <span class="cnt">${on}/${set.rules.length}</span>
         <button data-toggle="${esc(set.name)}">${allOn ? 'none' : 'all'}</button>
       </summary>
-      <div class="rlist">${set.rules.map((r) => `<label title="${esc(r.description || '')}">
+      <div class="rlist">${set.rules.map((r) => `<label data-rule-row="${esc(r.id)}">
         <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id) ? ' checked' : ''}>
         <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id] || ''}</span></label>`).join('')}</div>
     </details>`;
@@ -846,6 +864,10 @@ function renderRules() {
   }
   for (const c of el.querySelectorAll('input[data-rule]')) {
     c.onchange = () => { c.checked ? S.active.add(c.dataset.rule) : S.active.delete(c.dataset.rule); run(); };
+  }
+  for (const row of el.querySelectorAll('label[data-rule-row]')) {
+    row.onmouseenter = () => showTip(row, S.byId[row.dataset.ruleRow]);
+    row.onmouseleave = hideTip;
   }
   for (const b of el.querySelectorAll('button[data-toggle]')) b.onclick = (e) => {
     // the button lives in a <summary>; do not let the click fold the block

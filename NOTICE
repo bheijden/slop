@@ -4,7 +4,7 @@ Copyright 2026 Bas van der Heijden
 This product includes software developed by Simon Willison
 (https://github.com/simonw/tools), licensed under the Apache License 2.0.
 
-The cliché-detection patterns in rules/llm-cliches.json and
+The cliché-detection patterns in rules/simonwillison.json and
 rules/wikipedia-ai.json, together with their test cases, are derived from
 llm-cliche-highlighter.html in that project. A pinned copy of the original file
 is kept at vendor/llm-cliche-highlighter.html, and tools/build-rules.mjs
