@@ -286,8 +286,8 @@ restored house-style v1.1.0 2 rules  differs from the lock (1.0.0 → 1.1.0)
 
 Committing `.slop/rules/` as well pins the exact files; committing only
 the lock keeps them fresh. `slop fudge` tests the built-ins, the library
-and anything in `ruleSets` together, so installed rules get the same checks
-ours do.
+and anything in `ruleSets` together. Installed rules face the same two phases
+that ours face.
 
 An installed set **shadows** a built-in of the same name, so you can pin or
 customise the rules that ship here by installing your own `llm-cliches`.
