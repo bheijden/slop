@@ -100,6 +100,28 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 .nav #n-count{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
 
 /* panes */
+/* A file tree appears beside the panes only when more than one document is
+   loaded, so the single-document layout is untouched. */
+.workspace{display:grid;grid-template-columns:minmax(0,1fr)}
+.workspace[data-multi]{grid-template-columns:216px minmax(0,1fr);gap:0 18px}
+.tree{height:min(70vh,680px);overflow:auto;scrollbar-width:thin;border-right:1px solid var(--hair);padding-right:12px}
+.tree .thead{position:sticky;top:0;background:var(--paper);z-index:2;padding:0 0 7px;min-height:26px;
+  color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;display:flex;gap:8px;align-items:baseline}
+.tree .dir{color:var(--muted);font-size:11px;margin:9px 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree .dir:first-of-type{margin-top:0}
+.tree button.f{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;cursor:pointer;
+  padding:3px 6px;border-radius:5px;font-size:12px;color:var(--ink);align-items:baseline}
+.tree button.f:hover{background:var(--sunk)}
+.tree button.f[aria-current=true]{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
+.tree button.f .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree button.f .ct{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
+.tree button.f.clean .ct{color:var(--muted);font-weight:400}
+.tree .skipped{color:var(--muted);font-size:11px;margin-top:12px;padding-top:8px;border-top:1px solid var(--hair)}
+@media(max-width:820px){
+  .workspace[data-multi]{grid-template-columns:1fr}
+  .tree{height:auto;max-height:200px;border-right:0;border-bottom:1px solid var(--hair);padding:0 0 10px;margin-bottom:12px}
+}
+
 /* Two panes and a divider you can drag, or step left/right to collapse a side. */
 .panes{display:grid;grid-template-columns:var(--split,60%) 44px minmax(0,1fr);
        height:min(70vh,680px);align-items:stretch}
@@ -244,7 +266,7 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 
   <div class="io" id="io">
-    <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop a .md, .html or .txt file anywhere on the page."></textarea>
+    <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
     <div class="tools">
       <button class="chip" id="b-example">Load an example</button>
       <button class="chip" id="b-file">Choose a file</button>
@@ -269,6 +291,8 @@ body.resizing{cursor:col-resize;user-select:none}
       <button class="chip" id="b-copy" hidden title="Copy the findings as JSON — the same shape as --format json">copy JSON</button>
     </div>
     <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
+    <div class="workspace" id="workspace">
+    <aside class="tree" id="tree" hidden></aside>
     <div class="panes" id="panes" data-layout="split">
       <div class="pane" id="pane-doc">
         <div class="phead">
@@ -291,6 +315,7 @@ body.resizing{cursor:col-resize;user-select:none}
         <div class="phead"><span id="list-head">findings</span></div>
         <ol class="list" id="list"></ol>
       </div>
+    </div>
     </div>
   </div>
 
@@ -315,12 +340,15 @@ slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a
       <summary>Open this page from a link<span class="hint">#gz=…</span></summary>
       <div class="body">
         <p>Everything is in the fragment, which browsers never send to a server. <code>--share</code> writes the link and gzips the file into it.</p>
-<pre><span class="p">#gz=</span> <span class="p">#text=</span>       the document, base64url
+<pre><span class="p">#gz=</span> <span class="p">#text=</span>       one document, base64url
+<span class="p">#bundle=</span>           several files, base64url of gzipped JSON
 <span class="p">#url=</span>              fetch a page and lint it
 <span class="p">#kind=</span>             md · html · txt
+<span class="p">#name=</span>             a label for the result
 <span class="p">#rules=</span>            a rule set URL, repeatable
 <span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
 <span class="p">#mode=fudge</span>        test rules instead</pre>
+        <p><code>--share</code> on a directory writes a single <code>#bundle=</code> link, so the page opens the whole tree rather than the reader juggling one link per file.</p>
       </div>
     </details>
     <details>
@@ -368,9 +396,12 @@ Then lint docs/ and fix what it reports.</span></pre>
 <div class="tip" id="tip"></div>
 
 <script type="module">
+import { readZip } from '../js/zip.mjs';
+
 const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const S = { sets:[], active:new Set(), findings:[], text:'', kind:'md', name:'input',
+const S = { sets:[], active:new Set(), docs:[], doc:0, skipped:0,
+            findings:[], text:'', kind:'md', name:'input',
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')) };
@@ -414,6 +445,13 @@ async function readHash() {
     if (set) set.rules.forEach((r) => S.active.delete(r.id)); else S.active.delete(i);
   }
   let src = '';
+  if (p.get('bundle')) {
+    try {
+      S.docs = JSON.parse(await gunzip(b64urlToBytes(p.get('bundle'))));
+      S.doc = 0;
+      return;
+    } catch (e) { note(`could not read that bundle: ${e.message}`); }
+  }
   if (p.get('gz')) src = await gunzip(b64urlToBytes(p.get('gz')));
   else if (p.get('text')) src = new TextDecoder().decode(b64urlToBytes(p.get('text')));
   else if (p.get('url')) {
@@ -474,6 +512,15 @@ async function ask(msg, ms = 5000) {
 }
 
 /* render */
+// One document or many, this is the list to lint. With a single document the
+// textarea stays the source of truth so edits take effect as you type.
+function currentDocs() {
+  if (S.docs.length > 1) return S.docs;
+  const name = S.docs.length ? S.docs[0].name : S.name;
+  return [{ name, kind: S.kind, src: $('input').value }];
+}
+const currentSrc = () => (currentDocs()[S.doc] || {}).src || '';
+
 const note = (m) => { $('score').innerHTML = m ? `<span class="err">${esc(m)}</span>` : ''; };
 
 function marked(body, ranges, keepBlank) {
@@ -510,12 +557,17 @@ function renderResults() {
     return;
   }
   $('views').hidden = $('divider').hidden = false;
-  if (!$('input').value.trim()) { res.hidden = true; return; }
+  if (!currentDocs().some((d) => d.src.trim())) { res.hidden = true; return; }
   res.hidden = false;
   const n = S.findings.length;
-  $('r-title').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'No findings';
+  const multi = (S.results || []).length > 1;
+  const total = multi ? S.results.reduce((a, r) => a + r.findings.length, 0) : n;
+  $('r-title').textContent = multi
+    ? `${total} finding${total === 1 ? '' : 's'} in ${S.results.length} files`
+    : (n ? `${n} finding${n === 1 ? '' : 's'}` : 'No findings');
+  renderTree();
   const useSrc = S.view === 'source';
-  const body = useSrc ? $('input').value : S.text;
+  const body = useSrc ? currentSrc() : S.text;
   const doc = $('doc');
   doc.className = useSrc ? 'source' : 'prose';
   doc.innerHTML = marked(body, S.findings.map((f,i) => useSrc ? [f.srcStart,f.srcEnd,i] : [f.start,f.end,i]), useSrc);
@@ -530,8 +582,8 @@ function renderResults() {
   applyLayout();
   $('list-head').textContent = n ? `${n} finding${n === 1 ? '' : 's'}` : 'findings';
   $('nav').hidden = !n;
-  $('b-copy').hidden = !n;
-  if (!n) { $('copy-fallback').hidden = true; }
+  $('b-copy').hidden = !(S.results || []).length;
+  if (!$('b-copy').hidden === false) { $('copy-fallback').hidden = true; }
   $('n-count').textContent = n ? (S.sel >= 0 ? `${S.sel + 1} / ${n}` : `– / ${n}`) : '';
   $('list').innerHTML = S.findings.map((f, i) => `<li data-i="${i}"${i === S.sel ? ' class="on"' : ''}>
       <span class="loc">${f.line}:${f.col}</span>
@@ -544,13 +596,17 @@ function renderResults() {
 // The copied object is the same shape the CLI writes with --format json, so it
 // can be pasted wherever that output would go.
 function resultJson() {
-  const strip = ({ srcStart, srcEnd, start, end, ...keep }) => ({ file: S.name, ...keep });
-  const words = S.text ? (S.text.match(/\S+/g) || []).length : 0;
+  const results = S.results || [];
+  const files = results.map((r) => ({
+    file: r.name,
+    words: r.words,
+    findings: r.findings.map(({ srcStart, srcEnd, start, end, ...keep }) => ({ file: r.name, ...keep }))
+  }));
+  const total = files.reduce((a, f) => a + f.findings.length, 0);
+  const words = files.reduce((a, f) => a + f.words, 0);
   return JSON.stringify({
-    files: [{ file: S.name, words, findings: S.findings.map(strip) }],
-    total: S.findings.length,
-    words,
-    per1000: words ? +(S.findings.length / words * 1000).toFixed(2) : 0,
+    files, total, words,
+    per1000: words ? +(total / words * 1000).toFixed(2) : 0,
     rules: [...S.active]
   }, null, 2);
 }
@@ -630,6 +686,39 @@ function renderFudge() {
     }).join('')}`;
 }
 
+// The tree only exists for a multi-document load; a single file keeps the
+// layout it had.
+function renderTree() {
+  const multi = (S.results || []).length > 1;
+  $('workspace').toggleAttribute('data-multi', multi);
+  $('tree').hidden = !multi;
+  if (!multi) return;
+  let html = '<div class="thead">files</div>';
+  let dir = null;
+  S.results.forEach((r, i) => {
+    const parts = r.name.split('/');
+    const base = parts.pop();
+    const d = parts.join('/');
+    if (d !== dir) { dir = d; html += `<div class="dir">${esc(d || './')}</div>`; }
+    const n = r.findings.length;
+    html += `<button class="f${n ? '' : ' clean'}" data-i="${i}" aria-current="${i === S.doc}"
+      title="${esc(r.name)}"><span class="nm">${esc(base)}</span><span class="ct">${n || '·'}</span></button>`;
+  });
+  if (S.skipped) html += `<div class="skipped">${S.skipped} file${S.skipped === 1 ? '' : 's'} skipped (not text)</div>`;
+  $('tree').innerHTML = html;
+  for (const b of $('tree').querySelectorAll('button.f')) b.onclick = () => selectDoc(+b.dataset.i);
+}
+
+function selectDoc(i) {
+  S.doc = i;
+  const cur = S.results[i];
+  S.findings = cur.findings; S.text = cur.text; S.sel = -1;
+  S.kind = cur.kind;
+  renderResults();
+  $('pane-doc').scrollTop = 0;
+  $('pane-list').scrollTop = 0;
+}
+
 function renderRules() {
   const counts = {};
   for (const f of S.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
@@ -670,6 +759,64 @@ function renderRules() {
   $('rule-hint').textContent = `${S.active.size} of ${total} on`;
 }
 
+const TEXTY = /\.(md|markdown|mdown|mdx|html?|xhtml|txt|text|rst)$/i;
+const kindOf = (n) => /\.(html?|xhtml)$/i.test(n) ? 'html'
+                    : /\.(md|markdown|mdown|mdx)$/i.test(n) ? 'md' : 'txt';
+
+// Everything that can arrive — a paste, one file, several, a folder, a zip —
+// ends up as this same list, so the rest of the page has one shape to render.
+async function loadDocs(docs, skipped = 0) {
+  S.docs = docs;
+  S.skipped = skipped;
+  S.doc = 0;
+  S.sel = -1;
+  if (docs.length === 1) { $('input').value = docs[0].src; S.kind = docs[0].kind; $('kind').value = S.kind; }
+  $('io').hidden = docs.length > 1;
+  grow();
+  run();
+}
+
+async function filesToDocs(files) {
+  const docs = [];
+  let skipped = 0;
+  for (const f of files) {
+    const name = f.path || f.name;
+    if (/\.zip$/i.test(name)) {
+      try {
+        for (const e of await readZip(await f.arrayBuffer())) {
+          if (!TEXTY.test(e.name)) { skipped++; continue; }
+          docs.push({ name: e.name, kind: kindOf(e.name), src: await e.text() });
+        }
+      } catch (err) { note(`${name}: ${err.message}`); }
+      continue;
+    }
+    if (!TEXTY.test(name)) { skipped++; continue; }
+    docs.push({ name, kind: kindOf(name), src: await f.text() });
+  }
+  docs.sort((a, b) => a.name.localeCompare(b.name));
+  return { docs, skipped };
+}
+
+// A dropped folder arrives as a directory entry, not a file list.
+async function entryToFiles(entry, out = [], prefix = '') {
+  if (entry.isFile) {
+    const f = await new Promise((res, rej) => entry.file(res, rej));
+    f.path = prefix + f.name;
+    out.push(f);
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    for (;;) {
+      const batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+      if (!batch.length) break;
+      for (const e of batch) {
+        if (e.name.startsWith('.')) continue;
+        await entryToFiles(e, out, prefix + entry.name + '/');
+      }
+    }
+  }
+  return out;
+}
+
 function pickFile(accept, cb) {
   const i = Object.assign(document.createElement('input'), { type:'file', accept });
   i.onchange = () => i.files[0] && cb(i.files[0]);
@@ -688,7 +835,8 @@ function run() {
   clearTimeout(timer);
   timer = setTimeout(async () => {
     renderRules();
-    $('io').hidden = S.mode === 'fudge';
+    // The paste box is for a single document; a loaded set has the tree instead.
+    $('io').hidden = S.mode === 'fudge' || S.docs.length > 1;
     if (S.mode === 'fudge') {
       S.fudge = null; renderResults();
       const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
@@ -700,15 +848,24 @@ function run() {
       renderResults();
       return;
     }
-    const src = $('input').value;
-    if (!src.trim()) { S.findings = []; $('score').textContent = ''; $('meta').textContent = ''; renderResults(); return; }
-    const res = await ask({ mode:'check', src, kind:S.kind, sets:S.sets, active:[...S.active] });
+    const docs = currentDocs();
+    if (!docs.some((d) => d.src.trim())) {
+      S.results = []; S.findings = []; $('score').textContent = ''; $('meta').textContent = '';
+      renderResults(); return;
+    }
+    const res = await ask({ mode:'check', docs, sets:S.sets, active:[...S.active] }, 20000);
     if (!res.ok) return note(res.error);
-    S.findings = res.findings; S.text = res.text; S.sel = -1;
-    const per = res.words ? (res.findings.length / res.words * 1000).toFixed(1) : '0.0';
-    $('score').className = 'score' + (res.findings.length ? '' : ' zero');
-    $('score').innerHTML = `<b>${res.findings.length}</b> · ${per}/1k`;
-    $('meta').textContent = `${res.words} words`;
+    S.results = res.results;
+    S.doc = Math.min(S.doc, S.results.length - 1);
+    const cur = S.results[S.doc];
+    S.findings = cur.findings; S.text = cur.text; S.sel = -1;
+    const total = S.results.reduce((a, r) => a + r.findings.length, 0);
+    const words = S.results.reduce((a, r) => a + r.words, 0);
+    const per = words ? (total / words * 1000).toFixed(1) : '0.0';
+    $('score').className = 'score' + (total ? '' : ' zero');
+    $('score').innerHTML = `<b>${total}</b> · ${per}/1k`
+      + (S.results.length > 1 ? ` · ${S.results.length} files` : '');
+    $('meta').textContent = `${words} words`;
     renderResults(); renderRules();
   }, 160);
 }
@@ -796,14 +953,18 @@ The parser is a tiny state machine. The renderer is a tiny state machine.
 That's the whole point, and you already know the answer.`;
   grow(); run();
 };
-$('b-file').onclick = () => pickFile('.md,.markdown,.mdx,.html,.htm,.txt,.text', loadFile);
-async function loadFile(f) {
-  $('input').value = await f.text();
-  S.name = f.name;
-  S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
-  $('kind').value = S.kind;
-  grow(); run();
-}
+$('b-file').onclick = () => {
+  const i = Object.assign(document.createElement('input'), {
+    type: 'file', multiple: true,
+    accept: '.md,.markdown,.mdx,.html,.htm,.txt,.text,.rst,.zip'
+  });
+  i.onchange = async () => {
+    const { docs, skipped } = await filesToDocs([...i.files]);
+    if (!docs.length) return note(`nothing to lint — ${skipped} file${skipped === 1 ? '' : 's'} skipped (not text)`);
+    loadDocs(docs, skipped);
+  };
+  i.click();
+};
 // The whole page is a drop target, so you never have to aim.
 let depth = 0;
 addEventListener('dragenter', (e) => { e.preventDefault(); if (++depth === 1) document.body.classList.add('dragging'); });
@@ -811,11 +972,29 @@ addEventListener('dragover', (e) => e.preventDefault());
 addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; document.body.classList.remove('dragging'); } });
 addEventListener('drop', async (e) => {
   e.preventDefault(); depth = 0; document.body.classList.remove('dragging');
-  const f = e.dataTransfer.files[0]; if (!f) return;
-  if (/\.json$/i.test(f.name)) {
-    try { const set = JSON.parse(await f.text()); set.name = set.name || f.name.replace(/\.json$/,''); addSet(set); run(); }
-    catch (err) { note(err.message); }
-  } else loadFile(f);
+  const items = [...(e.dataTransfer.items || [])];
+  const dropped = [...e.dataTransfer.files];
+  if (!dropped.length) return;
+
+  // A single rule set is configuration, not a document.
+  if (dropped.length === 1 && /\.json$/i.test(dropped[0].name)) {
+    try {
+      const set = JSON.parse(await dropped[0].text());
+      set.name = set.name || dropped[0].name.replace(/\.json$/, '');
+      addSet(set); run();
+    } catch (err) { note(err.message); }
+    return;
+  }
+
+  let files = dropped;
+  const entries = items.map((i) => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+  if (entries.some((en) => en.isDirectory)) {
+    files = [];
+    for (const en of entries) await entryToFiles(en, files);
+  }
+  const { docs, skipped } = await filesToDocs(files);
+  if (!docs.length) return note(`nothing to lint — ${skipped} file${skipped === 1 ? '' : 's'} skipped (not text)`);
+  loadDocs(docs, skipped);
 });
 addEventListener('keydown', (e) => {
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;

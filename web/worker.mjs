@@ -20,11 +20,17 @@ function lineCol(starts, off) {
   return { line: lo + 1, col: off - starts[lo] + 1 };
 }
 
-function check({ src, kind, sets, active }) {
+// One message carries every document, so a dropped directory costs one round
+// trip rather than one per file.
+function check({ docs, sets, active }) {
   const rules = [];
   for (const raw of sets) {
     for (const r of compileRuleSet(raw, raw.name).rules) if (active.includes(r.id)) rules.push(r);
   }
+  return { results: docs.map((d) => checkOne(d, rules)) };
+}
+
+function checkOne({ name, src, kind }, rules) {
   const { text, runs } = (EXTRACT[kind] || extractPlain)(src, {});
   const starts = lineIndex(src);
   const findings = analyze(text, rules).map((m) => {
@@ -44,7 +50,7 @@ function check({ src, kind, sets, active }) {
       match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
     };
   });
-  return { findings, text, words: countWords(text) };
+  return { name, kind, findings, text, words: countWords(text) };
 }
 
 // The same two phases the CLI runs: every tests.hit example must match on plain

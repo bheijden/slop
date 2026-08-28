@@ -35,9 +35,11 @@ git clone --depth 1 https://github.com/bheijden/slop
 node slop/js/cli.mjs check docs/ -r
 ```
 
-**The web page** — <https://bheijden.github.io/slop/>. Drop a file or
-paste text, see findings highlighted with the fix on hover, read them beside
-the document, and copy them out as JSON. Nothing is uploaded.
+**The web page** — <https://bheijden.github.io/slop/>. Paste text, or drop
+a file, several files, a folder or a `.zip`. Findings are highlighted with the
+fix on hover and listed beside the document; a file tree appears for more than
+one document, with a per-file count and non-text files skipped. **copy JSON**
+puts the whole result on the clipboard. Nothing is uploaded.
 
 Both load the same `rules/*.json` and run the same `js/engine.mjs`.
 
@@ -127,6 +129,9 @@ two machines that already have it. A 3 KB markdown file becomes a 2.2 KB link.
 ```sh
 slop check --share docs/intro.md
 # https://bheijden.github.io/slop/#gz=H4sIAAAA…&kind=md&name=intro.md
+
+slop check --share -r docs/
+# one #bundle= link carrying every file, so the page opens the whole tree
 ```
 
 Or build one by hand:
@@ -135,7 +140,8 @@ Or build one by hand:
 |---|---|
 | `url=https://…` | fetch that page and lint it |
 | `text=<base64url>` | lint text you encoded |
-| `gz=<base64url>` | same, gzipped — what `--share` emits |
+| `gz=<base64url>` | same, gzipped — what `--share` emits for one file |
+| `bundle=<base64url>` | several files: gzipped JSON, what `--share` emits for a directory |
 | `kind=md\|html\|txt` | how to parse it |
 | `rules=https://…` | load a rule set over https (repeatable) |
 | `select=`, `ignore=` | choose rule sets or rules |
@@ -367,6 +373,7 @@ rules/            rule sets as JSON  <- the shared artifact
   wikipedia-ai.json
   index.json      manifest for the web pages
 js/               engine.mjs  extract.mjs  config.mjs  fudge.mjs  cli.mjs
+                  zip.mjs      minimal ZIP reader, no dependencies
 web/              index.html   the web page
                   worker.mjs   runs rules off the main thread, with a timeout
 skill/            SKILL.md     the agent skill

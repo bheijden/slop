@@ -246,21 +246,33 @@ async function main() {
   // rule sets and the same findings in the web viewer. The document travels in
   // the URL fragment, which browsers never send to a server.
   if (o.share) {
-    for (let i = 0; i < files.length; i++) {
-      const target = files[i];
-      const p = new URLSearchParams();
-      if (isUrl(target)) p.set('url', target);
-      else {
-        const src = fs.readFileSync(target === '-' ? 0 : target, 'utf8');
-        p.set('gz', zlib.gzipSync(Buffer.from(src, 'utf8')).toString('base64url'));
-        p.set('kind', /\.html?$/i.test(target) ? 'html' : /\.(md|markdown|mdx)$/i.test(target) ? 'md' : 'txt');
-      }
-      if (target !== '-' && !isUrl(target)) p.set('name', path.basename(target));
-      if (cfg.select.length) p.set('select', cfg.select.join(','));
-      if (cfg.ignore.length) p.set('ignore', cfg.ignore.join(','));
-      for (const r of cfg.ruleSets) if (/^https?:\/\//i.test(r)) p.append('rules', r);
-      const link = o.shareBase.replace(/\/?$/, '/') + '#' + p.toString();
-      process.stdout.write(files.length > 1 ? `${reports[i].file}\n  ${link}\n` : link + '\n');
+    const kindOf = (f) => /\.html?$/i.test(f) ? 'html' : /\.(md|markdown|mdx)$/i.test(f) ? 'md' : 'txt';
+    const p = new URLSearchParams();
+    if (files.length === 1 && isUrl(files[0])) {
+      p.set('url', files[0]);
+    } else if (files.length === 1) {
+      const f = files[0];
+      p.set('gz', zlib.gzipSync(fs.readFileSync(f === '-' ? 0 : f)).toString('base64url'));
+      p.set('kind', f === '-' ? 'md' : kindOf(f));
+      if (f !== '-') p.set('name', path.basename(f));
+    } else {
+      // A directory becomes one link carrying every file, so the page can show
+      // the tree rather than the reader juggling a link per file.
+      const bundle = files.map((f) => ({
+        name: path.relative(process.cwd(), f) || path.basename(f),
+        kind: kindOf(f),
+        src: fs.readFileSync(f, 'utf8')
+      }));
+      p.set('bundle', zlib.gzipSync(Buffer.from(JSON.stringify(bundle), 'utf8')).toString('base64url'));
+    }
+    if (cfg.select.length) p.set('select', cfg.select.join(','));
+    if (cfg.ignore.length) p.set('ignore', cfg.ignore.join(','));
+    for (const r of cfg.ruleSets) if (/^https?:\/\//i.test(r)) p.append('rules', r);
+    const link = o.shareBase.replace(/\/?$/, '/') + '#' + p.toString();
+    process.stdout.write(link + '\n');
+    if (link.length > 60000) {
+      process.stderr.write(`slop: that link is ${Math.round(link.length / 1000)}k characters — `
+        + `some tools truncate long URLs. Share fewer files, or send the JSON from --format json.\n`);
     }
     return 0;
   }
