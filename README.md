@@ -18,39 +18,32 @@ slop check  docs/ -r                    # lint documents with a set of rules
 slop fudge  rules/house-style.json      # test a rule set (alias: test-rules)
 ```
 
-Everything runs locally. Nothing is uploaded, including by the web page.
+Everything runs locally. Nothing is uploaded, including by the web pages.
 
 ---
 
-## Install
+## Three ways to run it
 
-**Python** (the primary CLI):
-
-```sh
-uv tool install ./py        # or: pip install ./py
-slop check docs/ -r
-```
-
-**JavaScript** (same behaviour, and the engine the web page uses):
+**CLI** — one engine, no install needed:
 
 ```sh
+npx --yes github:bheijden/slop check docs/ -r
+# or clone and run it directly
 node js/cli.mjs check docs/ -r
 ```
 
-**Web** — live at **<https://bheijden.github.io/slop/>**. It needs neither
-a build step nor a backend, so any static server works locally too:
+**The UI** — <https://bheijden.github.io/slop/>. Paste or drop a file,
+see findings highlighted with the fix on hover, toggle rule sets, load your
+own. Nothing is uploaded.
 
-```sh
-python3 -m http.server 8000    # then http://localhost:8000/web/
-```
+**The checker** — <https://bheijden.github.io/slop/web/check.html>. The
+same engine with no interface: give it a document in the URL and it renders the
+result, as text or `#format=json`. Nobody has to install anything, and it is
+readable three ways — the page itself, `window.slopResult`, and a
+`postMessage` to a parent frame — so a headless browser or an embedding page
+can use it as a zero-install checker.
 
-The page runs both commands: **check** marks findings on your document, **test
-rules** runs the fudger. Everything it needs comes from the URL, so a script or
-an agent can hand someone a link — see [Opening the page from a
-script](#opening-the-page-from-a-script).
-
-Both CLIs and the web page load the same `rules/*.json`. They are checked
-against each other in CI, so a finding in one is a finding in all three.
+All three load the same `rules/*.json` and run the same `js/engine.mjs`.
 
 ---
 
@@ -90,6 +83,18 @@ docs/intro.md (3385 words, 2 findings)
 `--select` and `--ignore` take a **set name** or a **single rule id**, the way
 ruff accepts both `E` and `E501`.
 
+### What the flags mean
+
+| flag | what it does |
+|---|---|
+| `-r` | Recurse into directories. `slop check docs/ -r` walks the whole tree and lints every `.md`, `.html`, `.txt` and `.rst` it finds, skipping dotfiles and `node_modules`. Without it, pointing at a directory is an error. |
+| `--max N` | A **budget**. Findings are style smells, not errors, so demanding zero is usually wrong. `--max 5` means "fail only if there are more than 5". |
+| `--max-per-1000 N` | A budget scaled by length, which is the one you usually want: a 20-page document is allowed more findings than a paragraph. `--max-per-1000 2` fails above 2 findings per 1000 words. |
+| exit codes | `0` clean or within budget, `1` over budget, `2` bad usage or unreadable file. This is what makes it usable in CI or a pre-commit hook — the job fails on `1`. |
+| `--format json` | The full result as JSON: every finding with `file`, `line`, `col`, `rule`, `match`, `sentence`, `why` and `suggest`. For agents and scripts. |
+| `--format github` | GitHub Actions annotation lines (`::warning file=…,line=…::`). GitHub renders these as inline comments on the changed lines of a pull request. |
+| `--share` | Prints a **link** that opens the document in the web UI, with the file gzipped into the URL fragment. Nothing is uploaded — the fragment never leaves the browser. It is for handing a result to someone who has nothing installed. Point it at `check.html` with `--share-base` for the no-UI results page. |
+
 ### For a coding agent
 
 `--format json` gives an agent everything it needs to fix the prose without a
@@ -117,18 +122,22 @@ flags and what it deliberately allows.
 
 Exit codes: `0` clean, `1` over budget, `2` usage or read error.
 
-### Opening the page from a script
+### Opening a web page from a script
 
 `--share` turns a local file into a link. The document is gzipped into the URL
 **fragment**, which browsers never send to a server, so the text stays on the
-two machines that already have it.
+two machines that already have it. A 3 KB markdown file becomes a 2.2 KB link.
 
 ```sh
 slop check --share docs/intro.md
-# https://bheijden.github.io/slop/#gz=H4sIAAAA…&kind=md
+# https://bheijden.github.io/slop/#gz=H4sIAAAA…&kind=md&name=intro.md
+
+slop check --share --share-base https://bheijden.github.io/slop/web/check.html \
+                 --share-format json docs/intro.md
+# the same document, rendered as JSON with no interface
 ```
 
-A 3 KB markdown file becomes a 2.2 KB link. Or build one by hand:
+Or build one by hand:
 
 | fragment key | effect |
 |---|---|
@@ -140,11 +149,14 @@ A 3 KB markdown file becomes a 2.2 KB link. Or build one by hand:
 | `select=`, `ignore=` | choose rule sets or rules |
 | `mode=fudge` | test rule sets instead of linting a document |
 
+| `name=` | a filename to label the result with |
+| `format=text\|json` | `check.html` only |
+
 `url=` needs the target site to allow cross-origin reads; the CLI has no such
 limit, so prefer `slop check <url> --share` when it does not.
 
-An agent working in a terminal should use `--format json` directly. The link is
-for handing a result to a person.
+An agent working in a terminal should use `--format json` directly. The links
+are for reaching someone with nothing installed.
 
 ---
 
@@ -182,9 +194,6 @@ Or in `slop.json`, found by walking up from the working directory:
   "maxPer1000": 3.0
 }
 ```
-
-The Python CLI also reads `[tool.slop]` from a `pyproject.toml` passed
-with `--config`.
 
 Every rule ships enabled. `colon-triple` nearly did not: it produced 45% of all
 findings on a real corpus, and 16 of its 21 hits were docstrings, matrix algebra
@@ -329,23 +338,23 @@ code blocks, front matter, link destinations and reference definitions.
 rules/            rule sets as JSON  <- the shared artifact
   llm-cliches.json
   wikipedia-ai.json
-  index.json      manifest for the web page
+  index.json      manifest for the web pages
 js/               engine.mjs  extract.mjs  config.mjs  fudge.mjs  cli.mjs
-py/slop/    engine.py   extract.py   config.py   fudge.py   cli.py
-web/              index.html  worker.mjs   <- static, no server
-tests/            run.mjs (JS)  test_rules.py (Python)
+web/              index.html   the UI
+                  check.html   the same engine, no interface, driven by the URL
+                  worker.mjs   runs rules off the main thread, with a timeout
+tests/            run.mjs      conformance + fudging
 tools/            build-rules.mjs   regenerate rules/ from vendor/
 examples/         a rule set to copy
 ```
 
-Two engines, one rule format. Each uses its platform's best tools — Python
-parses HTML with `html.parser`, the browser has the DOM — but both run the same
-rule files against the same test cases, which is what keeps them from drifting.
-CI runs both suites.
+One engine. `js/engine.mjs` and `js/extract.mjs` are what the CLI, the UI and
+the checker all run; the rule sets are data both they and any other
+implementation can read.
 
-### Web page
+### Web pages
 
-`web/index.html` is a static page with two voices: everything the linter says is
+`web/index.html` is the UI, a static page with two voices: everything the linter says is
 monospace, everything you wrote is serif. Findings get a wavy underline rather
 than a highlight block, with a marker in the margin at the line it came from —
 and you can read them over the extracted prose or over your original source.
@@ -380,8 +389,8 @@ derived from [simonw/tools](https://github.com/simonw/tools), also Apache 2.0.
 - **Heuristics, not proof.** These are style smells. `ai-vocab` firing once is
   coincidence; several times is a tell. Use `--max-per-1000` rather than
   demanding zero.
-- **`.rtf` is not supported.** RTF is a control-word format; it would need
-  `striprtf` and would be Python-only. Convert to `.md` or `.txt` first.
+- **`.rtf` is not supported.** RTF is a control-word format and would need a
+  real parser. Convert to `.md` or `.txt` first.
 - **Long inline code spans are removed.** A single short token is kept, because
   ``` `retry_count` is deprecated ``` needs its subject to parse. Anything with
   a space in it — ``` `npm test && node run.mjs` ``` — is a code fragment and is

@@ -10,10 +10,6 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
       - run: node tests/run.mjs
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.12' }
-      # Both engines run the same rule files. If one drifts, this goes red.
-      - run: python3 tests/test_rules.py
 
   prose:
     name: lint the docs
@@ -22,4 +18,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
-      - run: node js/cli.mjs --format github -r .
+      - run: node js/cli.mjs check --format github -r .
+      - run: node js/cli.mjs check -r .

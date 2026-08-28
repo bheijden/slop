@@ -236,6 +236,8 @@ slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a
 <span class="p">#rules=</span>            a rule set URL, repeatable
 <span class="p">#select=</span> <span class="p">#ignore=</span>  set names or rule ids
 <span class="p">#mode=fudge</span>        test rules instead</pre>
+        <p>Same keys work on <a href="./check.html">check.html</a> — the same checker with no interface, for when you want the result and not the page. It renders plain text or <code>#format=json</code>, sets <code>&lt;html data-status="done"&gt;</code>, exposes <code>window.slopResult</code>, and <code>postMessage</code>s the findings to a parent frame, so a headless browser or an embedding page can read it without installing anything.</p>
+<pre>slop check <span class="p">--share</span> <span class="p">--share-base</span> …/web/check.html <span class="p">--share-format</span> json doc.md</pre>
       </div>
     </details>
     <details>
