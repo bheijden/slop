@@ -112,12 +112,46 @@ button,select,input{font:inherit;color:inherit}
   width:100%;min-height:58vh;border:1px solid var(--hair);border-radius:8px;background:var(--sunk);
   padding:14px;font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical;
 }
-.empty{padding:34px 0;color:var(--muted);max-width:56ch}
-.empty h2{font-family:var(--serif);font-size:29px;font-weight:400;line-height:1.28;color:var(--ink);margin:0 0 12px;letter-spacing:-.015em}
-.empty p{margin:0 0 16px;line-height:1.62;font-size:12.5px}
-.empty .cta{display:flex;gap:8px;flex-wrap:wrap}
-.empty .cta button{border:1px solid var(--hair);background:none;border-radius:7px;padding:6px 12px;cursor:pointer;font-size:12px}
-.empty .cta button:first-child{border-color:var(--blue);color:var(--blue)}
+/* landing */
+.land{grid-column:1/-1;max-width:660px}
+.land .hero{padding:8px 0 28px;border-bottom:1px solid var(--hair)}
+.land h1{font-family:var(--serif);font-size:42px;font-weight:400;letter-spacing:-.025em;margin:0 0 10px;line-height:1.1}
+.land h1 em{font-style:italic;color:var(--flag)}
+.land .lede{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--ink);margin:0 0 6px;max-width:52ch}
+.land .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
+.drop{
+  margin:22px 0 8px;border:1.5px dashed var(--hair);border-radius:10px;padding:24px;
+  text-align:center;color:var(--muted);font-size:12.5px;
+}
+.drop .cta{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.drop button{border:1px solid var(--hair);background:var(--paper);border-radius:7px;padding:6px 13px;cursor:pointer;font-size:12px}
+.drop button:first-child{border-color:var(--blue);color:var(--blue)}
+.land section{padding:26px 0;border-bottom:1px solid var(--hair)}
+.land section:last-child{border-bottom:0}
+.land h2{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  font-weight:500;margin:0 0 12px;
+}
+.land h3{font-size:12.5px;font-weight:600;margin:18px 0 6px}
+.land p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0 0 12px;max-width:66ch}
+.land p code,.land li code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--ink)}
+.land pre{
+  background:var(--sunk);border-radius:8px;padding:12px 14px;overflow-x:auto;
+  font-size:11.5px;line-height:1.75;margin:0 0 12px;
+}
+.land pre .c{color:var(--muted)}
+.land pre .p{color:var(--flag)}
+.land pre .k{color:var(--blue)}
+.land table{border-collapse:collapse;width:100%;font-size:11.5px;margin:0 0 12px}
+.land td{padding:4px 10px 4px 0;border-bottom:1px solid var(--hair);vertical-align:top;color:var(--muted)}
+.land td:first-child{white-space:nowrap;color:var(--ink);width:1%}
+.land details{border:1px solid var(--hair);border-radius:9px;padding:0 14px;margin:22px 0 0}
+.land details[open]{padding-bottom:14px}
+.land details summary{cursor:pointer;padding:11px 0;font-size:12.5px;list-style:none;font-weight:500}
+.land details summary::-webkit-details-marker{display:none}
+.land details summary::before{content:"▸ ";color:var(--blue)}
+.land details[open] summary::before{content:"▾ "}
+.rulebox{max-height:340px;overflow:auto;border-top:1px solid var(--hair);padding-top:10px}
 .sheet.over{background:var(--sunk);outline:2px dashed var(--blue);outline-offset:-10px}
 
 /* ── fudge report ──────────────────────────────────────────────────────── */
@@ -207,7 +241,7 @@ button,select,input{font:inherit;color:inherit}
   </div>
 </div>
 
-<div class="foot">
+<div class="foot" id="foot" hidden>
   <details>
     <summary>Open this page from a script, an agent or a CI job</summary>
     <p>Everything is in the URL fragment, which browsers never send to a server. The document travels with the link; nothing is uploaded.</p>
@@ -330,6 +364,125 @@ async function ask(msg, ms = 5000) {
   });
 }
 
+
+const LANDING = `<div class="land">
+  <div class="hero">
+    <h1>prose<em>check</em></h1>
+    <p class="lede">A linter for prose, the way ruff is a linter for Python.</p>
+    <p class="sub">Point it at markdown, HTML or plain text. It flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code>, three sentences opening on the same word — and reports each one at the line it came from, with the fix. Rules are JSON files, not code. Nothing you drop here leaves your browser.</p>
+  </div>
+
+  <div class="drop">
+    Drop a <code>.md</code>, <code>.html</code> or <code>.txt</code> file
+    <div class="cta">
+      <button id="e-sample">Load an example</button>
+      <button id="e-file">Choose a file</button>
+      <button id="e-paste">Paste text</button>
+    </div>
+  </div>
+
+  <details>
+    <summary>Advanced: choose rule sets, add your own</summary>
+    <div class="rulebox" id="adv-rules"></div>
+  </details>
+
+  <section>
+    <h2>Run it without this page</h2>
+    <p>The CLI is the same engine over the same rule files. It is what an agent or a CI job should call.</p>
+<pre><span class="c"># install — either runtime</span>
+uv tool install <span class="k">git+https://github.com/bheijden/slop#subdirectory=py</span>
+npx --yes <span class="k">github:bheijden/slop</span> --help
+
+<span class="c"># lint files, directories, URLs, stdin</span>
+slop check README.md
+slop check docs/ <span class="p">-r</span>
+slop check https://example.com/post
+cat draft.md | slop check <span class="p">-</span>
+
+<span class="c"># choose rules — a set name or a single rule id</span>
+slop check <span class="p">--select</span> wikipedia-ai <span class="p">--ignore</span> promo docs/ <span class="p">-r</span>
+slop check <span class="p">--rules</span> https://example.com/house.json docs/ <span class="p">-r</span>
+
+<span class="c"># for an agent: every finding carries what broke and how to fix it</span>
+slop check <span class="p">--format</span> json <span class="p">-r</span> docs/</pre>
+    <p>Human output reads like any other linter:</p>
+<pre>docs/intro.md (3385 words, 2 findings)
+  <span class="k">42:7</span>      <span class="p">note-that</span>             It is important to note that
+            It is important to note that timing matters.
+            fix: Delete the hedge and state the fact.
+
+2 findings in 1 file, 3385 words — 0.59 per 1000 words</pre>
+    <p>Exit codes: <code>0</code> clean, <code>1</code> over budget, <code>2</code> usage or read error. Budget with <code>--max N</code> or <code>--max-per-1000 N</code>. Config lives in <code>slop.json</code>, found by walking up from the working directory.</p>
+  </section>
+
+  <section>
+    <h2>Send a document to this page</h2>
+    <p>Everything this page needs is in the URL fragment, which browsers never send to a server. The CLI writes the link for you — the file is gzipped into it, so a 3 KB document becomes a 2.2 KB link.</p>
+<pre>slop check <span class="p">--share</span> docs/intro.md
+<span class="c">→ https://bheijden.github.io/slop/#gz=H4sIAAAA…&amp;kind=md</span></pre>
+    <p>Or assemble one yourself:</p>
+    <table>
+      <tr><td><code>#url=</code></td><td>fetch that page and lint it — the site must allow cross-origin reads</td></tr>
+      <tr><td><code>#text=</code></td><td>base64url of the document</td></tr>
+      <tr><td><code>#gz=</code></td><td>base64url of gzipped document — what <code>--share</code> emits</td></tr>
+      <tr><td><code>#kind=</code></td><td><code>md</code>, <code>html</code> or <code>txt</code></td></tr>
+      <tr><td><code>#rules=</code></td><td>URL of a rule set to load, repeatable</td></tr>
+      <tr><td><code>#select=</code> <code>#ignore=</code></td><td>comma-separated set names or rule ids</td></tr>
+      <tr><td><code>#mode=fudge</code></td><td>test rule sets instead of linting a document</td></tr>
+    </table>
+    <p>The link is for handing a result to a person. An agent in a terminal should call the CLI and read <code>--format json</code>.</p>
+  </section>
+
+  <section>
+    <h2>Writing and testing your own rules</h2>
+    <p>A rule set is a JSON file. Every rule carries its own examples, and those examples are what makes the rule testable.</p>
+<pre>{
+  <span class="p">"name"</span>: "house-style",
+  <span class="p">"rules"</span>: [{
+    <span class="p">"id"</span>: "utilise",
+    <span class="p">"kind"</span>: "regex",
+    <span class="p">"pattern"</span>: "\\\\butili[sz]e[sd]?\\\\b",
+    <span class="p">"flags"</span>: "gi",
+    <span class="p">"description"</span>: "\\"Utilise\\" is never better than \\"use\\".",
+    <span class="p">"suggest"</span>: "Write \\"use\\".",
+    <span class="p">"tests"</span>: {
+      <span class="p">"hit"</span>:  ["We utilise the cache for lookups."],
+      <span class="p">"miss"</span>: ["The utility ran overnight."]
+    }
+  }]
+}</pre>
+    <h3>The fudger</h3>
+    <p>A rule that passes on a clean sentence still has to survive a real file. <b>Test rules</b> above — <code>slop fudge</code> on the command line — runs two phases over every rule you give it.</p>
+    <p><b>Conformance:</b> each <code>tests.hit</code> example must match and each <code>tests.miss</code> must not, on plain text.</p>
+    <p><b>Fudging:</b> each hit example is then rewritten 27 ways with the markup real documents carry, and the rule must still fire:</p>
+<pre>It is important to note that this works.        <span class="c">the example</span>
+**It is important to note that** this works.    <span class="c">md:bold-span</span>
+It is _important_ to note that this works.      <span class="c">md:italic-word</span>
+It is imp**ort**ant to note that this works.    <span class="c">md:bold-inside-word</span>
+It is important[^1] to note that this works.    <span class="c">md:footnote-after-word</span>
+It is important\\nto note that this works.       <span class="c">md:soft-wrap</span>
+&lt;p&gt;It is &lt;em&gt;&lt;strong&gt;important&lt;/strong&gt;&lt;/em&gt; …    <span class="c">html:nested-em-strong</span>
+&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …        <span class="c">html:tag-inside-word</span>
+&lt;p&gt;It is important &lt;!-- note --&gt; to note …      <span class="c">html:comment-before-word</span>
+&lt;p&gt;&lt;span&gt;It&lt;/span&gt; &lt;span&gt;is&lt;/span&gt; …             <span class="c">html:span-per-word</span></pre>
+    <p>A variant that turns a hit into a miss is a bug — in extraction, or in a rule too tight for real files. Variants that genuinely delete words are marked lossy and only reported for information.</p>
+<pre>slop fudge rules/house-style.json
+<span class="c">rule sets: house-style  (2 rules)</span>
+<span class="c">conformance: 4 pass, 0 fail</span>
+<span class="c">fudging:     44 pass, 2 fail</span>
+
+<span class="p">too-brittle</span>  fragile: md:double-space
+            It is important  to note that this exact spacing matters.</pre>
+    <p>The built-in sets carry 196 examples and 3241 markup assertions. Its first run found four real bugs, including markdown soft-wrapping silently breaking every multi-sentence rule on 80-column files.</p>
+  </section>
+
+  <section>
+    <h2>How it reads your file</h2>
+    <p>Markup is removed before the rules run, and every offset is mapped back, so a finding reports the line it came from in <em>your</em> file. Inline tags are deleted rather than blanked, so <code>in&lt;b&gt;ter&lt;/b&gt;nal</code> stays one word. Block tags emit a line break but inline whitespace does not, because HTML collapses whitespace and markdown soft-wraps. Skipped entirely: <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, <code>&lt;pre&gt;</code>, <code>&lt;code&gt;</code>, fenced and indented code blocks, front matter, link destinations.</p>
+    <p><a href="https://github.com/bheijden/slop">Source, rule format and the calibration notes</a> · Apache-2.0 · patterns adapted from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
+  </section>
+</div>`;
+
 /* ── render ──────────────────────────────────────────────────────────── */
 function note(msg) { $('score').innerHTML = msg ? `<span class="err">${esc(msg)}</span>` : ''; }
 
@@ -357,6 +510,8 @@ function marked(body, ranges, keepBlank) {
 function renderDoc() {
   const doc = $('doc'), gut = $('gutter');
   $('btn-view').hidden = $('btn-edit').hidden = (S.mode !== 'check' || !S.src);
+  $('btn-rules').hidden = (S.mode === 'check' && !S.src);
+  $('foot').hidden = (S.mode === 'check' && !S.src);
   $('btn-view').textContent = S.view === 'prose' ? 'source' : 'prose';
   $('btn-view').title = S.view === 'prose' ? 'Show the file as written' : 'Show the prose the rules ran on';
 
@@ -371,14 +526,11 @@ function renderDoc() {
   }
   if (!S.src) {
     doc.className = ''; gut.innerHTML = '';
-    doc.innerHTML = `<div class="empty">
-      <h2>Drop a document here.</h2>
-      <p>Markdown, HTML or plain text. Markup is stripped before the rules run, so a phrase split across <code>&lt;em&gt;</code> tags still matches, and every finding maps back to the line it came from.</p>
-      <p>Nothing leaves your browser.</p>
-      <div class="cta"><button id="e-sample">Load an example</button><button id="e-paste">Paste text</button></div>
-    </div>`;
+    doc.innerHTML = LANDING;
     $('e-sample').onclick = loadSample;
     $('e-paste').onclick = () => { S.editing = true; renderDoc(); };
+    $('e-file').onclick = pickDoc;
+    renderRules($('adv-rules'));
     return;
   }
   const useSrc = S.view === 'source';
@@ -457,10 +609,14 @@ function renderFudge() {
     }).join('')}</div>`;
 }
 
-function renderPop() {
+// One implementation of the rule controls, rendered into either the bar
+// popover or the Advanced section on the landing page. Queries are scoped to
+// the container so both can exist without colliding.
+function renderRules(el) {
+  if (!el) return;
   const counts = {};
   for (const f of S.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
-  $('pop').innerHTML = S.sets.map((set) => {
+  el.innerHTML = S.sets.map((set) => {
     const allOn = set.rules.every((r) => S.active.has(r.id));
     return `<h3>${esc(set.title || set.name)}<button data-set="${esc(set.name)}">${allOn?'none':'all'}</button></h3>` +
       set.rules.map((r) => `<label title="${esc(r.description||'')}">
@@ -468,37 +624,49 @@ function renderPop() {
         <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id]||''}</span></label>`).join('');
   }).join('') + `<div class="load">
       <p>Add a rule set from a URL or a file. Same JSON format as the built-ins.</p>
-      <input type="url" id="r-url" placeholder="https://…/house-style.json">
-      <div class="row"><button id="r-add">Add</button><button id="r-file">Choose file…</button></div>
-      <div class="err" id="r-err"></div>
+      <input type="url" data-url placeholder="https://…/house-style.json">
+      <div class="row"><button data-add>Add</button><button data-file>Choose file…</button></div>
+      <div class="err" data-err></div>
     </div>`;
-  for (const el of $('pop').querySelectorAll('input[data-rule]')) {
-    el.onchange = () => { el.checked ? S.active.add(el.dataset.rule) : S.active.delete(el.dataset.rule); run(); };
+  const q = (sel) => el.querySelector(sel);
+  for (const c of el.querySelectorAll('input[data-rule]')) {
+    c.onchange = () => { c.checked ? S.active.add(c.dataset.rule) : S.active.delete(c.dataset.rule); run(); };
   }
-  for (const b of $('pop').querySelectorAll('button[data-set]')) {
+  for (const b of el.querySelectorAll('button[data-set]')) {
     b.onclick = () => {
-      const set = S.sets.find((s) => s.name === b.dataset.set);
+      const set = S.sets.find((x) => x.name === b.dataset.set);
       const allOn = set.rules.every((r) => S.active.has(r.id));
       set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
       run();
     };
   }
-  $('r-add').onclick = async () => {
-    const u = $('r-url').value.trim(); if (!u) return;
-    try { await addRemoteSet(u); $('r-err').textContent = ''; run(); }
-    catch (e) { $('r-err').textContent = e.message; }
+  q('[data-add]').onclick = async () => {
+    const u = q('[data-url]').value.trim(); if (!u) return;
+    try { await addRemoteSet(u); q('[data-err]').textContent = ''; run(); }
+    catch (e) { q('[data-err]').textContent = e.message; }
   };
-  $('r-file').onclick = () => {
-    const inp = Object.assign(document.createElement('input'), { type:'file', accept:'.json' });
-    inp.onchange = async () => {
-      try { const set = JSON.parse(await inp.files[0].text());
-            if (!Array.isArray(set.rules)) throw new Error('no "rules" array');
-            set.name = set.name || inp.files[0].name.replace(/\.json$/, '');
-            addSet(set); $('r-err').textContent = ''; run(); }
-      catch (e) { $('r-err').textContent = e.message; }
-    };
-    inp.click();
-  };
+  q('[data-file]').onclick = () => pickFile('.json', async (file) => {
+    try {
+      const set = JSON.parse(await file.text());
+      if (!Array.isArray(set.rules)) throw new Error('no "rules" array');
+      set.name = set.name || file.name.replace(/\.json$/, '');
+      addSet(set); q('[data-err]').textContent = ''; run();
+    } catch (e) { q('[data-err]').textContent = e.message; }
+  });
+}
+
+function pickFile(accept, cb) {
+  const i = Object.assign(document.createElement('input'), { type:'file', accept });
+  i.onchange = () => i.files[0] && cb(i.files[0]);
+  i.click();
+}
+
+function pickDoc() {
+  pickFile('.md,.markdown,.mdx,.html,.htm,.txt,.text', async (f) => {
+    S.src = await f.text(); S.editing = false;
+    S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
+    run();
+  });
 }
 
 /* ── run ─────────────────────────────────────────────────────────────── */
@@ -506,7 +674,7 @@ let t = null;
 function run() {
   clearTimeout(t);
   t = setTimeout(async () => {
-    renderPop();
+    renderRules($('pop'));
     if (S.mode === 'fudge') {
       S.fudge = null; renderDoc();
       const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
@@ -526,7 +694,7 @@ function run() {
     const per = res.words ? (res.findings.length / res.words * 1000).toFixed(1) : '0.0';
     $('score').className = 'score' + (res.findings.length ? '' : ' zero');
     $('score').innerHTML = `<b>${res.findings.length}</b> · ${per}/1k · ${res.words}w`;
-    renderDoc(); renderPop();
+    renderDoc(); renderRules($('pop'));
     // Arriving on a link should land on the first finding. Re-running while
     // editing should not yank the page around.
     const arrived = S.src !== S.lastSrc;
@@ -553,7 +721,7 @@ That's the whole point, and you already know the answer.`;
 $('btn-rules').onclick = () => {
   const open = $('pop').hidden;
   $('pop').hidden = !open; $('btn-rules').setAttribute('aria-expanded', String(open));
-  if (open) renderPop();
+  if (open) renderRules($('pop'));
 };
 document.addEventListener('click', (e) => {
   if (!$('pop').hidden && !$('pop').contains(e.target) && e.target !== $('btn-rules')) {

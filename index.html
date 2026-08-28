@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>slop</title>
-<meta http-equiv="refresh" content="0; url=./web/">
+<!-- A meta refresh drops the #fragment, which is where a shared document
+     lives. Redirect in script so the payload survives; the meta tag is the
+     no-script fallback for people arriving without one. -->
+<script>location.replace('./web/' + location.search + location.hash);</script>
+<noscript><meta http-equiv="refresh" content="0; url=./web/"></noscript>
 <link rel="canonical" href="./web/">
 <style>
   body { font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
