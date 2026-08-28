@@ -24,12 +24,15 @@ Everything runs locally. Nothing is uploaded, including by the web pages.
 
 ## Three ways to run it
 
-**CLI** — one engine, no install needed:
+**CLI** — one engine, no dependencies:
 
 ```sh
+# one-off, nothing installed
 npx --yes github:bheijden/slop check docs/ -r
-# or clone and run it directly
-node js/cli.mjs check docs/ -r
+
+# repeated use: npx re-resolves the repo every call (~5s), a clone runs in ~0.2s
+git clone --depth 1 https://github.com/bheijden/slop
+node slop/js/cli.mjs check docs/ -r
 ```
 
 **The UI** — <https://bheijden.github.io/slop/>. Paste or drop a file,

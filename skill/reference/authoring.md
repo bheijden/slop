@@ -58,7 +58,7 @@ always global.
 ## Testing a rule set (the fudger)
 
 ```bash
-npx --yes github:bheijden/slop fudge ./house-style.json
+node /tmp/slop/js/cli.mjs fudge ./house-style.json
 ```
 
 Two phases:
@@ -92,7 +92,7 @@ Deleting it is the last resort, not the first.
 Count the hits by rule over a real corpus:
 
 ```bash
-npx --yes github:bheijden/slop check --format json -r docs/ \
+node /tmp/slop/js/cli.mjs check --format json -r docs/ \
   | jq -r '.files[].findings[].rule' | sort | uniq -c | sort -rn
 ```
 

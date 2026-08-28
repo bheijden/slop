@@ -11,16 +11,27 @@ project can add its own.
 
 ## Run it
 
-No install step:
+For a single check, with no install step:
 
 ```bash
 npx --yes github:bheijden/slop check docs/ -r
 ```
 
+`npx` re-resolves the repository on every call, which costs about 5 seconds each
+time. Fixing findings means running it repeatedly, so clone once instead and the
+per-run cost drops to about 0.2s:
+
+```bash
+git clone --depth 1 https://github.com/bheijden/slop /tmp/slop
+node /tmp/slop/js/cli.mjs check docs/ -r
+```
+
+There are no dependencies to install; the clone is 380 KB and needs only Node.
+
 Use `--format json` whenever you intend to act on the findings:
 
 ```bash
-npx --yes github:bheijden/slop check --format json docs/ -r
+node /tmp/slop/js/cli.mjs check --format json docs/ -r
 ```
 
 Each finding carries everything needed to fix it:
@@ -57,7 +68,7 @@ worse.
 Prefer a budget over demanding zero:
 
 ```bash
-npx --yes github:bheijden/slop check --max-per-1000 2 docs/ -r
+... check --max-per-1000 2 docs/ -r
 ```
 
 Exit codes: `0` within budget, `1` over budget, `2` usage or read error. In CI,
@@ -68,8 +79,8 @@ use `--format github` to get inline pull-request annotations.
 `--select` and `--ignore` take a rule-set name or a single rule id:
 
 ```bash
-npx --yes github:bheijden/slop check --select wikipedia-ai --ignore promo docs/ -r
-npx --yes github:bheijden/slop check --rules ./house-style.json docs/ -r
+... check --select wikipedia-ai --ignore promo docs/ -r
+... check --rules ./house-style.json docs/ -r
 ```
 
 `list` shows every rule and whether it is active. `explain <rule-id>` shows one
