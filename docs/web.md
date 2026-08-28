@@ -19,12 +19,20 @@ continuous scroll, the findings pane runs through all of them grouped by file,
 and next/prev crosses file boundaries. A file list on the left shows which file
 you are in as you scroll and jumps you to any of them.
 
-The input is one card: the text, the buttons that fill it, and the **rules**
-control that decides what runs over it. The rules button opens a panel of the
-loaded sets, each collapsible, with per-rule finding counts and a URL box for
-adding another. It carries the state — `38 rules`, or `11/38 rules` once you
-turn some off. Load a directory and the text area gives way to a summary, so the
-card and its controls stay put.
+There is one region for the text, with three views of it: **prose** (what the
+rules read, with findings highlighted), **source** (your original, highlighted
+the same way), and **edit** (type in place; it re-lints as you go). Editing and
+reading are the same pane, so your document is never shown twice.
+
+Beside them sits everything that acts on it: **file** to pick one, the format,
+**rules**, **clear**, and **copy JSON**. The format follows what you paste —
+markdown, HTML or plain text — until you choose one yourself. The **rules**
+button opens a panel of the loaded sets, each collapsible, with per-rule
+finding counts and a URL box for adding another; it carries the state, `38
+rules` or `11/38 rules` once some are off.
+
+Empty, the pane is a live field with the invitation over it, so you can paste
+straight in.
 
 Three columns — files, document, findings — separated by dividers you can drag
 to resize or step left and right to collapse. A theme control in the bar chooses

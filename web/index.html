@@ -71,35 +71,31 @@ button,select,textarea,input{font:inherit;color:inherit}
 .hero .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
 .hero .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
 
-/* input — one card: the text, what to do with it, and which rules run. */
-.io{margin:22px 0 0}
-#input-card{
-  position:relative;border:1.5px dashed var(--hair);border-radius:10px;background:var(--card);
-  transition:border-color .12s,background .12s;
-}
-#input-card:focus-within{border-style:solid;border-color:var(--blue)}
-body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
+/* The pane is the text: read it, read the source, or edit it in place. */
 #input{
-  display:block;width:100%;min-height:132px;max-height:52vh;overflow:auto;resize:vertical;
-  border:0;background:none;padding:14px 16px 10px;color:inherit;
-  font-family:var(--mono);font-size:12.5px;line-height:1.7;
+  display:block;width:100%;min-height:min(66vh,640px);resize:none;
+  border:0;background:none;padding:0 2px;color:inherit;
+  font-family:var(--mono);font-size:12.5px;line-height:1.75;
 }
 #input:focus{outline:none}
-#input::placeholder{color:var(--muted)}
-.loaded{padding:16px;color:var(--muted);font-size:12.5px}
-.loaded b{color:var(--ink);font-weight:500}
-.tools{
-  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-  padding:9px 12px;border-top:1px solid var(--hair);
+.blank{
+  position:absolute;top:0;left:0;right:0;padding:30px 4px;max-width:52ch;
+  pointer-events:none;   /* the field underneath stays usable */
 }
-.tools select{background:var(--paper);border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px}
-.tools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.blank .chip{pointer-events:auto}
+#pane-doc{position:relative}
+.blank .lead{font-family:var(--serif);font-size:22px;line-height:1.3;margin:0 0 8px;color:var(--ink)}
+.blank .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0 0 16px}
+.blank code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink)}
+body.dragging #pane-doc{outline:2px dashed var(--blue);outline-offset:6px;border-radius:8px}
 
 /* results */
 .results{margin:26px 0 0}
 .rhead{display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px;flex-wrap:wrap}
 .rhead h2{font-family:var(--serif);font-size:22px;font-weight:400;margin:0;letter-spacing:-.015em}
+.rhead{position:relative}
 .rhead .chip{padding:3px 9px;font-size:11.5px}
+.rhead select{background:var(--paper);border:1px solid var(--hair);border-radius:6px;padding:3px 6px;font-size:11.5px;color:var(--muted)}
 .rhead .chip.done{border-color:var(--blue);color:var(--blue)}
 #copy-fallback{width:100%;height:150px;margin-bottom:12px;font-family:var(--mono);font-size:11.5px;
   border:1px solid var(--blue);border-radius:8px;background:var(--sunk);padding:10px;color:var(--ink)}
@@ -347,28 +343,6 @@ body.resizing{cursor:col-resize;user-select:none}
     <p class="sub">Flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code> — at the line it came from, with the fix. Nothing leaves your browser.</p>
   </div>
 
-  <div class="io" id="io">
-    <div class="card" id="input-card">
-      <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
-      <div class="loaded" id="loaded" hidden></div>
-      <div class="tools">
-        <button class="chip" id="b-example">Load an example</button>
-        <button class="chip" id="b-file">Choose a file</button>
-        <select id="kind" aria-label="How to parse the input">
-          <option value="md">markdown</option>
-          <option value="html">html</option>
-          <option value="txt">plain text</option>
-        </select>
-        <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
-        <span class="n" id="meta"></span>
-      </div>
-      <div class="pop" id="rules-pop" hidden>
-        <div class="pop-head">Rules <span id="rule-hint"></span></div>
-        <div class="rulebox" id="rules"></div>
-      </div>
-    </div>
-  </div>
-
   <div class="results" id="results" hidden>
     <div class="rhead">
       <h2 id="r-title"></h2>
@@ -378,7 +352,24 @@ body.resizing{cursor:col-resize;user-select:none}
         <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
       </div>
       <span class="spacer"></span>
+      <div class="seg" id="views">
+        <button id="v-prose" aria-pressed="true">prose</button>
+        <button id="v-source" aria-pressed="false">source</button>
+        <button id="v-edit" aria-pressed="false">edit</button>
+      </div>
+      <button class="chip" id="b-file">file</button>
+      <select id="kind" aria-label="How to parse the input">
+        <option value="md">markdown</option>
+        <option value="html">html</option>
+        <option value="txt">plain text</option>
+      </select>
+      <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
+      <button class="chip" id="b-clear" hidden>clear</button>
       <button class="chip" id="b-copy" hidden title="Copy the findings as JSON — the same shape as --format json">copy JSON</button>
+      <div class="pop" id="rules-pop" hidden>
+        <div class="pop-head">Rules <span id="rule-hint"></span></div>
+        <div class="rulebox" id="rules"></div>
+      </div>
     </div>
     <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
     <div class="workspace" id="workspace">
@@ -393,13 +384,13 @@ body.resizing{cursor:col-resize;user-select:none}
     </div>
     <div class="panes" id="panes" data-layout="split">
       <div class="pane" id="pane-doc">
-        <div class="phead">
-          <div class="seg" id="views">
-            <button id="v-prose" aria-pressed="true">prose</button>
-            <button id="v-source" aria-pressed="false">source</button>
-          </div>
-        </div>
         <div id="doc" class="prose"></div>
+        <textarea id="input" spellcheck="false" hidden></textarea>
+        <div class="blank" id="blank" hidden>
+          <p class="lead">Paste your writing here, or drop a file.</p>
+          <p class="sub">Markdown, HTML or plain text — a folder or a <code>.zip</code> works too.</p>
+          <button class="chip" id="b-example">Load an example</button>
+        </div>
       </div>
       <div class="divider" id="divider">
         <div class="grip" id="grip" role="separator" aria-orientation="vertical"
@@ -489,7 +480,7 @@ const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:
             view:'prose', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
-            setOpen:{}, byId:{},
+            setOpen:{}, byId:{}, kindLocked:false,
             tree:store('pc-tree', 'open'),
             treeW:parseFloat(store('pc-treew', '220')) };
 
@@ -658,21 +649,40 @@ function renderResults() {
     res.hidden = false;
     $('views').hidden = $('nav').hidden = $('b-copy').hidden = true;
     $('copy-fallback').hidden = $('divider').hidden = true;
+    $('b-clear').hidden = $('blank').hidden = $('input').hidden = true;
+    $('doc').hidden = false;
     $('panes').dataset.layout = 'text';
     $('workspace').removeAttribute('data-multi');
     $('tree').hidden = true;
     renderFudge();
     return;
   }
-  $('views').hidden = $('divider').hidden = false;
-  if (!currentDocs().some((d) => d.src.trim())) { res.hidden = true; return; }
   res.hidden = false;
+  const empty = !currentDocs().some((d) => d.src.trim());
+  const editing = S.view === 'edit';
+  $('blank').hidden = !empty;
+  $('input').hidden = !(editing || empty);   // empty keeps a live field to paste into
+  $('doc').hidden = editing || empty;
+  $('views').hidden = empty;
+  $('divider').hidden = $('pane-list').hidden = empty;
+  $('b-clear').hidden = empty;
+  $('v-edit').hidden = (S.results || []).length > 1;   // one document at a time
+  if (empty) {
+    $('r-title').textContent = '';
+    $('nav').hidden = $('b-copy').hidden = true;
+    $('workspace').removeAttribute('data-multi');
+    $('tree').hidden = true;
+    renderRules();
+    if (document.activeElement !== $('input')) $('input').focus({ preventScroll: true });
+    return;
+  }
 
   const results = S.results || [];
   const total = S.flat.length;
   const multi = results.length > 1;
-  const useSrc = S.view === 'source';
+  const useSrc = S.view !== 'prose';
   const srcs = currentDocs();
+  if (S.view === 'edit' && $('input').value !== (srcs[0] || {}).src) $('input').value = (srcs[0] || {}).src || '';
   $('r-title').textContent = multi
     ? `${total} finding${total === 1 ? '' : 's'} in ${results.length} files`
     : (total ? `${total} finding${total === 1 ? '' : 's'}` : 'No findings');
@@ -714,8 +724,8 @@ function renderResults() {
     li.onmouseleave = hideTip;
   }
 
-  $('v-prose').setAttribute('aria-pressed', String(!useSrc));
-  $('v-source').setAttribute('aria-pressed', String(useSrc));
+  for (const [id, v] of [['v-prose','prose'],['v-source','source'],['v-edit','edit']])
+    $(id).setAttribute('aria-pressed', String(S.view === v));
   applyLayout();
   $('nav').hidden = !total;
   $('b-copy').hidden = !results.length;
@@ -956,7 +966,6 @@ function loadDocs(docs, skipped = 0) {
   S.cur = 0;
   S.sel = -1;
   if (docs.length === 1) { $('input').value = docs[0].src; S.kind = docs[0].kind; $('kind').value = S.kind; }
-  grow();
   run();
 }
 
@@ -1007,29 +1016,12 @@ function pickFile(accept, cb) {
   i.click();
 }
 
-function grow() {
-  const t = $('input');
-  t.style.height = 'auto';
-  t.style.height = Math.max(132, Math.min(t.scrollHeight + 4, innerHeight * 0.52)) + 'px';
-}
-
 /* run */
 let timer = null;
 function run() {
   clearTimeout(timer);
   timer = setTimeout(async () => {
     renderRules();
-    // The card stays for a loaded set — the text area gives way to a summary,
-    // so the rules control and the file picker never go out of reach.
-    $('io').hidden = S.mode === 'fudge';
-    const many = S.docs.length > 1;
-    $('input').hidden = $('kind').hidden = many;
-    $('loaded').hidden = !many;
-    if (many) {
-      $('loaded').innerHTML = `<b>${S.docs.length} files</b> loaded`
-        + (S.skipped ? ` · ${S.skipped} skipped (not text)` : '')
-        + ` ${esc('—')} drop more to replace them`;
-    }
     if (S.mode === 'fudge') {
       S.fudge = null; renderResults();
       const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
@@ -1043,7 +1035,7 @@ function run() {
     }
     const docs = currentDocs();
     if (!docs.some((d) => d.src.trim())) {
-      S.results = []; S.flat = []; $('score').textContent = ''; $('meta').textContent = '';
+      S.results = []; S.flat = []; $('score').textContent = '';
       renderResults(); return;
     }
     const res = await ask({ mode:'check', docs, sets:S.sets, active:[...S.active] }, 20000);
@@ -1058,9 +1050,8 @@ function run() {
     const words = S.results.reduce((a, r) => a + r.words, 0);
     const per = words ? (total / words * 1000).toFixed(1) : '0.0';
     $('score').className = 'score' + (total ? '' : ' zero');
-    $('score').innerHTML = `<b>${total}</b> · ${per}/1k`
+    $('score').innerHTML = `<b>${total}</b> · ${per}/1k · ${words}w`
       + (S.results.length > 1 ? ` · ${S.results.length} files` : '');
-    $('meta').textContent = `${words} words`;
     renderResults(); renderRules();
   }, 160);
 }
@@ -1094,10 +1085,32 @@ for (const pre of document.querySelectorAll('.docs pre')) {
 }
 
 /* wiring */
-$('input').addEventListener('input', () => { $('copy-fallback').hidden = true; grow(); run(); });
-$('kind').addEventListener('change', () => { S.kind = $('kind').value; run(); });
-$('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
-$('v-source').onclick = () => { S.view = 'source'; renderResults(); };
+$('input').addEventListener('input', () => {
+  $('copy-fallback').hidden = true;
+  if (!S.kindLocked) {
+    const k = detectKind($('input').value);
+    if (k !== S.kind) { S.kind = k; $('kind').value = k; }
+  }
+  run();
+});
+$('kind').addEventListener('change', () => { S.kind = $('kind').value; S.kindLocked = true; run(); });
+
+// Guess the format from what was pasted, until the reader picks one themselves.
+function detectKind(src) {
+  const head = src.slice(0, 4000);
+  if (/^\s*<(?:!doctype|html|head|body|article|section|div|p|h[1-6])\b/i.test(head)
+      || /<\/(?:p|div|h[1-6]|li|td|table|section|article)>/i.test(head)) return 'html';
+  if (/^\s{0,3}#{1,6}\s|^\s*[-*+]\s|^\s*\d+[.)]\s|^\s*>\s|```|~~~|\[[^\]]*\]\([^)]*\)|\*\*[^*\n]+\*\*/m.test(head)) return 'md';
+  return 'txt';
+}
+for (const [id, v] of [['v-prose','prose'],['v-source','source'],['v-edit','edit']]) {
+  $(id).onclick = () => { S.view = v; renderResults(); if (v === 'edit') $('input').focus(); };
+}
+$('b-clear').onclick = () => {
+  $('input').value = ''; S.docs = []; S.results = []; S.flat = []; S.skipped = 0;
+  S.sel = -1; S.cur = 0; S.name = 'input'; S.kindLocked = false; S.view = 'prose';
+  run();
+};
 $('n-prev').onclick = () => step(-1);
 $('n-next').onclick = () => step(1);
 
@@ -1209,7 +1222,7 @@ underscoring the value of an ever-evolving landscape.
 The parser is a tiny state machine. The renderer is a tiny state machine.
 
 That's the whole point, and you already know the answer.`;
-  grow(); run();
+  run();
 };
 $('b-file').onclick = () => {
   const i = Object.assign(document.createElement('input'), {
@@ -1272,7 +1285,7 @@ await readHash();
 S.kind = $('kind').value = S.kind;
 $('m-check').setAttribute('aria-pressed', String(S.mode === 'check'));
 $('m-fudge').setAttribute('aria-pressed', String(S.mode === 'fudge'));
-grow(); run();
+run();
 </script>
 </body>
 </html>
