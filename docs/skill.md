@@ -19,8 +19,10 @@ Or hand the instruction to the agent and let it install itself:
 
 > Install the slop skill from
 > `github.com/bheijden/slop/tree/main/skill` into
-> `~/.claude/skills/linting-prose/`, keeping the `reference/` files. Then lint
-> `docs/` and fix what it reports.
+> `~/.claude/skills/linting-prose/`, keeping the `reference/` files.
+
+After that the agent picks it up whenever you ask for writing to be reviewed —
+you do not name the tool again.
 
 Only `name` and `description` sit in context until the skill triggers, so it
 costs roughly 100 tokens to have installed. The body loads when the agent is

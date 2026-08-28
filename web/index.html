@@ -433,8 +433,8 @@ for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; 
         <p>Or hand the instruction to the agent and let it install itself:</p>
 <pre><span class="c">Install the slop skill from
 github.com/bheijden/slop/tree/main/skill into
-~/.claude/skills/linting-prose/, keeping the reference/ files.
-Then lint docs/ and fix what it reports.</span></pre>
+~/.claude/skills/linting-prose/, keeping the reference/ files.</span></pre>
+        <p>After that it picks itself up whenever you ask for writing to be reviewed — you do not name the tool again.</p>
         <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
         <p>A skill gives an agent instructions it will act on, so read one before installing it — this one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
       </div>

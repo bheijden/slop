@@ -11,10 +11,13 @@ project can add its own.
 
 ## Run it
 
+Point it at whatever the user is working on — a single file, a directory, or
+`.` for the whole project. `docs/` in the examples below is only a placeholder.
+
 For a single check, with no install step:
 
 ```bash
-npx --yes github:bheijden/slop check docs/ -r
+npx --yes github:bheijden/slop check <paths> -r
 ```
 
 `npx` re-resolves the repository on every call, which costs about 5 seconds each
