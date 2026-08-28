@@ -16,6 +16,9 @@
   --paper:#FCFCFA; --card:#fff; --ink:#17191E; --muted:#767982; --hair:#E6E6E0;
   --sunk:#F4F4EF; --blue:#2D5BD6; --flag:#C2403C;
   --mark:#FFEFA8; --mark-edge:#E0B93C; --mark-on:#FFE066; --mark-ink:#17191E;
+  /* Side margin grows with the window up to a cap, then the content takes the
+     rest of the width rather than sitting in a fixed column. */
+  --gutter:clamp(16px, 4vw, 112px);
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
   color-scheme:light;
@@ -41,7 +44,8 @@ button,select,textarea,input{font:inherit;color:inherit}
 [hidden]{display:none!important}
 
 /* bar */
-.bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;height:46px;padding:0 18px;
+.bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;height:46px;
+     padding:0 var(--gutter);
      background:var(--paper);border-bottom:1px solid var(--hair)}
 .wordmark{font-weight:600;font-size:14px;letter-spacing:-.02em}
 .wordmark b{color:var(--flag);font-weight:600}
@@ -60,7 +64,7 @@ button,select,textarea,input{font:inherit;color:inherit}
 /* The page grows with the window. Individual blocks cap their own measure in
    ch, so a wider window gives more room to the panes rather than longer lines
    of prose. */
-.page{margin:0 auto;padding:28px 24px 80px}
+.page{margin:0 auto;padding:28px var(--gutter) 80px}
 .hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
 .hero h1 em{font-style:italic;color:var(--flag)}
 .hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
@@ -269,7 +273,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .err{color:var(--flag);font-size:11.5px}
 .colophon{color:var(--muted);font-size:11.5px;line-height:1.6;margin:22px 0 0;max-width:66ch}
 .colophon a{color:var(--blue)}
-@media (max-width:640px){.page{padding:20px 14px 60px}.hero h1{font-size:32px}#doc.prose{font-size:16px}}
+@media (max-width:640px){.page{padding-top:20px;padding-bottom:60px}.hero h1{font-size:32px}#doc.prose{font-size:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
