@@ -4,333 +4,540 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>slop</title>
+<meta name="description" content="A prose linter for markdown, HTML and text. Rules are JSON, not code.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='25' font-size='26' font-family='Georgia,serif' fill='%23C2403C'%3E%C2%B6%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ── Two voices ───────────────────────────────────────────────────────────
+   Everything the linter says is monospace. Everything you wrote is serif.
+   The split is the whole visual system: machine on the left and below,
+   prose in the middle.                                                    */
 :root {
-  --bg: #fbfaf8; --panel: #fff; --ink: #1d1b17; --muted: #6e6a62;
-  --line: #e4e0d8; --accent: #7c5cff; --mark: #fcd34d; --mark-ink: #3a2f00;
-  --code: #f4f2ee; --ok: #2f7d32; --warn: #b4530a;
+  --paper:#FBFBF8; --ink:#16181C; --muted:#7A7D85; --hair:#E5E5DE;
+  --flag:#C2403C; --wash:rgba(194,64,60,.09); --blue:#2D5BD6; --sunk:#F3F3EE;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
+  color-scheme:light dark;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #16161a; --panel: #1d1d22; --ink: #e9e7e2; --muted: #9a958c;
-    --line: #32323a; --accent: #a68bff; --mark: #8a6d00; --mark-ink: #ffeaa0;
-    --code: #24242b; --ok: #6fbf73; --warn: #e08a4a;
-  }
+@media (prefers-color-scheme:dark){
+  :root{ --paper:#131418; --ink:#E9E9E4; --muted:#888B93; --hair:#292B31;
+         --flag:#E4665C; --wash:rgba(228,102,92,.13); --blue:#7FA2FF; --sunk:#1A1C21; }
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0; background: var(--bg); color: var(--ink); line-height: 1.55;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--mono); font-size:13px; line-height:1.5;
+  display:flex; flex-direction:column;
+  -webkit-font-smoothing:antialiased;
 }
-header { border-bottom: 1px solid var(--line); padding: 22px 20px; }
-header .wrap, main { max-width: 1180px; margin: 0 auto; }
-h1 { margin: 0 0 4px; font-size: 21px; letter-spacing: -.01em; }
-h1 span { color: var(--accent); }
-.sub { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
-main { padding: 20px; display: grid; grid-template-columns: 260px 1fr; gap: 20px; align-items: start; }
-@media (max-width: 860px) { main { grid-template-columns: 1fr; } }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
-.card + .card { margin-top: 14px; }
-h2 { margin: 0 0 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
-label.rule { display: flex; gap: 8px; align-items: baseline; font-size: 13px; padding: 2px 0; cursor: pointer; }
-label.rule input { margin: 0; flex: none; }
-label.rule .n { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
-label.rule.hit .n { color: var(--warn); font-weight: 600; }
-.setname { font-weight: 600; font-size: 13px; margin: 12px 0 4px; display: flex; gap: 8px; align-items: center; }
-.setname:first-of-type { margin-top: 0; }
-.setname button { font-size: 11px; margin-left: auto; }
-button, .btn {
-  font: inherit; font-size: 13px; padding: 5px 11px; border-radius: 7px;
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer;
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:2px}
+
+/* ── bar ───────────────────────────────────────────────────────────────── */
+.bar{
+  display:flex; align-items:center; gap:18px; padding:0 18px; height:46px;
+  border-bottom:1px solid var(--hair); flex:none; position:relative; z-index:20;
 }
-button:hover { border-color: var(--accent); }
-button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-textarea {
-  width: 100%; min-height: 190px; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
-  padding: 11px; border-radius: 8px; border: 1px solid var(--line);
-  background: var(--code); color: var(--ink); resize: vertical;
+.wordmark{font-weight:600;letter-spacing:-.02em;font-size:14px}
+.wordmark b{color:var(--flag);font-weight:600}
+.modes{display:flex;gap:2px}
+.modes button{
+  background:none;border:0;padding:4px 9px;border-radius:5px;cursor:pointer;
+  color:var(--muted);font-size:12px;
 }
-.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-.row .grow { flex: 1; }
-select, input[type=text] { font: inherit; font-size: 13px; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
-.drop { border: 2px dashed var(--line); border-radius: 10px; padding: 14px; text-align: center; color: var(--muted); font-size: 13px; }
-.drop.over { border-color: var(--accent); color: var(--accent); }
-pre.view {
-  margin: 0; padding: 13px; border-radius: 8px; background: var(--code);
-  font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace;
-  white-space: pre-wrap; word-break: break-word; max-height: 460px; overflow: auto;
+.modes button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+.spacer{flex:1}
+.bar .ghost{
+  background:none;border:1px solid var(--hair);border-radius:6px;
+  padding:4px 10px;cursor:pointer;font-size:12px;color:var(--muted);
 }
-mark { background: var(--mark); color: var(--mark-ink); border-radius: 3px; padding: 0 2px; cursor: pointer; }
-mark.on { outline: 2px solid var(--accent); }
-.finding { border-top: 1px solid var(--line); padding: 9px 0; font-size: 13px; }
-.finding:first-child { border-top: 0; }
-.finding .loc { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
-.finding .rid { color: var(--accent); font-weight: 600; }
-.finding .m { font: 13px ui-monospace, Menlo, monospace; }
-.finding .fix { color: var(--muted); font-size: 12.5px; }
-.stat { font-size: 13px; color: var(--muted); }
-.stat b { color: var(--ink); }
-.tabs { display: flex; gap: 4px; margin-bottom: 9px; }
-.tabs button[aria-selected=true] { background: var(--accent); border-color: var(--accent); color: #fff; }
-code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
-details.help { margin-top: 14px; }
-details.help summary { cursor: pointer; font-size: 13px; color: var(--accent); }
-details.help pre { background: var(--code); padding: 11px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; }
-.err { color: #c0392b; font-size: 13px; }
+.bar .ghost:hover{border-color:var(--blue);color:var(--ink)}
+.score{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.score b{color:var(--ink);font-weight:600}
+.score.zero b{color:var(--blue)}
+
+/* ── rules popover ─────────────────────────────────────────────────────── */
+.pop{
+  position:absolute;top:44px;right:14px;width:330px;max-height:74vh;overflow:auto;
+  background:var(--paper);border:1px solid var(--hair);border-radius:9px;
+  box-shadow:0 14px 40px -12px rgba(0,0,0,.28); padding:12px; z-index:30;
+}
+.pop[hidden]{display:none}
+.pop h3{
+  margin:12px 0 5px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;display:flex;align-items:center;gap:8px;
+}
+.pop h3:first-child{margin-top:2px}
+.pop h3 button{margin-left:auto;background:none;border:0;color:var(--blue);cursor:pointer;font-size:11px;padding:0}
+.pop label{display:flex;gap:8px;align-items:baseline;padding:2.5px 0;cursor:pointer;font-size:12px}
+.pop label input{margin:0;flex:none;accent-color:var(--blue)}
+.pop label .id{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pop label .n{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
+.pop .load{margin-top:14px;padding-top:12px;border-top:1px solid var(--hair)}
+.pop .load p{margin:0 0 7px;color:var(--muted);font-size:11.5px;line-height:1.45}
+.pop .load input[type=url]{width:100%;padding:5px 8px;border:1px solid var(--hair);border-radius:6px;background:var(--sunk);font-size:11.5px}
+.pop .load .row{display:flex;gap:6px;margin-top:6px}
+.pop .load button{flex:none;border:1px solid var(--hair);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11.5px}
+
+/* ── the sheet ─────────────────────────────────────────────────────────── */
+.sheet{flex:1;overflow:auto;position:relative}
+.inner{max-width:940px;margin:0 auto;padding:34px 24px 64px;display:grid;grid-template-columns:34px 1fr;gap:0 14px}
+.gutter{position:relative}
+.tick{
+  position:absolute;right:0;width:22px;height:15px;border:0;background:none;cursor:pointer;
+  color:var(--flag);font-size:10.5px;text-align:right;padding:0;font-family:var(--mono);
+  opacity:.6;transition:opacity .12s;
+}
+.tick:hover,.tick.on{opacity:1;font-weight:600}
+.tick::after{content:"";position:absolute;right:-14px;top:6px;width:8px;height:1.5px;background:currentColor}
+
+#doc{min-width:0}
+#doc.prose{font-family:var(--serif);font-size:19px;line-height:1.62;letter-spacing:-.003em}
+#doc.prose p{margin:0 0 .85em}
+#doc.source{font-family:var(--mono);font-size:12.5px;line-height:1.75}
+#doc.source p{margin:0;white-space:pre-wrap;word-break:break-word;min-height:1.75em}
+#doc p{word-break:break-word}
+#doc mark{
+  background:none;color:inherit;
+  text-decoration:underline wavy var(--flag);
+  text-decoration-thickness:1.5px; text-underline-offset:4px;
+  cursor:pointer;border-radius:2px;
+}
+#doc mark:hover{background:var(--wash)}
+#doc mark.on{background:var(--wash);text-decoration-thickness:2.5px}
+#edit{
+  width:100%;min-height:58vh;border:1px solid var(--hair);border-radius:8px;background:var(--sunk);
+  padding:14px;font-family:var(--mono);font-size:13px;line-height:1.7;resize:vertical;
+}
+.empty{padding:34px 0;color:var(--muted);max-width:56ch}
+.empty h2{font-family:var(--serif);font-size:29px;font-weight:400;line-height:1.28;color:var(--ink);margin:0 0 12px;letter-spacing:-.015em}
+.empty p{margin:0 0 16px;line-height:1.62;font-size:12.5px}
+.empty .cta{display:flex;gap:8px;flex-wrap:wrap}
+.empty .cta button{border:1px solid var(--hair);background:none;border-radius:7px;padding:6px 12px;cursor:pointer;font-size:12px}
+.empty .cta button:first-child{border-color:var(--blue);color:var(--blue)}
+.sheet.over{background:var(--sunk);outline:2px dashed var(--blue);outline-offset:-10px}
+
+/* ── fudge report ──────────────────────────────────────────────────────── */
+.fudge{grid-column:1/-1}
+.fudge .top{display:flex;gap:22px;align-items:baseline;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--hair)}
+.fudge .big{font-size:29px;font-family:var(--serif);letter-spacing:-.02em}
+.fudge .big.bad{color:var(--flag)}
+.fudge .lbl{color:var(--muted);font-size:11.5px}
+.frow{display:grid;grid-template-columns:1fr 96px 96px;gap:14px;padding:4px 0;border-bottom:1px solid var(--hair);align-items:baseline}
+.frow.head{border-bottom:1px solid var(--ink);padding-bottom:6px;margin-bottom:2px}
+.frow.head span{color:var(--muted);font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+.frow:last-child{border-bottom:0}
+.frow .rid{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frow .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:12px}
+.frow.bad{color:var(--flag)}
+.frow.bad .num{color:var(--flag)}
+.frow .why{grid-column:1/-1;color:var(--flag);font-size:11.5px;padding-left:12px;border-left:2px solid var(--flag);margin:3px 0 5px;white-space:pre-wrap;word-break:break-word}
+
+/* ── detail strip ──────────────────────────────────────────────────────── */
+.detail{border-top:1px solid var(--hair);flex:none;background:var(--paper)}
+.detail[hidden]{display:none}
+.detail .in{max-width:940px;margin:0 auto;padding:12px 24px 14px 72px}
+.detail .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.detail .rid{color:var(--flag);font-weight:600}
+.detail .loc,.detail .set{color:var(--muted);font-size:11.5px}
+.detail .nav{margin-left:auto;display:flex;gap:4px}
+.detail .nav button{background:none;border:1px solid var(--hair);border-radius:5px;width:24px;height:22px;cursor:pointer;color:var(--muted);line-height:1;padding:0}
+.detail q{display:block;font-family:var(--serif);font-size:17px;margin:7px 0 5px;quotes:'"' '"'}
+.detail .fix{color:var(--muted);font-size:12px;max-width:80ch}
+.detail .fix b{color:var(--ink);font-weight:500}
+
+/* ── footer ────────────────────────────────────────────────────────────── */
+.foot{border-top:1px solid var(--hair);flex:none}
+.foot details{max-width:940px;margin:0 auto;padding:0 24px}
+.foot summary{cursor:pointer;padding:10px 0;color:var(--muted);font-size:11.5px;list-style:none}
+.foot summary::-webkit-details-marker{display:none}
+.foot summary::before{content:"+ ";color:var(--blue)}
+.foot details[open] summary::before{content:"− "}
+.foot pre{background:var(--sunk);border-radius:7px;padding:12px 14px;overflow-x:auto;font-size:11.5px;line-height:1.65;margin:0 0 14px}
+.foot .k{color:var(--flag)}
+.foot p{color:var(--muted);font-size:11.5px;max-width:78ch;line-height:1.6}
+.foot a{color:var(--blue)}
+.err{color:var(--flag)}
+@media (max-width:720px){
+  .inner{grid-template-columns:20px 1fr;padding:22px 14px 48px}
+  #doc.prose{font-size:17px}
+  .detail .in{padding-left:38px}
+  .pop{right:8px;left:8px;width:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header><div class="wrap">
-  <h1>prose<span>check</span></h1>
-  <p class="sub">Paste or drop a <code>.md</code>, <code>.html</code> or <code>.txt</code> file. Markup is stripped, the selected rule sets run over the prose, and every hit is mapped back to the line it came from. Nothing leaves your browser.</p>
-</div></header>
 
-<main>
-  <div>
-    <div class="card">
-      <h2>Rule sets</h2>
-      <div id="rules"></div>
-    </div>
-    <div class="card">
-      <h2>Your rules</h2>
-      <p class="stat" style="margin:0 0 8px">Load a rule set JSON. Same format as the built-ins.</p>
-      <input type="file" id="rulefile" accept=".json" style="font-size:12px;width:100%">
-      <div id="ruleerr" class="err"></div>
-    </div>
+<div class="bar">
+  <span class="wordmark">prose<b>check</b></span>
+  <div class="modes" role="group" aria-label="Mode">
+    <button id="m-check" aria-pressed="true">check</button>
+    <button id="m-fudge" aria-pressed="false">test rules</button>
   </div>
+  <span class="spacer"></span>
+  <button class="ghost" id="btn-view" hidden>prose</button>
+  <button class="ghost" id="btn-edit" hidden>edit</button>
+  <button class="ghost" id="btn-rules" aria-expanded="false">rules</button>
+  <span class="score" id="score"></span>
+</div>
 
-  <div>
-    <div class="card">
-      <h2>Input</h2>
-      <div class="drop" id="drop">drop a file here, or paste below</div>
-      <div class="row">
-        <select id="kind">
-          <option value="md">markdown</option>
-          <option value="html">html</option>
-          <option value="txt">plain text</option>
-        </select>
-        <span class="stat" id="fname"></span>
-        <span class="grow"></span>
-        <button id="sample">load example</button>
-      </div>
-      <div class="row"><textarea id="input" placeholder="Paste prose, markdown or HTML…" spellcheck="false"></textarea></div>
-    </div>
+<div class="pop" id="pop" hidden></div>
 
-    <div class="card">
-      <div class="tabs">
-        <button id="tab-src" aria-selected="true">source</button>
-        <button id="tab-prose" aria-selected="false">extracted prose</button>
-        <span class="grow"></span>
-        <span class="stat" id="stat"></span>
-      </div>
-      <pre class="view" id="view"></pre>
-    </div>
-
-    <div class="card">
-      <h2>Findings</h2>
-      <div id="findings" class="stat">Nothing yet.</div>
-    </div>
-
-    <details class="help" open>
-      <summary>Using this from a terminal or a coding agent</summary>
-      <p class="stat">The page and the CLI run the same rule files, so a finding here is a finding there.</p>
-<pre># lint files, directories and URLs
-slop README.md docs/ -r
-slop https://example.com/post
-
-# machine-readable, for an agent to act on
-slop --format json docs/ -r
-
-# each finding carries what broke and how to fix it:
-# { "file": "docs/intro.md", "line": 42, "col": 7,
-#   "rule": "note-that", "set": "wikipedia-ai", "severity": "warn",
-#   "match": "It is important to note that",
-#   "sentence": "It is important to note that timing matters.",
-#   "why":    "Didactic hedging ...",
-#   "suggest":"Delete the hedge and state the fact." }
-
-# pick rule sets, drop noisy rules, add your own
-slop --select wikipedia-ai --ignore promo docs/ -r
-slop --rules rules/house-style.json --select house-style docs/ -r
-
-# check a rule set you are writing (conformance + markup fudging)
-slop test-rules rules/house-style.json</pre>
-    </details>
+<div class="sheet" id="sheet">
+  <div class="inner">
+    <div class="gutter" id="gutter"></div>
+    <div id="doc" class="prose"></div>
   </div>
-</main>
+</div>
+
+<div class="detail" id="detail" hidden>
+  <div class="in">
+    <div class="head">
+      <span class="rid" id="d-rule"></span>
+      <span class="loc" id="d-loc"></span>
+      <span class="set" id="d-set"></span>
+      <span class="nav"><button id="d-prev" title="Previous finding">↑</button><button id="d-next" title="Next finding">↓</button></span>
+    </div>
+    <q id="d-match"></q>
+    <div class="fix" id="d-fix"></div>
+  </div>
+</div>
+
+<div class="foot">
+  <details>
+    <summary>Open this page from a script, an agent or a CI job</summary>
+    <p>Everything is in the URL fragment, which browsers never send to a server. The document travels with the link; nothing is uploaded.</p>
+<pre># the CLI writes the link for you — the file is gzipped into the fragment
+slop check --share docs/intro.md
+
+# or build one yourself
+<span class="k">#url=</span>https://example.com/post          fetch and lint a page
+<span class="k">#text=</span>&lt;base64url&gt;<span class="k">&amp;kind=</span>md              lint text you encoded
+<span class="k">#gz=</span>&lt;base64url of gzip&gt;<span class="k">&amp;kind=</span>html      same, compressed
+<span class="k">#rules=</span>https://example.com/house.json  load a rule set over https
+<span class="k">#select=</span>wikipedia-ai<span class="k">&amp;ignore=</span>promo      choose rules
+<span class="k">#mode=</span>fudge<span class="k">&amp;rules=</span>...                 test a rule set instead
+
+# an agent working in a terminal should use the CLI directly:
+slop check --format json -r docs/     # match, sentence, why, suggest
+slop fudge rules/house-style.json     # conformance + markup fudging</pre>
+    <p><a href="https://github.com/bheijden/slop">Source and rule format</a> · rules run in a Web Worker with a 2s timeout, so a rule set fetched from someone else's repo cannot hang this tab.</p>
+  </details>
+</div>
 
 <script type="module">
 const $ = (id) => document.getElementById(id);
-const state = { sets: [], active: new Set(), findings: [], text: '', tab: 'src', sel: -1 };
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const S = { sets:[], active:new Set(), findings:[], text:'', src:'', kind:'md',
+            view:'prose', mode:'check', sel:-1, editing:false, fudge:null, lastSrc:null };
 
-const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-
-async function loadSets() {
-  const manifest = await (await fetch('../rules/index.json')).json();
-  for (const f of manifest.sets) {
-    const set = await (await fetch('../rules/' + f)).json();
-    state.sets.push(set);
-    for (const r of set.rules) if (r.default !== 'off') state.active.add(r.id);
-  }
-  renderRules();
+/* ── URL ─────────────────────────────────────────────────────────────── */
+const b64urlToBytes = (s) => {
+  const b = atob(s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'='));
+  return Uint8Array.from(b, (c) => c.charCodeAt(0));
+};
+async function gunzip(bytes) {
+  const ds = new DecompressionStream('gzip');
+  const r = new Blob([bytes]).stream().pipeThrough(ds);
+  return new Response(r).text();
 }
 
-function renderRules() {
-  const counts = {};
-  for (const f of state.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
-  const el = $('rules');
-  el.innerHTML = '';
-  for (const set of state.sets) {
-    const h = document.createElement('div');
-    h.className = 'setname';
-    h.innerHTML = `<span>${esc(set.title || set.name)}</span>`;
+async function readHash() {
+  const p = new URLSearchParams(location.hash.replace(/^#/, ''));
+  if (p.get('mode') === 'fudge') S.mode = 'fudge';
+  if (p.get('kind')) S.kind = p.get('kind');
+  for (const url of p.getAll('rules')) await addRemoteSet(url).catch((e) => note(e.message));
+  const sel = (p.get('select') || '').split(',').filter(Boolean);
+  const ign = (p.get('ignore') || '').split(',').filter(Boolean);
+  if (sel.length) {
+    S.active = new Set();
+    for (const s of S.sets) for (const r of s.rules) if (sel.includes(s.name) || sel.includes(r.id)) S.active.add(r.id);
+  }
+  for (const i of ign) {
+    const set = S.sets.find((s) => s.name === i);
+    if (set) set.rules.forEach((r) => S.active.delete(r.id));
+    else S.active.delete(i);
+  }
+  if (p.get('gz')) S.src = await gunzip(b64urlToBytes(p.get('gz')));
+  else if (p.get('text')) S.src = new TextDecoder().decode(b64urlToBytes(p.get('text')));
+  else if (p.get('url')) {
+    const u = p.get('url');
+    note('fetching ' + u + ' …');
+    try {
+      const res = await fetch(u, { redirect:'follow' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      S.src = await res.text();
+      S.kind = /html/i.test(res.headers.get('content-type') || '') ? 'html' : S.kind;
+      note('');
+    } catch (e) {
+      note(`could not fetch that URL (${e.message}). The site must allow cross-origin reads — the CLI has no such limit.`);
+    }
+  }
+}
+
+/* ── rule sets ───────────────────────────────────────────────────────── */
+async function addRemoteSet(url) {
+  const res = await fetch(url, { headers:{accept:'application/json'} });
+  if (!res.ok) throw new Error(`rule set ${url}: HTTP ${res.status}`);
+  const set = await res.json();
+  if (!Array.isArray(set.rules)) throw new Error(`rule set ${url}: no "rules" array`);
+  set.name = set.name || url.split('/').pop().replace(/\.json$/, '');
+  addSet(set);
+  return set;
+}
+function addSet(set) {
+  S.sets = S.sets.filter((s) => s.name !== set.name);
+  S.sets.push(set);
+  for (const r of set.rules) if (r.default !== 'off') S.active.add(r.id);
+}
+async function loadBuiltins() {
+  const m = await (await fetch('../rules/index.json')).json();
+  for (const f of m.sets) addSet(await (await fetch('../rules/' + f)).json());
+}
+
+/* ── worker ──────────────────────────────────────────────────────────── */
+// One worker, kept alive across runs so its modules load once. The timeout
+// starts only after the worker reports ready, so it measures rule execution
+// rather than network latency. A rule that runs away gets the worker
+// terminated; the next run builds a fresh one.
+let worker = null, ready = null;
+function spawn() {
+  worker = new Worker('./worker.mjs', { type:'module' });
+  ready = new Promise((res) => {
+    const first = (e) => { if (e.data && e.data.ready) { worker.removeEventListener('message', first); res(); } };
+    worker.addEventListener('message', first);
+  });
+}
+async function ask(msg, ms = 5000) {
+  if (!worker) spawn();
+  await ready;
+  return new Promise((resolve) => {
+    const w = worker;
+    const done = (v) => { w.removeEventListener('message', onMsg); w.removeEventListener('error', onErr); clearTimeout(t); resolve(v); };
+    const onMsg = (e) => done(e.data);
+    const onErr = (e) => done({ ok:false, error:e.message });
+    const t = setTimeout(() => {
+      w.terminate(); if (worker === w) worker = null;
+      done({ ok:false, error:`no result after ${ms/1000}s — a rule is backtracking. Rules run in a worker, so this cannot freeze the page.` });
+    }, ms);
+    w.addEventListener('message', onMsg);
+    w.addEventListener('error', onErr);
+    w.postMessage(msg);
+  });
+}
+
+/* ── render ──────────────────────────────────────────────────────────── */
+function note(msg) { $('score').innerHTML = msg ? `<span class="err">${esc(msg)}</span>` : ''; }
+
+function marked(body, ranges, keepBlank) {
+  const ok = ranges.slice().sort((a, b) => a[0] - b[0]).filter((r, i, a) => i === 0 || r[0] >= a[i-1][1]);
+  const out = [];
+  let pos = 0;
+  for (const line of body.split('\n')) {
+    const s = pos, e = pos + line.length;
+    pos = e + 1;
+    if (!line.trim() && !keepBlank) continue;
+    let html = '', last = s;
+    for (const [rs, re, i] of ok) {
+      if (re <= s || rs >= e) continue;
+      const a = Math.max(rs, s), b = Math.min(re, e);
+      html += esc(body.slice(last, a)) + `<mark data-i="${i}"${i === S.sel ? ' class="on"' : ''}>${esc(body.slice(a, b))}</mark>`;
+      last = b;
+    }
+    html += esc(body.slice(last, e));
+    out.push(`<p>${html || '<br>'}</p>`);
+  }
+  return out.join('');
+}
+
+function renderDoc() {
+  const doc = $('doc'), gut = $('gutter');
+  $('btn-view').hidden = $('btn-edit').hidden = (S.mode !== 'check' || !S.src);
+  $('btn-view').textContent = S.view === 'prose' ? 'source' : 'prose';
+  $('btn-view').title = S.view === 'prose' ? 'Show the file as written' : 'Show the prose the rules ran on';
+
+  if (S.mode === 'fudge') { renderFudge(); return; }
+  if (S.editing) {
+    doc.className = ''; gut.innerHTML = '';
+    doc.innerHTML = '<textarea id="edit" spellcheck="false"></textarea>';
+    const ta = $('edit');
+    ta.value = S.src; ta.focus();
+    ta.oninput = () => { S.src = ta.value; run(); };
+    return;
+  }
+  if (!S.src) {
+    doc.className = ''; gut.innerHTML = '';
+    doc.innerHTML = `<div class="empty">
+      <h2>Drop a document here.</h2>
+      <p>Markdown, HTML or plain text. Markup is stripped before the rules run, so a phrase split across <code>&lt;em&gt;</code> tags still matches, and every finding maps back to the line it came from.</p>
+      <p>Nothing leaves your browser.</p>
+      <div class="cta"><button id="e-sample">Load an example</button><button id="e-paste">Paste text</button></div>
+    </div>`;
+    $('e-sample').onclick = loadSample;
+    $('e-paste').onclick = () => { S.editing = true; renderDoc(); };
+    return;
+  }
+  const useSrc = S.view === 'source';
+  doc.className = useSrc ? 'source' : 'prose';
+  const body = useSrc ? S.src : S.text;
+  doc.innerHTML = marked(body, S.findings.map((f, i) => useSrc ? [f.srcStart, f.srcEnd, i] : [f.start, f.end, i]), useSrc);
+  for (const m of doc.querySelectorAll('mark')) m.onclick = () => select(+m.dataset.i);
+  placeTicks();
+}
+
+// The gutter is measured, not guessed: each tick sits at the marked span's
+// own offsetTop, so the margin reads like a proof sheet's marks.
+function placeTicks() {
+  const gut = $('gutter'); gut.innerHTML = '';
+  const marks = [...$('doc').querySelectorAll('mark')];
+  const top = $('doc').getBoundingClientRect().top;
+  let lastY = -99;
+  for (const m of marks) {
+    const i = +m.dataset.i;
+    const y = m.getBoundingClientRect().top - top;
+    if (y - lastY < 13) continue;
+    lastY = y;
     const b = document.createElement('button');
-    const allOn = set.rules.every((r) => state.active.has(r.id));
-    b.textContent = allOn ? 'none' : 'all';
+    b.className = 'tick' + (i === S.sel ? ' on' : '');
+    b.style.top = y + 'px';
+    b.textContent = S.findings[i].line;
+    b.title = S.findings[i].rule;
+    b.onclick = () => select(i);
+    gut.appendChild(b);
+  }
+}
+
+function select(i, scroll = true) {
+  S.sel = i;
+  const f = S.findings[i];
+  $('detail').hidden = !f;
+  if (f) {
+    $('d-rule').textContent = f.rule;
+    $('d-loc').textContent = `${f.line}:${f.col}` + (f.count ? ` · ${f.count} items` : '');
+    $('d-set').textContent = f.set;
+    $('d-match').textContent = f.sentence.trim() || f.match;
+    $('d-fix').innerHTML = (f.suggest ? `<b>${esc(f.suggest)}</b> ` : '') + esc(f.why || '');
+  }
+  renderDoc();
+  if (!scroll) return;
+  const m = $('doc').querySelector(`mark[data-i="${i}"]`);
+  if (m) m.scrollIntoView({ block:'center', behavior: S.lastSrc === S.src && S.sel >= 0 ? 'smooth' : 'auto' });
+}
+
+function renderFudge() {
+  $('gutter').innerHTML = '';
+  const d = $('doc'); d.className = '';
+  if (!S.fudge) { d.innerHTML = '<div class="empty"><h2>Testing rules…</h2></div>'; return; }
+  const t = S.fudge.reduce((a, r) => ({
+    cok:a.cok+r.conform.ok, cbad:a.cbad+r.conform.fail,
+    fok:a.fok+r.fudge.ok, fbad:a.fbad+r.fudge.fail, lossy:a.lossy+r.fudge.lossy
+  }), {cok:0,cbad:0,fok:0,fbad:0,lossy:0});
+  const bad = t.cbad + t.fbad;
+  d.innerHTML = `<div class="fudge">
+    <div class="top">
+      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${S.sets.map((s)=>s.name).join(' · ')}</div></div>
+      <div><div class="big">${t.cok}</div><div class="lbl">examples matched</div></div>
+      <div><div class="big">${t.fok}</div><div class="lbl">survived markup</div></div>
+      <div><div class="big">${t.lossy}</div><div class="lbl">expected misses</div></div>
+    </div>
+    <div class="frow head"><span>rule</span><span class="num">examples</span><span class="num">markup</span></div>
+    ${S.fudge.slice().sort((a, b) =>
+        (b.conform.fail + b.fudge.fail) - (a.conform.fail + a.fudge.fail)).map((r) => {
+      const rb = r.conform.fail + r.fudge.fail;
+      return `<div class="frow${rb?' bad':''}">
+        <span class="rid">${esc(r.rule)}</span>
+        <span class="num">${r.conform.ok}/${r.conform.ok+r.conform.fail}</span>
+        <span class="num">${r.fudge.ok}/${r.fudge.ok+r.fudge.fail}</span>
+        ${r.failures.map((f)=>`<div class="why">${esc(f.kind)} — ${esc(String(f.detail).slice(0,150))}</div>`).join('')}
+      </div>`;
+    }).join('')}</div>`;
+}
+
+function renderPop() {
+  const counts = {};
+  for (const f of S.findings) counts[f.rule] = (counts[f.rule] || 0) + 1;
+  $('pop').innerHTML = S.sets.map((set) => {
+    const allOn = set.rules.every((r) => S.active.has(r.id));
+    return `<h3>${esc(set.title || set.name)}<button data-set="${esc(set.name)}">${allOn?'none':'all'}</button></h3>` +
+      set.rules.map((r) => `<label title="${esc(r.description||'')}">
+        <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id)?' checked':''}>
+        <span class="id">${esc(r.id)}</span><span class="n">${counts[r.id]||''}</span></label>`).join('');
+  }).join('') + `<div class="load">
+      <p>Add a rule set from a URL or a file. Same JSON format as the built-ins.</p>
+      <input type="url" id="r-url" placeholder="https://…/house-style.json">
+      <div class="row"><button id="r-add">Add</button><button id="r-file">Choose file…</button></div>
+      <div class="err" id="r-err"></div>
+    </div>`;
+  for (const el of $('pop').querySelectorAll('input[data-rule]')) {
+    el.onchange = () => { el.checked ? S.active.add(el.dataset.rule) : S.active.delete(el.dataset.rule); run(); };
+  }
+  for (const b of $('pop').querySelectorAll('button[data-set]')) {
     b.onclick = () => {
-      for (const r of set.rules) allOn ? state.active.delete(r.id) : state.active.add(r.id);
+      const set = S.sets.find((s) => s.name === b.dataset.set);
+      const allOn = set.rules.every((r) => S.active.has(r.id));
+      set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
       run();
     };
-    h.appendChild(b);
-    el.appendChild(h);
-    for (const r of set.rules) {
-      const l = document.createElement('label');
-      l.className = 'rule' + (counts[r.id] ? ' hit' : '');
-      l.title = r.description;
-      const c = document.createElement('input');
-      c.type = 'checkbox';
-      c.checked = state.active.has(r.id);
-      c.onchange = () => { c.checked ? state.active.add(r.id) : state.active.delete(r.id); run(); };
-      l.appendChild(c);
-      l.appendChild(Object.assign(document.createElement('span'), { textContent: r.id }));
-      l.appendChild(Object.assign(document.createElement('span'), { className: 'n', textContent: counts[r.id] || '' }));
-      el.appendChild(l);
-    }
   }
+  $('r-add').onclick = async () => {
+    const u = $('r-url').value.trim(); if (!u) return;
+    try { await addRemoteSet(u); $('r-err').textContent = ''; run(); }
+    catch (e) { $('r-err').textContent = e.message; }
+  };
+  $('r-file').onclick = () => {
+    const inp = Object.assign(document.createElement('input'), { type:'file', accept:'.json' });
+    inp.onchange = async () => {
+      try { const set = JSON.parse(await inp.files[0].text());
+            if (!Array.isArray(set.rules)) throw new Error('no "rules" array');
+            set.name = set.name || inp.files[0].name.replace(/\.json$/, '');
+            addSet(set); $('r-err').textContent = ''; run(); }
+      catch (e) { $('r-err').textContent = e.message; }
+    };
+    inp.click();
+  };
 }
 
-// Rules run in a worker so a runaway pattern can be killed instead of freezing
-// the tab. Two seconds is far more than any sane rule needs.
-let worker = null;
-let timer = null;
-function analyze(src, kind) {
-  return new Promise((resolve) => {
-    if (worker) worker.terminate();
-    worker = new Worker('./worker.mjs', { type: 'module' });
-    timer = setTimeout(() => {
-      worker.terminate();
-      worker = null;
-      resolve({ ok: false, error: 'timed out after 2s — a rule is probably backtracking' });
-    }, 2000);
-    worker.onmessage = (e) => { clearTimeout(timer); resolve(e.data); };
-    worker.onerror = (e) => { clearTimeout(timer); resolve({ ok: false, error: e.message }); };
-    worker.postMessage({ src, kind, sets: state.sets, active: [...state.active] });
-  });
-}
-
-function marks(source, ranges) {
-  const sorted = ranges.slice().sort((a, b) => a[0] - b[0]);
-  const merged = [];
-  for (const [s, e, i] of sorted) {
-    if (merged.length && s < merged[merged.length - 1][1]) continue;
-    merged.push([s, e, i]);
-  }
-  let out = '';
-  let last = 0;
-  for (const [s, e, i] of merged) {
-    out += esc(source.slice(last, s));
-    out += `<mark data-i="${i}"${i === state.sel ? ' class="on"' : ''}>${esc(source.slice(s, e))}</mark>`;
-    last = e;
-  }
-  return out + esc(source.slice(last));
-}
-
-function render() {
-  const src = $('input').value;
-  const useSrc = state.tab === 'src';
-  const body = useSrc ? src : state.text;
-  const ranges = state.findings.map((f, i) => useSrc ? [f.srcStart, f.srcEnd, i] : [f.start, f.end, i]);
-  $('view').innerHTML = body ? marks(body, ranges) : '<span class="stat">Nothing to show.</span>';
-  for (const m of $('view').querySelectorAll('mark')) {
-    m.onclick = () => { state.sel = +m.dataset.i; render(); renderFindings(); };
-  }
-  $('tab-src').setAttribute('aria-selected', String(useSrc));
-  $('tab-prose').setAttribute('aria-selected', String(!useSrc));
-}
-
-function renderFindings() {
-  const el = $('findings');
-  if (!state.findings.length) { el.className = 'stat'; el.textContent = 'No findings.'; return; }
-  el.className = '';
-  el.innerHTML = '';
-  state.findings.forEach((f, i) => {
-    const d = document.createElement('div');
-    d.className = 'finding';
-    if (i === state.sel) d.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)';
-    d.innerHTML = `<div><span class="loc">${f.line}:${f.col}</span> <span class="rid">${esc(f.rule)}</span>`
-      + (f.count ? ` <span class="loc">×${f.count}</span>` : '')
-      + `</div><div class="m">${esc(f.match)}</div>`
-      + (f.suggest ? `<div class="fix">fix: ${esc(f.suggest)}</div>` : '');
-    d.onclick = () => { state.sel = i; render(); renderFindings(); };
-    el.appendChild(d);
-  });
-}
-
-let debounce = null;
+/* ── run ─────────────────────────────────────────────────────────────── */
+let t = null;
 function run() {
-  clearTimeout(debounce);
-  debounce = setTimeout(async () => {
-    const src = $('input').value;
-    const kind = $('kind').value;
-    const res = await analyze(src, kind);
-    if (!res.ok) {
-      $('stat').innerHTML = `<span class="err">${esc(res.error)}</span>`;
+  clearTimeout(t);
+  t = setTimeout(async () => {
+    renderPop();
+    if (S.mode === 'fudge') {
+      S.fudge = null; renderDoc();
+      const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
+      if (!res.ok) return note(res.error);
+      S.fudge = res.results;
+      const bad = res.results.reduce((a, r) => a + r.conform.fail + r.fudge.fail, 0);
+      $('score').className = 'score' + (bad ? '' : ' zero');
+      $('score').innerHTML = `<b>${bad || 0}</b> failing`;
+      $('detail').hidden = true;
+      renderDoc();
       return;
     }
-    state.findings = res.findings;
-    state.text = res.text;
-    state.sel = -1;
+    if (!S.src) { S.findings = []; $('score').textContent = ''; $('detail').hidden = true; renderDoc(); return; }
+    const res = await ask({ mode:'check', src:S.src, kind:S.kind, sets:S.sets, active:[...S.active] });
+    if (!res.ok) return note(res.error);
+    S.findings = res.findings; S.text = res.text; S.sel = -1;
     const per = res.words ? (res.findings.length / res.words * 1000).toFixed(1) : '0.0';
-    $('stat').innerHTML = `<b>${res.findings.length}</b> findings · ${res.words} words · ${per} per 1000`;
-    render(); renderFindings(); renderRules();
-  }, 160);
+    $('score').className = 'score' + (res.findings.length ? '' : ' zero');
+    $('score').innerHTML = `<b>${res.findings.length}</b> · ${per}/1k · ${res.words}w`;
+    renderDoc(); renderPop();
+    // Arriving on a link should land on the first finding. Re-running while
+    // editing should not yank the page around.
+    const arrived = S.src !== S.lastSrc;
+    S.lastSrc = S.src;
+    if (S.findings.length) select(0, arrived && !S.editing); else $('detail').hidden = true;
+  }, 140);
 }
 
-$('input').addEventListener('input', run);
-$('kind').addEventListener('change', run);
-$('tab-src').onclick = () => { state.tab = 'src'; render(); };
-$('tab-prose').onclick = () => { state.tab = 'prose'; render(); };
-
-const drop = $('drop');
-for (const ev of ['dragenter', 'dragover']) drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); });
-for (const ev of ['dragleave', 'drop']) drop.addEventListener(ev, () => drop.classList.remove('over'));
-drop.addEventListener('drop', async (e) => {
-  e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (!file) return;
-  $('input').value = await file.text();
-  $('kind').value = /\.html?$/i.test(file.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(file.name) ? 'md' : 'txt';
-  $('fname').textContent = file.name;
-  run();
-});
-
-$('rulefile').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  try {
-    const set = JSON.parse(await file.text());
-    if (!Array.isArray(set.rules)) throw new Error('no "rules" array');
-    state.sets = state.sets.filter((s) => s.name !== set.name);
-    state.sets.push(set);
-    for (const r of set.rules) if (r.default !== 'off') state.active.add(r.id);
-    $('ruleerr').textContent = '';
-    renderRules(); run();
-  } catch (err) { $('ruleerr').textContent = err.message; }
-});
-
-$('sample').onclick = async () => {
-  $('kind').value = 'md';
-  $('input').value = `# Release notes
+function loadSample() {
+  S.kind = 'md'; S.editing = false;
+  S.src = `# Release notes
 
 It is important to note that the rollout happened in stages. No sign-ups, no
 downloads, no hassle. Community feedback plays a pivotal role in every release,
@@ -339,11 +546,60 @@ underscoring the value of an ever-evolving landscape.
 The parser is a tiny state machine. The renderer is a tiny state machine.
 
 That's the whole point, and you already know the answer.`;
-  $('fname').textContent = 'example.md';
   run();
-};
+}
 
-await loadSets();
+/* ── wiring ──────────────────────────────────────────────────────────── */
+$('btn-rules').onclick = () => {
+  const open = $('pop').hidden;
+  $('pop').hidden = !open; $('btn-rules').setAttribute('aria-expanded', String(open));
+  if (open) renderPop();
+};
+document.addEventListener('click', (e) => {
+  if (!$('pop').hidden && !$('pop').contains(e.target) && e.target !== $('btn-rules')) {
+    $('pop').hidden = true; $('btn-rules').setAttribute('aria-expanded', 'false');
+  }
+});
+$('btn-view').onclick = () => { S.view = S.view === 'prose' ? 'source' : 'prose'; renderDoc(); };
+$('btn-edit').onclick = () => { S.editing = !S.editing; renderDoc(); };
+for (const [id, mode] of [['m-check','check'], ['m-fudge','fudge']]) {
+  $(id).onclick = () => {
+    S.mode = mode; S.editing = false;
+    $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
+    $('m-fudge').setAttribute('aria-pressed', String(mode === 'fudge'));
+    run();
+  };
+}
+const step = (d) => { if (S.findings.length) select((S.sel + d + S.findings.length) % S.findings.length); };
+$('d-next').onclick = () => step(1);
+$('d-prev').onclick = () => step(-1);
+addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+  if (e.key === 'j' || e.key === 'ArrowDown') { e.preventDefault(); step(1); }
+  if (e.key === 'k' || e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
+  if (e.key === 'Escape') { $('pop').hidden = true; $('detail').hidden = true; S.sel = -1; renderDoc(); }
+});
+const sheet = $('sheet');
+for (const ev of ['dragenter','dragover']) sheet.addEventListener(ev, (e) => { e.preventDefault(); sheet.classList.add('over'); });
+for (const ev of ['dragleave','drop']) sheet.addEventListener(ev, () => sheet.classList.remove('over'));
+sheet.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  const f = e.dataTransfer.files[0]; if (!f) return;
+  if (/\.json$/i.test(f.name)) {
+    try { const set = JSON.parse(await f.text()); set.name = set.name || f.name.replace(/\.json$/,''); addSet(set); run(); }
+    catch (err) { note(err.message); }
+    return;
+  }
+  S.src = await f.text(); S.editing = false;
+  S.kind = /\.html?$/i.test(f.name) ? 'html' : /\.(md|markdown|mdx)$/i.test(f.name) ? 'md' : 'txt';
+  run();
+});
+addEventListener('resize', () => { if (S.mode === 'check' && !S.editing && S.src) placeTicks(); });
+
+await loadBuiltins();
+await readHash();
+$('m-check').setAttribute('aria-pressed', String(S.mode === 'check'));
+$('m-fudge').setAttribute('aria-pressed', String(S.mode === 'fudge'));
 run();
 </script>
 </body>

@@ -237,6 +237,19 @@ def _md_inline(mapper: Mapper, line: str, base: int, depth: int = 0) -> None:
             continue
         text = m.group(2) if m.group(2) is not None else m.group(3)
         gap_end, after = m.start(), m.end()
+        # A short single-token code span is a noun in the sentence -- `retry_count`
+        # is deprecated. Dropping it leaves " is deprecated" and grammar-sensitive
+        # rules fire on the hole. Longer spans are code fragments, not words.
+        if m.group(1):
+            n = len(m.group(1))
+            inner = m.group(0)[n:len(m.group(0)) - n].strip()
+            if inner and not re.search(r"\s", inner) and len(inner) <= 24:
+                if gap_end > last:
+                    mapper.copy(line[last:gap_end], base + last)
+                mapper.copy(inner, base + m.start() + m.group(0).index(inner))
+                last = after
+                pos = max(after, m.start() + 1)
+                continue
         # A dropped token inside brackets would leave "()" behind.
         if not text:
             if (gap_end and after < len(line)

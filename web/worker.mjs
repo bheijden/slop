@@ -74,6 +74,11 @@ function fudge({ sets }) {
   return { results: out };
 }
 
+// Announce readiness so the page can start its timeout clock only once the
+// modules are loaded. Otherwise a slow network looks exactly like a runaway
+// rule, and the page kills work that never got to start.
+self.postMessage({ ready: true });
+
 self.onmessage = (e) => {
   try {
     const data = e.data.mode === 'fudge' ? fudge(e.data) : check(e.data);

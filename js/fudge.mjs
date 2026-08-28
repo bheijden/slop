@@ -59,7 +59,8 @@ export function variants(example, s, e) {
     add('md:link-word', 'md', true,
         splice(example, tw.at, tw.word.length, `[${tw.word}](https://example.com/a_b)`));
     add('md:footnote-after-word', 'md', true, splice(example, tw.at + tw.word.length, 0, '[^1]'));
-    add('md:code-word', 'md', false, splice(example, tw.at, tw.word.length, '`' + tw.word + '`'));
+    add('md:code-word', 'md', true, splice(example, tw.at, tw.word.length, '`' + tw.word + '`'));
+    add('md:code-phrase', 'md', false, splice(example, s, e - s, '`' + span + '`'));
   }
   if (sp !== -1) {
     add('md:soft-wrap', 'md', true, splice(example, sp, 1, '\n'));

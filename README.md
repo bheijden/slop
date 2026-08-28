@@ -44,9 +44,10 @@ a build step nor a backend, so any static server works locally too:
 python3 -m http.server 8000    # then http://localhost:8000/web/
 ```
 
-GitHub Pages serves from the repo root, because `web/index.html` imports
-`../js/` and fetches `../rules/`. `.nojekyll` keeps Jekyll out of the way and
-the root `index.html` redirects to the app.
+The page runs both commands: **check** marks findings on your document, **test
+rules** runs the fudger. Everything it needs comes from the URL, so a script or
+an agent can hand someone a link — see [Opening the page from a
+script](#opening-the-page-from-a-script).
 
 Both CLIs and the web page load the same `rules/*.json`. They are checked
 against each other in CI, so a finding in one is a finding in all three.
@@ -79,11 +80,12 @@ docs/intro.md (3385 words, 2 findings)
 |---|---|
 | `--select IDS` | only these rule sets or rules |
 | `--ignore IDS` | drop these rule sets or rules |
-| `--rules FILE` | load an extra rule set (repeatable) |
+| `--rules FILE\|URL` | load an extra rule set, from disk or over https (repeatable) |
 | `--all` | include rules marked `"default": "off"` |
 | `--format` | `human`, `json`, `tsv`, `github` |
 | `--max N` / `--max-per-1000 N` | fail only above a budget |
 | `-r`, `--exclude SUBSTR` | walking a tree |
+| `--share` | print a link that opens these files in the web viewer |
 
 `--select` and `--ignore` take a **set name** or a **single rule id**, the way
 ruff accepts both `E` and `E501`.
@@ -114,6 +116,35 @@ in `sentence`, and the instruction in `suggest`. Running
 flags and what it deliberately allows.
 
 Exit codes: `0` clean, `1` over budget, `2` usage or read error.
+
+### Opening the page from a script
+
+`--share` turns a local file into a link. The document is gzipped into the URL
+**fragment**, which browsers never send to a server, so the text stays on the
+two machines that already have it.
+
+```sh
+slop check --share docs/intro.md
+# https://bheijden.github.io/slop/#gz=H4sIAAAA…&kind=md
+```
+
+A 3 KB markdown file becomes a 2.2 KB link. Or build one by hand:
+
+| fragment key | effect |
+|---|---|
+| `url=https://…` | fetch that page and lint it |
+| `text=<base64url>` | lint text you encoded |
+| `gz=<base64url>` | same, gzipped — what `--share` emits |
+| `kind=md\|html\|txt` | how to parse it |
+| `rules=https://…` | load a rule set over https (repeatable) |
+| `select=`, `ignore=` | choose rule sets or rules |
+| `mode=fudge` | test rule sets instead of linting a document |
+
+`url=` needs the target site to allow cross-origin reads; the CLI has no such
+limit, so prefer `slop check <url> --share` when it does not.
+
+An agent working in a terminal should use `--format json` directly. The link is
+for handing a result to a person.
 
 ---
 
@@ -192,8 +223,20 @@ A rule set is a JSON file. Copy [`examples/house-style.json`](examples/house-sty
 slop check --rules examples/house-style.json --select house-style docs/ -r
 ```
 
-Drop it in `rules/` to make it a built-in for your repo, or point at it with
-`ruleSets` in `slop.json`. The web page loads one through its file picker.
+Then use it from anywhere:
+
+```sh
+slop check --rules ./house-style.json --select house-style docs/ -r
+slop check --rules https://example.com/house-style.json docs/ -r
+```
+
+Drop it in `rules/` to make it a built-in for your repo, point at it with
+`ruleSets` in `slop.json`, or hand the web page a `#rules=` URL. The page
+also takes one from its file picker or a drag-and-drop.
+
+Fetching a rule set runs someone else's patterns over your text. The browser
+caps a runaway rule with the worker timeout; **the CLI does not**, so read a
+rule set before pointing production CI at a URL you do not control.
 
 **Five detector kinds.** Most rules are `regex`; the other four are
 parameterised algorithms for things a regex cannot express.
@@ -217,6 +260,9 @@ below.
 slop fudge examples/house-style.json    # your set
 slop fudge                              # every built-in set
 ```
+
+The web page runs the same thing under **test rules**, with failures sorted to
+the top — useful while you are still writing the pattern.
 
 ```
 rule sets: llm-cliches, wikipedia-ai  (38 rules)
@@ -249,7 +295,8 @@ A variant that turns a HIT into a MISS is a bug — in extraction, or in the rul
 being too tight for real files. Variants that genuinely delete words (inline
 code) are marked lossy and only reported for information.
 
-This is how you refine a rule: write the example, run `fudge`, fix what breaks.
+That is how you refine a rule. Write the example, run `fudge`, and fix whatever
+it reports.
 It earned its place immediately — the first run found four real bugs, listed in
 [docs/extraction.md](docs/extraction.md).
 
@@ -298,11 +345,16 @@ CI runs both suites.
 
 ### Web page
 
-`web/index.html` is a static page: drop a file, pick rule sets, load your own
-rule JSON, see hits highlighted over your source with the fix for each. Rules
-run in a **Web Worker with a 2-second timeout**, because a user-supplied regex
-can backtrack forever and a worker is the only way to kill it without freezing
-the tab.
+`web/index.html` is a static page with two voices: everything the linter says is
+monospace, everything you wrote is serif. Findings get a wavy underline rather
+than a highlight block, with a marker in the margin at the line it came from —
+and you can read them over the extracted prose or over your original source.
+
+Rules run in a **Web Worker**, which the page terminates if a run takes too long.
+A regex from a rule set you fetched can backtrack forever, and a worker is the
+only way to kill that without freezing the tab. The timeout starts only after
+the worker reports ready, so a slow network is never mistaken for a runaway
+rule.
 
 ---
 
@@ -330,12 +382,10 @@ derived from [simonw/tools](https://github.com/simonw/tools), also Apache 2.0.
   demanding zero.
 - **`.rtf` is not supported.** RTF is a control-word format; it would need
   `striprtf` and would be Python-only. Convert to `.md` or `.txt` first.
-- **Inline code is removed, which can leave a gap.** A sentence whose subject is
-  an inline code span — ``` `retry_count` is deprecated ``` — becomes
-  `" is deprecated"`, and a grammar-sensitive rule such as
-  `stranded-auxiliary` may fire on the hole. Dropping the code is still the
-  right trade: keeping it produces far more noise. `--ignore stranded-auxiliary`
-  if it bothers you in API docs.
+- **Long inline code spans are removed.** A single short token is kept, because
+  ``` `retry_count` is deprecated ``` needs its subject to parse. Anything with
+  a space in it — ``` `npm test && node run.mjs` ``` — is a code fragment and is
+  dropped, which can leave a gap a grammar-sensitive rule fires on.
 - **Markdown tables can trip `echo-triad`.** Column-structured rows look like
   parallel sentences. This repo turns tables off with `"skipTables": true` in
   its own `slop.json`.

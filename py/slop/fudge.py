@@ -62,7 +62,8 @@ def variants(example: str, s: int, e: int) -> list[Variant]:
         add("md:bold-inside-word", "md", True, _splice(example, at, len(w), w[:cut] + "**" + w[cut:] + "**"))
         add("md:link-word", "md", True, _splice(example, at, len(w), f"[{w}](https://example.com/a_b)"))
         add("md:footnote-after-word", "md", True, _splice(example, at + len(w), 0, "[^1]"))
-        add("md:code-word", "md", False, _splice(example, at, len(w), f"`{w}`"))
+        add("md:code-word", "md", True, _splice(example, at, len(w), f"`{w}`"))
+        add("md:code-phrase", "md", False, _splice(example, s, e - s, f"`{span}`"))
     if sp != -1:
         add("md:soft-wrap", "md", True, _splice(example, sp, 1, "\n"))
         add("md:double-space", "md", True, _splice(example, sp, 1, "  "))

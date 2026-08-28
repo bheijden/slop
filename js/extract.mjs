@@ -233,6 +233,19 @@ function mdInline(mapper, line, base, depth) {
     const text = m[2] !== undefined ? m[2] : m[3];
     let gapEnd = m.index;
     let after = m.index + tok.length;
+    // A short single-token code span is a noun in the sentence -- `retry_count`
+    // is deprecated. Dropping it leaves " is deprecated" and grammar-sensitive
+    // rules fire on the hole. Longer spans are code fragments, not words.
+    if (m[1]) {
+      const inner = tok.slice(m[1].length, tok.length - m[1].length).trim();
+      if (inner && !/\s/.test(inner) && inner.length <= 24) {
+        if (gapEnd > last) mapper.copy(line.slice(last, gapEnd), base + last);
+        mapper.copy(inner, base + m.index + tok.indexOf(inner));
+        last = after;
+        re.lastIndex = Math.max(after, m.index + 1);
+        continue;
+      }
+    }
     // A dropped token inside brackets would leave "()" behind -- as in
     // "AX200 (`iwlwifi`)". Take the brackets with it.
     if (!text) {
