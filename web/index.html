@@ -101,6 +101,12 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 .panes[data-layout=text]{grid-template-columns:minmax(0,1fr) 44px 0}
 .panes[data-layout=list]{grid-template-columns:0 44px minmax(0,1fr)}
 .panes[data-layout=text] #pane-list,.panes[data-layout=list] #pane-doc{display:none}
+/* Pin each child to its column. Without this, `display:none` on a collapsed
+   pane drops it from the flow and the rest slide left, so the findings pane
+   would inherit the divider's 44px column. */
+#pane-doc{grid-column:1}
+.divider{grid-column:2}
+#pane-list{grid-column:3}
 .pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative}
 .phead{position:sticky;top:0;z-index:2;background:var(--paper);padding:0 0 7px;
        display:flex;align-items:center;gap:8px;min-height:26px}
@@ -108,6 +114,7 @@ body.dragging #input{border-color:var(--blue);background:var(--sunk)}
 #pane-list{padding-left:16px}
 #pane-doc{padding-right:4px}
 .panes[data-layout=text] #doc{max-width:70ch}
+.panes[data-layout=list] .list,.panes[data-layout=list] .phead{max-width:820px}
 
 /* The control sits at the middle of the divider, where you would reach for it. */
 .divider{position:relative;user-select:none}
@@ -127,6 +134,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 @media(max-width:820px){
   .panes,.panes[data-layout=text],.panes[data-layout=list]{grid-template-columns:1fr;height:auto}
+  #pane-doc,.divider,#pane-list{grid-column:1}
   .panes[data-layout=split] .pane{height:auto;overflow:visible}
   .divider{height:34px}
   .grip{top:50%;bottom:auto;left:0;right:0;transform:translateY(-50%);width:auto;height:7px;cursor:default}
