@@ -1,5 +1,7 @@
 # slop
 
+**[Try it in your browser →](https://bheijden.github.io/slop/)**
+
 A prose linter for `.md`, `.html` and `.txt` files. It flags stock LLM
 phrasings — `"it is important to note that"`, `"no X, no Y, no Z"`, three
 sentences opening on the same word — and reports each one as
@@ -35,12 +37,16 @@ slop check docs/ -r
 node js/cli.mjs check docs/ -r
 ```
 
-**Web** — open `web/index.html` from any static server. It needs neither a build
-step nor a backend:
+**Web** — live at **<https://bheijden.github.io/slop/>**. It needs neither
+a build step nor a backend, so any static server works locally too:
 
 ```sh
 python3 -m http.server 8000    # then http://localhost:8000/web/
 ```
+
+GitHub Pages serves from the repo root, because `web/index.html` imports
+`../js/` and fetches `../rules/`. `.nojekyll` keeps Jekyll out of the way and
+the root `index.html` redirects to the app.
 
 Both CLIs and the web page load the same `rules/*.json`. They are checked
 against each other in CI, so a finding in one is a finding in all three.
