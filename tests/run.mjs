@@ -12,7 +12,7 @@
 //                  markup; lossless markup must not turn a HIT into a MISS
 
 import process from 'node:process';
-import { loadBuiltinSets, loadSetFile } from '../js/config.mjs';
+import { loadBuiltinSets, loadSetFile, findConfig, loadConfig } from '../js/config.mjs';
 import { extractMarkdown, extractHtml } from '../js/extract.mjs';
 import { variants } from '../js/fudge.mjs';
 
@@ -25,7 +25,15 @@ const files = argv.filter((a) => a.endsWith('.json'));
 
 let sets;
 try {
-  sets = files.length ? files.map(loadSetFile) : loadBuiltinSets();
+  if (files.length) {
+    sets = files.map(loadSetFile);
+  } else {
+    // Your own rule sets get the same tests as the built-in ones, so
+    // `slop fudge` covers everything the linter would actually run.
+    const cfg = loadConfig(findConfig());
+    const local = (cfg.ruleSets || []).filter((r) => !/^https?:\/\//i.test(r));
+    sets = [...loadBuiltinSets(), ...local.map(loadSetFile)];
+  }
 } catch (err) {
   process.stderr.write(`slop: ${err.message}\n`);
   return 2;

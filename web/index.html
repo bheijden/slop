@@ -377,7 +377,8 @@ node slop/js/cli.mjs check docs/ <span class="p">-r</span>
 node slop/js/cli.mjs check <span class="p">--format</span> json docs/ <span class="p">-r</span>   <span class="c"># match, sentence, why, suggest</span>
 node slop/js/cli.mjs check <span class="p">--select</span> wikipedia-ai .  <span class="c"># a set name or one rule id</span>
 node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</span> docs/        <span class="c"># a link to this page</span></pre>
-        <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page. Exit <code>0</code> clean, <code>1</code> over budget, <code>2</code> error.</p>
+        <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page.</p>
+        <p>Findings never fail a run on their own — they are style smells, not errors. Add <code>--max-per-1000 2</code> or <code>--max 0</code> when you want CI to gate on them. Exit <code>0</code> ok, <code>1</code> over a budget you set, <code>2</code> usage or read error.</p>
       </div>
     </details>
     <details>

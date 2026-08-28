@@ -127,7 +127,7 @@ export function mergeConfig(config = {}, flags = {}) {
     all: flags.all ?? config.all ?? false,
     exclude: list(config.exclude, flags.exclude),
     maxPer1000: flags.maxPer1000 ?? config.maxPer1000 ?? null,
-    max: flags.max ?? config.max ?? 0,
+    max: flags.max ?? config.max ?? null,
     severity: { ...(config.severity || {}), ...(flags.severity || {}) },
     // Extraction options: markdown tables and indented code blocks.
     skipTables: flags.skipTables || config.skipTables || false,

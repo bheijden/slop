@@ -42,8 +42,8 @@ Output
   -q, --quiet        summary only
 
 Budget
-  --max N            fail only above N findings (default 0)
-  --max-per-1000 N   fail only above N findings per 1000 words
+  --max N            fail above N findings         (off by default)
+  --max-per-1000 N   fail above N findings per 1000 words (off by default)
   --exit-zero        always exit 0
 
 Files
@@ -309,9 +309,12 @@ async function main() {
     process.stdout.write(`\n${head} in ${reports.length} file${reports.length === 1 ? '' : 's'}, ${words} words — ${per1000} per 1000 words\n`);
   }
 
+  // Findings are style smells, not errors, so they do not fail a run on their
+  // own. Opt in with --max or --max-per-1000 when you want CI to gate on them.
   if (o.exitZero) return 0;
   if (cfg.maxPer1000 != null) return per1000 > cfg.maxPer1000 ? 1 : 0;
-  return all.length > (cfg.max || 0) ? 1 : 0;
+  if (cfg.max != null) return all.length > cfg.max ? 1 : 0;
+  return 0;
 }
 
 main().then((c) => { process.exitCode = c; }, (e) => {

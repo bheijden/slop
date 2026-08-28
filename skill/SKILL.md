@@ -79,14 +79,15 @@ several times is a tell. Leave a hit alone when the flagged phrasing is
 genuinely the clearest option, and say why rather than rewriting into something
 worse.
 
-Prefer a budget over demanding zero:
+Findings never fail a run on their own. Set a budget when you want one to:
 
 ```bash
-... check --max-per-1000 2 docs/ -r
+... check --max-per-1000 2 docs/ -r    # fail above 2 findings per 1000 words
+... check --max 0 docs/ -r             # fail on any finding
 ```
 
-Exit codes: `0` within budget, `1` over budget, `2` usage or read error. In CI,
-use `--format github` to get inline pull-request annotations.
+Exit codes: `0` ok, `1` over a budget you set, `2` usage or read error. In CI,
+use `--format github` for inline pull-request annotations.
 
 ## Choosing rules
 

@@ -61,6 +61,10 @@ always global.
 node /tmp/slop/js/cli.mjs fudge ./house-style.json
 ```
 
+With no argument, `fudge` tests the built-in sets plus any local `ruleSets`
+listed in the nearest `slop.json`, so a project's own rules are covered by
+the same command.
+
 Two phases:
 
 **Conformance** — every `tests.hit` example must match and every `tests.miss`

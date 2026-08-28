@@ -91,9 +91,9 @@ ruff accepts both `E` and `E501`.
 | flag | what it does |
 |---|---|
 | `-r` | Recurse into directories. `slop check docs/ -r` walks the whole tree and lints every `.md`, `.html`, `.txt` and `.rst` it finds, skipping dotfiles and `node_modules`. Without it, pointing at a directory is an error. |
-| `--max N` | A **budget**. Findings are style smells, not errors, so demanding zero is usually wrong. `--max 5` means "fail only if there are more than 5". |
+| `--max N` | A **budget**, off by default. Findings are style smells, not errors, so a run does not fail just because it found some. `--max 5` means "fail if there are more than 5"; `--max 0` means "fail on any". |
 | `--max-per-1000 N` | A budget scaled by length, which is the one you usually want: a 20-page document is allowed more findings than a paragraph. `--max-per-1000 2` fails above 2 findings per 1000 words. |
-| exit codes | `0` clean or within budget, `1` over budget, `2` bad usage or unreadable file. This is what makes it usable in CI or a pre-commit hook — the job fails on `1`. |
+| exit codes | `0` ok, `1` over a budget you set, `2` bad usage or unreadable file. Without a budget it is always `0` — set one to make CI or a pre-commit hook gate on prose. |
 | `--format json` | The full result as JSON: every finding with `file`, `line`, `col`, `rule`, `match`, `sentence`, `why` and `suggest`. For agents and scripts. |
 | `--format github` | GitHub Actions annotation lines (`::warning file=…,line=…::`). GitHub renders these as inline comments on the changed lines of a pull request. |
 | `--share` | Prints a **link** that opens the document in the web UI, with the file gzipped into the URL fragment. Nothing is uploaded — the fragment never leaves the browser. It is for handing a result to someone who has nothing installed. |
@@ -123,7 +123,8 @@ in `sentence`, and the instruction in `suggest`. Running
 `slop explain <rule>` prints the full rule, including examples of what it
 flags and what it deliberately allows.
 
-Exit codes: `0` clean, `1` over budget, `2` usage or read error.
+Exit codes: `0` ok, `1` over a budget you set, `2` usage or read error. Findings
+alone never fail a run.
 
 ### Opening a web page from a script
 
@@ -268,8 +269,9 @@ below.
 ## 3. Fudging: testing a rule set
 
 ```sh
-slop fudge examples/house-style.json    # your set
-slop fudge                              # every built-in set
+slop fudge examples/house-style.json    # one set
+slop fudge                              # every built-in set, plus any
+                                              # `ruleSets` in slop.json
 ```
 
 The web page runs the same thing under **test rules**, with failures sorted to
