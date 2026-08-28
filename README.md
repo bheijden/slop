@@ -2,7 +2,7 @@
 
 **[Try it in your browser →](https://bheijden.github.io/slop/)**
 
-A prose linter for `.md`, `.html` and `.txt` files. It flags stock LLM
+A prose linter for `.md`, `.html`, `.txt` and `.rst` files. It flags stock LLM
 phrasings — `"it is important to note that"`, `"no X, no Y, no Z"`, three
 sentences opening on the same word — and reports each one as
 `file:line:col` with a suggested fix.
@@ -18,7 +18,7 @@ slop check  docs/ -r                    # lint documents with a set of rules
 slop fudge  rules/house-style.json      # test a rule set (alias: test-rules)
 ```
 
-Everything runs locally. Nothing is uploaded, including by the web pages.
+Everything runs locally. Nothing is uploaded, including by the web page.
 
 ---
 
@@ -81,7 +81,7 @@ docs/intro.md (3385 words, 2 findings)
 | `--format` | `human`, `json`, `tsv`, `github` |
 | `--max N` / `--max-per-1000 N` | fail only above a budget |
 | `-r`, `--exclude SUBSTR` | walking a tree |
-| `--share` | print a link that opens these files in the web viewer |
+| `--share` | print a link that opens these files in the web page |
 
 `--select` and `--ignore` take a **set name** or a **single rule id**, the way
 ruff accepts both `E` and `E501`.
@@ -376,7 +376,7 @@ code blocks, front matter, link destinations and reference definitions.
 rules/            rule sets as JSON  <- the shared artifact
   llm-cliches.json
   wikipedia-ai.json
-  index.json      manifest for the web pages
+  index.json      manifest the web page reads
 js/               engine.mjs  extract.mjs  config.mjs  fudge.mjs  cli.mjs
                   zip.mjs      minimal ZIP reader, no dependencies
 web/              index.html   the web page
@@ -388,22 +388,35 @@ tools/            build-rules.mjs   regenerate rules/ from vendor/
 examples/         a rule set to copy
 ```
 
-One engine. `js/engine.mjs` and `js/extract.mjs` are what the CLI, the UI and
-the checker all run; the rule sets are data both they and any other
-implementation can read.
+One engine. `js/engine.mjs` and `js/extract.mjs` are what both the CLI and the
+web page run; the rule sets are data that they, and any other implementation,
+can read.
 
 ### Web page
 
-`web/index.html` is a static page. Drop a file anywhere on it, or paste text —
-the input box grows and the results appear under it, beside the document.
-**copy JSON** puts the findings on the clipboard in exactly the shape
-`--format json` writes, so they paste straight into an issue, a diff review or
-an agent's context.
+`web/index.html` is a static page. Paste text, or drop a file, several files, a
+folder or a `.zip` anywhere on it. Non-text files are counted and skipped rather
+than failing.
 
-Two voices carry the design: everything the linter says is monospace,
-everything you wrote is serif. Findings get a wavy underline rather
-than a highlight block, with a marker in the margin at the line it came from —
-and you can read them over the extracted prose or over your original source.
+Findings are highlighted in the document, and hovering one shows the rule and
+its fix. Read them over the extracted prose or over your original source. The
+findings list sits beside the document; **copy JSON** puts the whole result on
+the clipboard in exactly the shape `--format json` writes, so it pastes straight
+into an issue, a review or an agent's context.
+
+More than one file reads like a diff view: every document renders in one
+continuous scroll, the findings pane runs through all of them grouped by file,
+and next/prev crosses file boundaries. A file list on the left shows which file
+you are in as you scroll and jumps you to any of them.
+
+Three columns — files, document, findings — separated by dividers you can drag
+to resize or step left and right to collapse. A theme control in the bar chooses
+light, dark or the system setting, because a browser forced to dark for every
+site should not force it here. The page grows with the window, with a side
+margin that widens to a cap.
+
+Two voices carry the design: everything the linter says is monospace, everything
+you wrote is serif.
 
 Rules run in a **Web Worker**, which the page terminates if a run takes too long.
 A regex from a rule set you fetched can backtrack forever, and a worker is the

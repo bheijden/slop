@@ -58,6 +58,20 @@ follow `suggest` for the rewrite.
 Do not silence a finding by disabling its rule unless it is a genuine false
 positive.
 
+## Handing the result to a person
+
+`--share` prints a link that opens the document in the web page with every
+finding marked, so a reviewer reads them without installing anything. The file
+is gzipped into the URL fragment, which browsers never send to a server.
+
+```bash
+... check --share docs/intro.md
+... check --share -r docs/      # one link carrying the whole tree
+```
+
+Use it when the person asked for a review rather than a rewrite, or when a
+finding is a judgement call that is theirs to make.
+
 ## Not every finding is a defect
 
 These are style smells, not errors. `ai-vocab` firing once is coincidence;

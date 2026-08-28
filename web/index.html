@@ -367,13 +367,17 @@ body.resizing{cursor:col-resize;user-select:none}
     <details>
       <summary>Command line<span class="hint">for agents and CI</span></summary>
       <div class="body">
-<pre>uv tool install <span class="k">git+https://github.com/bheijden/slop#subdirectory=py</span>
+<pre><span class="c"># one-off, nothing installed</span>
+npx --yes <span class="k">github:bheijden/slop</span> check docs/ <span class="p">-r</span>
 
-slop check docs/ <span class="p">-r</span>                    <span class="c"># a tree, a file, a URL, stdin</span>
-slop check <span class="p">--format</span> json docs/ <span class="p">-r</span>     <span class="c"># match, sentence, why, suggest</span>
-slop check <span class="p">--select</span> wikipedia-ai .    <span class="c"># a set name or one rule id</span>
-slop check <span class="p">--share</span> docs/intro.md      <span class="c"># a link to this page</span></pre>
-        <p>Same engine, same rule files. Exit <code>0</code> clean, <code>1</code> over budget, <code>2</code> error.</p>
+<span class="c"># repeated use: npx re-resolves the repo each call (~5s), a clone runs in ~0.2s</span>
+git clone --depth 1 <span class="k">https://github.com/bheijden/slop</span>
+node slop/js/cli.mjs check docs/ <span class="p">-r</span>
+
+node slop/js/cli.mjs check <span class="p">--format</span> json docs/ <span class="p">-r</span>   <span class="c"># match, sentence, why, suggest</span>
+node slop/js/cli.mjs check <span class="p">--select</span> wikipedia-ai .  <span class="c"># a set name or one rule id</span>
+node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</span> docs/        <span class="c"># a link to this page</span></pre>
+        <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page. Exit <code>0</code> clean, <code>1</code> over budget, <code>2</code> error.</p>
       </div>
     </details>
     <details>
@@ -425,7 +429,7 @@ github.com/bheijden/slop/tree/main/skill into
 ~/.claude/skills/linting-prose/, keeping the reference/ files.
 Then lint docs/ and fix what it reports.</span></pre>
         <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
-        <p>A skill gives an agent instructions it will act on, so read one before installing it — this one runs <code>npx</code> against this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
+        <p>A skill gives an agent instructions it will act on, so read one before installing it — this one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
       </div>
     </details>
   </div>
