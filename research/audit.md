@@ -36,6 +36,7 @@ as on AI prose.**
 | | human per 1000 | AI per 1000 |
 |---|---|---|
 | `simonwillison` + `wikipedia-ai` | **1.96** | **1.01** |
+| the same, after the `not-just` replacement below | **1.84** | **1.01** |
 | all slop sets together | 3.11 | 4.32 |
 
 Per register, with the shipped sets, human prose scores higher in five of six:
@@ -306,6 +307,67 @@ which points the right way. But the distributions overlap almost entirely, so no
 threshold separates them and reformulating the rule would not change that. The rule stays as what it always
 claimed to be: an observation about monotony in your own draft, not evidence
 about who wrote it.
+
+## What was decided
+
+Three outcomes, on a principle worth stating: **the two shipped sets are a port
+of someone else's artifact**, generated from a pinned copy of Simon Willison's
+highlighter in `vendor/`. Changing one is not editing our rule, it is diverging
+from upstream. So divergence has to be deliberate, visible, and backed by a
+number. `tools/build-rules.mjs` now carries two tables that do exactly that, and
+both survive re-vendoring.
+
+### Replaced: `not-just`
+
+The only change to a shipped rule. Upstream also matches the form where "not
+only" negates a clause rather than a thing, and a negative lookahead for
+subordinating conjunctions removes precisely those:
+
+| | human docs | human hits | AI docs | AI hits |
+|---|---|---|---|---|
+| upstream | 5 of 18 | 5 | 2 of 18 | 3 |
+| shipped now | **3 of 18** | 3 | **2 of 18** | **3** |
+
+Every true positive kept, two false positives gone. It earns the replacement
+because it is the same tell: negative parallelism between two parallel things.
+The three human hits that remain are people using the construction correctly,
+which is not this rule's business to suppress.
+
+### Kept, with the false firing documented: `echo-triad` and `stacked-questions`
+
+Both are upstream's, and the shapes they describe are real. Neither is changed.
+Both now carry a `note` recording what they do on human prose, so anyone reading
+a finding can weigh it, and `slop explain <rule>` prints it.
+
+`echo-triad` hit 10 of 18 human documents and 1 of 18 AI ones.
+`stacked-questions` hit 3 human and 0 AI.
+
+A rule whose failure mode is written down is a different thing from a rule that
+quietly misfires, and this is the cheaper half of the fix.
+
+### Kept as candidates: everything else
+
+`echo-aligned`, `echo-run3`, `echo-aligned-func`, `echo-structural`,
+`stacked-questions-run3` and `moreover-density` stay in
+`candidates/variants.json`, off by default. Any of them can be selected by name.
+None was promoted, for two different reasons.
+
+The echo variants cannot be separated on the evidence: they all cut false
+positives by 80% or more and the corpus holds no true positives to rank them by.
+Promoting one would be picking on taste and calling it measurement.
+
+`stacked-questions-run3` removed every false positive at no measurable cost, and
+is the strongest candidate for the next promotion. It is held back only because
+neither version fired on AI prose at all, so its recall is untested rather than
+confirmed.
+
+### The honest limit
+
+None of this makes the shipped sets a detector. They still fire more on human
+prose than on AI prose overall, 1.84 against 1.01 per thousand words after the
+change, down from 1.96. The gap narrowed; it did not close, and one rule change
+was never going to close it. What these rules are good for is the thing they were
+built for: pointing at worn phrasing so a writer can decide.
 
 ## What this does not show
 

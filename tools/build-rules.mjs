@@ -48,6 +48,26 @@ const COLON_TECH = String.raw`=\[\]\(\)\{\}"'\/\\|_~^%*+<>&#@$\u2192\u21d2\u2194
 const COLON_ITEM = String.raw`[a-z][^.!?;:\n,${COLON_TECH}]{1,39}`;
 
 const OVERRIDES = {
+  'not-just': {
+    // Upstream also matches the form where "not only" negates a clause rather
+    // than a thing: "not only because performance differences impair the
+    // system". A negative lookahead for subordinating conjunctions removes
+    // exactly those. Measured over 18 matched document pairs: human hits fell
+    // from 5 to 3 and all 3 AI hits were kept. The two dropped were the only
+    // genuine errors; the three that remain are people using the construction
+    // correctly, which is not this rule's business to suppress.
+    pattern: String.raw`\bnot\s+(?:just|only|merely|simply)\s+(?!because|when|if|since|though|although|that\b|as\b|to\b|in\s+order)[^.!?\n;]{1,50}?,?\s+but(?:\s+also)?\b|\b(?:it|this|that)(?:['\u2019]s|\s+(?:is|was))\s+not\s+[^.!?\n,;\u2014\u2013]{1,60}[,;\u2014\u2013]\s*(?:it|this|that)(?:['\u2019]s|\s+(?:is|was))\b`,
+    note: 'Tightened from upstream, which also matched "not only" negating a clause rather than a thing. Over 18 matched document pairs this cut hits on human prose from 5 to 3 while keeping all 3 on AI prose. See research/audit.md.',
+    tests: {
+      hit: ['This is not just a tool, but a philosophy.',
+            'It was not merely mistaken, but dangerous.',
+            'Not only fast but also reliable.',
+            'It\u2019s not a bug \u2014 it\u2019s a feature.'],
+      miss: ['He did not buy it.',
+             'She was not sure about the plan.',
+             'not only because performance differences impair the system, but the effect is small'],
+    },
+  },
   'colon-triple': {
     pattern: String.raw`:\s+${COLON_ITEM},\s+${COLON_ITEM},\s+(?:and\s+|or\s+)?${COLON_ITEM}(?=[.!?\n])`,
     description: 'A colon opening onto three or more comma-separated prose items: \u201cseparate ports, processes, and local state\u201d. The most common shape LLM prose uses to sound concrete. Tightened from upstream: items must read as prose, not as code, measurements or proper-noun lists.',
@@ -129,6 +149,27 @@ const casesFor = (id) => {
   return { hit, miss };
 };
 
+// Divergences from the vendored upstream, kept in one place so every one is
+// visible and survives re-vendoring. Both tables are applied after import.
+//
+// NOTES records behaviour we have measured and decided to live with. The rule
+// is upstream's and stays upstream's; the note says what it does on real prose.
+const NOTES = {
+  'echo-triad':
+    'Known to fire on human prose. In an audit over 18 pre-2022 human documents it '
+    + 'hit 10 of them and only 1 of 18 AI documents, because the shared run is usually '
+    + 'the document\'s topic rather than a repeated frame: "the person who died" in '
+    + 'guidance, "in the python 2" in a PEP. Kept unchanged because it is upstream\'s '
+    + 'rule and the shape it describes is real. Tighter formulations are measured in '
+    + 'candidates/variants.json and the numbers are in research/audit.md.',
+  'stacked-questions':
+    'Fires on essayists setting up a topic, which is a rhetorical move much older than '
+    + 'the technology it is meant to detect: "Who are the speakers of AAE? How are they '
+    + 'viewed?". Hit 3 of 18 human documents and 0 of 18 AI ones in the audit. Kept '
+    + 'unchanged; stacked-questions-run3 in candidates/variants.json requires three in '
+    + 'a row and removed every false positive.',
+};
+
 const sets = { 'simonwillison': [], 'wikipedia-ai': [] };
 for (const p of api.patterns) {
   const setName = p.group ? 'wikipedia-ai' : 'simonwillison';
@@ -140,6 +181,7 @@ for (const p of api.patterns) {
     description: p.description,
     suggest: SUGGEST[p.id] || 'Rewrite plainly.'
   };
+  if (NOTES[p.id]) rule.note = NOTES[p.id];
   if (f.kind === 'regex') {
     rule.kind = 'regex';
     rule.pattern = f.re.source;
