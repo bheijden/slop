@@ -17,9 +17,9 @@ source.
 |---|---|---|
 | [awesome-slop](https://github.com/hwajongpark/awesome-slop) | curated index | the map for everything below |
 | [slop-gate](https://github.com/hwajongpark/slop-gate) | CLI, JSON rules | vocabulary + punctuation packs |
-| [slopster](https://github.com/t0ddharris/slopster) | lint rules + agent skill | pending |
-| [writinglint](https://github.com/NikhilVerma/writinglint) | NLP dependency rules | pending |
-| [slop-cop](https://github.com/awnist/slop-cop) | in-browser detector | pending |
+| [slopster](https://github.com/t0ddharris/slopster) | Vale styles | reveal-shape openers, cross-sentence negation |
+| [writinglint](https://github.com/NikhilVerma/writinglint) | NLP dependency rules | nothing — see below |
+| [slop-cop](https://github.com/awnist/slop-cop) | in-browser detector | a limitation, not rules — see below |
 | [antislop-sampler](https://github.com/sam-paech/antislop-sampler) | generation-time phrase list | pending |
 | [EQ-Bench slop score](https://eqbench.com/slop-score.html) | leaderboard + word list | pending |
 | [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | pending |
@@ -28,7 +28,7 @@ source.
 | [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | word list | pending |
 | The Economist, AI writing in 2026 | report incl. red herrings | pending |
 | [simonw tweet thread](https://x.com/simonw/status/2093277255438860358) | replies | structural tells; 3 further sources |
-| [sloptells.com](https://sloptells.com) | auto-mined weekly, pre-LLM vs AI corpus | pending — found via the thread |
+| [sloptells.com](https://sloptells.com) | measured against human baselines | 14 rules, and the em-dash verdict |
 | [louisabraham word list](https://louisabraham.github.io) | banned-word list | pending — found via the thread |
 | [marmbiz humanizer](https://github.com/marmbiz) | ~72 patterns, German | pending — found via the thread |
 
@@ -126,3 +126,85 @@ So there are two honest options, and neither is a regex over a span:
 Recommendation: do not ship a per-occurrence em-dash rule. Build the `density`
 kind, calibrate a threshold against human-written corpora, and let the em-dash be
 its first user.
+
+### sloptells → [candidates/sloptells.json](../candidates/sloptells.json)
+
+The best source found so far, and the only one that measures. It generates text
+from current and older models on prompts matched to pre-AI human writing, finds
+what models overuse, **checks every candidate against acclaimed human prose so it
+does not flag good writers**, dates each tell, and tracks a lifecycle from
+emerging through active, saturated, fading, stale and retired. The copy fetched
+was generated the same day.
+
+Each tell carries a measured rate, a human baseline rate, and a `collateral`
+rating — its own false-positive risk. 14 of 38 were taken. A tell had to be active or saturated, rated low
+collateral, and expressible as a pattern. Formatting and cadence tells
+(bold everywhere, emoji as structure, sentences that march in formation) are not
+reachable by a regex over spans. Everything rated medium or high collateral was
+left out, which is where `not just`, `especially`, `in practice` and `signposting`
+went.
+
+The highest-ratio tells it measures:
+
+| tell | vs humans |
+|---|---|
+| genuinely | ×53 |
+| the real question/issue | ×30 |
+| That said, … | ×19 |
+| here's what … | ×18 |
+| one of those X | ×12 |
+| (this) feels like | ×12 |
+
+**Its retired list matters to this project.**
+<!-- slop-ignore-start -->
+sloptells has retired `delve`, `tapestry` and `a testament to` — models stopped
+using them — and all three are live in the shipped `simonwillison` set.
+<!-- slop-ignore-end --> Also retired: staccato mic-drop
+sentences, refuted by measurement. That is a calibration question for a later
+pass, not a change to make blind.
+
+### writinglint → nothing
+
+Its `experiments/rule-sensitivity/RESULTS.md` is a dependency-parser training
+result — BERT-Mini distilled from DeBERTa, rule-aware token weighting, UD English
+EWT scores. Real work, but about their NLP infrastructure rather than which
+prose rules hold up. No transferable rules.
+
+### slop-cop → a limitation, not rules
+
+Its detectors run `compromise` for part-of-speech context, and say why:
+
+> NLP-assisted detectors for context-sensitive slop words — cases where simple
+> word matching produces too many false positives.
+
+<!-- slop-ignore-start -->
+The words it treats this way are `leverage`, `harness`, `foster`, `underscore`,
+`navigate`, `streamline`, `spearhead`, `craft`, `bolster`, `emphasize`: all
+ordinary verbs whose slop-ness depends on grammatical role.
+<!-- slop-ignore-end --> This engine is regex
+over spans and cannot make that distinction. Worth recording as a known ceiling.
+
+## Calibration so far
+
+Against 30k words of real technical writing, and against a synthetic slop
+paragraph as a positive control:
+
+| set | rules | on real prose | on synthetic slop |
+|---|---|---|---|
+| slop-gate | 28 | 3 findings, 0.1/1k | 6 |
+| slopster | 7 | 0 findings | 6 |
+| sloptells | 14 | 35 findings, 1.16/1k | — |
+
+slopster firing zero on the corpus and six on the synthetic sample is the
+behaviour to want: its reveal-shape openers do not occur in technical
+documentation.
+
+sloptells' 35 are almost all two rules: `rather-than` (17) and `genuinely` (13).
+Both are rated low collateral by sloptells — **but their baselines are Hacker
+News, cooking and parenting registers, and this corpus is engineering
+documentation**, where "rather than" is ordinary English. A tell's collateral is
+register-dependent, and a rating measured on one register does not transfer.
+
+One caveat on the other side: parts of that corpus were probably drafted with an
+assistant, so some of those 13 `genuinely` hits may be true positives rather than
+noise. Calibrating against prose of known provenance is the honest next step.
