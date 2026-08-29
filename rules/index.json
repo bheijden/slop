@@ -1,5 +1,6 @@
 {
   "sets": [
+    "em-dash.json",
     "simonwillison.json",
     "wikipedia-ai.json"
   ]

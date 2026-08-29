@@ -12,6 +12,7 @@
 //                  markup; lossless markup must not turn a HIT into a MISS
 
 import process from 'node:process';
+import { readFileSync } from 'node:fs';
 import { loadBuiltinSets, loadLibrarySets, loadSetFile, findConfig, loadConfig } from '../js/config.mjs';
 import { extractMarkdown, extractHtml } from '../js/extract.mjs';
 import { testRules } from '../js/fudge.mjs';
@@ -26,7 +27,12 @@ const files = argv.filter((a) => a.endsWith('.json'));
 let sets;
 try {
   if (files.length) {
-    sets = files.map(loadSetFile);
+    // `candidates/*.json` also matches the manifest that lists them, which is
+    // not a rule set. Skip anything with a "sets" array and no rules.
+    sets = files.map((f) => {
+      const raw = JSON.parse(readFileSync(f, 'utf8'));
+      return Array.isArray(raw.sets) && !Array.isArray(raw.rules) ? null : loadSetFile(f);
+    }).filter(Boolean);
   } else {
     // Your own rule sets get the same tests as the built-in ones, so
     // `slop fudge` covers everything the linter would actually run:

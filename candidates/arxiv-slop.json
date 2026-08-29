@@ -2,7 +2,7 @@
   "name": "arxiv-slop",
   "version": "0.1.0",
   "slop": "0.1.0",
-  "title": "Measuring AI Slop in Text (arXiv 2509.19163)",
+  "title": "Templatedness (arXiv 2509.19163)",
   "description": "One rule, for the one code in the paper's taxonomy that this engine can genuinely own. Shaib, Chakrabarty, Garcia-Olano and Wallace define eleven codes; five need human annotation and the paper reports that reasoning models fail at extracting them too. SQ2 Templatedness is the exception: the paper measures it via syntactic structures, and so does this.",
   "source": "https://arxiv.org/abs/2509.19163",
   "rules": [

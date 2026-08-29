@@ -1,0 +1,19 @@
+{
+  "$comment": "Everything here is opt-in. The web page loads these unchecked; the CLI needs --rules and --select.",
+  "sets": [
+    "antislop-fiction.json",
+    "antislop.json",
+    "arxiv-slop.json",
+    "economist.json",
+    "humanizer-de.json",
+    "slop-gate.json",
+    "slopster.json",
+    "sloptells.json",
+    "structural.json",
+    "style-academic.json",
+    "style-conversational.json",
+    "style-economist.json",
+    "style-newsroom.json",
+    "style-plain.json"
+  ]
+}

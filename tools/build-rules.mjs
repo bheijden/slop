@@ -205,8 +205,13 @@ const OFF_BY_DEFAULT = new Set([]);
 }
 
 // The web page cannot list a directory, so ship a manifest alongside the sets.
+// List what is actually there, not what this script generates: a hand-written
+// set alongside the generated ones used to be dropped from the manifest on
+// every rebuild, so the page silently stopped applying it while the CLI, which
+// reads the directory, carried on applying it.
 fs.writeFileSync(path.join(ROOT, 'rules', 'index.json'),
-  JSON.stringify({ sets: Object.keys(sets).map((k) => k + '.json') }, null, 2) + '\n');
+  JSON.stringify({ sets: fs.readdirSync(path.join(ROOT, 'rules'))
+    .filter((f) => f.endsWith('.json') && f !== 'index.json').sort() }, null, 2) + '\n');
 
 for (const [key, rules] of Object.entries(sets)) {
   for (const r of rules) if (OFF_BY_DEFAULT.has(r.id)) r.default = 'off';

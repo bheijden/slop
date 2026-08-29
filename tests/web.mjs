@@ -119,6 +119,19 @@ async function main() {
     const w = JSON.parse(wiring);
     check('every element the script wires up exists', w.ids.length === 0, w.ids.join(','));
     check('rule sets rendered', w.sets >= 2, String(w.sets));
+
+    // What ships runs; what is a candidate is loaded but unchecked. Getting
+    // this backwards would silently change what every visitor's text is judged by.
+    const defaults = await evaluate(`(()=>{
+      const boxes=[...document.querySelectorAll('#rules input[data-toggle]')];
+      const on=boxes.filter(b=>b.checked||b.indeterminate).map(b=>b.dataset.toggle).sort();
+      return JSON.stringify({total:boxes.length, on});
+    })()`);
+    const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
+    check('every set has a set-level toggle', D.total >= 15, String(D.total));
+    check('shipped sets on, candidates off',
+      JSON.stringify(D.on) === JSON.stringify(['em-dash', 'simonwillison', 'wikipedia-ai']),
+      D.on.join(','));
     check('code blocks have copy buttons', w.copyButtons >= 4, String(w.copyButtons));
 
     const example = await evaluate(`(async()=>{document.getElementById('b-example').click();

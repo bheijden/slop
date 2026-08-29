@@ -3,7 +3,7 @@
   "role": "style",
   "version": "0.2.0",
   "slop": "0.1.0",
-  "title": "Conversational: warm, spoken register for consumer software",
+  "title": "Conversational register",
   "description": "A warm, spoken register: the voice the Mailchimp Content Style Guide describes and is itself written in, the plain-language guidance behind it, and the long-form house style of 37signals. The register is defined more by what it asks for than by what it rules out, so seven of these eight bands are floors, with the register’s own maximum recorded in each `measured` field and no edge on the far side. That is a real limitation and not a design: a document can run further into the permitted direction than any document in either corpus and this profile stays quiet. Only the rhythm band is two-sided. Every edge was measured over a 19-document reference corpus in the target register and contrasted with 12 documents of local technical prose in another register. The numbers are one reading of one corpus and they are the first thing to change: a finding that keeps coming back is sometimes a reason to move the band rather than the document.",
   "source": "https://styleguide.mailchimp.com/",
   "corpus": {

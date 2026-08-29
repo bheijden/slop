@@ -313,6 +313,9 @@ body.resizing{cursor:col-resize;user-select:none}
 .rset summary::-webkit-details-marker{display:none}
 .rset summary::before{content:"+";color:var(--blue);width:9px;flex:none;font-size:11px}
 .rset[open] summary::before{content:"−"}
+/* The set box is the whole set in one click. Indeterminate means partly on,
+   which is the honest third state for a set you have picked rules out of. */
+.rset summary .setbox{flex:none;margin:0;cursor:pointer}
 .rset summary .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rset summary .hits{color:var(--flag);font-weight:600;font-variant-numeric:tabular-nums}
 .rset summary .cnt{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
@@ -588,11 +591,11 @@ async function addRemoteSet(url) {
   set.name = set.name || url.split('/').pop().replace(/\.json$/, '');
   addSet(set);
 }
-function addSet(set) {
+function addSet(set, on = true) {
   S.sets = S.sets.filter((s) => s.name !== set.name);
   S.sets.push(set);
   for (const r of set.rules) {
-    if (r.default !== 'off') S.active.add(r.id);
+    if (on && r.default !== 'off') S.active.add(r.id);
     S.byId[r.id] = { id: r.id, rule: r.id, set: set.name, name: r.name,
                      why: r.description, suggest: r.suggest };
   }
@@ -600,6 +603,13 @@ function addSet(set) {
 async function loadBuiltins() {
   const m = await (await fetch('../rules/index.json')).json();
   for (const f of m.sets) addSet(await (await fetch('../rules/' + f)).json());
+  // Candidate sets, style profiles included, are the same kind of artifact and
+  // get the same panel. They arrive unchecked: tick one to see what it makes of
+  // your text without committing to it.
+  try {
+    const c = await (await fetch('../candidates/index.json')).json();
+    for (const f of c.sets) addSet(await (await fetch('../candidates/' + f)).json(), false);
+  } catch { /* candidates are optional */ }
 }
 
 /* worker — kept alive, so the timeout measures rule execution, not module load */
@@ -899,10 +909,11 @@ function renderRules() {
     const allOn = on === set.rules.length;
     return `<details class="rset"${S.setOpen[set.name] ? ' open' : ''} data-set="${esc(set.name)}">
       <summary>
+        <input type="checkbox" class="setbox" data-toggle="${esc(set.name)}"
+               ${allOn ? 'checked' : ''} aria-label="Turn ${esc(set.title || set.name)} on or off">
         <span class="nm">${esc(set.title || set.name)}</span>
         ${hits ? `<span class="hits">${hits}</span>` : ''}
         <span class="cnt">${on}/${set.rules.length}</span>
-        <button data-toggle="${esc(set.name)}">${allOn ? 'none' : 'all'}</button>
       </summary>
       <div class="rlist">${set.rules.map((r) => `<label data-rule-row="${esc(r.id)}">
         <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id) ? ' checked' : ''}>
@@ -924,14 +935,19 @@ function renderRules() {
     row.onmouseenter = () => showTip(row, S.byId[row.dataset.ruleRow]);
     row.onmouseleave = hideTip;
   }
-  for (const b of el.querySelectorAll('button[data-toggle]')) b.onclick = (e) => {
-    // the button lives in a <summary>; do not let the click fold the block
-    e.preventDefault(); e.stopPropagation();
+  for (const b of el.querySelectorAll('input[data-toggle]')) {
     const set = S.sets.find((x) => x.name === b.dataset.toggle);
-    const allOn = set.rules.every((r) => S.active.has(r.id));
-    set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
-    run();
-  };
+    const on = set.rules.filter((r) => S.active.has(r.id)).length;
+    // Partly on is a third state, and saying so is better than rounding it.
+    b.indeterminate = on > 0 && on < set.rules.length;
+    b.onclick = (e) => {
+      // the box lives in a <summary>; do not let the click fold the block
+      e.stopPropagation();
+      const allOn = set.rules.every((r) => S.active.has(r.id));
+      set.rules.forEach((r) => allOn ? S.active.delete(r.id) : S.active.add(r.id));
+      run();
+    };
+  }
   q('[data-add]').onclick = async () => {
     const u = q('[data-url]').value.trim(); if (!u) return;
     try { await addRemoteSet(u); q('[data-err]').textContent = ''; run(); }
