@@ -11,6 +11,17 @@ jobs:
         with: { node-version: '20' }
       - run: node tests/run.mjs
 
+  candidates:
+    name: candidate rule sets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      # Candidate sets are not shipped on by default, but they are held to
+      # the same bar so they do not rot between mining runs.
+      - run: node tests/run.mjs candidates/*.json
+
   web:
     name: web smoke test
     runs-on: ubuntu-latest

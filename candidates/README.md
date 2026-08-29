@@ -9,6 +9,22 @@ Each set records where it came from in `source`, and carries the same
 `slop fudge candidates/<set>.json` checks it the same way the shipped sets are
 checked.
 
+## What is here
+
+| set | rules | what it covers | on 30k words of technical prose | worth turning on |
+|---|---|---|---|---|
+| [`antislop-fiction`](antislop-fiction.json) | 10 | creative-writing constructions | 0 per 30k words | fiction only |
+| [`antislop`](antislop.json) | 12 | essay-register constructions, incl. unqualified not-X-but-Y | 0 per 30k words | on |
+| [`slop-gate`](slop-gate.json) | 28 | vocabulary and stock phrases | 3 findings per 30k words | on |
+| [`slopster`](slopster.json) | 7 | reveal-shape openers, cross-sentence negation | 0 per 30k words | on |
+| [`sloptells`](sloptells.json) | 14 | tells measured against register-matched human baselines | 35 per 30k words | read the log first |
+
+The last column is a judgement, not a measurement. `sloptells` fires most
+often here because its collateral ratings were measured against Hacker News,
+cooking and parenting registers, where "rather than" is rarer than it is in
+engineering documentation. A tell's collateral does not transfer between
+registers, which is why these ship one set per source instead of merged.
+
 Try one against your own writing:
 
 ```sh
