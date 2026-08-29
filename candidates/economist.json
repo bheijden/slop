@@ -61,8 +61,7 @@
       "params": {
         "minWords": 250,
         "minSentences": 4,
-        "max": 20,
-        "maxSentenceWords": 120
+        "max": 20
       },
       "description": "Fewer than 20 sentence endings per 1000 words is an average sentence of 50 words or more. Long sentences with few short ones among them were one of the Economist's confirmed markers, alongside sparse punctuation.",
       "suggest": "Break the longest ones. A short sentence after a long one is what makes the long one readable.",

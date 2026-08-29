@@ -124,6 +124,15 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
 
   const selectedSets = select.filter((n) => byName.has(n));
   const selectedIds = select.filter((n) => byId.has(n) && !byName.has(n));
+
+  // You write in one house style. Two style profiles at once would report a
+  // document as simultaneously too formal and not formal enough, so refuse it
+  // rather than average two registers into nonsense.
+  const styles = selectedSets.filter((n) => byName.get(n).role === 'style');
+  if (styles.length > 1) {
+    throw new Error(`select: pick one style profile, not ${styles.length} (${styles.join(', ')}). `
+      + 'Style profiles are registers, and a document cannot sit in two of them at once.');
+  }
   const ignoredSets = new Set(ignore.filter((n) => byName.has(n)));
   const ignoredIds = new Set(ignore.filter((n) => byId.has(n) && !byName.has(n)));
 
@@ -134,10 +143,14 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
       ])]
     : everyRule;
 
+  // Naming a set is as explicit as naming a rule, so it lifts `default: "off"`
+  // for that set. Without this a set whose rules are all off-by-default -- every
+  // style profile -- selects to nothing, which is what it used to do.
   const explicit = new Set(selectedIds);
+  const explicitSets = new Set(selectedSets);
   const rules = base.filter((r) => {
     if (ignoredIds.has(r.id) || ignoredSets.has(r.set)) return false;
-    if (r.default === 'off' && !all && !explicit.has(r.id)) return false;
+    if (r.default === 'off' && !all && !explicit.has(r.id) && !explicitSets.has(r.set)) return false;
     return true;
   });
 

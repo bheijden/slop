@@ -226,8 +226,18 @@ fires once, not per match. `params.min` catches pile-up, `params.max` catches
 commas, semicolons and parentheses than human writing, not more. It refuses to
 run below `params.minWords` (250 by default), and a prose gate skips anything
 that is not prose at all, because a config dump or a diff has no commas either.
-`params.minSentences`, `params.minSentenceWords` and `params.maxSentenceWords`
-tune that gate.
+The gate is a question about vocabulary, not about sentence length: prose is
+mostly closed-class words and code is not, so `params.minFunctionWords` (0.12 by
+default) is what separates them. It used to gate on mean sentence length
+instead, which was a bug, because that excluded exactly the documents a
+sentence-length band exists to catch and left such a rule unable to fire in
+either direction. `params.minSentences` still guards the sample size, and
+`params.minSentenceWords` and `params.maxSentenceWords` remain available as
+explicit guards but no longer decide what counts as prose.
+
+Setting both `params.min` and `params.max` makes the rule an out-of-band check:
+silent between the two, firing on either side. That is what
+[docs/styles.md](styles.md) builds writing-style profiles out of.
 
 `rhythm` is the other document-level kind. It has no pattern: it measures the
 coefficient of variation of sentence length and fires when prose is metrically

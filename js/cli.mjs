@@ -183,7 +183,12 @@ function lintSource(name, src, kind, rules, opts) {
     return { file: name, line: a.line, col: a.col, endLine: b.line, endCol: b.col,
              rule: r.id, set: r.set, severity: r.severity, name: r.name,
              why: r.description, suggest: r.suggest || null,
-             count: m.count ?? null, match: text.slice(m.start, m.end), sentence: text.slice(ss, se) };
+             count: m.count ?? null, match: text.slice(m.start, m.end), sentence: text.slice(ss, se),
+             // A density or rhythm rule measures the whole document. It has to
+             // anchor somewhere to have an offset at all, but that anchor is an
+             // artefact: reporting it as line:col points the reader at an
+             // innocent word. Carry the flag so the reporter can say "document".
+             docLevel: m.docLevel || false, measure: m.badgeTitle || null };
   });
   return { file: name, words: countWords(text), findings };
 }
@@ -453,9 +458,14 @@ async function main() {
       process.stdout.write(`\n${C.bold(r.file)} ${C.dim(`(${r.words} words, ${r.findings.length} findings)`)}\n`);
       for (const f of r.findings) {
         const badge = f.count ? C.dim(` ×${f.count}`) : '';
-        process.stdout.write(`  ${C.cyan(`${f.line}:${f.col}`.padEnd(9))} ${C.yellow(f.rule.padEnd(21))}${badge} ${oneLine(f.match, 88)}\n`);
-        if (o.context && f.sentence.trim() !== f.match.trim()) {
-          process.stdout.write(`  ${' '.repeat(9)} ${C.dim(oneLine(f.sentence, 132))}\n`);
+        if (f.docLevel) {
+          // No line:col and no excerpt: there is no offending span to show.
+          process.stdout.write(`  ${C.cyan('document '.padEnd(9))} ${C.yellow(f.rule.padEnd(21))} ${oneLine(f.measure || f.name, 88)}\n`);
+        } else {
+          process.stdout.write(`  ${C.cyan(`${f.line}:${f.col}`.padEnd(9))} ${C.yellow(f.rule.padEnd(21))}${badge} ${oneLine(f.match, 88)}\n`);
+          if (o.context && f.sentence.trim() !== f.match.trim()) {
+            process.stdout.write(`  ${' '.repeat(9)} ${C.dim(oneLine(f.sentence, 132))}\n`);
+          }
         }
         if (o.suggest && f.suggest) process.stdout.write(`  ${' '.repeat(9)} ${C.dim('fix: ' + f.suggest)}\n`);
       }

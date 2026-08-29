@@ -143,10 +143,26 @@ function anaphoraFinder(rule) {
 // parentheses than human writing, not more.
 const DENSITY_WORD = /[A-Za-z0-9][A-Za-z0-9'\u2019-]*/g;
 
+// Whether a document is prose is a question about its vocabulary, not about how
+// long its sentences are. Using mean sentence length as the proxy was a bug: it
+// gated out exactly the documents a sentence-length band exists to catch, so
+// such a rule could never fire in either direction. Closed-class words separate
+// the two cleanly. Measured over this project's corpus: config dumps, CSV and
+// diffs land at 0 to 0.4 percent, pasted source at 8.6, and real prose at 16.8
+// to 43.8.
+function functionWordRatio(text) {
+  const toks = text.match(DENSITY_WORD) || [];
+  if (!toks.length) return 0;
+  let n = 0;
+  for (const t of toks) if (FUNC_WORDS.has(t.toLowerCase())) n += 1;
+  return n / toks.length;
+}
+
 function densityFinder(rule) {
   const re = reOf(rule);
   const { per = 1000, min, max, minWords = 250, minMatches = 0, unit = 'words',
-          prose = true, minSentences = 5, maxSentenceWords = 60, minSentenceWords = 4 } = rule.params || {};
+          prose = true, minSentences = 5, maxSentenceWords = 200, minSentenceWords = 1,
+          minFunctionWords = 0.12 } = rule.params || {};
   if (min === undefined && max === undefined) {
     throw new Error(`rule "${rule.id}": a density rule needs params.min or params.max`);
   }
@@ -161,6 +177,7 @@ function densityFinder(rule) {
     if (prose) {
       const sentences = (text.match(/[.!?](?=\s|$)/g) || []).length;
       if (sentences < minSentences) return [];
+      if (functionWordRatio(text) < minFunctionWords) return [];
       const perSentence = words / sentences;
       if (perSentence > maxSentenceWords || perSentence < minSentenceWords) return [];
     }
@@ -203,12 +220,13 @@ function densityFinder(rule) {
 // stddev_mean_ratio. Prose that is correct, readable and metrically monotone.
 function rhythmFinder(rule) {
   const { maxCV, minCV, minWords = 250, minSentences = 8,
-          maxSentenceWords = 60, minSentenceWords = 4 } = rule.params || {};
+          maxSentenceWords = 200, minSentenceWords = 1, minFunctionWords = 0.12 } = rule.params || {};
   if (maxCV === undefined && minCV === undefined) {
     throw new Error(`rule "${rule.id}": a rhythm rule needs params.maxCV or params.minCV`);
   }
   return (text) => {
     if ((text.match(DENSITY_WORD) || []).length < minWords) return [];
+    if (functionWordRatio(text) < minFunctionWords) return [];
     const parts = text.split(/(?<=[.!?])\s+/);
     const lens = [];
     for (const part of parts) {

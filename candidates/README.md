@@ -22,12 +22,30 @@ checked.
 | [`slopster`](slopster.json) | 7 | reveal-shape openers, cross-sentence negation | 0 findings | on |
 | [`sloptells`](sloptells.json) | 14 | tells measured against register-matched human baselines | 35 findings | read the log first |
 | [`structural`](structural.json) | 2 | hedge-then-affirm, and the rhetorical self-interview | 0 findings | on |
+| [`style-academic`](style-academic.json) | 11 | *style*: formal scholarly register, citations and hedged claims | 74 findings, 16 documents | pick at most one style |
+| [`style-conversational`](style-conversational.json) | 8 | *style*: warm spoken register for consumer software | 28 findings, 12 documents | pick at most one style |
+| [`style-economist`](style-economist.json) | 12 | *style*: Economist house style, concrete and active | 21 findings, 11 documents | pick at most one style |
+| [`style-newsroom`](style-newsroom.json) | 10 | *style*: wire service, attributed and past tense | 39 findings, 17 documents | pick at most one style |
+| [`style-plain`](style-plain.json) | 11 | *style*: Plain English, everyday words and a named actor | 15 findings, 12 documents | pick at most one style |
 
 The last column is a judgement, not a measurement. `sloptells` fires most
 often here because its collateral ratings were measured against Hacker News,
 cooking and parenting registers, where "rather than" is rarer than it is in
 engineering documentation. A tell's collateral does not transfer between
 registers, which is why these ship one set per source instead of merged.
+
+The five `style-` sets are read differently from everything above them. A slop
+set reports a probable defect, and a finding is a reason to rewrite. A style set
+reports that the document is **off target for that register**, which is a
+measurement of fit and carries no verdict: good writing sits outside a band all
+the time. Their counts in the fourth column are therefore not comparable with
+the slop sets' counts and should not be added to them. That corpus is human
+technical documentation, which is out of register for all five on purpose, so
+the number shows the distance between the corpus and the register rather than a
+false-positive rate. Every rule in them is off by default, they use only
+`density` and `rhythm` so they cannot mask a slop finding, and at most one of
+them should be selected at a time, because two registers contradict each other.
+See [../docs/styles.md](../docs/styles.md).
 
 `economist` and `humanizer-de` are the odd ones out: their rules are `density`
 and `rhythm` rules, which report a rate for the whole document rather than
