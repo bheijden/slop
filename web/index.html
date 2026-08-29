@@ -94,12 +94,15 @@ body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
 .loaded{padding:16px;color:var(--muted);font-size:12.5px}
 .loaded b{color:var(--ink);font-weight:500}
 .tools{
-  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-  padding:9px 12px;border-top:1px solid var(--hair);background:var(--sunk);
+  display:flex;gap:7px;align-items:center;flex-wrap:wrap;
+  padding:7px 10px;border-top:1px solid var(--hair);
   border-radius:0 0 9px 9px;
 }
-.tools select{background:var(--paper);border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px}
+.tools select{background:transparent;border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px;color:var(--ink)}
+/* Everything after this sits at the right end: what the document is, not what
+   you can do to it. */
 .tools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.rulewrap{position:relative;display:inline-flex}
 
 /* results */
 .results{margin:26px 0 0}
@@ -238,8 +241,9 @@ body.resizing{cursor:col-resize;user-select:none}
 
 /* the rules control: a panel under the bar, not a documentation section */
 .pop{
-  position:absolute;top:calc(100% + 6px);right:0;z-index:40;width:340px;max-width:100%;
-  max-height:min(70vh,620px);overflow:auto;scrollbar-width:thin;
+  position:absolute;bottom:calc(100% + 8px);right:0;z-index:40;width:380px;
+  max-width:calc(100vw - 32px);
+  max-height:min(62vh,560px);overflow:auto;scrollbar-width:thin;overscroll-behavior:contain;
   background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:12px 14px;
   box-shadow:0 16px 44px -14px rgba(0,0,0,.30);
 }
@@ -368,12 +372,14 @@ body.resizing{cursor:col-resize;user-select:none}
           <option value="html">html</option>
           <option value="txt">plain text</option>
         </select>
-        <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
         <span class="n" id="meta"></span>
-      </div>
-      <div class="pop" id="rules-pop" hidden>
-        <div class="pop-head">Rules <span id="rule-hint"></span></div>
-        <div class="rulebox" id="rules"></div>
+        <span class="rulewrap">
+          <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
+          <div class="pop" id="rules-pop" hidden>
+            <div class="pop-head">Rules <span id="rule-hint"></span></div>
+            <div class="rulebox" id="rules"></div>
+          </div>
+        </span>
       </div>
     </div>
   </div>
@@ -521,6 +527,17 @@ $('b-rules').onclick = (e) => {
   const open = $('rules-pop').hidden;
   $('rules-pop').hidden = !open;
   $('b-rules').setAttribute('aria-expanded', String(open));
+  // Seventeen sets is taller than most viewports. Open into whichever side of
+  // the button has more room, and take only what is there.
+  if (open) {
+    const r = $('b-rules').getBoundingClientRect();
+    const above = r.top - 16, below = window.innerHeight - r.bottom - 16;
+    const up = above >= Math.min(below, 320) || above >= below;
+    const pop = $('rules-pop');
+    pop.style.bottom = up ? 'calc(100% + 8px)' : 'auto';
+    pop.style.top = up ? 'auto' : 'calc(100% + 8px)';
+    pop.style.maxHeight = Math.max(180, Math.round(up ? above : below)) + 'px';
+  }
 };
 document.addEventListener('click', (e) => {
   if (!$('rules-pop').hidden && !$('rules-pop').contains(e.target) && e.target !== $('b-rules')) {
