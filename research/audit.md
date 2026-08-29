@@ -109,6 +109,98 @@ the fourth independent confirmation that the em dash runs the wrong way, now on
 fresh matched data, and the first from this project's own corpus. It stays: it
 is a house-style rule and was never a detection claim.
 
+## Per-rule findings
+
+The set-level numbers hide what is actually happening. Of 121 slop rules, 94
+never fired at all, and the rest split into four groups.
+
+### The strongest single signal: parentheses
+
+`paren-scarcity` fires on **18 of 18 AI documents and 6 of 18 human ones**.
+Counting the characters directly:
+
+| | documents | parentheses |
+|---|---|---|
+| human, pre-2022 | 18 | **184** |
+| AI, written blind | 18 | **0** |
+
+Not one parenthesis in sixteen thousand words of AI prose, across all six
+registers. The Economist reported the same thing from four different models and
+called it "hardly any parentheses"; this is an independent confirmation with a
+cleaner separation than expected.
+
+It is a *scarcity* signal, which is why no word-list approach would ever have
+found it. Six human documents also use none, so as a document-level flag it runs
+at roughly three quarters precision and full recall on this corpus.
+
+One caveat that matters: all eighteen AI pieces came from one model on one
+prompt. This could be a habit of that model rather than a property of machine
+prose. The Economist's four-model result is what makes it credible.
+
+### Rules that fire on humans and not on AI
+
+These are the false positives, and they are concentrated in a handful of rules.
+
+| rule | human docs | AI docs | what it is actually catching |
+|---|---|---|---|
+| `echo-triad` | **10 of 18** | 1 | parallel construction in formal prose |
+| `em-dash` | 8 | 0 | house style, working as intended |
+| `stacked-questions` | 3 | 0 | rhetorical questions in essays |
+| `moreover` | 3 | 0 | "Moreover," and "Additionally," in academic writing |
+| `uniform-sentence-length` | 4 | 1 | even rhythm in institutional prose |
+
+`echo-triad` is the worst rule in the project on this evidence. Its hits are
+scholarly convention:
+
+<!-- slop-ignore-start -->
+> In this study, we investigate the relationship between skull morphology...
+> The first four of these papers simply focus on system performance...
+<!-- slop-ignore-end -->
+
+`stacked-questions` catches an essayist setting up a topic, which is a rhetorical
+move older than the technology it is meant to detect:
+
+<!-- slop-ignore-start -->
+> Who are the speakers of AAE? How are they viewed?
+<!-- slop-ignore-end -->
+
+### Rules that fire on both about equally
+
+`not-just` (5 human, 3 AI), `stranded-auxiliary` (2 and 2), `note-that` (1 and
+1), `robust` (1 and 2). These carry no information about authorship either way.
+`not-just` is the interesting one: its human hits are ordinary English rather
+than the rhetorical flip it is aimed at.
+
+### Rules that fired only on AI
+
+| rule | AI documents | example |
+|---|---|---|
+| `rather-than` | 10 of 18, 24 hits | 12 times the human rate |
+| `genuinely` | 4 | |
+| `not-x-but-y` | 3 | "not the posted wage but the" |
+| `no-chain` | 3 | "no announcement, no decision anyone had to defend" |
+| `thats-the-part` | 2 | "this is the part" |
+| `colon-triple` | 2 | |
+| `the-entire-is`, `is-real`, `is-the-whole` | 1 each | |
+| `nominalisation-pileup`, `leverage` | 1 each | |
+
+`rather-than` deserves a note. It was the rule flagged during mining as too noisy
+on engineering documentation, where "rather than" is ordinary. Across six mixed
+registers it is the second-strongest discriminator in the project. Its value is
+register-dependent, exactly as the mining log predicted.
+
+### The 94 that never fired
+
+| set | silent rules |
+|---|---|
+| `slop-gate` | 24 of 28 |
+| `simonwillison` | 16 of 27 |
+| `sloptells` | 12 of 14 |
+
+Silence is not failure. A rule for a phrase that did not come up says nothing
+about itself. But it does mean most of the library is untested by this exercise,
+and that the sets are carried by a few rules each.
+
 ## What this does not show
 
 **The sample is small.** Eighteen pairs, about a thousand words each. A rule
