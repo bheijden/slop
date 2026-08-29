@@ -3,7 +3,7 @@
 ## Contents
 
 - Rule format
-- The five detector kinds
+- The six detector kinds
 - Testing a rule set (the fudger)
 - Fixing a noisy rule
 
@@ -45,7 +45,7 @@ directive ("Delete the hedge and state the fact"), not a description.
 Use it with `--rules ./house-style.json`, drop it in the repo's `rules/`
 directory, or point the web page at it with `#rules=<url>`.
 
-## The five detector kinds
+## The six detector kinds
 
 | `kind` | fields | detects |
 |---|---|---|
@@ -54,6 +54,12 @@ directory, or point the web page at it with `#rules=<url>`.
 | `echo` | `params.minGram`, `params.minRun` | consecutive sentences sharing a skeleton |
 | `question-chain` | `params.minRun` | runs of consecutive questions |
 | `anaphora` | `params.minRun` | consecutive sentences opening on the same word |
+| `density` | `pattern`, `params.min` or `params.max` | a document-level *rate* rather than a span |
+
+`density` is the odd one out: it reports a rate per 1000 words for the document
+as a whole and fires once. `params.min` catches pile-up, `params.max` catches
+scarcity. It needs `params.minWords` worth of text (250 by default) and skips
+anything that does not read as prose.
 
 Patterns are JavaScript regular expressions. `flags` only needs `i`; matching is
 always global.

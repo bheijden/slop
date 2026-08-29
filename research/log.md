@@ -23,10 +23,10 @@ source.
 | [antislop-sampler](https://github.com/sam-paech/antislop-sampler) | generation-time phrase list | 12 essay rules + 10 fiction rules |
 | [EQ-Bench slop score](https://eqbench.com/slop-score.html) | leaderboard + word list | folded into antislop; weights not-X-but-Y at 25% |
 | [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | no rules — a coverage map, see below |
-| [Excess vocabulary in LLM writing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12219543/) | paper, 15M abstracts | pending |
+| [Excess vocabulary in LLM writing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12219543/) | paper, 15M abstracts | no rules — it proves the style/topic split |
 | [LLM usage in scientific papers](https://www.nature.com/articles/s41562-025-02273-8) | paper, 1M+ papers | pending |
-| [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | word list | pending |
-| The Economist, AI writing in 2026 | report incl. red herrings | pending |
+| [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | word list | nothing — downstream of antislop-sampler |
+| [The Economist, How to Spot AI Writing](https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing) | 55,940 sentences vs 4 models | 6 density rules, and the em dash killed a third time |
 | [slop-forensics](https://github.com/sam-paech/slop-forensics) | per-domain n-gram lists | essay-domain trigrams, heavily topic-contaminated |
 | [simonw tweet thread](https://x.com/simonw/status/2093277255438860358) | replies | structural tells; 3 further sources |
 | [sloptells.com](https://sloptells.com) | measured against human baselines | 14 rules, and the em-dash verdict |
@@ -222,6 +222,124 @@ independent argument for a document-level rate detector, after sloptells'
 slopIndex, slopster's Vale `occurrence`, and the sampler's own `slop_index.py`,
 which computes weighted matches per thousand words — the same unit this CLI
 already reports.
+
+### Excess vocabulary in 15.1M PubMed abstracts → no rules, but the control everyone else lacked
+
+Kobak, González-Márquez, Horvát and Lause. 15.1 million abstracts, 2010–2024.
+The method is borrowed from excess-mortality epidemiology: take 2021–2022 word
+frequencies, extrapolate them forward, and measure what 2024 actually did
+against that counterfactual. It needs neither labelled data nor a classifier, and
+it has a genuine pre-ChatGPT baseline over the *same corpus* — exactly the
+control every n-gram list in this log was missing.
+
+The headline numbers are ratios against the counterfactual:
+
+<!-- slop-ignore-start -->
+| word | r |
+|---|---|
+| delves | 28.0 |
+| underscores | 13.8 |
+| showcasing | 10.7 |
+<!-- slop-ignore-end -->
+
+**Its most useful result is not the word list, it is the split.** The paper
+separates style words from content words and then makes the comparison that
+settles the question this log kept running into. In 2024, excess vocabulary was
+"almost entirely style words" — 45.2% style against 51.3% content overall, and
+among the style words 66% were verbs. During COVID, excess vocabulary was
+almost entirely *content* words: coronavirus, covid, lockdown, pandemic, at
+r > 1000.
+
+That is the style/topic distinction demonstrated rather than argued, on the same
+corpus with the same method, and it is the reason the slop-forensics essay
+trigrams could be dismissed: their excess vocabulary looks like the COVID
+column, not the 2024 one.
+
+No rules come out of it. Every one of its style words is already covered by the
+shipped `ai-vocab` rule or the slop-gate candidate, and the register is
+biomedical abstracts. What it does contribute is a warning about staleness.
+<!-- slop-ignore-start -->
+This is 2024 data, `delves` is its single strongest signal at r = 28.0, and
+sloptells has since retired `delve` as a tell that models stopped using.
+<!-- slop-ignore-end -->
+Two excellent sources, three years apart, flatly disagreeing about the same
+word. That disagreement is why the retired-tell calibration is still open.
+
+### Ultimate AI Slop Word Blacklist → nothing
+
+Roughly 1500 entries across unigrams, bigrams and trigrams, aimed at "GPT-5.2
+and the models running now, in 2026". The unigram list is dominated by fantasy
+proper nouns and genre vocabulary, which places it downstream of the
+antislop-sampler lists and inherits their register problem wholesale.
+
+The author's own workflow is the tell: "a piece does not leave my drafts folder
+until it hits zero flags." A 1500-entry blacklist at zero tolerance is not a
+linter, it is a thesaurus constraint, and it is the failure mode this project is
+built to avoid. Nothing taken.
+
+### The Economist, "How to Spot AI Writing" → [candidates/economist.json](../candidates/economist.json)
+
+Published 30 July 2026. The best-controlled source in this log: four models
+were asked to rewrite Economist articles from summaries, with no web access,
+and the output was compared against the paper's own journalism, CNN, the New
+York Times, the Washington Post, and novels published between 1950 and 2022.
+55,940 sentences and 1.2 million words.
+
+**The em dash dies a third time.** Only Claude used more em dashes than human
+writers; ChatGPT used markedly fewer. That is now three independent
+measurements agreeing — sloptells against acclaimed human prose, this project
+against its own corpus, and the Economist against journalism and novels — and
+they agree in the direction opposite to the folklore.
+
+**What it found instead is almost all rates.** Latinate suffixes and
+polysyllables; nominalisations, favoured by all four models; long sentences
+with few short ones; "and" as the most overused word; rule-of-three
+constructions and the not-X-but-Y flip; and, most surprisingly, **punctuation
+scarcity** — fewer commas, fewer semicolons, "hardly any parentheses". Also
+that the models do not quote experts, which is a journalism-specific tell and
+was left out.
+
+Almost none of that is a span. It is why this iteration implemented the
+`density` detector kind rather than writing more regexes: a sixth kind that
+reports a rate per 1000 words for the document as a whole, with `min` for
+pile-up and `max` for scarcity.
+
+**The prose gate exists because the first calibration run was a disaster.**
+Scarcity rules over a real directory immediately flagged a config dump, a CSV
+and two HTML diffs — all of which have zero commas, zero parentheses and zero
+sentence endings, and none of which are prose. A rate over something that is
+not prose is meaningless. Density rules now require a minimum word count, a
+minimum number of sentences, and a mean sentence length in a plausible range
+before they will evaluate anything at all.
+
+**Thresholds came from measurement, not from taste.** Sixteen documents in the
+corpus survive that gate; here is what human technical prose actually does,
+per 1000 words:
+
+| metric | min | median | max | threshold | fires on |
+|---|---|---|---|---|---|
+| commas | 21.6 | 41.5 | 79.1 | ≤ 20 | 0 of 16 |
+| parentheses | 0 | 47.7 | 110.3 | = 0 | 1 of 16 |
+| sentence endings | 17.3 | 45.2 | 75.0 | ≤ 20 | 2 of 16 |
+| nominalisations | 14.2 | 30.2 | 94.6 | ≥ 70 | 1 of 16 |
+| tricolons | 0 | 0 | 3.1 | ≥ 8 | 0 of 16 |
+| em dashes | 0 | 16.3 | 55.2 | ≥ 35 | 1 of 16 |
+
+Six findings across 35 files, 0.2 per 1000 words. Each threshold sits at or
+beyond the edge of the observed human distribution, so the set says something
+only about documents at the far tail — which is the honest thing a rate can do.
+
+**One half of the calibration is missing and should stay visible.** There is no
+AI-written corpus here, so every threshold is derived from the human side
+alone. `comma-scarcity` in particular is a floor below observed human writing,
+not a ceiling measured on model output. The Economist has the numbers that
+would close this; they are not published in a form that can be reused.
+
+The em-dash rule ships with its description leading on the word NOT. It is not
+an AI tell, it never was, and the only honest thing a rate can say about em
+dashes is that past some density they have stopped doing any work — whoever
+wrote them. That is worth keeping as a style rule and worth refusing to dress
+up as detection.
 
 ## The em-dash question
 

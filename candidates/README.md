@@ -13,17 +13,23 @@ checked.
 
 | set | rules | what it covers | on 30k words of technical prose | worth turning on |
 |---|---|---|---|---|
-| [`antislop-fiction`](antislop-fiction.json) | 10 | creative-writing constructions | 0 per 30k words | fiction only |
-| [`antislop`](antislop.json) | 12 | essay-register constructions, incl. unqualified not-X-but-Y | 0 per 30k words | on |
-| [`slop-gate`](slop-gate.json) | 28 | vocabulary and stock phrases | 3 findings per 30k words | on |
-| [`slopster`](slopster.json) | 7 | reveal-shape openers, cross-sentence negation | 0 per 30k words | on |
-| [`sloptells`](sloptells.json) | 14 | tells measured against register-matched human baselines | 35 per 30k words | read the log first |
+| [`antislop-fiction`](antislop-fiction.json) | 10 | creative-writing constructions | 0 findings | fiction only |
+| [`antislop`](antislop.json) | 12 | essay-register constructions, incl. unqualified not-X-but-Y | 0 findings | on |
+| [`economist`](economist.json) | 6 | document-level *rates*: punctuation scarcity, long sentences, nominalisations | 6 findings, 6 documents | tune the thresholds |
+| [`slop-gate`](slop-gate.json) | 28 | vocabulary and stock phrases | 3 findings | on |
+| [`slopster`](slopster.json) | 7 | reveal-shape openers, cross-sentence negation | 0 findings | on |
+| [`sloptells`](sloptells.json) | 14 | tells measured against register-matched human baselines | 35 findings | read the log first |
 
 The last column is a judgement, not a measurement. `sloptells` fires most
 often here because its collateral ratings were measured against Hacker News,
 cooking and parenting registers, where "rather than" is rarer than it is in
 engineering documentation. A tell's collateral does not transfer between
 registers, which is why these ship one set per source instead of merged.
+
+`economist` is the odd one out: its rules are `density` rules, which report a
+rate for the whole document rather than marking a span, so one finding means
+one document rather than one phrase. Its thresholds were measured against a
+16-document human corpus and are the first thing you should change.
 
 Try one against your own writing:
 

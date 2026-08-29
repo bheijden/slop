@@ -1,10 +1,10 @@
-// The rule engine. Five detector kinds, all driven by data from rules/*.json.
+// The rule engine. Six detector kinds, all driven by data from rules/*.json.
 //
 // Behaviour is deliberately identical to the upstream LLM cliche highlighter,
 // which is what tests/conformance lets us prove. Do not "improve" a detector
 // here without regenerating the rule tests.
 
-export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora'];
+export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density'];
 
 const CHAIN_BODY = String.raw`[^,.;:!?\n–—…]*`;
 const CHAIN_SEP = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+|\s*[;&–—]\s*(?:and\s+|or\s+)?|\s+-{1,2}\s+)`;
@@ -133,8 +133,73 @@ function anaphoraFinder(rule) {
   };
 }
 
+// Document-level rates rather than spans. Five independent sources landed on
+// this shape: sloptells' slopIndex, slopster's Vale `occurrence`, the antislop
+// sampler's slop_index.py, the arXiv taxonomy's Density and Verbosity codes,
+// and The Economist's 2026 study, whose findings are almost all rates.
+//
+// `min` fires on pile-up, `max` on scarcity — and scarcity is a real tell:
+// the Economist found LLM prose uses *fewer* commas, semicolons and
+// parentheses than human writing, not more.
+const DENSITY_WORD = /[A-Za-z0-9][A-Za-z0-9'\u2019-]*/g;
+
+function densityFinder(rule) {
+  const re = reOf(rule);
+  const { per = 1000, min, max, minWords = 250, minMatches = 0, unit = 'words',
+          prose = true, minSentences = 5, maxSentenceWords = 60, minSentenceWords = 4 } = rule.params || {};
+  if (min === undefined && max === undefined) {
+    throw new Error(`rule "${rule.id}": a density rule needs params.min or params.max`);
+  }
+  return (text) => {
+    const words = (text.match(DENSITY_WORD) || []).length;
+    const total = unit === 'chars' ? text.length : words;
+    if (total < minWords) return [];
+
+    // A rate over something that is not prose is meaningless, and scarcity
+    // rules are the worst affected: a config dump or a diff has no commas at
+    // all. Gate on there being enough sentences, of a plausible length.
+    if (prose) {
+      const sentences = (text.match(/[.!?](?=\s|$)/g) || []).length;
+      if (sentences < minSentences) return [];
+      const perSentence = words / sentences;
+      if (perSentence > maxSentenceWords || perSentence < minSentenceWords) return [];
+    }
+    let count = 0;
+    let first = null;
+    for (const m of text.matchAll(re)) {
+      count += 1;
+      if (first === null) first = m;
+    }
+    if (count < minMatches) return [];
+    const rate = (count / total) * per;
+    const high = min !== undefined && rate >= min;
+    const low = max !== undefined && rate <= max;
+    if (!high && !low) return [];
+
+    // Pile-up anchors on the first offender so the reader can see one. Scarcity
+    // often has nothing to point at, so it anchors on the first word.
+    let start = 0;
+    let end = 0;
+    if (high && first) {
+      start = first.index;
+      end = first.index + first[0].length;
+    } else {
+      const w = DENSITY_WORD.exec(text);
+      DENSITY_WORD.lastIndex = 0;
+      if (!w) return [];
+      start = w.index;
+      end = w.index + w[0].length;
+    }
+    const shown = rate >= 10 ? Math.round(rate) : Math.round(rate * 10) / 10;
+    return [{ start, end, count, docLevel: true, badge: `${shown}/${per}`,
+              badgeTitle: `${count} in ${total} ${unit} — ${shown} per ${per}, `
+                          + `${high ? `at or above ${min}` : `at or below ${max}`}` }];
+  };
+}
+
 const BUILDERS = {
   regex: regexFinder,
+  density: densityFinder,
   chain: chainFinder,
   echo: echoFinder,
   'question-chain': questionChainFinder,
@@ -183,10 +248,13 @@ export function analyze(text, rules) {
   }
   raw.sort((a, b) => a.start - b.start || b.end - a.end);
   const out = [];
+  let lastSpan = null;
   for (const m of raw) {
-    const last = out[out.length - 1];
-    if (last && m.start < last.end) continue;
+    // Document-level findings are not spans and do not compete for one.
+    if (m.docLevel) { out.push(m); continue; }
+    if (lastSpan && m.start < lastSpan.end) continue;
     out.push(m);
+    lastSpan = m;
   }
   return out;
 }
