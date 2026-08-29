@@ -48,7 +48,12 @@ function chainFinder(rule) {
 }
 
 function echoFinder(rule) {
-  const { minGram = 4, minRun = 2 } = rule.params || {};
+  // `anchored` and `minShare` default off, so the original behaviour is
+  // untouched. They exist because the loose form fires on formal prose, where
+  // consecutive sentences share a phrase without sharing a shape. The tell that
+  // sources actually describe is repetition at the sentence *opening*, across
+  // three or more units: "Ensures... Provides... Enables...".
+  const { minGram = 4, minRun = 2, anchored = false, minShare = 0, minFuncWords = 0 } = rule.params || {};
   const SENT = /[^.!?\n]+[.!?]?/g;
   const grams = (s, n) => {
     const w = s.toLowerCase().match(/[a-z0-9'’-]+/g) || [];
@@ -70,9 +75,34 @@ function echoFinder(rule) {
       let shared = null;
       while (j + 1 < sents.length) {
         if (sents[j + 1].start - sents[j].end > 3) break;
+        const words = (t) => t.toLowerCase().match(/[a-z0-9'’-]+/g) || [];
         const a = grams(sents[j].text, minGram);
         const b = grams(sents[j + 1].text, minGram);
-        const common = [...a].filter((g) => b.has(g));
+        let common = [...a].filter((g) => b.has(g));
+        if (anchored) {
+          // Aligned, not merely present. An echo repeats a frame at the same
+          // place in both sentences: "…is an object in the system." Topic words
+          // recur anywhere, which is what the loose form kept catching.
+          const head = (t) => words(t).slice(0, minGram).join(' ');
+          const tail = (t) => words(t).slice(-minGram).join(' ');
+          const ok = [];
+          if (anchored !== 'tail' && head(sents[j].text) && head(sents[j].text) === head(sents[j + 1].text))
+            ok.push(head(sents[j].text));
+          if (anchored !== 'head' && tail(sents[j].text) && tail(sents[j].text) === tail(sents[j + 1].text))
+            ok.push(tail(sents[j].text));
+          common = ok;
+        }
+        if (minFuncWords > 0 && common.length) {
+          // A shared span made of content words is a shared subject, not a
+          // shared shape. "the person who died" is what the document is about;
+          // "is an object in the system" is a frame with the nouns swapped.
+          common = common.filter((g) =>
+            g.split(' ').filter((w) => FUNC_WORDS.has(w)).length >= minFuncWords);
+        }
+        if (minShare > 0 && common.length) {
+          const shortest = Math.min(words(sents[j].text).length, words(sents[j + 1].text).length) || 1;
+          common = common.filter((g) => g.split(' ').length / shortest >= minShare);
+        }
         if (!common.length) break;
         shared = common.sort((x, y) => y.length - x.length)[0];
         j += 1;

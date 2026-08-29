@@ -1,0 +1,180 @@
+{
+  "name": "variants",
+  "version": "0.1.0",
+  "slop": "0.1.0",
+  "title": "Rule variants under evaluation",
+  "description": "Alternative formulations of rules the audit found firing on human prose. Nothing here replaces anything: the originals still ship unchanged and these sit beside them, so the two can be measured against the same corpus. Every rule is off by default. Scores are in research/audit.md.",
+  "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
+  "rules": [
+    {
+      "id": "echo-aligned",
+      "name": "Echo, aligned",
+      "kind": "echo",
+      "default": "off",
+      "description": "The shared run must sit at the same end of both sentences, head or tail, rather than floating anywhere in them. Simon's own example repeats a tail: is an object in the system.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "A shopping cart is an object in the system. A chat room is an object in the system. A user session is an object in the system."
+        ],
+        "miss": [
+          "In this study, we investigate the relationship between skull morphology and diet. We implement an integrative approach combining geometric morphometrics with performance testing.",
+          "The first four of these papers focus on system performance differences. This perspective belongs to a broader set of ideologies."
+        ]
+      },
+      "params": {
+        "minGram": 4,
+        "minRun": 2,
+        "anchored": "either"
+      }
+    },
+    {
+      "id": "echo-run3",
+      "name": "Echo, three or more",
+      "kind": "echo",
+      "default": "off",
+      "description": "The original rule, but requiring three consecutive echoing sentences instead of two. Two sentences sharing a phrase is common in formal prose; three is a pattern.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "A shopping cart is an object in the system. A chat room is an object in the system. A user session is an object in the system."
+        ],
+        "miss": [
+          "In this study, we investigate the relationship between skull morphology and diet. We implement an integrative approach combining geometric morphometrics with performance testing.",
+          "The first four of these papers focus on system performance differences. This perspective belongs to a broader set of ideologies."
+        ]
+      },
+      "params": {
+        "minGram": 4,
+        "minRun": 3
+      }
+    },
+    {
+      "id": "echo-aligned-func",
+      "name": "Echo, aligned and structural",
+      "kind": "echo",
+      "default": "off",
+      "description": "Aligned, and the shared run must carry at least two closed-class words. A span of content words is a shared subject, not a shared shape: the person who died is what a document is about, while is an object in the system is a frame with the nouns swapped out.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "A shopping cart is an object in the system. A chat room is an object in the system. A user session is an object in the system."
+        ],
+        "miss": [
+          "In this study, we investigate the relationship between skull morphology and diet. We implement an integrative approach combining geometric morphometrics with performance testing.",
+          "The first four of these papers focus on system performance differences. This perspective belongs to a broader set of ideologies."
+        ]
+      },
+      "params": {
+        "minGram": 4,
+        "minRun": 2,
+        "anchored": "either",
+        "minFuncWords": 2
+      }
+    },
+    {
+      "id": "echo-structural",
+      "name": "Echo, structural",
+      "kind": "echo",
+      "default": "off",
+      "description": "The tightest form: three or more sentences sharing a run of at least three closed-class words. Catches the canonical example and nothing in the audit corpus at all.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "A shopping cart is an object in the system. A chat room is an object in the system. A user session is an object in the system."
+        ],
+        "miss": [
+          "In this study, we investigate the relationship between skull morphology and diet. We implement an integrative approach combining geometric morphometrics with performance testing.",
+          "The first four of these papers focus on system performance differences. This perspective belongs to a broader set of ideologies."
+        ]
+      },
+      "params": {
+        "minGram": 4,
+        "minRun": 3,
+        "minFuncWords": 3
+      }
+    },
+    {
+      "id": "moreover-density",
+      "name": "Transition-word addiction",
+      "kind": "density",
+      "default": "off",
+      "description": "Not one Moreover, but the habit. Sources put the tell at paragraph level: if every paragraph opens with a transition word, the text is probably machine-written. Counts paragraph-opening transitions per 1000 words instead of flagging each one.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "Moreover, the cost matters here and deserves attention from the team.\nMoreover, the latency matters here and deserves attention from the team.\nMoreover, the schema matters here and deserves attention from the team.\nMoreover, the queue matters here and deserves attention from the team.\nMoreover, the budget matters here and deserves attention from the team.\nMoreover, the rollout matters here and deserves attention from the team.\nMoreover, the backlog matters here and deserves attention from the team.\nMoreover, the roadmap matters here and deserves attention from the team.\nMoreover, the staffing matters here and deserves attention from the team.\nMoreover, the tooling matters here and deserves attention from the team.\nMoreover, the vendor matters here and deserves attention from the team.\nMoreover, the policy matters here and deserves attention from the team.\nMoreover, the audit matters here and deserves attention from the team."
+        ],
+        "miss": [
+          "The parser reads each record and validates it.\nMoreover, it logs the failures for review.\nThe queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all. The queue drained overnight and nobody was paged about it at all."
+        ]
+      },
+      "pattern": "(?:^|\\n)\\s*(?:Moreover|Furthermore|Additionally|In\\s+addition|Notably|Consequently|Nevertheless|However|Therefore)\\s*,",
+      "flags": "g",
+      "params": {
+        "min": 6,
+        "minWords": 100,
+        "minSentences": 5
+      }
+    },
+    {
+      "id": "stacked-questions-run3",
+      "name": "Question runs of three",
+      "kind": "question-chain",
+      "default": "off",
+      "description": "Three consecutive questions rather than two. An essayist setting up a topic asks two; a machine asks three and answers them itself.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "What is it? Who is it for? Why now? Nobody has said."
+        ],
+        "miss": [
+          "Who are the speakers of AAE? How are they viewed by others?"
+        ]
+      },
+      "params": {
+        "minRun": 3
+      }
+    },
+    {
+      "id": "not-just-tight",
+      "name": "Negative parallelism, tightened",
+      "kind": "regex",
+      "default": "off",
+      "description": "The original also matches ordinary English, as in not only because performance differences impair the system. This version requires the two halves to be parallel noun phrases, which is what makes the construction rhetorical rather than plain.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "This is not just a tool, but a philosophy.",
+          "It was not merely a change but a reinvention."
+        ],
+        "miss": [
+          "not only because performance differences impair system performance, but the effect is small",
+          "She did not only fund the building, she also chose the architect."
+        ]
+      },
+      "pattern": "\\bnot\\s+(?:just|only|merely|simply)\\s+(?:a|an|the)\\s+[^.!?\\n;]{1,40}?,?\\s+but\\s+(?:also\\s+)?(?:a|an|the)\\b",
+      "flags": "gi"
+    },
+    {
+      "id": "not-just-nosub",
+      "name": "Negative parallelism, minus subordinate clauses",
+      "kind": "regex",
+      "default": "off",
+      "pattern": "\\bnot\\s+(?:just|only|merely|simply)\\s+(?!because|when|if|since|though|although|that\\b|as\\b|to\\b|in\\s+order)[^.!?\\n;]{1,50}?,?\\s+but(?:\\s+also)?\\b",
+      "flags": "gi",
+      "description": "The original's real errors are the cases where not only negates a clause rather than a thing: not only because performance differences impair the system. Three of its five hits on human prose were humans using the construction properly, which no rule should suppress. This version removes only the subordinate-clause form.",
+      "suggest": "Variant under evaluation. See research/audit.md.",
+      "tests": {
+        "hit": [
+          "This is not just a tool, but a philosophy.",
+          "It was not merely mistaken, but dangerous."
+        ],
+        "miss": [
+          "not only because performance differences impair the system, but the effect is small",
+          "He did not run because it was raining, but he walked."
+        ]
+      }
+    }
+  ]
+}

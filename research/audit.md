@@ -201,6 +201,112 @@ Silence is not failure. A rule for a phrase that did not come up says nothing
 about itself. But it does mean most of the library is untested by this exercise,
 and that the sets are carried by a few rules each.
 
+## Variants: trying to fix the false firers
+
+Every original still ships unchanged. The alternatives live in
+[candidates/variants.json](../candidates/variants.json), all off by default, so
+the two can be scored against the same corpus.
+`node tools/compare-variants.mjs` reproduces the table.
+
+### What the false positives turned out to be
+
+Reading the actual matched text settled the design. Every `echo-triad` hit on
+human prose shares a **topic** phrase, not a structure:
+
+<!-- slop-ignore-start -->
+| document | shared run |
+|---|---|
+| academic paper | "performance and trophic ecology" |
+| government guidance | "the person who died" |
+| Python PEP | "in the python 2" |
+| forum comment | "if you find a" |
+<!-- slop-ignore-end -->
+
+Those recur because they are what the document is about. The tell the rule is
+named for shares a **frame**: "is an object in the system", where the nouns swap
+and the skeleton holds. The difference is measurable without a parser. A frame is
+mostly closed-class words; a topic is mostly content words.
+
+Two new `echo` params came out of that, both defaulting off so the original is
+untouched: `anchored`, requiring the shared run to sit at the same end of both
+sentences, and `minFuncWords`, requiring it to carry closed-class words.
+
+### Scores
+
+Lower human is better, higher AI is better, and `canon` is whether the rule still
+catches the example it exists for.
+
+| rule | human docs | human hits | AI docs | AI hits | canon |
+|---|---|---|---|---|---|
+| **`echo-triad`** (original) | 10 of 18 | 19 | 1 | 1 | yes |
+| `echo-aligned` | 2 | 2 | 0 | 0 | yes |
+| `echo-run3` | 2 | 2 | 0 | 0 | yes |
+| `echo-aligned-func` | 2 | 2 | 0 | 0 | yes |
+| `echo-structural` | **0** | 0 | 0 | 0 | yes |
+| **`stacked-questions`** (original) | 3 | 4 | 0 | 0 | yes |
+| `stacked-questions-run3` | **0** | 0 | 0 | 0 | yes |
+| **`not-just`** (original) | 5 | 5 | 2 | 3 | yes |
+| `not-just-tight` | 1 | 1 | **0** | 0 | yes |
+| `not-just-nosub` | **3** | 3 | **2** | **3** | yes |
+| **`moreover`** (original) | 3 | 4 | 0 | 0 | yes |
+| `moreover-density` | 0 | 0 | 0 | 0 | n/a |
+
+### What that says, rule by rule
+
+**`not-just-nosub` is the only unambiguous improvement in the exercise.** It
+drops two human hits and keeps all three AI hits. Reading the matches explains
+why: three of the original's five human hits were people using the construction
+correctly, which no rule should suppress, and only two were real errors, both of
+the form where "not only" negates a clause rather than a thing. Excluding
+subordinating conjunctions removes exactly those two and nothing else.
+`not-just-tight`, which demanded a determiner on both sides, scored better on
+paper and is worse: it threw away every true positive along with the noise.
+
+**Every `echo-triad` variant cuts false positives by 80% or more** and still
+catches the canonical example. Which one is best cannot be settled here, because
+the corpus contains essentially no true positives for this rule to find. On
+precision alone `echo-structural` wins; on the evidence available, any of them is
+a large improvement.
+
+The uncomfortable part is what the surviving hits are. The best variants still
+flag this, from a human forum comment:
+
+<!-- slop-ignore-start -->
+> If you find a simple way, that's great, but it can be copied by anyone...
+> If you find a massively complicated way...
+<!-- slop-ignore-end -->
+
+That is a person using parallel construction deliberately, and it is
+indistinguishable from a machine doing it mechanically, because they are the
+same thing. A tightened echo rule flags rhetoric, not authorship.
+
+**`stacked-questions-run3` removes every false positive** and keeps the
+canonical example. Its cost cannot be measured: neither version fired on AI prose
+at all, so the change is a free precision gain on this evidence and untested for
+recall.
+
+**`moreover-density` has no evidence either way.** It never fired on either
+corpus, and the `canon` column reads n/a because a density rule needs a hundred
+words and the canonical example is one sentence. Its premise, that the tell is
+every paragraph opening with a connective rather than any single "Moreover", is
+what the sources describe, but this corpus does not test it.
+
+### `uniform-sentence-length`: no variant, because there is no signal
+
+Sentence-length variation was measured directly on both corpora, as a
+coefficient of variation per document:
+
+| | min | median | max |
+|---|---|---|---|
+| human | 0.30 | **0.52** | 0.84 |
+| AI | 0.36 | **0.52** | 0.73 |
+
+Identical medians and near-total overlap. The AI range is slightly narrower,
+which points the right way. But the distributions overlap almost entirely, so no
+threshold separates them and reformulating the rule would not change that. The rule stays as what it always
+claimed to be: an observation about monotony in your own draft, not evidence
+about who wrote it.
+
 ## What this does not show
 
 **The sample is small.** Eighteen pairs, about a thousand words each. A rule
