@@ -37,8 +37,12 @@ source.
 ### slop-gate → [candidates/slop-gate.json](../candidates/slop-gate.json)
 
 39 vocabulary rules and one punctuation rule. Eleven duplicated the shipped
-sets (delve, tapestry, meticulous, pivotal, vibrant, bustling, nestled,
-testament, worth-noting) and were dropped; 28 were converted.
+sets and were dropped; 28 were converted. The duplicates:
+
+<!-- slop-ignore-start -->
+> delve, tapestry, meticulous, pivotal, vibrant, bustling, nestled, testament,
+> worth-noting
+<!-- slop-ignore-end -->
 
 Converting them into a format that demands test examples exposed a flaw the
 original does not check for: **18 of the 28 patterns broke on a double space or
@@ -63,6 +67,8 @@ though that corpus is documentation rather than marketing register.
 The replies converge on one point, from several people independently: the
 vocabulary is the easy half.
 
+<!-- slop-ignore-start -->
+
 > The lexical ones are the easy 38. The stubborn tells are structural:
 > rule-of-three lists, the not just X but Y frame, hedge-then-affirm. Those
 > survive a synonym swap because the sentence skeleton is the watermark, not the
@@ -74,14 +80,18 @@ vocabulary is the easy half.
 > the pattern that keeps getting stamped on my own drafts is the three-beat one.
 > punchy opener, receipt, tidy closer. word lists miss it completely.
 
+<!-- slop-ignore-end -->
+
 Two further remarks worth carrying into the method:
 
+<!-- slop-ignore-start -->
 - One reply derived rules from 875 posts across five accounts: *"Cross checking
   against the other four killed 3 of them"* — five of eight rules survived. The
   same result the calibration method here produces, arrived at independently.
 - *"A phrase can be stale in one paragraph and exact in another"* — an argument
   for reporting why a rule fired and letting the writer decide, which is what
   `suggest` and the hover card do.
+<!-- slop-ignore-end -->
 
 ## The em-dash question
 
