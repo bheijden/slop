@@ -369,6 +369,44 @@ change, down from 1.96. The gap narrowed; it did not close, and one rule change
 was never going to close it. What these rules are good for is the thing they were
 built for: pointing at worn phrasing so a writer can decide.
 
+## Regrouped by evidence
+
+The rules are also grouped by how they behaved, not by where they came from.
+`tools/group-by-evidence.mjs` derives four sets from the numbers above and writes
+them to `candidates/`. Nothing is moved or removed: every rule still lives in its
+original set, and each copy records its origin in `from` and its measurement in
+`evidence`.
+
+| set | rules | criterion |
+|---|---|---|
+| `measured-proven` | 12 | fired on AI and either never on human, or at least 3x more on AI |
+| `measured-even` | 4 | fired about equally on both |
+| `measured-noisy` | 11 | fired more on human than on AI |
+| `measured-untested` | 94 | never fired on either side |
+
+They are views, not copies. A rule id is global, so `no-chain` in
+`measured-proven` is the same rule as `no-chain` in `simonwillison`; enabling one
+enables both, and a document that trips it yields one finding rather than two.
+
+### The number, and why it is not a result
+
+On the audit corpus:
+
+| | human/1000 | AI/1000 | ratio |
+|---|---|---|---|
+| shipped default | 4.14 | 1.01 | 0.2x |
+| `measured-proven` | **0.46** | **3.73** | **8.1x** |
+
+**That 8.1x is circular and must not be quoted as a finding.** The twelve rules
+were selected because they scored well on this corpus, then scored on the same
+corpus. Any twelve rules chosen that way would look good. It is a hypothesis
+worth testing, not evidence, and testing it needs a corpus the selection never
+saw.
+
+That is the honest reason `measured-proven` is off by default despite being, on
+paper, forty times the discriminator the shipped set is. The next useful piece of
+work is a second corpus, not another rule.
+
 ## What this does not show
 
 **The sample is small.** Eighteen pairs, about a thousand words each. A rule

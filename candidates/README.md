@@ -9,6 +9,40 @@ Each set records where it came from in `source`, and carries the same
 `slop fudge candidates/<set>.json` checks it the same way the shipped sets are
 checked.
 
+## Grouped by measurement
+
+Four sets regroup every slop rule by how it behaved on the matched human/AI
+corpus in [../research/audit.md](../research/audit.md), rather than by where it
+came from. Nothing is moved: each rule still lives in its original set, and each
+copy records its origin in `from` and its numbers in `evidence`. Duplicate ids
+across sets collapse to one finding, so enabling a measured set alongside its
+sources does not double count.
+
+| set | rules | what it means |
+|---|---|---|
+| [`measured-proven`](measured-proven.json) | 12 | fired on AI prose and rarely or never on human |
+| [`measured-even`](measured-even.json) | 4 | fired about equally on both, so carries no signal |
+| [`measured-noisy`](measured-noisy.json) | 11 | fired more on human prose than on AI |
+| [`measured-untested`](measured-untested.json) | 94 | never fired on either side |
+
+**Read `measured-proven` with the circularity in mind.** Those twelve rules were
+chosen because they scored well on this corpus and then scored on the same
+corpus, which is not a result, it is a hypothesis. On that corpus it separates
+human from AI prose at 0.46 against 3.73 findings per thousand words, an 8.1x
+ratio, where the shipped default runs at 4.14 against 1.01. Whether that survives
+a corpus it was not selected on is the open question, and the honest reason it is
+not the default.
+
+These four are **views over the same rules, not copies of them**. A rule id is
+global, so `no-chain` in `measured-proven` is the same rule as `no-chain` in
+`simonwillison`: turning it on in one turns it on in both, and a document that
+trips it produces one finding, not two. In the web panel a measured set therefore
+shows as partly on whenever its sources are on, which is accurate rather than a
+display bug.
+
+`tools/group-by-evidence.mjs` regenerates all four. The grouping is derived, so
+growing the corpus and re-running it is how these change.
+
 ## What is here
 
 | set | rules | what it covers | on 30k words of technical prose | worth turning on |

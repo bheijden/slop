@@ -124,7 +124,10 @@ async function main() {
     // this backwards would silently change what every visitor's text is judged by.
     const defaults = await evaluate(`(()=>{
       const boxes=[...document.querySelectorAll('#rules input[data-toggle]')];
-      const on=boxes.filter(b=>b.checked||b.indeterminate).map(b=>b.dataset.toggle).sort();
+      // Fully checked, not merely partly. The measured-* sets are views over the
+      // same rule ids as their sources, so they read as indeterminate whenever a
+      // source set is on. That is accurate: those rules really are running.
+      const on=boxes.filter(b=>b.checked&&!b.indeterminate).map(b=>b.dataset.toggle).sort();
       return JSON.stringify({total:boxes.length, on});
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
