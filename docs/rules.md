@@ -205,7 +205,7 @@ Fetching a rule set runs someone else's patterns over your text. The browser
 caps a runaway rule with the worker timeout; **the CLI does not**, so read a
 rule set before pointing production CI at a URL you do not control.
 
-**Six detector kinds.** Most rules are `regex`; the other five are
+**Seven detector kinds.** Most rules are `regex`; the other six are
 parameterised algorithms for things a regex cannot express.
 
 | `kind` | fields | detects |
@@ -216,6 +216,7 @@ parameterised algorithms for things a regex cannot express.
 | `question-chain` | `params.minRun` | runs of consecutive questions |
 | `anaphora` | `params.minRun` | consecutive sentences opening on the same word |
 | `density` | `pattern`, `params.min` or `params.max` | a document-level *rate* rather than a span |
+| `rhythm` | `params.maxCV` | sentence-length variation, as stddev over mean |
 
 A `density` rule counts matches per 1000 words over the whole document and
 fires once, not per match. `params.min` catches pile-up, `params.max` catches
@@ -226,8 +227,12 @@ that is not prose at all, because a config dump or a diff has no commas either.
 `params.minSentences`, `params.minSentenceWords` and `params.maxSentenceWords`
 tune that gate.
 
-A density rule is only as good as its threshold, so calibrate on your own
-corpus. The ones in `candidates/economist.json` come from a 16-document sample
+`rhythm` is the other document-level kind. It has no pattern: it measures the
+coefficient of variation of sentence length and fires when prose is metrically
+monotone. Both kinds share the prose gate and both report once per document.
+
+A density or rhythm rule is only as good as its threshold, so calibrate on your
+own corpus. The ones in `candidates/economist.json` come from a 16-document sample
 and are meant to be changed.
 
 `tests.hit` and `tests.miss` are required, and they are not decoration — see

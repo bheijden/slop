@@ -1,10 +1,10 @@
-// The rule engine. Six detector kinds, all driven by data from rules/*.json.
+// The rule engine. Seven detector kinds, all driven by data from rules/*.json.
 //
 // Behaviour is deliberately identical to the upstream LLM cliche highlighter,
 // which is what tests/conformance lets us prove. Do not "improve" a detector
 // here without regenerating the rule tests.
 
-export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density'];
+export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density', 'rhythm'];
 
 const CHAIN_BODY = String.raw`[^,.;:!?\n–—…]*`;
 const CHAIN_SEP = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+|\s*[;&–—]\s*(?:and\s+|or\s+)?|\s+-{1,2}\s+)`;
@@ -197,9 +197,47 @@ function densityFinder(rule) {
   };
 }
 
+// Sentence-length variation, as a coefficient of variation: standard deviation
+// over mean. Low means every sentence is the same length — what sloptells calls
+// "sentences that march in formation" and what humanizer-de measures as
+// stddev_mean_ratio. Prose that is correct, readable and metrically monotone.
+function rhythmFinder(rule) {
+  const { maxCV, minCV, minWords = 250, minSentences = 8,
+          maxSentenceWords = 60, minSentenceWords = 4 } = rule.params || {};
+  if (maxCV === undefined && minCV === undefined) {
+    throw new Error(`rule "${rule.id}": a rhythm rule needs params.maxCV or params.minCV`);
+  }
+  return (text) => {
+    if ((text.match(DENSITY_WORD) || []).length < minWords) return [];
+    const parts = text.split(/(?<=[.!?])\s+/);
+    const lens = [];
+    for (const part of parts) {
+      const n = (part.match(DENSITY_WORD) || []).length;
+      if (n > 0) lens.push(n);
+    }
+    if (lens.length < minSentences) return [];
+    const mean = lens.reduce((a, b) => a + b, 0) / lens.length;
+    if (mean > maxSentenceWords || mean < minSentenceWords) return [];
+    const sd = Math.sqrt(lens.reduce((a, b) => a + (b - mean) ** 2, 0) / lens.length);
+    const cv = sd / mean;
+    if (!((maxCV !== undefined && cv <= maxCV) || (minCV !== undefined && cv >= minCV))) return [];
+
+    const w = DENSITY_WORD.exec(text);
+    DENSITY_WORD.lastIndex = 0;
+    if (!w) return [];
+    const shown = Math.round(cv * 100) / 100;
+    return [{ start: w.index, end: w.index + w[0].length, count: lens.length, docLevel: true,
+              badge: `cv ${shown}`,
+              badgeTitle: `${lens.length} sentences averaging ${Math.round(mean)} words, `
+                          + `variation ${shown} — ${maxCV !== undefined && cv <= maxCV
+                              ? `at or below ${maxCV}` : `at or above ${minCV}`}` }];
+  };
+}
+
 const BUILDERS = {
   regex: regexFinder,
   density: densityFinder,
+  rhythm: rhythmFinder,
   chain: chainFinder,
   echo: echoFinder,
   'question-chain': questionChainFinder,

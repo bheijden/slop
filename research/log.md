@@ -30,8 +30,8 @@ source.
 | [slop-forensics](https://github.com/sam-paech/slop-forensics) | per-domain n-gram lists | essay-domain trigrams, heavily topic-contaminated |
 | [simonw tweet thread](https://x.com/simonw/status/2093277255438860358) | replies | structural tells; 3 further sources |
 | [sloptells.com](https://sloptells.com) | measured against human baselines | 14 rules, and the em-dash verdict |
-| [louisabraham word list](https://louisabraham.github.io) | banned-word list | pending — found via the thread |
-| [marmbiz humanizer](https://github.com/marmbiz) | ~72 patterns, German | pending — found via the thread |
+| [louisabraham](https://louisabraham.github.io) | banned-word list | not found — no such article on the site |
+| [humanizer-de](https://github.com/marmbiz/humanizer-de) | 72 patterns, German | 2 rules, including sentence-length variation |
 
 ## Per-source notes
 
@@ -431,6 +431,103 @@ The words it treats this way are `leverage`, `harness`, `foster`, `underscore`,
 ordinary verbs whose slop-ness depends on grammatical role.
 <!-- slop-ignore-end --> This engine is regex
 over spans and cannot make that distinction. Worth recording as a known ceiling.
+
+### humanizer-de → [candidates/humanizer-de.json](../candidates/humanizer-de.json)
+
+A German AI-text auditor built as a Claude Code and Codex skill: 72 patterns, a
+117KB pattern catalogue, an evidence ledger, a coverage matrix, and a
+false-positive corpus report. The most methodologically serious project in this
+log after sloptells, and it arrives at the same discipline from a different
+language.
+
+Most of the catalogue does not transfer. Modal particles, `„Text”` quotation
+asymmetry, Konjunktiv register — these are German problems. The
+English-transferable patterns it names were already covered here: vague
+authorities by `vague-experts`, negative parallelism by `not-just`, section
+summaries by `in-conclusion`, mechanical connectives by `moreover`, rule of
+three by `triad-density`.
+
+**Its governing rule is stated in bold at the top of its own checklist, and it
+is the sentence this whole log keeps converging on.** *Grundregel: Cluster
+zählen, nicht Einzelsignale* — count clusters, not single signals. A single em
+dash, it says, proves nothing at all. That is the fourth independent source to
+kill the em dash and the fifth to argue for rates over occurrences.
+
+**What it contributes that nothing else did is a measurement.** Its
+`style-targets.json` requires `stddev_mean_ratio` of at least 0.4 in every
+register profile it ships: the coefficient of variation of sentence length.
+Prose where every sentence is the same length is correct, readable, and
+metrically monotone — tell 10 in their checklist, and the thing sloptells
+describes as sentences that march in formation.
+
+That needed a seventh detector kind, `rhythm`, because it is a statistic over a
+distribution rather than a count of anything. Their German threshold transfers
+cleanly: sixteen documents of English human technical prose measured 0.49 to
+1.54, so 0.4 sits below all of them.
+
+The second rule is their paired-aside cluster. What it counts is not the em
+dash but `— like this —` as a repeated shape, per thousand words. The corpus topped out
+at 3.6, so the threshold is 6.
+
+Both rules find nothing in 30,300 words of human prose.
+
+One rejection worth recording, because it is a red herring found by someone
+else: they note that straight quotes throughout a document are a CMS artefact
+rather than an AI signal. Typography is not evidence.
+
+### louisabraham → not found
+
+The thread pointed here for a banned-word list. The site's article index has
+nothing on AI writing, word lists or prose. Either it was removed or the
+reference was wrong. Recorded so nobody spends the search twice.
+
+## The retired-tell question, settled
+
+Three sources, three years, apparently in flat contradiction:
+
+<!-- slop-ignore-start -->
+- The PubMed excess-vocabulary study puts `delves` at r = 28.0 in 2024 — its
+  single strongest style signal out of 15.1 million abstracts.
+- sloptells, measuring current models in 2026, has retired `delve`, `tapestry`
+  and `a testament to` as tells models no longer produce.
+- Both are shipped live here, in `wikipedia-ai`'s `ai-vocab` and `testament`.
+<!-- slop-ignore-end -->
+
+**They do not actually disagree.** They measured different years. The word was
+the strongest tell of 2024 *and* has since been trained out. Both statements
+are true, and the apparent contradiction is an artefact of reading two dated
+measurements as if they were claims about the present.
+
+So the question is not which source is right. It is what a linter should do
+with a tell whose recall has decayed. That depends entirely on collateral, so
+the collateral was measured over 43,479 words of human technical prose:
+
+| | hits |
+|---|---|
+| the whole `ai-vocab` rule | 1 |
+| the retired trio | **0** |
+
+Zero. Nobody reaches for these words by accident in technical writing.
+
+**Verdict: keep them, and date them.** Removing a rule with zero collateral
+buys nothing and loses coverage of everything written by the models that did
+produce it — which is a great deal of text still on the internet. The argument
+for removal was about recall, and recall costs the reader nothing; precision is
+what costs them.
+
+What was wrong was not the rules but the silence. A rule that exists because of
+a 2024 measurement should say so. Two changes, both data only:
+
+- Rules may now carry a `measured` field recording when a tell was measured and
+  by whom, and `ai-vocab` and `testament` carry one.
+- `slop explain` prints `measured` and `note`. `note` was already used by
+  several candidate rules and had never been shown to anyone, which was a plain
+  bug.
+
+The general lesson is worth keeping in view for every set in this log: **a
+tell's value depends on the age of the text being linted, not only on the age
+of the measurement.** Someone checking their own draft today gets nothing from
+a retired tell. Someone auditing an archive gets a great deal.
 
 ## Calibration so far
 

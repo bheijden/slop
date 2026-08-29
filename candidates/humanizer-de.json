@@ -1,0 +1,54 @@
+{
+  "name": "humanizer-de",
+  "version": "0.1.0",
+  "slop": "0.1.0",
+  "title": "humanizer-de",
+  "description": "Two rules from a 72-pattern German AI-text auditor. Almost all of its catalogue is German-specific — particles, quotation typography, Konjunktiv — and the English-transferable patterns it names were already covered here. What it contributes is a measurement nothing else in this project had: sentence-length variation, plus its governing rule, which is to count clusters and never single signals.",
+  "source": "https://github.com/marmbiz/humanizer-de",
+  "rules": [
+    {
+      "id": "uniform-sentence-length",
+      "name": "Sentences march in formation",
+      "kind": "rhythm",
+      "params": {
+        "maxCV": 0.4,
+        "minWords": 250,
+        "minSentences": 8
+      },
+      "description": "Sentence lengths that barely vary. humanizer-de measures this as stddev_mean_ratio and requires at least 0.4 in every register profile it ships; sloptells describes the same thing as sentences that march in formation. The badge is the coefficient of variation — standard deviation over mean sentence length.",
+      "suggest": "Cut one sentence in half and let another run long. Rhythm is what stops correct prose from reading as generated.",
+      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone.",
+      "tests": {
+        "hit": [
+          "The worker reads each record from the queue and checks its schema. The schema lives in a shared repository that both teams can edit. A record that fails the check is written to a separate log. The log is rotated every night and kept for thirty days. An operator reviews the log each morning before the standup meeting. Most of the failures come from a single partner in the north. That partner has been sending malformed dates since the middle of March. We opened a ticket with their integration team on the same day. The ticket has not received a reply from anyone on their side. We now reject their malformed records at the edge of the system. The change was fifteen lines and shipped on a Tuesday afternoon. Nobody on the team noticed the change had gone out at all. The operator noticed because she stopped being paged at six each morning. She sent a short message to the channel to say so. That message has been pinned in the channel ever since that day. The queue has now run clean for four consecutive months without trouble. We have not touched the retry logic in any way since then. Eleven records are sitting in the dead letter queue this morning. All eleven of them came from the same partner in the north. We check the queue on Friday afternoons now instead of every day. The runbook still tells the operator to check it every single morning. Somebody on the team should update that page in the runbook. So far nobody has found the time to go and do it."
+        ],
+        "miss": [
+          "Short. The worker reads each record from the queue and checks it against a schema that lives in a shared repository both teams can edit, which sounded sensible at the time and has since caused two outages. A record that fails is logged. The log rotates nightly. An operator reviews it each morning before standup, and most of what she finds comes from one partner in the north who has been sending malformed dates since March, a fact we established within an hour and have been unable to act on since. We opened a ticket. No reply. We now reject their malformed records at the edge instead, which took fifteen lines and shipped on a Tuesday afternoon with no announcement, no review beyond the usual one, and no ceremony of any kind. Nobody noticed. The operator noticed, because she stopped being paged at six, and she sent a two-word message to the channel that has been pinned there ever since and remains the only recognition that change will ever get. Four months clean. The retry logic is untouched. Eleven records sit in the dead letter queue this morning, all from the same partner, and we check on Fridays now rather than daily even though the runbook, which nobody has updated, still says every morning. Somebody should fix that. Nobody will. The wider lesson, if there is one, is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed was the only person the system had actually been hurting all along, which is roughly how these things go everywhere I have worked. Four months. No pages. Nobody asked."
+        ]
+      }
+    },
+    {
+      "id": "paired-dash-aside",
+      "name": "Paired em-dash asides",
+      "kind": "density",
+      "pattern": "—[^—.!?\\n]{3,80}—",
+      "flags": "g",
+      "params": {
+        "min": 6,
+        "minWords": 250,
+        "minSentences": 5
+      },
+      "description": "Not the em dash itself — that tell is dead three times over — but the paired parenthetical aside, which humanizer-de flags as a cluster pattern rather than a single signal. Their governing rule is the one this project keeps arriving at: count clusters, never singletons.",
+      "suggest": "Some of these are commas and some are brackets. A paired aside works when it is the only one on the page.",
+      "note": "The human corpus topped out at 3.6 per 1000 words, so 6 leaves clear air. This counts asides, not dashes, and is a different measurement from em-dash-density in the economist set.",
+      "tests": {
+        "hit": [
+          "The worker reads each record — one at a time — and checks its schema. The schema — a shared file both teams edit — has drifted twice this year. A failing record goes to a log, which the operator — who starts at seven — reviews each morning. Most failures come from one partner — the same one every quarter — in the north. That partner has been sending malformed dates — always the same field — since March. We opened a ticket — our third with them — on the same afternoon. Nobody replied. We now reject the records at the edge — a fifteen line change — instead of waiting for them to fail downstream. It shipped on a Tuesday — quietly, as these things do — and nobody noticed. The operator noticed, because the six o'clock page — the one that had been waking her for months — simply stopped. She sent a message — two words, no punctuation — to the channel. That message — pinned ever since — is the only recognition the change will get. The queue has run clean for four months — a record for this team — and the retry logic is untouched. Eleven records — all from the same partner — sit in the dead letter queue. We check on Fridays now — rather than daily — because the volume no longer justifies it. The runbook — still saying daily — is out of date. Somebody ought to fix it — everybody agrees — and so far nobody has done anything. The wider lesson — if there is one at all — is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed — the only one the system had been hurting — was not in the room when it was planned. Four months — no pages — and nobody has asked once. The dashboard — rebuilt twice since — still shows the old alert threshold."
+        ],
+        "miss": [
+          "Short. The worker reads each record from the queue and checks it against a schema that lives in a shared repository both teams can edit, which sounded sensible at the time and has since caused two outages. A record that fails is logged. The log rotates nightly. An operator reviews it each morning before standup, and most of what she finds comes from one partner in the north who has been sending malformed dates since March, a fact we established within an hour and have been unable to act on since. We opened a ticket. No reply. We now reject their malformed records at the edge instead, which took fifteen lines and shipped on a Tuesday afternoon with no announcement, no review beyond the usual one, and no ceremony of any kind. Nobody noticed. The operator noticed, because she stopped being paged at six, and she sent a two-word message to the channel that has been pinned there ever since and remains the only recognition that change will ever get. Four months clean. The retry logic is untouched. Eleven records sit in the dead letter queue this morning, all from the same partner, and we check on Fridays now rather than daily even though the runbook, which nobody has updated, still says every morning. Somebody should fix that. Nobody will. The wider lesson, if there is one, is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed was the only person the system had actually been hurting all along, which is roughly how these things go everywhere I have worked. Four months. No pages. Nobody asked."
+        ]
+      }
+    }
+  ]
+}

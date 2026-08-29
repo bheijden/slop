@@ -225,6 +225,8 @@ async function main() {
     if (r.pattern) process.stdout.write(`  pattern:  /${r.pattern}/${r.flags || ''}\n`);
     process.stdout.write(`\n  ${r.description}\n`);
     if (r.suggest) process.stdout.write(`\n  ${C.cyan('fix:')} ${r.suggest}\n`);
+    if (r.measured) process.stdout.write(`\n  ${C.dim('measured:')} ${r.measured}\n`);
+    if (r.note) process.stdout.write(`\n  ${C.dim('note:')} ${r.note}\n`);
     const t = r.tests || {};
     if (t.hit?.length) { process.stdout.write(`\n  ${C.yellow('flags:')}\n`); t.hit.forEach((x) => process.stdout.write(`    ${x}\n`)); }
     if (t.miss?.length) { process.stdout.write(`\n  ${C.green('allows:')}\n`); t.miss.forEach((x) => process.stdout.write(`    ${x}\n`)); }
