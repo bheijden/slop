@@ -11,7 +11,7 @@ project can add its own.
 
 ## Run it
 
-Point it at whatever the user is working on — a single file, a directory, or
+Point it at whatever the user is working on. That can be a single file, a directory, or
 `.` for the whole project. `docs/` in the examples below is only a placeholder.
 
 For a single check, with no install step:
@@ -102,10 +102,10 @@ use `--format github` for inline pull-request annotations.
 ```
 
 `list` shows every rule and whether it is active. `explain <rule-id>` shows one
-in full, including examples of what it flags and what it deliberately allows —
+in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
-Two sets ship: `simonwillison` (27 rules) and `wikipedia-ai` (11). The full
+Three sets ship: `simonwillison` (27 rules), `wikipedia-ai` (11), and `em-dash` (1). `em-dash` is house style rather than a tell, so say so if a user asks why it fired. The full
 catalogue is in [reference/rules.md](reference/rules.md).
 
 A project can install more. Rule sets are versioned packages, recorded in
@@ -121,7 +121,7 @@ A project can install more. Rule sets are versioned packages, recorded in
 Every rule carries its own examples in the same file, so `add`, `update` and
 `restore` run them before installing and hold back a set that fails. `--force`
 installs it anyway. Check `sets` before assuming a finding came from a built-in
-rule — a project's own set can shadow one of ours.
+rule, because a project's own set can shadow one of ours.
 
 ## Writing or fixing a rule
 

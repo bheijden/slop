@@ -79,10 +79,10 @@ the same command.
 
 Two phases:
 
-**Conformance** — every `tests.hit` example must match and every `tests.miss`
+**Conformance.** Every `tests.hit` example must match and every `tests.miss`
 example must not, on plain text.
 
-**Fudging** — each hit example is rewritten 27 ways with the markup real files
+**Fudging.** Each hit example is rewritten 27 ways with the markup real files
 carry, and the rule must still fire:
 
 ```
@@ -94,7 +94,7 @@ It is important\nto note that this works.      md:soft-wrap
 <p><span>It</span> <span>is</span> …           html:span-per-word
 ```
 
-A lossless variant that turns a hit into a miss is a bug — in extraction, or in
+A lossless variant that turns a hit into a miss is a bug, either in extraction or in
 a rule too tight for real files. Variants that genuinely delete words (a long
 inline code span) are marked lossy and reported for information only.
 
@@ -117,5 +117,5 @@ missing constraint. A worked example is in the repo's `docs/calibration.md`:
 `colon-triple` produced 45% of all findings on technical writing, and 16 of its
 21 hits were docstrings, matrix algebra and hardware lists rather than prose.
 Requiring prose characters and a lowercase initial in each item removed every
-false positive without losing a single real hit — and the false positives went
+false positive without losing a single real hit, and the false positives went
 into `tests.miss`, so the regression is locked in.

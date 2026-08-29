@@ -11,6 +11,7 @@ sharing and writing them.
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
+| `em-dash` | 1 | House style: flags every em dash. A preference, not a tell. `slop explain em-dash` gives the evidence, which points the other way. |
 
 ```sh
 slop list                    # every rule and whether it is active
@@ -41,7 +42,7 @@ Or in `slop.json`, found by walking up from the working directory:
 
 Every rule ships enabled. `colon-triple` nearly did not: it produced 45% of all
 findings on a real corpus, and 16 of its 21 hits were docstrings, matrix algebra
-and hardware lists rather than prose. Tightening the rule beat disabling it — 5
+and hardware lists rather than prose. Tightening the rule beat disabling it: 5
 hits, all genuine, with full recall on the examples. See
 [docs/calibration.md](docs/calibration.md) for the method.
 
@@ -58,7 +59,7 @@ A rule set is a package. It carries its own `name` and `version`, and the
 
 `add` downloads one into `.slop/rules/`, beside your `slop.json`.
 It is compiled and run through its own tests on the way in, then becomes active
-immediately — you do not pass a flag or edit the config:
+immediately. You do not pass a flag or edit the config:
 
 ```sh
 slop add https://example.com/house-style.json
@@ -67,7 +68,7 @@ slop add ./local-set.json
 ```
 
 A URL can hold one set, an array of sets, or a `{"sets": [...]}` manifest naming
-files beside it — the shape this repo's own `rules/index.json` uses, so
+files beside it, the shape this repo's own `rules/index.json` uses, so
 `slop add <that url>` installs both of ours.
 
 ```sh
@@ -107,7 +108,7 @@ held back house-style 1.0.0 → 1.2.0  2 failing — --force to install anyway
 
 Failing *what*, exactly: every rule in a set carries its own `tests.hit` and
 `tests.miss` examples in the same JSON file, so the examples travel with the
-rule. Anyone who fetches the set can run them — that is what `add`, `update`
+rule. Anyone who fetches the set can run them, which is what `add`, `update`
 and `restore` do before installing, and what `slop fudge` does on demand.
 You do not have to write tests for someone else's rules to know whether they
 work on your machine.
@@ -220,7 +221,7 @@ parameterised algorithms for things a regex cannot express.
 
 A `density` rule counts matches per 1000 words over the whole document and
 fires once, not per match. `params.min` catches pile-up, `params.max` catches
-*scarcity* — which is a real tell: The Economist found LLM prose uses **fewer**
+*scarcity*, which is a real tell. The Economist found LLM prose uses **fewer**
 commas, semicolons and parentheses than human writing, not more. It refuses to
 run below `params.minWords` (250 by default), and a prose gate skips anything
 that is not prose at all, because a config dump or a diff has no commas either.
@@ -235,7 +236,7 @@ A density or rhythm rule is only as good as its threshold, so calibrate on your
 own corpus. The ones in `candidates/economist.json` come from a 16-document sample
 and are meant to be changed.
 
-`tests.hit` and `tests.miss` are required, and they are not decoration — see
+`tests.hit` and `tests.miss` are required, and they are not decoration. See
 below.
 
 ---
@@ -250,7 +251,7 @@ slop fudge                              # every built-in set, plus any
 ```
 
 The web page runs the same thing under **test rules**, with failures sorted to
-the top — useful while you are still writing the pattern.
+the top, which is useful while you are still writing the pattern.
 
 ```
 rule sets: simonwillison, wikipedia-ai  (38 rules)
@@ -260,10 +261,10 @@ fudging:     3066 pass, 0 fail  (86 expected misses on lossy markup)
 
 Two phases:
 
-**Conformance** — every `tests.hit` example must match and every `tests.miss`
+**Conformance.** Every `tests.hit` example must match and every `tests.miss`
 example must not, on plain text.
 
-**Fudging** — each `hit` example is then rewritten 26 ways, injecting the markup
+**Fudging.** Each `hit` example is then rewritten 26 ways, injecting the markup
 a real document carries, and the rule must still fire:
 
 ```
@@ -279,13 +280,13 @@ It is important\nto note that this works.         md:soft-wrap
 <p><span>It</span> <span>is</span> …              html:span-per-word
 ```
 
-A variant that turns a HIT into a MISS is a bug — in extraction, or in the rule
+A variant that turns a HIT into a MISS is a bug, either in extraction or in the rule
 being too tight for real files. Variants that genuinely delete words (inline
 code) are marked lossy and only reported for information.
 
 That is how you refine a rule. Write the example, run `fudge`, and fix whatever
 it reports.
-It earned its place immediately — the first run found four real bugs, listed in
+It earned its place immediately. The first run found four real bugs, listed in
 [docs/extraction.md](docs/extraction.md).
 
 ---

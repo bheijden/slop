@@ -34,7 +34,7 @@ release-notes.md (49 words, 5 findings)
 ```
 
 Or drop the file on **[the page](https://bheijden.github.io/slop/)** and read it
-the same way — same engine, same rules, nothing uploaded:
+the same way. Same engine, same rules, nothing uploaded:
 
 <p align="center">
   <picture>
@@ -60,7 +60,7 @@ node slop/js/cli.mjs check docs/ -r
 
 No dependencies; the clone is 380 KB and needs only Node.
 
-Findings never fail a run on their own — they are style smells, not errors. Set
+Findings never fail a run on their own. They are style smells, not errors. Set
 a budget when you want CI to gate on them:
 
 ```sh
@@ -77,7 +77,7 @@ slop fudge  rules/mine.json       # test a rule set
 ```
 
 `fudge` runs each rule's own examples, then rewrites them 27 ways with the
-markup real files carry — bold, italics, inline tags, soft-wrapped lines — and
+markup real files carry (bold, italics, inline tags, soft-wrapped lines) and
 requires the rule to still fire. A rule that survives a clean sentence but not a
 real document is a rule that will miss things.
 
@@ -89,6 +89,7 @@ Two ship, both enabled:
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings models overproduce, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
+| `em-dash` | 1 | House style: no em dashes, anywhere. Not a detection claim; `slop explain em-dash` says why |
 
 Install more, write your own, and keep them up to date:
 
@@ -101,7 +102,7 @@ slop restore shared.lock.json                # rebuild a library elsewhere
 
 An update that fails its own tests is held back rather than installed.
 `.slop/rules.lock.json` records each set's version, source and test
-result — commit it and everyone gets the same rules.
+result. Commit it and everyone gets the same rules.
 
 ## Documentation
 
@@ -135,7 +136,7 @@ can read.
 ## Limits
 
 - **English only.** The patterns are hard-coded English. Prose in another
-  language passes almost silently — no findings is not evidence of clean prose.
+  language passes almost silently. No findings is not evidence of clean prose.
 - **Heuristics, not proof.** `ai-vocab` firing once is coincidence; several
   times is a tell. Use a budget rather than demanding zero.
 - **Long inline code spans are removed.** A single short token is kept, because

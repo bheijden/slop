@@ -1,7 +1,7 @@
 # How a file is read
 
-To exclude a region deliberately — a quoted example of bad prose, a block you do
-not want linted — wrap it in `<!-- slop-ignore-start -->` and
+To exclude a region deliberately, such as a quoted example of bad prose or a
+block you do not want linted, wrap it in `<!-- slop-ignore-start -->` and
 `<!-- slop-ignore-end -->`. Both markdown and HTML honour it.
 
 
@@ -15,7 +15,7 @@ original file. Three rules, all of them learned from failing fudge variants:
 2. **Block boundaries emit a newline; inline whitespace does not.** HTML
    collapses whitespace and markdown soft-wraps, so a source newline inside a
    paragraph is a *space*. Treating it as a line break puts a false sentence
-   boundary at every hard-wrap column — which silently breaks every
+   boundary at every hard-wrap column, which silently breaks every
    sentence-based rule on any file wrapped at 80 characters.
 3. **Long unbroken lines are hard-wrapped.** The sentence detectors rescan from
    every start position, so text with no terminator is O(n²): 8000 words on one

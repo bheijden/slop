@@ -350,7 +350,7 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="hero">
     <h1>slop<em>.</em></h1>
     <p class="lede">A linter for prose.</p>
-    <p class="sub">Flags stock LLM phrasing — <code>it is important to note that</code>, <code>no X, no Y, no Z</code> — at the line it came from, with the fix. Nothing leaves your browser.</p>
+    <p class="sub">Flags stock LLM phrasing: <code>it is important to note that</code>, <code>no X, no Y, no Z</code>, at the line it came from, with the fix. Nothing leaves your browser.</p>
   </div>
 
   <div class="io" id="io">
@@ -380,7 +380,7 @@ body.resizing{cursor:col-resize;user-select:none}
       <h2 id="r-title"></h2>
       <div class="nav" id="nav" hidden>
         <button id="n-prev" title="Previous finding (k or ↑)" aria-label="Previous finding">↑</button>
-        <span id="n-count">–</span>
+        <span id="n-count">·</span>
         <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
       </div>
       <span class="spacer"></span>
@@ -438,7 +438,7 @@ node slop/js/cli.mjs check <span class="p">--format</span> json docs/ <span clas
 node slop/js/cli.mjs check <span class="p">--select</span> wikipedia-ai .  <span class="c"># a set name or one rule id</span>
 node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</span> docs/        <span class="c"># a link to this page</span></pre>
         <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page.</p>
-        <p>Findings never fail a run on their own — they are style smells, not errors. Add <code>--max-per-1000 2</code> or <code>--max 0</code> when you want CI to gate on them. Exit <code>0</code> ok, <code>1</code> over a budget you set, <code>2</code> usage or read error.</p>
+        <p>Findings never fail a run on their own. They are style smells, not errors. Add <code>--max-per-1000 2</code> or <code>--max 0</code> when you want CI to gate on them. Exit <code>0</code> ok, <code>1</code> over a budget you set, <code>2</code> usage or read error.</p>
       </div>
     </details>
     <details>
@@ -450,13 +450,13 @@ node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</sp
   <span class="p">"suggest"</span>: "Write \"use\".",
   <span class="p">"tests"</span>: { <span class="p">"hit"</span>: ["We utilise the cache."],
              <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
-        <p><b>Test rules</b> above — <code>slop fudge mine.json</code> — checks every example, then rewrites each one 27 ways with the markup real files carry and requires the rule to still fire:</p>
+        <p><b>Test rules</b> above, or <code>slop fudge mine.json</code>, checks every example, then rewrites each one 27 ways with the markup real files carry and requires the rule to still fire:</p>
 <pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
 It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
 It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
 &lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
 &lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
-        <p>A variant that turns a hit into a miss is a bug — in extraction, or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
+        <p>A variant that turns a hit into a miss is a bug, either in extraction or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
       </div>
     </details>
     <details>
@@ -473,9 +473,9 @@ for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; 
 <pre><span class="c">Install the slop skill from
 github.com/bheijden/slop/tree/main/skill into
 ~/.claude/skills/linting-prose/, keeping the reference/ files.</span></pre>
-        <p>After that it picks itself up whenever you ask for writing to be reviewed — you do not name the tool again.</p>
+        <p>After that it picks itself up whenever you ask for writing to be reviewed. You do not name the tool again.</p>
         <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
-        <p>A skill gives an agent instructions it will act on, so read one before installing it — this one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
+        <p>A skill gives an agent instructions it will act on, so read one before installing it. This one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
       </div>
     </details>
   </div>

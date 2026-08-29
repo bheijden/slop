@@ -125,8 +125,8 @@ style with topic.** The essay-domain trigrams are topped by:
 control`, `abu dhabi`, `civil rights movement`
 <!-- slop-ignore-end -->
 
-Those are not tells. They are fingerprints of the prompt set — the essays were
-about business, health and policy — and a human writing the same essays would
+Those are not tells. They are fingerprints of the prompt set. The essays were
+about business, health and policy, and a human writing the same essays would
 produce them at the same rate. They only look like slop because the human
 baseline was not topic-matched. This is the exact failure sloptells avoids by
 matching baselines to register, and it is the strongest argument in this log
@@ -156,7 +156,7 @@ Slop Score weights it at 25% of the total, on its own, separate from the word
 lists (60%) and trigrams (15%). No other construction gets its own component.
 The sampler ships only three regexes in total and this is the first of them.
 
-Their regex is `(?i)not [^.!?]{3,60} but`, which is unusable as a linter rule —
+Their regex is `(?i)not [^.!?]{3,60} but`, which is unusable as a linter rule:
 it fires on "I am not sure but I will check" and "he did not know but she did".
 The difference is what `not` negates. When it negates a *nominal* the flip is
 rhetorical; when it negates a *verb* the sentence is ordinary English. Without
@@ -166,12 +166,12 @@ test hits and drops all four verbal negations. It also stays clear of
 wikipedia-ai's `not-just`, which already covers the qualified form.
 
 The other two sampler regexes, `each(?:\s*\w+\s*|\s*)a` and the `every`
-variant, are after the appositive cascade — "twelve panels, each a window into
+variant, are after the appositive cascade, as in "twelve panels, each a window into
 another world". Kept, with a note: with no part-of-speech information a
 descriptive appositive can still match.
 
 **The fiction set is shipped separately and off by default.** The creative
-constructions are real and consistent — voice barely above a whisper, heart
+constructions are real and consistent: voice barely above a whisper, heart
 pounding in her chest, a shiver down her spine, the words hung in the air,
 little did she know, maybe just maybe. Ten rules rather than 2500 phrases.
 Anyone linting fiction wants these, and nobody linting documentation has any
@@ -211,7 +211,7 @@ fail to capture annotator preferences, capable reasoning models fail to
 reliably extract slop spans, and the authors close by saying "fully automated
 and scalable methods remain an open challenge". Nobody has a good automatic
 method. That makes a transparent, testable, per-rule linter a defensible place
-to stand — provided it claims SQ1 and SQ2 and stays quiet about the rest.
+to stand, provided it claims SQ1 and SQ2 and stays quiet about the rest.
 
 Two further notes. Its Templatedness example is a *repeated appositive frame*
 ("Dr. Smith, a researcher at Oxford University, found that... Professor
@@ -220,7 +220,7 @@ close to the `anaphora` detector but keyed on an internal frame rather than a
 sentence head. Worth prototyping. And its Density code is the fourth
 independent argument for a document-level rate detector, after sloptells'
 slopIndex, slopster's Vale `occurrence`, and the sampler's own `slop_index.py`,
-which computes weighted matches per thousand words — the same unit this CLI
+which computes weighted matches per thousand words, the same unit this CLI
 already reports.
 
 ### Excess vocabulary in 15.1M PubMed abstracts → no rules, but the control everyone else lacked
@@ -229,7 +229,7 @@ Kobak, González-Márquez, Horvát and Lause. 15.1 million abstracts, 2010–202
 The method is borrowed from excess-mortality epidemiology: take 2021–2022 word
 frequencies, extrapolate them forward, and measure what 2024 actually did
 against that counterfactual. It needs neither labelled data nor a classifier, and
-it has a genuine pre-ChatGPT baseline over the *same corpus* — exactly the
+it has a genuine pre-ChatGPT baseline over the *same corpus*, exactly the
 control every n-gram list in this log was missing.
 
 The headline numbers are ratios against the counterfactual:
@@ -245,7 +245,7 @@ The headline numbers are ratios against the counterfactual:
 **Its most useful result is not the word list, it is the split.** The paper
 separates style words from content words and then makes the comparison that
 settles the question this log kept running into. In 2024, excess vocabulary was
-"almost entirely style words" — 45.2% style against 51.3% content overall, and
+"almost entirely style words": 45.2% style against 51.3% content overall, and
 among the style words 66% were verbs. During COVID, excess vocabulary was
 almost entirely *content* words: coronavirus, covid, lockdown, pandemic, at
 r > 1000.
@@ -287,15 +287,15 @@ York Times, the Washington Post, and novels published between 1950 and 2022.
 
 **The em dash dies a third time.** Only Claude used more em dashes than human
 writers; ChatGPT used markedly fewer. That is now three independent
-measurements agreeing — sloptells against acclaimed human prose, this project
-against its own corpus, and the Economist against journalism and novels — and
-they agree in the direction opposite to the folklore.
+measurements agreeing. sloptells measured against acclaimed human prose, this
+project against its own corpus, and the Economist against journalism and
+novels, and they agree in the direction opposite to the folklore.
 
 **What it found instead is almost all rates.** Latinate suffixes and
 polysyllables; nominalisations, favoured by all four models; long sentences
 with few short ones; "and" as the most overused word; rule-of-three
 constructions and the not-X-but-Y flip; and, most surprisingly, **punctuation
-scarcity** — fewer commas, fewer semicolons, "hardly any parentheses". Also
+scarcity**: fewer commas, fewer semicolons, "hardly any parentheses". Also
 that the models do not quote experts, which is a journalism-specific tell and
 was left out.
 
@@ -306,7 +306,7 @@ pile-up and `max` for scarcity.
 
 **The prose gate exists because the first calibration run was a disaster.**
 Scarcity rules over a real directory immediately flagged a config dump, a CSV
-and two HTML diffs — all of which have zero commas, zero parentheses and zero
+and two HTML diffs, all of which have zero commas, zero parentheses and zero
 sentence endings, and none of which are prose. A rate over something that is
 not prose is meaningless. Density rules now require a minimum word count, a
 minimum number of sentences, and a mean sentence length in a plausible range
@@ -327,7 +327,7 @@ per 1000 words:
 
 Six findings across 35 files, 0.2 per 1000 words. Each threshold sits at or
 beyond the edge of the observed human distribution, so the set says something
-only about documents at the far tail — which is the honest thing a rate can do.
+only about documents at the far tail. That is the honest limit of a rate.
 
 **One half of the calibration is missing and should stay visible.** There is no
 AI-written corpus here, so every threshold is derived from the human side
@@ -337,7 +337,7 @@ would close this; they are not published in a form that can be reused.
 
 The em-dash rule ships with its description leading on the word NOT. It is not
 an AI tell, it never was, and the only honest thing a rate can say about em
-dashes is that past some density they have stopped doing any work — whoever
+dashes is that past some density they have stopped doing any work, whoever
 wrote them. That is worth keeping as a style rule and worth refusing to dress
 up as detection.
 
@@ -362,18 +362,48 @@ at all. That is a property of the document's style, not of any one sentence, and
 a per-match rule turns it into 84 findings in a single file.
 
 Sampling 276 contexts, almost all are ordinary appositive or parenthetical use.
-Only **16%** are followed by *and / but / not / no* — the reversal construction,
+Only **16%** are followed by *and / but / not / no*, the reversal construction,
 which the shipped `not-just` and `stranded-auxiliary` rules already reach.
 
-So there are two honest options, and neither is a regex over a span:
+So as a *detection* signal there are two honest options, and neither is a
+regex over a span:
 
 1. **A `density` detector kind** reporting once per document above a threshold,
    like `--max-per-1000` but per rule. This is the shape the signal actually has.
-2. **Flag only the constructions**, not the character — which is already done.
+2. **Flag only the constructions**, not the character, which is already done.
 
-Recommendation: do not ship a per-occurrence em-dash rule. Build the `density`
-kind, calibrate a threshold against human-written corpora, and let the em-dash be
-its first user.
+Both were built. The density kind ships as `em-dash-density` in the economist
+candidate set, and the constructions were already covered.
+
+### But detection was the wrong question
+
+Everything above answers "does an em dash tell you a machine wrote this?" The
+answer is no, four times over. What it does not answer is "do I want em dashes
+in my own writing?", and that question belongs to the writer, not to the
+evidence.
+
+This project's owner does not want them. So `rules/em-dash.json` ships a
+per-occurrence rule, on by default, flagging every one. It is filed as house
+style and its `measured` field states plainly that the research says the
+opposite about detection, so nobody mistakes a hit for evidence of authorship.
+
+The two claims sit together without contradiction:
+
+| question | answer |
+|---|---|
+| Does an em dash indicate AI wrote it? | No. Human prose uses more of them. |
+| Should this repo's prose contain any? | No, because its owner says so. |
+
+The rule was then turned on the repo itself, which had 78 of them. All 78 are
+gone: rewritten as commas, colons, brackets or full stops, across the README,
+every doc, the skill, the web page and this log. The CLI's own output no longer
+prints one either, since a tool that flags em dashes should not emit them. The
+only ones left in the source are regex character classes, the HTML entity table,
+and the test fixtures that exist to be flagged.
+
+That cleanup is the strongest evidence available that the rule is livable: a
+7,600-word technical repository, written by someone who reaches for the em dash
+constantly, reads no worse without a single one.
 
 ### sloptells → [candidates/sloptells.json](../candidates/sloptells.json)
 
@@ -385,7 +415,7 @@ emerging through active, saturated, fading, stale and retired. The copy fetched
 was generated the same day.
 
 Each tell carries a measured rate, a human baseline rate, and a `collateral`
-rating — its own false-positive risk. 14 of 38 were taken. A tell had to be active or saturated, rated low
+rating, its own false-positive risk. 14 of 38 were taken. A tell had to be active or saturated, rated low
 collateral, and expressible as a pattern. Formatting and cadence tells
 (bold everywhere, emoji as structure, sentences that march in formation) are not
 reachable by a regex over spans. Everything rated medium or high collateral was
@@ -414,7 +444,7 @@ pass, not a change to make blind.
 ### writinglint → nothing
 
 Its `experiments/rule-sensitivity/RESULTS.md` is a dependency-parser training
-result — BERT-Mini distilled from DeBERTa, rule-aware token weighting, UD English
+result: BERT-Mini distilled from DeBERTa, rule-aware token weighting, UD English
 EWT scores. Real work, but about their NLP infrastructure rather than which
 prose rules hold up. No transferable rules.
 
@@ -422,7 +452,7 @@ prose rules hold up. No transferable rules.
 
 Its detectors run `compromise` for part-of-speech context, and say why:
 
-> NLP-assisted detectors for context-sensitive slop words — cases where simple
+> NLP-assisted detectors for context-sensitive slop words, cases where simple
 > word matching produces too many false positives.
 
 <!-- slop-ignore-start -->
@@ -441,7 +471,7 @@ log after sloptells, and it arrives at the same discipline from a different
 language.
 
 Most of the catalogue does not transfer. Modal particles, `„Text”` quotation
-asymmetry, Konjunktiv register — these are German problems. The
+asymmetry, Konjunktiv register: these are German problems. The
 English-transferable patterns it names were already covered here: vague
 authorities by `vague-experts`, negative parallelism by `not-just`, section
 summaries by `in-conclusion`, mechanical connectives by `moreover`, rule of
@@ -449,7 +479,7 @@ three by `triad-density`.
 
 **Its governing rule is stated in bold at the top of its own checklist, and it
 is the sentence this whole log keeps converging on.** *Grundregel: Cluster
-zählen, nicht Einzelsignale* — count clusters, not single signals. A single em
+zählen, nicht Einzelsignale*, meaning count clusters, not single signals. A single em
 dash, it says, proves nothing at all. That is the fourth independent source to
 kill the em dash and the fifth to argue for rates over occurrences.
 
@@ -457,7 +487,7 @@ kill the em dash and the fifth to argue for rates over occurrences.
 `style-targets.json` requires `stddev_mean_ratio` of at least 0.4 in every
 register profile it ships: the coefficient of variation of sentence length.
 Prose where every sentence is the same length is correct, readable, and
-metrically monotone — tell 10 in their checklist, and the thing sloptells
+metrically monotone. That is tell 10 in their checklist, and the thing sloptells
 describes as sentences that march in formation.
 
 That needed a seventh detector kind, `rhythm`, because it is a statistic over a
@@ -511,7 +541,7 @@ Zero. Nobody reaches for these words by accident in technical writing.
 
 **Verdict: keep them, and date them.** Removing a rule with zero collateral
 buys nothing and loses coverage of everything written by the models that did
-produce it — which is a great deal of text still on the internet. The argument
+produce it, which is a great deal of text still on the internet. The argument
 for removal was about recall, and recall costs the reader nothing; precision is
 what costs them.
 
@@ -545,7 +575,7 @@ behaviour to want: its reveal-shape openers do not occur in technical
 documentation.
 
 sloptells' 35 are almost all two rules: `rather-than` (17) and `genuinely` (13).
-Both are rated low collateral by sloptells — **but their baselines are Hacker
+Both are rated low collateral by sloptells, **but their baselines are Hacker
 News, cooking and parenting registers, and this corpus is engineering
 documentation**, where "rather than" is ordinary English. A tell's collateral is
 register-dependent, and a rating measured on one register does not transfer.

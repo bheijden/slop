@@ -17,7 +17,7 @@ function reOf(rule) {
   try {
     return new RegExp(rule.pattern, flags);
   } catch (err) {
-    throw new Error(`rule "${rule.id}": bad pattern — ${err.message}`);
+    throw new Error(`rule "${rule.id}": bad pattern: ${err.message}`);
   }
 }
 
@@ -138,7 +138,7 @@ function anaphoraFinder(rule) {
 // sampler's slop_index.py, the arXiv taxonomy's Density and Verbosity codes,
 // and The Economist's 2026 study, whose findings are almost all rates.
 //
-// `min` fires on pile-up, `max` on scarcity — and scarcity is a real tell:
+// `min` fires on pile-up, `max` on scarcity, and scarcity is a real tell:
 // the Economist found LLM prose uses *fewer* commas, semicolons and
 // parentheses than human writing, not more.
 const DENSITY_WORD = /[A-Za-z0-9][A-Za-z0-9'\u2019-]*/g;
@@ -192,13 +192,13 @@ function densityFinder(rule) {
     }
     const shown = rate >= 10 ? Math.round(rate) : Math.round(rate * 10) / 10;
     return [{ start, end, count, docLevel: true, badge: `${shown}/${per}`,
-              badgeTitle: `${count} in ${total} ${unit} — ${shown} per ${per}, `
+              badgeTitle: `${count} in ${total} ${unit}, ${shown} per ${per}, `
                           + `${high ? `at or above ${min}` : `at or below ${max}`}` }];
   };
 }
 
 // Sentence-length variation, as a coefficient of variation: standard deviation
-// over mean. Low means every sentence is the same length — what sloptells calls
+// over mean. Low means every sentence is the same length, what sloptells calls
 // "sentences that march in formation" and what humanizer-de measures as
 // stddev_mean_ratio. Prose that is correct, readable and metrically monotone.
 function rhythmFinder(rule) {
@@ -229,7 +229,7 @@ function rhythmFinder(rule) {
     return [{ start: w.index, end: w.index + w[0].length, count: lens.length, docLevel: true,
               badge: `cv ${shown}`,
               badgeTitle: `${lens.length} sentences averaging ${Math.round(mean)} words, `
-                          + `variation ${shown} — ${maxCV !== undefined && cv <= maxCV
+                          + `variation ${shown}, ${maxCV !== undefined && cv <= maxCV
                               ? `at or below ${maxCV}` : `at or above ${minCV}`}` }];
   };
 }

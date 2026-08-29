@@ -255,7 +255,7 @@ async function main() {
         const shadows = fs.existsSync(path.join(BUILTIN, info.name + '.json'));
         if (info.failing && !o.force) {
           process.stdout.write(`${C.red('not added')} ${C.bold(info.name)} ${C.dim('v' + info.version)}  `
-            + `${C.red(info.failing + ' failing')} ${C.dim('— run `fudge` on it, or --force to install anyway')}\n`);
+            + `${C.red(info.failing + ' failing')} ${C.dim('· run `fudge` on it, or --force to install anyway')}\n`);
           continue;
         }
         install(f.json, info, f.src);
@@ -278,11 +278,11 @@ async function main() {
       if (!rec) { process.stderr.write(`slop: "${name}" is not installed\n`); return 2; }
       let fetched;
       try { fetched = await fetchSets(rec.source); }
-      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)} — ${e.message}\n`); continue; }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)}: ${e.message}\n`); continue; }
       const match = fetched.find((f) => (f.json.name || f.name) === name) || fetched[0];
       let info;
       try { info = inspect(match.json, name); }
-      catch (e) { process.stdout.write(`${C.red('failed')} ${name} — ${e.message}\n`); continue; }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name}: ${e.message}\n`); continue; }
 
       // Unchanged means the same rules *and* the same version; a version bump
       // with identical rules is still worth recording.
@@ -295,7 +295,7 @@ async function main() {
       // A candidate that fails its own tests is held back unless forced.
       if (info.failing && !o.force) {
         process.stdout.write(`${C.red('held back')} ${name} ${C.dim(arrow)}  `
-          + `${C.red(info.failing + ' failing')} ${C.dim('— --force to install anyway')}\n`);
+          + `${C.red(info.failing + ' failing')} ${C.dim('· --force to install anyway')}\n`);
         continue;
       }
       if (o.checkOnly) {
@@ -333,14 +333,14 @@ async function main() {
     for (const [name, rec] of entries) {
       let fetched;
       try { fetched = await fetchSets(rec.source); }
-      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)} — ${e.message}\n`); continue; }
+      catch (e) { process.stdout.write(`${C.red('failed')} ${name} ${C.dim(rec.source)}: ${e.message}\n`); continue; }
       const match = fetched.find((f) => (f.json.name || f.name) === name) || fetched[0];
       const info = inspect(match.json, name);
       const drift = info.sha256 !== rec.sha256
         ? C.yellow(`  differs from the lock (${rec.version} → ${info.version})`) : '';
       if (info.failing && !o.force) {
         process.stdout.write(`${C.red('skipped')} ${name} ${C.dim('v' + info.version)}  `
-          + `${C.red(info.failing + ' failing')}${drift} ${C.dim('— --force to install anyway')}\n`);
+          + `${C.red(info.failing + ' failing')}${drift} ${C.dim('· --force to install anyway')}\n`);
         continue;
       }
       install(match.json, info, match.src);
@@ -432,7 +432,7 @@ async function main() {
     const link = o.shareBase.replace(/\/?$/, '/') + '#' + p.toString();
     process.stdout.write(link + '\n');
     if (link.length > 60000) {
-      process.stderr.write(`slop: that link is ${Math.round(link.length / 1000)}k characters — `
+      process.stderr.write(`slop: that link is ${Math.round(link.length / 1000)}k characters. `
         + `some tools truncate long URLs. Share fewer files, or send the JSON from --format json.\n`);
     }
     return 0;
@@ -446,7 +446,7 @@ async function main() {
   } else if (o.format === 'tsv') {
     for (const f of all) process.stdout.write([f.file, f.line, f.col, f.rule, oneLine(f.match, 200)].join('\t') + '\n');
   } else if (o.format === 'github') {
-    for (const f of all) process.stdout.write(`::warning file=${f.file},line=${f.line},col=${f.col},title=${f.rule}::${oneLine(f.match + ' — ' + (f.suggest || ''), 200).replace(/[\r\n%]/g, ' ')}\n`);
+    for (const f of all) process.stdout.write(`::warning file=${f.file},line=${f.line},col=${f.col},title=${f.rule}::${oneLine(f.match + ' · ' + (f.suggest || ''), 200).replace(/[\r\n%]/g, ' ')}\n`);
   } else {
     for (const r of reports) {
       if (!r.findings.length || o.quiet) continue;
@@ -467,7 +467,7 @@ async function main() {
       for (const [id, n] of [...by].sort((a, b) => b[1] - a[1])) process.stdout.write(`  ${String(n).padStart(4)}  ${id}\n`);
     }
     const head = all.length ? C.red(`${all.length} findings`) : C.green('0 findings');
-    process.stdout.write(`\n${head} in ${reports.length} file${reports.length === 1 ? '' : 's'}, ${words} words — ${per1000} per 1000 words\n`);
+    process.stdout.write(`\n${head} in ${reports.length} file${reports.length === 1 ? '' : 's'}, ${words} words, ${per1000} per 1000 words\n`);
   }
 
   // Findings are style smells, not errors, so they do not fail a run on their
