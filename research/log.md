@@ -20,13 +20,14 @@ source.
 | [slopster](https://github.com/t0ddharris/slopster) | Vale styles | reveal-shape openers, cross-sentence negation |
 | [writinglint](https://github.com/NikhilVerma/writinglint) | NLP dependency rules | nothing — see below |
 | [slop-cop](https://github.com/awnist/slop-cop) | in-browser detector | a limitation, not rules — see below |
-| [antislop-sampler](https://github.com/sam-paech/antislop-sampler) | generation-time phrase list | pending |
-| [EQ-Bench slop score](https://eqbench.com/slop-score.html) | leaderboard + word list | pending |
-| [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | pending |
+| [antislop-sampler](https://github.com/sam-paech/antislop-sampler) | generation-time phrase list | 12 essay rules + 10 fiction rules |
+| [EQ-Bench slop score](https://eqbench.com/slop-score.html) | leaderboard + word list | folded into antislop; weights not-X-but-Y at 25% |
+| [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | no rules — a coverage map, see below |
 | [Excess vocabulary in LLM writing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12219543/) | paper, 15M abstracts | pending |
 | [LLM usage in scientific papers](https://www.nature.com/articles/s41562-025-02273-8) | paper, 1M+ papers | pending |
 | [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | word list | pending |
 | The Economist, AI writing in 2026 | report incl. red herrings | pending |
+| [slop-forensics](https://github.com/sam-paech/slop-forensics) | per-domain n-gram lists | essay-domain trigrams, heavily topic-contaminated |
 | [simonw tweet thread](https://x.com/simonw/status/2093277255438860358) | replies | structural tells; 3 further sources |
 | [sloptells.com](https://sloptells.com) | measured against human baselines | 14 rules, and the em-dash verdict |
 | [louisabraham word list](https://louisabraham.github.io) | banned-word list | pending — found via the thread |
@@ -92,6 +93,135 @@ Two further remarks worth carrying into the method:
   for reporting why a rule fired and letting the writer decide, which is what
   `suggest` and the hover card do.
 <!-- slop-ignore-end -->
+
+### antislop-sampler, slop-forensics, Slop Score → [candidates/antislop.json](../candidates/antislop.json) and [candidates/antislop-fiction.json](../candidates/antislop-fiction.json)
+
+Sam Paech's three repositories are one lineage. The sampler suppresses phrases
+at generation time, slop-forensics builds the lists by comparing model output
+against human text, and the EQ-Bench Slop Score turns them into a leaderboard.
+Together they are the largest published body of slop data: 2500 phrases, 2000
+words, 358 essay trigrams, 430 creative-writing trigrams.
+
+**Almost none of it transfers directly, for two separate reasons.**
+
+The first is register. The headline lists are creative-writing artefacts. The
+top entries are fantasy proper nouns and single verbs:
+
+<!-- slop-ignore-start -->
+`elara`, `kael`, `eldoria`, `oakhaven`, `whisperwood`, `zephyria`, `nodded`,
+`whispered`, `flickered`, `rasped`, `thrummed`, `bioluminescent`
+<!-- slop-ignore-end -->
+
+None of that carries signal in documentation, and a linter that flags `nodded`
+is worse than no linter.
+
+The second reason is subtler and worth stating carefully, because it applies to
+every over-representation list ever built. **N-gram frequency lists conflate
+style with topic.** The essay-domain trigrams are topped by:
+
+<!-- slop-ignore-start -->
+`world war ii`, `world health organization`, `united arab emirates`,
+`cognitive behavioral therapy`, `harvard business review`, `centers disease
+control`, `abu dhabi`, `civil rights movement`
+<!-- slop-ignore-end -->
+
+Those are not tells. They are fingerprints of the prompt set — the essays were
+about business, health and policy — and a human writing the same essays would
+produce them at the same rate. They only look like slop because the human
+baseline was not topic-matched. This is the exact failure sloptells avoids by
+matching baselines to register, and it is the strongest argument in this log
+for treating any raw frequency list as a lead rather than a finding.
+
+**What survived both filters.** Stripping proper nouns and topic n-grams leaves
+a residue of genuine constructions, and one of them is startling in its
+frequency. The "significance inflation" shape appears in seventeen separate
+inflections in the essay trigram list alone:
+
+<!-- slop-ignore-start -->
+extends far beyond · extend far beyond · extends beyond mere · far beyond
+simple · far beyond mere · goes far beyond · extended far beyond · extending
+far beyond · extend beyond individual · extends beyond individual · extend
+beyond immediate · move beyond simply · must move beyond · moving beyond
+simple · goes beyond simply · move beyond simplistic · beyond surface level
+<!-- slop-ignore-end -->
+
+That is one rule, not seventeen. The same collapse gave `another critical
+aspect`, `this essay explores`, `requires a multi-faceted approach`, `provides
+valuable insights`, `marked a significant turning point`, `a closer examination
+reveals`, `inextricably linked`, and a stock-metaphor rule covering
+double-edged sword, level playing field, virtuous cycle and one-size-fits-all.
+
+**not-X-but-Y is their headline result, and it is worth taking seriously.** The
+Slop Score weights it at 25% of the total, on its own, separate from the word
+lists (60%) and trigrams (15%). No other construction gets its own component.
+The sampler ships only three regexes in total and this is the first of them.
+
+Their regex is `(?i)not [^.!?]{3,60} but`, which is unusable as a linter rule —
+it fires on "I am not sure but I will check" and "he did not know but she did".
+The difference is what `not` negates. When it negates a *nominal* the flip is
+rhetorical; when it negates a *verb* the sentence is ordinary English. Without
+part-of-speech tags the closest proxy is the word immediately after `not`:
+requiring a determiner or preposition on both sides of `but` holds all four
+test hits and drops all four verbal negations. It also stays clear of
+wikipedia-ai's `not-just`, which already covers the qualified form.
+
+The other two sampler regexes, `each(?:\s*\w+\s*|\s*)a` and the `every`
+variant, are after the appositive cascade — "twelve panels, each a window into
+another world". Kept, with a note: with no part-of-speech information a
+descriptive appositive can still match.
+
+**The fiction set is shipped separately and off by default.** The creative
+constructions are real and consistent — voice barely above a whisper, heart
+pounding in her chest, a shiver down her spine, the words hung in the air,
+little did she know, maybe just maybe. Ten rules rather than 2500 phrases.
+Anyone linting fiction wants these, and nobody linting documentation has any
+use for them. That is what per-source sets are for.
+
+### Measuring AI "Slop" in Text → no rules, but a coverage map
+
+Shaib, Chakrabarty, Garcia-Olano and Wallace (arXiv 2509.19163, revised January
+2026). This is a measurement paper, not a phrase source. It builds a taxonomy
+from interviews with 19 experts, then has professional copy-editors annotate
+slop spans across 150 news articles and 100 QA passages.
+
+It yields no rules. What it yields is an honest map of where a linter like this
+one can reach, which is worth more. Eleven codes under three themes:
+
+| code | what it is | reachable here? |
+|---|---|---|
+| IU1 Density | substantive content per word | only as a document-level rate |
+| IU2 Relevance | alignment with the task | no |
+| IQ1 Factuality | inaccuracies, fabrications | no |
+| IQ2 Bias | missing or flattened perspective | no |
+| SQ1 Repetition | same words and phrases reused | **yes** — `echo`, `anaphora` |
+| SQ2 Templatedness | formulaic syntactic structures | **yes** — every regex rule here |
+| SQ3 Coherence | does it follow logically | no |
+| SQ4 Fluency | natural turns of phrase | no |
+| SQ5 Verbosity | passage and sentence length | as a rate, not a span |
+| SQ6 Word Complexity | needless jargon and rare words | partly — lexicon rules |
+| SQ7 Tone | register fit for the context | partly — promo and uplift rules |
+
+Five of eleven are out of reach, and the paper says they are out of reach for
+everyone: they "require human annotations due to the complexity of automated
+factual evaluations", and for coherence and fluency there is an "absence of
+reliable automatic measurements".
+
+The paper's own negative results are the reassuring part. Standard text metrics
+fail to capture annotator preferences, capable reasoning models fail to
+reliably extract slop spans, and the authors close by saying "fully automated
+and scalable methods remain an open challenge". Nobody has a good automatic
+method. That makes a transparent, testable, per-rule linter a defensible place
+to stand — provided it claims SQ1 and SQ2 and stays quiet about the rest.
+
+Two further notes. Its Templatedness example is a *repeated appositive frame*
+("Dr. Smith, a researcher at Oxford University, found that... Professor
+Johnson, a scientist at Cambridge University, discovered that..."), which is
+close to the `anaphora` detector but keyed on an internal frame rather than a
+sentence head. Worth prototyping. And its Density code is the fourth
+independent argument for a document-level rate detector, after sloptells'
+slopIndex, slopster's Vale `occurrence`, and the sampler's own `slop_index.py`,
+which computes weighted matches per thousand words — the same unit this CLI
+already reports.
 
 ## The em-dash question
 
