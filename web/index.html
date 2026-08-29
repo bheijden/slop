@@ -691,7 +691,8 @@ function renderResults() {
   $('doc').className = useSrc ? 'source' : 'prose';
   $('doc').innerHTML = results.map((r, di) => {
     const body = useSrc ? ((srcs[di] || {}).src || '') : r.text;
-    const ranges = byDoc[di].map(([f, gi]) => useSrc ? [f.srcStart, f.srcEnd, gi] : [f.start, f.end, gi]);
+    const ranges = byDoc[di].filter(([f]) => !f.docLevel)
+      .map(([f, gi]) => useSrc ? [f.srcStart, f.srcEnd, gi] : [f.start, f.end, gi]);
     const head = multi ? `<h3 class="fname"><span class="nm">${esc(r.name)}</span>`
       + `<span class="ct${r.findings.length ? '' : ' clean'}">${r.findings.length || 'clean'}</span></h3>` : '';
     return `<section class="filesec" data-doc="${di}">${head}<div class="fbody">${marked(body, ranges, useSrc)}</div></section>`;
@@ -705,10 +706,10 @@ function renderResults() {
 
   $('list-head').textContent = total ? `${total} finding${total === 1 ? '' : 's'}` : 'findings';
   $('list').innerHTML = results.map((r, di) => {
-    const rows = byDoc[di].map(([f, gi]) => `<li data-i="${gi}"${gi === S.sel ? ' class="on"' : ''}>
-        <span class="loc">${f.line}:${f.col}</span>
-        <span><span class="rid">${esc(f.rule)}</span>${f.count ? ` <span class="loc">×${f.count}</span>` : ''}
-          <div class="m">${esc(f.match)}</div>
+    const rows = byDoc[di].map(([f, gi]) => `<li data-i="${gi}" class="${gi === S.sel ? 'on' : ''}${f.docLevel ? ' doclevel' : ''}">
+        <span class="loc">${f.docLevel ? 'doc' : `${f.line}:${f.col}`}</span>
+        <span><span class="rid">${esc(f.rule)}</span>${f.count && !f.docLevel ? ` <span class="loc">×${f.count}</span>` : ''}
+          <div class="m">${esc(f.docLevel ? (f.measure || f.name) : f.match)}</div>
           ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
     if (!multi) return rows;
     return `<li class="fgroup" data-doc="${di}">${esc(r.name)}</li>` + (rows || '<li class="none">no findings</li>');

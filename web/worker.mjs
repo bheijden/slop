@@ -46,6 +46,9 @@ function checkOne({ name, src, kind }, rules) {
       // byte-identical to what the terminal writes.
       rule: m.rule.id, set: m.rule.set, severity: m.rule.severity || 'warn',
       name: m.rule.name, why: m.rule.description, suggest: m.rule.suggest || null,
+      // A density or rhythm finding measures the whole document. Its offsets are
+      // an anchor, not a location, so the page must not paint them as a span.
+      docLevel: m.docLevel || false, measure: m.badgeTitle || null,
       count: m.count ?? null,
       match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
     };
