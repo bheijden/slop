@@ -1,0 +1,51 @@
+{
+  "name": "structural",
+  "version": "0.1.0",
+  "slop": "0.1.0",
+  "title": "Structural tells",
+  "description": "Rhetorical shapes rather than phrases, distilled from the replies to Simon Willison's thread and from sloptells' structural descriptions. These survive rewording, which is what makes them worth a rule. Two of the four shapes people named turned out not to be expressible here at all; the research log says which and why.",
+  "source": "https://x.com/simonw/status/2093277255438860358",
+  "rules": [
+    {
+      "id": "hedge-then-affirm",
+      "name": "Hedge, then affirm",
+      "kind": "regex",
+      "pattern": "\\b(?:it|this|that)(?:(?:['\\u2019]s|\\s+is|\\s+was)\\s+not|\\s+(?:isn|wasn)['\\u2019]t)\\s+(?:a\\s+|the\\s+|going\\s+to\\s+)?[\\w-]+(?:\\s+[\\w-]+)?,\\s+but\\s+(?:it|they|this|that|you|we|the)\\b",
+      "flags": "gi",
+      "description": "The concession that costs nothing: “It's not perfect, but it works.” A weakness is admitted in a subordinate clause and immediately overridden, so the reader gets the feeling of balance without any of the information.",
+      "suggest": "Say what is wrong with it, and how much that matters. If the answer is “not much”, drop the first half.",
+      "tests": {
+        "hit": [
+          "It's not perfect, but it works.",
+          "This isn't elegant, but it does the job.",
+          "It was not cheap, but the team shipped on time."
+        ],
+        "miss": [
+          "It is not the answer we wanted.",
+          "This is not a drill.",
+          "It's not a bug but a feature."
+        ]
+      }
+    },
+    {
+      "id": "rhetorical-selfqa",
+      "name": "Asking yourself an easy question",
+      "kind": "regex",
+      "pattern": "\\b(?:is|was|are|does|did|do|will|can|should)\\s+(?:it|this|that|they|there|you|we)\\b[^.!?\\n]{0,40}\\?\\s+(?:No|Not\\s+(?:really|quite|exactly)|Yes|Absolutely|Probably\\s+not)[.!,]",
+      "flags": "gi",
+      "description": "The self-interview: “Is it perfect? No. Does it work? Yes.” A question nobody asked, answered in one word, twice in a row.",
+      "suggest": "State the answer. The question was never in doubt or you would not have written it.",
+      "tests": {
+        "hit": [
+          "Is it perfect? No. But it ships.",
+          "Does this scale? Not really. We are fine with that.",
+          "Should you use it? Yes, if you already run Postgres."
+        ],
+        "miss": [
+          "Is it perfect? Depends who you ask.",
+          "Does this scale? The benchmark says forty thousand a second."
+        ]
+      }
+    }
+  ]
+}

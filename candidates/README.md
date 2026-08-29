@@ -15,11 +15,13 @@ checked.
 |---|---|---|---|---|
 | [`antislop-fiction`](antislop-fiction.json) | 10 | creative-writing constructions | 0 findings | fiction only |
 | [`antislop`](antislop.json) | 12 | essay-register constructions, incl. unqualified not-X-but-Y | 0 findings | on |
+| [`arxiv-slop`](arxiv-slop.json) | 1 | repeated syntactic frames (the paper's Templatedness code) | 0 findings | on |
 | [`economist`](economist.json) | 6 | *rates*: punctuation scarcity, long sentences, nominalisations | 6 findings, 6 documents | tune the thresholds |
 | [`humanizer-de`](humanizer-de.json) | 2 | sentence-length variation and paired-dash asides | 0 findings | on |
 | [`slop-gate`](slop-gate.json) | 28 | vocabulary and stock phrases | 3 findings | on |
 | [`slopster`](slopster.json) | 7 | reveal-shape openers, cross-sentence negation | 0 findings | on |
 | [`sloptells`](sloptells.json) | 14 | tells measured against register-matched human baselines | 35 findings | read the log first |
+| [`structural`](structural.json) | 2 | hedge-then-affirm, and the rhetorical self-interview | 0 findings | on |
 
 The last column is a judgement, not a measurement. `sloptells` fires most
 often here because its collateral ratings were measured against Hacker News,

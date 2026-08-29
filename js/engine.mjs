@@ -1,10 +1,10 @@
-// The rule engine. Seven detector kinds, all driven by data from rules/*.json.
+// The rule engine. Eight detector kinds, all driven by data from rules/*.json.
 //
 // Behaviour is deliberately identical to the upstream LLM cliche highlighter,
 // which is what tests/conformance lets us prove. Do not "improve" a detector
 // here without regenerating the rule tests.
 
-export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density', 'rhythm'];
+export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density', 'rhythm', 'frame'];
 
 const CHAIN_BODY = String.raw`[^,.;:!?\n–—…]*`;
 const CHAIN_SEP = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+|\s*[;&–—]\s*(?:and\s+|or\s+)?|\s+-{1,2}\s+)`;
@@ -234,10 +234,93 @@ function rhythmFinder(rule) {
   };
 }
 
+// Syntactic-frame repetition: the Templatedness code (SQ2) from arXiv
+// 2509.19163, whose own example is "Dr. Smith, a researcher at Oxford
+// University, found that... Professor Johnson, a scientist at Cambridge
+// University, discovered that...". `echo` cannot see this, because it looks for
+// repeated *words* and every content word here differs. What repeats is the
+// shape, so content words are wildcarded and only the closed class is compared.
+const FUNC_WORDS = new Set(('a an the of in on at to for with by from as and or but nor so yet '
+  + 'is was are were be been being has have had do does did will would can could may might must shall should '
+  + 'that which who whom whose this these those it its their his her our your my '
+  + 'not no if then than when where while because although though after before during over under between '
+  + 'i we you he she they them us him me one two three there here about into through out up down off '
+  + 's t re ve ll d m').split(' '));
+
+const ABBREV = /\b(?:Dr|Mr|Mrs|Ms|Prof|Sr|Jr|St|vs|etc|approx|Fig|No|Inc|Ltd|Co)\.(?=\s)/g;
+const FRAME_TOKEN = /[A-Za-z][A-Za-z'\u2019-]*|[,;:()"]/g;
+
+// Abbreviation full stops are masked with a same-length placeholder before
+// sentences are cut, or "Dr. Smith" becomes two sentences and every signature
+// downstream is wrong. Same length keeps every offset valid.
+export function sentenceSpans(text) {
+  const masked = text.replace(ABBREV, (m) => m.slice(0, -1) + '\u0000');
+  const out = [];
+  for (const m of masked.matchAll(/[^.!?\n]*[.!?]+/g)) {
+    let start = m.index;
+    while (start < m.index + m[0].length && /\s/.test(text[start])) start += 1;
+    if (start < m.index + m[0].length) out.push({ start, end: m.index + m[0].length });
+  }
+  return out;
+}
+
+// Repeated *code* lines are legitimately templated, and they carry enough
+// function words to slip past the anchor guard, so frames are only compared
+// between sentences that look like prose: no code punctuation, and mostly
+// letters. Same trick the colon-triple rule uses.
+const FRAME_CODE = /[=\[\]{}|\\<>@#$~^*/]|::|\w_\w|"""|`/;
+
+function frameFinder(rule) {
+  const { gram = 8, minRun = 3, anchors = 2, minLetters = 13, letterRatio = 0.62 } = rule.params || {};
+  return (text) => {
+    const spans = sentenceSpans(text).filter((sp) => {
+      const t = text.slice(sp.start, sp.end);
+      if ((t.match(/[A-Za-z]/g) || []).length < minLetters) return false;
+      if (FRAME_CODE.test(t)) return false;
+      return (t.match(/[A-Za-z\s]/g) || []).length / t.length >= letterRatio;
+    });
+    const sigs = spans.map((sp) => {
+      const toks = text.slice(sp.start, sp.end).match(FRAME_TOKEN) || [];
+      const sig = [];
+      for (const t of toks) {
+        if (/^[,;:()"]$/.test(t)) sig.push(t);
+        else {
+          const w = t.toLowerCase();
+          // "an" is the same determiner as "a". Without this the paper's own
+          // example fails to match itself.
+          sig.push(FUNC_WORDS.has(w) ? (w === 'an' ? 'a' : w) : '_');
+        }
+        if (sig.length >= gram) break;
+      }
+      if (sig.length < gram) return null;
+      // All wildcards is not a frame: it is a sentence with no closed-class
+      // anchor, which in practice means code, a table row or a heading.
+      if (sig.filter((x) => x !== '_').length < anchors) return null;
+      return sig.join(' ');
+    });
+
+    const found = [];
+    let i = 0;
+    while (i < sigs.length) {
+      if (!sigs[i]) { i += 1; continue; }
+      let j = i;
+      while (j + 1 < sigs.length && sigs[j + 1] === sigs[i]) j += 1;
+      const count = j - i + 1;
+      if (count >= minRun) {
+        found.push({ start: spans[i].start, end: spans[j].end, count, badge: String(count),
+                     badgeTitle: `${count} sentences on the frame \u201c${sigs[i]}\u201d` });
+        i = j + 1;
+      } else i += 1;
+    }
+    return found;
+  };
+}
+
 const BUILDERS = {
   regex: regexFinder,
   density: densityFinder,
   rhythm: rhythmFinder,
+  frame: frameFinder,
   chain: chainFinder,
   echo: echoFinder,
   'question-chain': questionChainFinder,

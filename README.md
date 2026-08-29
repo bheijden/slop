@@ -30,7 +30,7 @@ release-notes.md (49 words, 5 findings)
   7:1       echo-triad        ×2  The parser is a tiny state machine. The renderer is …
             fix: Merge the parallel sentences into one, or vary the structure.
 
-5 findings in 1 file, 49 words — 102.04 per 1000 words
+5 findings in 1 file, 49 words, 102.04 per 1000 words
 ```
 
 Or drop the file on **[the page](https://bheijden.github.io/slop/)** and read it
@@ -133,6 +133,33 @@ One engine. `js/engine.mjs` and `js/extract.mjs` are what both the CLI and the
 web page run; the rule sets are data that they, and any other implementation,
 can read.
 
+## What this does and does not claim
+
+**A finding is not evidence that AI wrote something.** It is evidence that a
+phrase is worn. Human writers produce every pattern here, and current models
+avoid some of them. If you want to know who wrote a document, this is the wrong
+tool, and so is every other one: the paper that defines the field
+([arXiv 2509.19163](https://arxiv.org/abs/2509.19163)) reports that standard
+metrics fail to match human judgement and that reasoning models fail at
+extracting these spans too.
+
+That paper's taxonomy has eleven codes. Measured against it, honestly:
+
+| | |
+|---|---|
+| **Reached** | Repetition, Templatedness |
+| **Partly reached** | Verbosity, Word Complexity, Tone |
+| **Not reached** | Factuality, Relevance, Bias, Coherence, Fluency |
+
+The last row is not a to-do list. Those five need human annotation, and the
+paper says so. A linter that claimed them would be lying.
+
+There is a second ceiling: this engine matches patterns over spans, with no
+part-of-speech information. That is why `leverage`, `harness` and `foster` are
+hard. They are slop as verbs and ordinary English as nouns, and a regex cannot
+tell the difference. The `frame` detector approximates syntax by wildcarding
+content words, which works, but it is an approximation.
+
 ## Limits
 
 - **English only.** The patterns are hard-coded English. Prose in another
@@ -143,16 +170,16 @@ can read.
   ``` `retry_count` is deprecated ``` needs its subject to parse. Anything with
   a space in it is a code fragment and is dropped.
 - **Markdown tables can trip `echo-triad`.** Set `"skipTables": true` in
-  `slop.json`, as this repo does.
+  `slop.json`, which this repo does for exactly that reason.
 - **`.rtf` is not supported.** Convert to `.md` or `.txt` first.
 
-To quote bad prose on purpose — as this README does above — wrap it in
+To quote bad prose on purpose, as this README does above, wrap it in
 `<!-- slop-ignore-start -->` and `<!-- slop-ignore-end -->`. Works in markdown
 and HTML.
 
 ## Provenance and license
 
-Apache 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE). The rule patterns are
+Apache 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). The rule patterns are
 derived from [simonw/tools](https://github.com/simonw/tools), also Apache 2.0; a
 pinned copy lives in `vendor/` and `node tools/build-rules.mjs` regenerates
 `rules/` from it. The `wikipedia-ai` set is adapted there from Wikipedia's

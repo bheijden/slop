@@ -205,6 +205,11 @@ export function extractHtml(src, opts = {}) {
 // in HTML, since both are just comments.
 const IGNORE_START = /<!--\s*slop-ignore-start\s*-->/i;
 const IGNORE_END = /<!--\s*slop-ignore-end\s*-->/i;
+// In markdown the marker must be alone on its line. Otherwise documentation
+// that *mentions* the marker inside a code span turns it on for real, and a
+// line carrying both markers used to leave it stuck on forever.
+const IGNORE_LINE_START = /^\s*<!--\s*slop-ignore-start\s*-->\s*$/i;
+const IGNORE_LINE_END = /^\s*<!--\s*slop-ignore-end\s*-->\s*$/i;
 
 const FENCE = /^(\s{0,3})(`{3,}|~{3,})(.*)$/;
 const SETEXT = /^\s{0,3}(?:=+|-{2,})\s*$/;
@@ -338,8 +343,10 @@ export function extractMarkdown(src, opts = {}) {
   for (; i < lines.length; i++) {
     const { text: line, off } = lines[i];
 
-    if (IGNORE_START.test(line)) { ignoring = true; close(off); continue; }
-    if (IGNORE_END.test(line)) { ignoring = false; close(off); continue; }
+    if (!fence) {
+      if (IGNORE_LINE_START.test(line)) { ignoring = true; close(off); continue; }
+      if (IGNORE_LINE_END.test(line)) { ignoring = false; close(off); continue; }
+    }
     if (ignoring) { close(off); continue; }
 
     if (fence) {
@@ -349,7 +356,12 @@ export function extractMarkdown(src, opts = {}) {
       continue;
     }
     const f = line.match(FENCE);
-    if (f) { fence = f[2]; close(off); pending = null; continue; }
+    // CommonMark: the info string of a backtick fence may not contain a
+    // backtick. Without that check, a line demonstrating a code span with
+    // ``` `x` ``` opens a fence and silently swallows the rest of the file.
+    if (f && !(f[2][0] === '`' && f[3].includes('`'))) {
+      fence = f[2]; close(off); pending = null; continue;
+    }
 
     if (!line.trim()) { close(off); pending = null; continue; }
 

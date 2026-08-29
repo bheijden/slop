@@ -1,9 +1,16 @@
 {
   "$comment": "Config for this repo. Copy it next to your docs and edit.",
-  "select": ["simonwillison", "wikipedia-ai"],
+  "select": [
+    "simonwillison",
+    "wikipedia-ai",
+    "em-dash"
+  ],
   "ignore": [],
   "ruleSets": [],
-  "exclude": ["vendor/", "node_modules/"],
+  "exclude": [
+    "vendor/",
+    "node_modules/"
+  ],
   "$comment2": "These docs are table-heavy, and parallel table rows trip echo-triad.",
   "skipTables": true,
   "maxPer1000": 3.0

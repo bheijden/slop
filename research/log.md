@@ -22,7 +22,7 @@ source.
 | [slop-cop](https://github.com/awnist/slop-cop) | in-browser detector | a limitation, not rules — see below |
 | [antislop-sampler](https://github.com/sam-paech/antislop-sampler) | generation-time phrase list | 12 essay rules + 10 fiction rules |
 | [EQ-Bench slop score](https://eqbench.com/slop-score.html) | leaderboard + word list | folded into antislop; weights not-X-but-Y at 25% |
-| [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | no rules — a coverage map, see below |
+| [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | paper, taxonomy | a coverage map, and eventually one rule |
 | [Excess vocabulary in LLM writing](https://pmc.ncbi.nlm.nih.gov/articles/PMC12219543/) | paper, 15M abstracts | no rules — it proves the style/topic split |
 | [LLM usage in scientific papers](https://www.nature.com/articles/s41562-025-02273-8) | paper, 1M+ papers | pending |
 | [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | word list | nothing — downstream of antislop-sampler |
@@ -437,7 +437,8 @@ The highest-ratio tells it measures:
 <!-- slop-ignore-start -->
 sloptells has retired `delve`, `tapestry` and `a testament to` — models stopped
 using them — and all three are live in the shipped `simonwillison` set.
-<!-- slop-ignore-end --> Also retired: staccato mic-drop
+<!-- slop-ignore-end -->
+Also retired: staccato mic-drop
 sentences, refuted by measurement. That is a calibration question for a later
 pass, not a change to make blind.
 
@@ -459,7 +460,8 @@ Its detectors run `compromise` for part-of-speech context, and say why:
 The words it treats this way are `leverage`, `harness`, `foster`, `underscore`,
 `navigate`, `streamline`, `spearhead`, `craft`, `bolster`, `emphasize`: all
 ordinary verbs whose slop-ness depends on grammatical role.
-<!-- slop-ignore-end --> This engine is regex
+<!-- slop-ignore-end -->
+This engine is regex
 over spans and cannot make that distinction. Worth recording as a known ceiling.
 
 ### humanizer-de → [candidates/humanizer-de.json](../candidates/humanizer-de.json)
@@ -559,6 +561,115 @@ tell's value depends on the age of the text being linted, not only on the age
 of the measurement.** Someone checking their own draft today gets nothing from
 a retired tell. Someone auditing an archive gets a great deal.
 
+### The structural tells, and the two that could not be built
+
+Four shapes were named across the thread and sloptells, none of them phrases.
+Two became rules and two did not, and the failures are the more useful half.
+
+**Hedge, then affirm.** "It's not perfect, but it works." A weakness admitted in
+a subordinate clause and immediately overridden, so the reader gets the feeling
+of balance and none of the information. This is a span, and it is distinguishable
+from the ordinary not-X-but-Y flip by what follows `but`: a clause with a subject
+pronoun rather than a parallel noun phrase. Shipped in
+[candidates/structural.json](../candidates/structural.json).
+
+**The rhetorical self-interview.** "Is it perfect? No. Does it work? Yes." A
+question nobody asked, answered in one word. Also a span, also shipped. It sits
+beside the existing `stacked-questions` rule, which counts question runs without
+caring how they are answered.
+
+**Sentences that march in formation** turned out to be measurable after all, but
+not here: humanizer-de had already reduced it to sentence-length variation, and
+it ships as `uniform-sentence-length`.
+
+**The mic-drop closer was not built, deliberately.** A very short emphatic
+sentence after a run of long ones is a real tell in aggregate and completely
+indistinguishable from good writing in the particular. Hemingway does it, every
+decent essayist does it, and the shape carries no information about who wrote
+it. Position awareness would be easy to add, since blocks are newline-separated
+and the last sentence of a block is findable. The reason not to is that the
+false-positive rate would be enormous and the rule would be flagging craft.
+
+**Setup, contrast, moral was not built either**, for a different reason. It is a
+description of an argument, not of a pattern. Every paragraph that states a
+position, complicates it and draws a conclusion has this shape, which is to say
+every well-constructed paragraph. There is nothing to match that is not also the
+thing you want people to do.
+
+### arXiv 2509.19163, second pass → [candidates/arxiv-slop.json](../candidates/arxiv-slop.json)
+
+The first pass concluded the paper yields no rules. That was half right. Five of
+its eleven codes are genuinely out of reach, but SQ2 Templatedness is the one it
+says is mechanisable, measured "via syntactic structures", and its own worked
+example is a run of appositive frames:
+
+<!-- slop-ignore-start -->
+> Dr. Smith, a researcher at Oxford University, found that... Professor Johnson,
+> a scientist at Cambridge University, discovered that... Dr. Williams, an expert
+> at Yale University, confirmed that...
+<!-- slop-ignore-end -->
+
+Run that through every rule in this project and nothing fires. **`echo` cannot
+see it**, because `echo` looks for repeated words and every content word here
+differs. What repeats is the shape.
+
+So content words are wildcarded and only the closed class is compared, giving
+each sentence a signature like `_ _ , a _ at _ _`. Runs of three or more
+consecutive sentences sharing a signature are the finding. That is the eighth
+detector kind, `frame`, and it is a crude stand-in for the part-of-speech
+tagging the engine does not have.
+
+Getting it to work took three guards, and each one came from a failure:
+
+1. **Abbreviations.** The first version did not fire on the paper's own example,
+   because splitting on `[.!?]` turns "Dr. Smith" into two sentences. Abbreviation
+   full stops are now masked with a same-length placeholder before the split, so
+   every offset stays valid.
+2. **One allomorph.** The second version still did not fire, because two
+   sentences signed `_ _ , a _ at _ _` and one signed `_ _ , an _ at _ _`. The
+   determiner is the same word. Normalising `an` to `a` fixed it, and the fact
+   that a single phonological variant defeated the whole method is worth
+   remembering about how brittle this family of technique is.
+3. **Code.** With those fixed it found two false positives in 30,300 words, both
+   runs of pasted Python. Repeated code lines *are* templated, legitimately, and
+   they carry enough function words to pass an anchor check. Frames are now only
+   compared between sentences that look like prose: no code punctuation, mostly
+   letters. That is the same trick the `colon-triple` rule uses.
+
+Final: fires on the paper's example, fires on synthetic templated prose, zero
+findings in 30,300 words of human technical writing.
+
+### Three extraction bugs, found by turning a rule on
+
+The em-dash rule was the first rule to match something on nearly every line,
+which made it an accidental fuzzer for the extractor. It found three bugs that
+every previous rule had been too sparse to reveal:
+
+1. **Ignore markers were honoured inside inline code.** A line reading
+   ``` `<!-- slop-ignore-start -->` and `<!-- slop-ignore-end -->` ``` in the
+   documentation *for the feature* turned ignoring on for real. Markers now have
+   to be alone on their line, which is also how every other linter's disable
+   comments behave.
+2. **A line carrying both markers stuck.** The start test ran first and
+   `continue`d, so the end on the same line was never read and the region stayed
+   open to the end of the file.
+3. **An inline triple backtick opened a fenced block.** The README's own Limits
+   section demonstrates a code span containing backticks, written
+   ``` `retry_count` is deprecated ``` on one line. CommonMark says the info
+   string of a backtick fence may not contain a backtick; the extractor did not
+   check, so it opened a fence and silently swallowed the last 600 characters of
+   the README, including two em dashes and a stranded auxiliary.
+
+Bug 3 is the one that mattered: any markdown file that documents backtick code
+spans that way was having its remainder dropped, under every rule, since the
+beginning.
+
+A fourth problem was not a bug but a gap. The repo's own `slop.json` pins
+`select` to two sets, so the new `em-dash` set was excluded from `check -r .`
+and from CI, while a cleanup driven by `--select em-dash` made the repo look
+clean. Config that names sets explicitly does not pick up new ones. The select
+list now includes it.
+
 ## Calibration so far
 
 Against 30k words of real technical writing, and against a synthetic slop
@@ -583,3 +694,77 @@ register-dependent, and a rating measured on one register does not transfer.
 One caveat on the other side: parts of that corpus were probably drafted with an
 assistant, so some of those 13 `genuinely` hits may be true positives rather than
 noise. Calibrating against prose of known provenance is the honest next step.
+
+## Closing summary
+
+Nine candidate sets, 84 rules, three new detector kinds, three extraction bugs
+and one settled argument. What follows collects the survey in one place.
+
+### Every source, and what it gave
+
+| source | yield |
+|---|---|
+| [slop-gate](https://github.com/hwajongpark/slop-gate) | 28 rules. Vocabulary and stock phrases. |
+| [slopster](https://github.com/t0ddharris/slopster) | 7 rules. Reveal-shape openers, cross-sentence negation. |
+| [sloptells](https://sloptells.com) | 14 rules, ratios against register-matched human baselines, and the em-dash verdict. The best-designed source found. |
+| [antislop-sampler](https://github.com/sam-paech/antislop-sampler) + slop-forensics + Slop Score | 12 essay rules, 10 fiction rules. |
+| [Measuring AI "Slop" in Text](https://arxiv.org/abs/2509.19163) | 1 rule and a coverage map that reshaped what this project claims. |
+| [The Economist](https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing) | 6 density rules. The best-controlled study. |
+| [humanizer-de](https://github.com/marmbiz/humanizer-de) | 2 rules, including sentence-length variation. |
+| [simonw thread](https://x.com/simonw/status/2093277255438860358) | 2 structural rules, plus the two that could not be built. |
+| [writinglint](https://github.com/NikhilVerma/writinglint) | Nothing. A dependency-parser training experiment, not prose rules. |
+| [slop-cop](https://github.com/awnist/slop-cop) | Nothing, but a limitation worth knowing: it uses part-of-speech tagging because word matching over-fires on `leverage`, `harness`, `foster`. This engine cannot make that distinction. |
+| [PubMed excess vocabulary](https://pmc.ncbi.nlm.nih.gov/articles/PMC12219543/) | No rules, and the best methodological result in the survey. |
+| [Ultimate AI Slop Word Blacklist](https://blog.atharvashah.com/p/the-ultimate-ai-slop-word-blacklist) | Nothing. Downstream of antislop-sampler, inherits its register problem. |
+| louisabraham | Nothing. No such article exists on the site. |
+
+### The four things worth remembering
+
+**The em dash is not a tell, measured four separate ways.** sloptells found
+acclaimed human prose uses more of them than models do, 0.67 against 0.56 per
+1000 characters. The Economist found only Claude above the human rate, with
+ChatGPT markedly below. humanizer-de states outright that a single em dash
+proves nothing. This project's own corpus agreed. It is nonetheless shipped as a
+default-on rule in `rules/em-dash.json`, because the repo owner does not want
+them in his writing, and that is a different question from detection. The rule
+says so in its own `measured` field.
+
+**Frequency lists conflate style with topic.** The slop-forensics essay trigrams
+are led by phrases that are fingerprints of the prompt set rather than tells.
+The PubMed study proves the point on the same corpus with the same method: 2024
+excess vocabulary was almost entirely *style* words, while COVID-era excess
+vocabulary was almost entirely *content* words. Any list built without a
+topic-matched human baseline is a lead, not a finding.
+
+**Collateral is register-dependent and does not transfer.** sloptells rates
+`rather than` and `genuinely` as low collateral against Hacker News, cooking and
+parenting baselines. In engineering documentation they fire 17 and 13 times in
+30,000 words. This is why every source has its own set and nothing is merged.
+
+**Five independent projects arrived at rates over occurrences.** sloptells'
+slopIndex, slopster's Vale `occurrence`, the antislop sampler's `slop_index.py`,
+the arXiv Density and Verbosity codes, and humanizer-de's *Cluster zählen, nicht
+Einzelsignale*. That convergence is why `density` and `rhythm` exist, and it is
+the strongest single design signal in the whole survey.
+
+### What to graduate into rules/
+
+Calibration is against 30,300 words of human technical prose, with a synthetic
+positive control for each set.
+
+| set | on human prose | recommendation |
+|---|---|---|
+| `antislop` | 0 findings, 15 on control | **Graduate.** Best profile measured. |
+| `structural` | 0 findings, all rules fire on control | **Graduate.** Shapes, not phrases, so they survive rewording. |
+| `arxiv-slop` | 0 findings, fires on the paper's example | **Graduate.** The one code the literature says this engine should own. |
+| `slopster` | 0 findings, 6 on control | **Graduate.** Small and clean. |
+| `humanizer-de` | 0 findings | **Graduate the rhythm rule**; the paired-aside threshold is guessed from one side. |
+| `slop-gate` | 3 findings, 0.1 per 1000 | **Graduate most of it.** Check the 3 first: vocabulary rules carry the part-of-speech ceiling. |
+| `antislop-fiction` | 0 findings | **Keep as a candidate.** Correct and useless outside fiction. Ship it opt-in. |
+| `economist` | 6 findings across 6 documents | **Keep as a candidate.** The rules are sound and the thresholds are floors derived from the human side only. Needs an AI-written corpus to finish. |
+| `sloptells` | 35 findings, 1.16 per 1000 | **Do not graduate as a set.** Two rules produce almost all of it and both are ordinary English in this register. Take the other twelve individually. |
+
+The survey ends on this: the sources agree on far less than
+their confidence suggests, the best of them measure against a human baseline and
+the worst assume one, and the single most reliable finding in six iterations of
+mining is that the most famous tell of all is not a tell.
