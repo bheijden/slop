@@ -403,8 +403,8 @@ corpus. Any twelve rules chosen that way would look good. It is a hypothesis
 worth testing, not evidence, and testing it needs a corpus the selection never
 saw.
 
-That is the honest reason `measured-proven` is off by default despite being, on
-paper, forty times the discriminator the shipped set is. The next useful piece of
+That is the honest reason `measured-proven` is off by default, despite scoring
+forty times better than the shipped set on paper. The next useful piece of
 work is a second corpus, not another rule.
 
 ## What this does not show
