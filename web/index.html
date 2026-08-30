@@ -317,6 +317,12 @@ body.resizing{cursor:col-resize;user-select:none}
 .rset summary::-webkit-details-marker{display:none}
 .rset summary::before{content:"+";color:var(--blue);width:9px;flex:none;font-size:11px}
 .rset[open] summary::before{content:"−"}
+/* the rule-writing guide, shown in test-rules mode */
+.guide{max-width:74ch;margin:26px 0 30px;padding:0 2px}
+.guide h2{font-size:15px;font-weight:600;margin:26px 0 8px;letter-spacing:-.01em}
+.guide h2:first-child{margin-top:0}
+.guide p{margin:0 0 10px;font-size:13.5px;line-height:1.62;color:var(--ink)}
+.guide pre{margin:0 0 12px}
 /* The set box is the whole set in one click. Indeterminate means partly on,
    which is the honest third state for a set you have picked rules out of. */
 .rset summary .setbox{flex:none;margin:0;cursor:pointer}
@@ -384,6 +390,55 @@ body.resizing{cursor:col-resize;user-select:none}
     </div>
   </div>
 
+  <div class="guide" id="guide" hidden>
+    <h2>Write a rule</h2>
+    <p>A rule is JSON. The <code>tests</code> are not optional decoration: they are
+    what makes the rule checkable, and every rule in this project has them.</p>
+<pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
+  <span class="p">"pattern"</span>: "\\butili[sz]e[sd]?\\b", <span class="p">"flags"</span>: "gi",
+  <span class="p">"description"</span>: "Formal where plain would do.",
+  <span class="p">"suggest"</span>: "Write \"use\".",
+  <span class="p">"tests"</span>: { <span class="p">"hit"</span>:  ["We utilise the cache."],
+             <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
+    <p>Wrap one or more in a set and you have a file you can share:
+    <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.
+    Eight <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule kinds</a>
+    exist; <code>regex</code> covers most of them. The others count things a regex
+    cannot express, like repeated sentence shapes or a rate across a whole document.</p>
+
+    <h2>Load it</h2>
+    <p>Three ways in, all equivalent:</p>
+<pre>drop the .json on this page                    <span class="c"># or use the rules panel</span>
+?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
+slop check --rules house-style.json docs/ -r   <span class="c"># same file, command line</span></pre>
+
+    <h2>Test it</h2>
+    <p>Two phases, both below. <b>Conformance</b> runs every example: each
+    <code>hit</code> must match, each <code>miss</code> must not.
+    <b>Fudging</b> then rewrites each hit 27 ways with the markup real files carry
+    and requires the rule to still fire:</p>
+<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
+It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
+It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
+&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
+&lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
+    <p>A rule that passes a clean sentence but fails a marked-up one will miss things
+    in real files. The first run of this found four such bugs, including soft-wrapping
+    silently breaking every multi-sentence rule on 80-column markdown.</p>
+
+    <h2>Then measure it</h2>
+    <p>Passing tests means a rule does what you wrote. It does not mean the rule is
+    worth having. For that, run it over prose you did not write it against and read
+    the hits:</p>
+<pre>slop check --rules mine.json --select mine ~/writing -r</pre>
+    <p>A rule firing on a lot of good prose is a rule to tighten, whatever its examples
+    say. One rule here produced 45% of all findings before it was narrowed; another
+    fires on 10 of 18 human documents and is
+    <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">kept with that written down</a>.
+    Both stories are in
+    <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">docs/calibration.md</a>.</p>
+  </div>
+
   <div class="results" id="results" hidden>
     <div class="rhead">
       <h2 id="r-title"></h2>
@@ -448,24 +503,6 @@ node slop/js/cli.mjs check <span class="p">--select</span> wikipedia-ai .  <span
 node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</span> docs/        <span class="c"># a link to this page</span></pre>
         <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page.</p>
         <p>Findings never fail a run on their own. They are style smells, not errors. Add <code>--max-per-1000 2</code> or <code>--max 0</code> when you want CI to gate on them. Exit <code>0</code> ok, <code>1</code> over a budget you set, <code>2</code> usage or read error.</p>
-      </div>
-    </details>
-    <details>
-      <summary>Writing and testing rules<span class="hint">the fudger</span></summary>
-      <div class="body">
-        <p>A rule set is JSON. Each rule carries its own examples, and those examples are what makes it testable.</p>
-<pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
-  <span class="p">"pattern"</span>: "\\butili[sz]e[sd]?\\b", <span class="p">"flags"</span>: "gi",
-  <span class="p">"suggest"</span>: "Write \"use\".",
-  <span class="p">"tests"</span>: { <span class="p">"hit"</span>: ["We utilise the cache."],
-             <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
-        <p><b>Test rules</b> above, or <code>slop fudge mine.json</code>, checks every example, then rewrites each one 27 ways with the markup real files carry and requires the rule to still fire:</p>
-<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
-It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
-It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
-&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
-&lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
-        <p>A variant that turns a hit into a miss is a bug, either in extraction or in a rule too tight for real files. Its first run found four, including soft-wrapping silently breaking every multi-sentence rule on 80-column markdown.</p>
       </div>
     </details>
     <details>
@@ -1062,6 +1099,7 @@ function run() {
     // The card stays for a loaded set — the text area gives way to a summary,
     // so the rules control and the file picker never go out of reach.
     $('io').hidden = S.mode === 'fudge';
+    $('guide').hidden = S.mode !== 'fudge';
     const many = S.docs.length > 1;
     $('input').hidden = $('kind').hidden = many;
     $('loaded').hidden = !many;
@@ -1107,7 +1145,7 @@ function run() {
 
 // Every code block gets a copy button — the skill installer especially, which
 // is meant to be pasted into a terminal or handed to an agent.
-for (const pre of document.querySelectorAll('.docs pre')) {
+for (const pre of document.querySelectorAll('.docs pre, .guide pre')) {
   const btn = document.createElement('button');
   btn.className = 'copy-pre';
   btn.type = 'button';
