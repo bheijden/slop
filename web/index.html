@@ -392,8 +392,8 @@ body.resizing{cursor:col-resize;user-select:none}
 
   <div class="guide" id="guide" hidden>
     <h2>Write a rule</h2>
-    <p>A rule is JSON. The <code>tests</code> are not optional decoration: they are
-    what makes the rule checkable, and every rule in this project has them.</p>
+    <p>A rule is JSON. The <code>tests</code> are what make it checkable, so every rule
+    below has them.</p>
 <pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
   <span class="p">"pattern"</span>: "\\butili[sz]e[sd]?\\b", <span class="p">"flags"</span>: "gi",
   <span class="p">"description"</span>: "Formal where plain would do.",
@@ -422,9 +422,9 @@ It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-wo
 It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
 &lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
 &lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
-    <p>A rule that passes a clean sentence but fails a marked-up one will miss things
-    in real files. The first run of this found four such bugs, including soft-wrapping
-    silently breaking every multi-sentence rule on 80-column markdown.</p>
+    <p>A rule that passes a clean sentence but fails a marked-up one will miss things in
+    real files. Soft-wrapped markdown is the usual culprit: a sentence broken across
+    two lines at column 80 stops matching, and nothing tells you.</p>
 
     <h2>Then measure it</h2>
     <p>Passing tests means a rule does what you wrote. It does not mean the rule is
@@ -432,11 +432,10 @@ It is important\nto note that this works.      <span class="c">md:soft-wrap</spa
     the hits:</p>
 <pre>slop check --rules mine.json --select mine ~/writing -r</pre>
     <p>A rule firing on a lot of good prose is a rule to tighten, whatever its examples
-    say. One rule here produced 45% of all findings before it was narrowed; another
-    fires on 10 of 18 human documents and is
-    <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">kept with that written down</a>.
-    Both stories are in
-    <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">docs/calibration.md</a>.</p>
+    say. Two worked examples, one tightened and one kept with its false firing
+    documented, are in
+    <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
+    and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
   </div>
 
   <div class="results" id="results" hidden>
@@ -508,7 +507,7 @@ node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</sp
     <details>
       <summary>Install as an agent skill<span class="hint">SKILL.md</span></summary>
       <div class="body">
-        <p>The repo ships a <a href="https://github.com/bheijden/slop/blob/main/skill/SKILL.md">SKILL.md</a> so a coding agent picks this up on its own when it is editing prose, without being told to run anything. Copy it into your skills directory:</p>
+        <p>A <a href="https://github.com/bheijden/slop/blob/main/skill/SKILL.md">SKILL.md</a> ships with the repo, so a coding agent runs this by itself whenever it is writing or editing prose for you. Copy it into your skills directory:</p>
 <pre>D=~/.claude/skills/linting-prose        <span class="c"># or .claude/skills/… for one project</span>
 R=https://raw.githubusercontent.com/bheijden/slop/main/skill
 
@@ -519,7 +518,6 @@ for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; 
 <pre><span class="c">Install the slop skill from
 github.com/bheijden/slop/tree/main/skill into
 ~/.claude/skills/linting-prose/, keeping the reference/ files.</span></pre>
-        <p>After that it picks itself up whenever you ask for writing to be reviewed. You do not name the tool again.</p>
         <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
         <p>A skill gives an agent instructions it will act on, so read one before installing it. This one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
       </div>

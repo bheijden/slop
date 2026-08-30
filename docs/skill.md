@@ -21,8 +21,7 @@ Or hand the instruction to the agent and let it install itself:
 > `github.com/bheijden/slop/tree/main/skill` into
 > `~/.claude/skills/linting-prose/`, keeping the `reference/` files.
 
-After that the agent picks it up whenever you ask for writing to be reviewed.
-You do not name the tool again.
+The agent then runs it by itself whenever it writes or edits prose for you.
 
 Only `name` and `description` sit in context until the skill triggers, so it
 costs roughly 100 tokens to have installed. The body loads when the agent is
