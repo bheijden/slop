@@ -312,3 +312,47 @@ It earned its place immediately. The first run found four real bugs, listed in
 
 
 See also [calibration.md](calibration.md): how a noisy rule gets fixed rather than disabled.
+
+---
+
+## What a finding does and does not mean
+
+**A finding is not evidence that AI wrote something.** It is evidence that a
+phrase is worn. Human writers produce every pattern here, and current models
+avoid some of them. If you want to know who wrote a document, this is the wrong
+tool, and so is every other one: the paper that defines the field
+([arXiv 2509.19163](https://arxiv.org/abs/2509.19163)) reports that standard
+metrics fail to match human judgement and that reasoning models fail at
+extracting these spans too.
+
+That paper's taxonomy has eleven codes. Measured against it, honestly:
+
+| | |
+|---|---|
+| **Reached** | Repetition, Templatedness |
+| **Partly reached** | Verbosity, Word Complexity, Tone |
+| **Not reached** | Factuality, Relevance, Bias, Coherence, Fluency |
+
+The last row is not a to-do list. Those five need human annotation, and the
+paper says so. A linter that claimed them would be lying.
+
+There is a second ceiling: this engine matches patterns over spans, with no
+part-of-speech information. That is why `leverage`, `harness` and `foster` are
+hard. They are slop as verbs and ordinary English as nouns, and a regex cannot
+tell the difference. The `frame` detector approximates syntax by wildcarding
+content words, which works, but it is an approximation.
+
+## Limits
+
+- **English only.** The patterns are hard-coded English. Prose in another
+  language passes almost silently. No findings is not evidence of clean prose.
+- **Heuristics, not proof.** `ai-vocab` firing once is coincidence; several
+  times is a tell. Use a budget rather than demanding zero.
+- **Long inline code spans are removed.** A single short token is kept. Anything
+  with a space in it is treated as a code fragment and dropped.
+- **Markdown tables can trip `echo-triad`.** Set `"skipTables": true` in
+  `slop.json`, which this repo does for exactly that reason.
+- **`.rtf` is not supported.** Convert to `.md` or `.txt` first.
+
+To quote bad prose on purpose, wrap it in `<!-- slop-ignore-start -->` and
+`<!-- slop-ignore-end -->`. Works in markdown and HTML.
