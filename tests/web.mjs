@@ -65,15 +65,19 @@ async function main() {
 
   let ws, fail = (m) => { throw new Error(m); };
   try {
+    // A cold CI runner can take a while to bring Chrome up, and 12 seconds was
+    // not always enough. Wait a minute, and say what went wrong if it never came.
     let target = null;
-    for (let i = 0; i < 60 && !target; i++) {
+    let lastErr = null;
+    for (let i = 0; i < 300 && !target; i++) {
+      if (proc.exitCode !== null) fail(`chrome exited with code ${proc.exitCode} before listening`);
       try {
         const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
         target = list.find((t) => t.type === 'page');
-      } catch { /* not up yet */ }
+      } catch (e) { lastErr = e.message; }
       if (!target) await sleep(200);
     }
-    if (!target) fail('chrome did not start');
+    if (!target) fail(`chrome did not start within 60s on port ${port}${lastErr ? ` (${lastErr})` : ''}`);
 
     ws = new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((r, j) => { ws.addEventListener('open', r); ws.addEventListener('error', j); });
