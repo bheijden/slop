@@ -27,9 +27,10 @@ what it scored on the audit corpus in `evidence`, so merging the sets did not
 lose the provenance. `slop explain <rule>` prints all three.
 
 The five `style-` profiles are registers rather than tells, and are described in
-[../docs/styles.md](../docs/styles.md). `variants` is a bench: alternative
-formulations of rules that fire on human prose, kept beside the originals so the
-two can be measured. See [../research/audit.md](../research/audit.md).
+[../docs/styles.md](../docs/styles.md). Alternative formulations of the
+rules that fire on human prose are recorded as specifications in
+[../research/audit.md](../research/audit.md) rather than as a set, so nothing
+unpromoted sits here waiting to be switched on beside the rule it duplicates.
 
 Try one against your own writing:
 

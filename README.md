@@ -69,22 +69,25 @@ slop check --format json docs/ -r        # for agents and scripts
 
 ## Rules
 
-Three sets ship, all on:
+Two sets ship on:
 
 | set | rules | |
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
-| `em-dash` | 1 | House style: no em dashes |
 
-Fourteen more are available and off by default, including writing-style profiles
-for the Economist, plain English, academic and other registers. Rules are data:
-a set is a JSON file with its own test examples, so adding one never means
-touching the linter.
+Two more ship off by default. `mined` is 80 tells this project gathered
+itself, each recording where it came from and how it scored against a matched
+human/AI corpus. The five `style-` sets match a register, from the Economist to
+plain English, instead of hunting tells.
 
 ```sh
+slop check --rules candidates/mined.json --select mined docs/ -r
 slop add https://example.com/house-style.json
 ```
+
+Rules are data: a set is a JSON file with its own test examples, so adding one
+never means touching the linter.
 
 **A finding means a phrase is worn, not that a machine wrote it.** Human writers
 produce all of these.

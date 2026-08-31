@@ -42,6 +42,20 @@ hold back a set that fails.
 agent acts on. Both appear in `--format json`, so write `suggest` as a
 directive ("Delete the hedge and state the fact"), not a description.
 
+**Every `id` in a set must be unique.** An id is how a rule is selected, ignored,
+reported and recorded in the lock file, so two rules answering to one are
+ambiguous rather than duplicated. A set with a repeat is refused, naming the id.
+
+Optional fields, all printed by `explain <id>`:
+
+| field | what it is for |
+|---|---|
+| `note` | a known limitation, such as a false positive the rule is kept in spite of |
+| `measured` | when a tell was measured and by whom, so a stale one can be recognised |
+| `from`, `source` | where a mined rule came from |
+| `evidence` | what it scored on a corpus |
+| `default` | `"off"` to keep a rule out of a run unless selected, `"on"` to run it even when its set is opt-in |
+
 Use it with `--rules ./house-style.json`, drop it in the repo's `rules/`
 directory, or point the web page at it with `#rules=<url>`.
 

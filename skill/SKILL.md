@@ -29,7 +29,7 @@ git clone --depth 1 https://github.com/bheijden/slop /tmp/slop
 node /tmp/slop/js/cli.mjs check docs/ -r
 ```
 
-There are no dependencies to install; the clone is 380 KB and needs only Node.
+There are no dependencies to install; the clone is about 1.4 MB and needs only Node.
 
 Use `--format json` whenever you intend to act on the findings:
 
@@ -105,8 +105,23 @@ use `--format github` for inline pull-request annotations.
 in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
-Three sets ship: `simonwillison` (27 rules), `wikipedia-ai` (11), and `em-dash` (1). `em-dash` is house style rather than a tell, so say so if a user asks why it fired. The full
-catalogue is in [reference/rules.md](reference/rules.md).
+Two sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
+of published catalogues. The full list is in [reference/rules.md](reference/rules.md).
+
+Two more are in the repository and off by default. `mined` (80 rules) is
+everything this project gathered itself, from research papers, style guides and
+other detectors; each rule records where it came from and what it scored on a
+matched human/AI corpus, which `explain` prints. The `style-` sets (52 rules
+across five registers) match a house style rather than hunt tells, and only one
+can be selected at a time.
+
+```bash
+... check --rules candidates/mined.json --select mined docs/ -r
+```
+
+One rule inside `mined` is on wherever that set is loaded: `em-dash`, which flags
+every em dash. It is house style rather than a tell, so say so if a user asks why
+it fired; `explain em-dash` gives the evidence, which points the other way.
 
 A project can install more. Rule sets are versioned packages, recorded in
 `.slop/rules.lock.json` with their source and test status:
@@ -128,5 +143,5 @@ rule, because a project's own set can shadow one of ours.
 A rule that fires constantly usually needs a constraint it does not have, not
 deletion. Read twenty of its hits before concluding it is noise.
 [reference/authoring.md](reference/authoring.md) covers the rule format, the
-five detector kinds, and the markup fudger that checks a rule still fires when
+eight detector kinds, and the markup fudger that checks a rule still fires when
 its example is wrapped in bold, italics, inline tags or a soft-wrapped line.

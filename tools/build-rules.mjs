@@ -161,13 +161,13 @@ const NOTES = {
     + 'the document\'s topic rather than a repeated frame: "the person who died" in '
     + 'guidance, "in the python 2" in a PEP. Kept unchanged because it is upstream\'s '
     + 'rule and the shape it describes is real. Tighter formulations are measured in '
-    + 'candidates/variants.json and the numbers are in research/audit.md.',
+    + 'research/audit.md, which also records tighter formulations that were measured.',
   'stacked-questions':
     'Fires on essayists setting up a topic, which is a rhetorical move much older than '
     + 'the technology it is meant to detect: "Who are the speakers of AAE? How are they '
     + 'viewed?". Hit 3 of 18 human documents and 0 of 18 AI ones in the audit. Kept '
-    + 'unchanged; stacked-questions-run3 in candidates/variants.json requires three in '
-    + 'a row and removed every false positive.',
+    + 'unchanged. A variant requiring three questions in a row removed every false '
+    + 'positive on that corpus; its specification is in research/audit.md.',
 };
 
 const sets = { 'simonwillison': [], 'wikipedia-ai': [] };

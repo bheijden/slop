@@ -298,7 +298,7 @@
       "severity": "warn",
       "description": "Consecutive sentences built on the same repeated skeleton — “A shopping cart is an object in the system. A chat room is an object in the system.” The badge counts the echoing sentences.",
       "suggest": "Merge the parallel sentences into one, or vary the structure.",
-      "note": "Known to fire on human prose. In an audit over 18 pre-2022 human documents it hit 10 of them and only 1 of 18 AI documents, because the shared run is usually the document's topic rather than a repeated frame: \"the person who died\" in guidance, \"in the python 2\" in a PEP. Kept unchanged because it is upstream's rule and the shape it describes is real. Tighter formulations are measured in candidates/variants.json and the numbers are in research/audit.md.",
+      "note": "Known to fire on human prose. In an audit over 18 pre-2022 human documents it hit 10 of them and only 1 of 18 AI documents, because the shared run is usually the document's topic rather than a repeated frame: \"the person who died\" in guidance, \"in the python 2\" in a PEP. Kept unchanged because it is upstream's rule and the shape it describes is real. Tighter formulations are measured in research/audit.md, which also records tighter formulations that were measured.",
       "kind": "echo",
       "params": {
         "minGram": 4,
@@ -442,7 +442,7 @@
       "severity": "warn",
       "description": "Two or more questions fired in a row, usually fragments after the first: “Do I know how it works? Where it breaks? Which corners it cut?” The badge counts the questions.",
       "suggest": "Keep one question, or convert them to statements.",
-      "note": "Fires on essayists setting up a topic, which is a rhetorical move much older than the technology it is meant to detect: \"Who are the speakers of AAE? How are they viewed?\". Hit 3 of 18 human documents and 0 of 18 AI ones in the audit. Kept unchanged; stacked-questions-run3 in candidates/variants.json requires three in a row and removed every false positive.",
+      "note": "Fires on essayists setting up a topic, which is a rhetorical move much older than the technology it is meant to detect: \"Who are the speakers of AAE? How are they viewed?\". Hit 3 of 18 human documents and 0 of 18 AI ones in the audit. Kept unchanged. A variant requiring three questions in a row removed every false positive on that corpus; its specification is in research/audit.md.",
       "kind": "question-chain",
       "params": {
         "minRun": 2

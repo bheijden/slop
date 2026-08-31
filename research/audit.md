@@ -204,10 +204,8 @@ and that the sets are carried by a few rules each.
 
 ## Variants: trying to fix the false firers
 
-Every original still ships unchanged. The alternatives live in
-[candidates/variants.json](../candidates/variants.json), all off by default, so
-the two can be scored against the same corpus.
-`node tools/compare-variants.mjs` reproduces the table.
+Every original still ships unchanged. The alternatives were scored against the
+same corpus and are recorded as specifications below rather than as live rules.
 
 ### What the false positives turned out to be
 
@@ -345,11 +343,31 @@ a finding can weigh it, and `slop explain <rule>` prints it.
 A rule whose failure mode is written down is a different thing from a rule that
 quietly misfires, and this is the cheaper half of the fix.
 
-### Kept as candidates: everything else
+### Recorded, not kept as rules
+
+The alternatives were a set of their own for a while. They are specifications
+rather than rules: nothing was promoted, three of the four are a parameter or two
+on a rule that already exists, and a set of unpromoted alternatives sitting beside
+the originals invites someone to enable both and see the same shape reported
+twice. The measurements are above; the implementations are here, which is all it
+takes to rebuild any of them.
+
+| alternative to | kind | specification | scored |
+|---|---|---|---|
+| `echo-triad` | `echo` | `{"minGram":4,"minRun":2,"anchored":"either","minFuncWords":2}` | 2 of 18 human, 0 AI, catches the canonical example |
+| `echo-triad` | `echo` | `{"minGram":4,"minRun":3,"minFuncWords":3}` | 0 of 18 human, 0 AI, catches the canonical example |
+| `stacked-questions` | `question-chain` | `{"minRun":3}` | 0 of 18 human, 0 AI, catches the canonical example |
+| `moreover` | `density` | pattern `(?:^\|\n)\s*(?:Moreover\|Furthermore\|Additionally\|In\s+addition\|Notably\|Consequently\|Nevertheless\|However\|Therefore)\s*,`, `{"min":6,"minWords":100,"minSentences":5}` | never fired on either corpus |
+
+`anchored`, `minFuncWords` and the `density` kind are all in the engine, so each
+line above is a working rule the moment it is pasted into a set.
+
+### Formerly kept as candidates
 
 `echo-aligned`, `echo-run3`, `echo-aligned-func`, `echo-structural`,
 `stacked-questions-run3` and `moreover-density` stay in
-`candidates/variants.json`, off by default. Any of them can be selected by name.
+this document as specifications. Any is a working rule the moment it is pasted
+into a set.
 None was promoted, for two different reasons.
 
 The echo variants cannot be separated on the evidence: they all cut false

@@ -6,7 +6,6 @@
     "style-conversational.json",
     "style-economist.json",
     "style-newsroom.json",
-    "style-plain.json",
-    "variants.json"
+    "style-plain.json"
   ]
 }
