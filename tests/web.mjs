@@ -173,17 +173,17 @@ async function main() {
     // so the mode demonstrates what a failure looks like without being loaded.
     const fudge = await evaluate(`(async()=>{document.getElementById('m-fudge').click();
       await new Promise(r=>setTimeout(r,4000));
-      return JSON.stringify({rows: document.querySelectorAll('.frow').length,
+      return JSON.stringify({rows: document.querySelectorAll('#list li[data-rule]').length,
         score: document.getElementById('score').textContent,
         prefilled: document.getElementById('rules-src').value.length,
-        why: document.querySelectorAll('.why').length})})()`);
+        why: document.querySelectorAll('#list .why').length})})()`);
     const fg = JSON.parse(fudge);
     check('test-rules mode tests the template', fg.rows >= 2 && fg.prefilled > 200, JSON.stringify(fg));
     check('the template shows a real failure', /1 failing/.test(fg.score) && fg.why >= 1, JSON.stringify(fg));
 
     // A failure points back at the exact string in the editor that caused it.
     const link = await evaluate(`(async()=>{
-      const why=document.querySelector('.frow.bad .why');
+      const why=document.querySelector('#list li.bad .why');
       why.click();
       await new Promise(r=>setTimeout(r,200));
       const ta=document.getElementById('rules-src');
@@ -193,7 +193,7 @@ async function main() {
       lk.picked === 'Every request is logged to disk.', JSON.stringify(lk));
 
     const rowLink = await evaluate(`(async()=>{
-      const row=document.querySelector('.frow.bad');
+      const row=document.querySelector('#list li.bad');
       row.click();
       await new Promise(r=>setTimeout(r,200));
       const ta=document.getElementById('rules-src');
@@ -211,7 +211,7 @@ async function main() {
       t.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,3000));
       return JSON.stringify({score: document.getElementById('score').textContent,
-        rows: document.querySelectorAll('.frow').length})})()`);
+        rows: document.querySelectorAll('#list li[data-rule]').length})})()`);
     const ow = JSON.parse(own);
     check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
 

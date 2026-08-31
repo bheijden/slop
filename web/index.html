@@ -317,21 +317,34 @@ body.resizing{cursor:col-resize;user-select:none}
 .rset summary::-webkit-details-marker{display:none}
 .rset summary::before{content:"+";color:var(--blue);width:9px;flex:none;font-size:11px}
 .rset[open] summary::before{content:"−"}
-/* the rule-writing guide, shown in test-rules mode */
-.guide{margin:22px 0 26px}
+/* In test-rules mode the document pane holds the rule set you are editing and
+   the findings pane holds what the tests made of it, so the split, the divider
+   and the collapse arrows all work exactly as they do for prose. */
 #rules-src{
-  display:block;width:100%;min-height:300px;max-height:60vh;overflow:auto;resize:vertical;
-  border:0;background:none;padding:14px 16px 10px;color:inherit;
+  display:none;width:100%;min-height:100%;box-sizing:border-box;resize:none;
+  border:0;background:none;padding:2px 0 0;color:inherit;
   font-family:var(--mono);font-size:12.5px;line-height:1.7;tab-size:2;
 }
 #rules-src:focus{outline:none}
 #rules-src::placeholder{color:var(--muted)}
-.rerr{margin:8px 2px 0;font:12px/1.5 var(--mono);color:var(--flag)}
-.rdocs{margin-top:26px}
-/* the results here are a short table, not a document pane, so the split view
-   should not reserve 70vh for it */
-body[data-mode=fudge] .panes{height:auto}
-body[data-mode=fudge] #pane-list,body[data-mode=fudge] .divider{display:none}
+body[data-mode=fudge] #rules-src{display:block}
+body[data-mode=fudge] #doc{display:none}
+body[data-mode=fudge] #views{display:none}
+.rtools{display:flex;gap:7px;align-items:center;width:100%}
+.rtools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+.rerr{margin:8px 0 0;font:12px/1.5 var(--mono);color:var(--flag)}
+/* the rule-writing sections only belong to that mode */
+.ronly{display:none}
+body[data-mode=fudge] .ronly{display:block}
+body[data-mode=fudge] .docs details:not(.ronly){display:none}
+/* a result row points back at the rule that produced it */
+.list li.bad .rid{color:var(--flag)}
+.list li .why{color:var(--flag);font-size:11.5px;padding-left:9px;
+  border-left:2px solid var(--flag);margin:4px 0 2px;white-space:pre-wrap;word-break:break-word}
+.list li .why b{font-weight:600}
+#list-head .bad{color:var(--flag)}
+#list-head .tot{margin-left:auto;text-transform:none;letter-spacing:0;opacity:.7}
+body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:baseline}
 /* a result row points back at the rule that produced it */
 .frow.click{cursor:pointer}
 .frow.click:hover span:first-child{text-decoration:underline;text-underline-offset:3px}
@@ -405,19 +418,6 @@ body[data-mode=fudge] #pane-list,body[data-mode=fudge] .divider{display:none}
     </div>
   </div>
 
-  <div class="guide" id="guide" hidden>
-    <div class="card iocard">
-      <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
-        placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
-      <div class="tools">
-        <button class="chip" id="b-rreset">Reset to template</button>
-        <button class="chip" id="b-rfile">Choose a file</button>
-        <span class="n" id="rmeta"></span>
-      </div>
-    </div>
-    <p class="rerr" id="rerr" hidden></p>
-  </div>
-
   <div class="results" id="results" hidden>
     <div class="rhead">
       <h2 id="r-title"></h2>
@@ -447,8 +447,16 @@ body[data-mode=fudge] #pane-list,body[data-mode=fudge] .divider{display:none}
             <button id="v-prose" aria-pressed="true">prose</button>
             <button id="v-source" aria-pressed="false">source</button>
           </div>
+          <div class="rtools" id="rule-tools" hidden>
+            <button class="chip" id="b-rreset">Reset to template</button>
+            <button class="chip" id="b-rfile">Choose a file</button>
+            <span class="n" id="rmeta"></span>
+          </div>
         </div>
         <div id="doc" class="prose"></div>
+        <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
+          placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
+        <p class="rerr" id="rerr" hidden></p>
       </div>
       <div class="divider" id="divider">
         <div class="grip" id="grip" role="separator" aria-orientation="vertical"
@@ -466,8 +474,8 @@ body[data-mode=fudge] #pane-list,body[data-mode=fudge] .divider{display:none}
     </div>
   </div>
 
-  <div class="docs rdocs" id="rule-docs" hidden>
-    <details>
+  <div class="docs">
+    <details class="ronly">
       <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
       <div class="body">
         <p><b>Conformance</b> runs every example you wrote: each <code>tests.hit</code>
@@ -485,7 +493,7 @@ It is important\nto note that this works.      <span class="c">md:soft-wrap</spa
         broken across two lines at column 80 stops matching, and nothing tells you.</p>
       </div>
     </details>
-    <details>
+    <details class="ronly">
       <summary>The rule format<span class="hint">eight kinds</span></summary>
       <div class="body">
         <p><code>regex</code> covers most rules. The other seven count things a regex
@@ -497,7 +505,7 @@ It is important\nto note that this works.      <span class="c">md:soft-wrap</spa
         <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.</p>
       </div>
     </details>
-    <details>
+    <details class="ronly">
       <summary>Using your rules for real<span class="hint">page, URL or CLI</span></summary>
       <div class="body">
         <p>Three ways in, all the same file:</p>
@@ -515,9 +523,7 @@ slop check --rules house-style.json docs/ -r   <span class="c"># command line</s
         and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
       </div>
     </details>
-  </div>
-
-  <div class="docs">
+  
     <details>
       <summary>Command line<span class="hint">for agents and CI</span></summary>
       <div class="body">
@@ -755,9 +761,12 @@ function renderResults() {
   const res = $('results');
   if (S.mode === 'fudge') {
     res.hidden = false;
+    // The rule set is the document and the test results are the findings, so
+    // this keeps the split, the divider and the collapse arrows.
     $('views').hidden = $('nav').hidden = $('b-copy').hidden = true;
-    $('copy-fallback').hidden = $('divider').hidden = true;
-    $('panes').dataset.layout = 'text';
+    $('copy-fallback').hidden = true;
+    $('divider').hidden = false;
+    $('panes').dataset.layout = S.layout === 'text' ? 'split' : S.layout;
     $('workspace').removeAttribute('data-multi');
     $('tree').hidden = true;
     renderFudge();
@@ -924,28 +933,32 @@ const step = (d) => {
 
 function renderFudge() {
   const set = S.fudge && S.fudge.length ? S.fudge[0].set : null;
-  $('r-title').textContent = set ? `Results for ${set}` : 'Results';
-  $('list').innerHTML = '';
-  const d = $('doc'); d.className = '';
-  if (!S.fudge) { d.innerHTML = '<p class="err" style="color:var(--muted)">Testing…</p>'; return; }
-  const t = S.fudge.reduce((a,r) => ({ cok:a.cok+r.conform.ok, cbad:a.cbad+r.conform.fail,
+  $('r-title').textContent = set ? `Testing ${set}` : 'Testing your rules';
+  $('doc').innerHTML = '';
+  if (!S.fudge) { $('list-head').textContent = 'testing…'; $('list').innerHTML = ''; return; }
+
+  const t = S.fudge.reduce((a, r) => ({ cok:a.cok+r.conform.ok, cbad:a.cbad+r.conform.fail,
     fok:a.fok+r.fudge.ok, fbad:a.fbad+r.fudge.fail, lossy:a.lossy+r.fudge.lossy }),
     {cok:0,cbad:0,fok:0,fbad:0,lossy:0});
   const bad = t.cbad + t.fbad;
-  d.innerHTML = `<div class="tallies">
-      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${esc([...new Set(S.fudge.map(r=>r.set))].join(" · "))}</div></div>
-      <div><div class="big">${t.cok}</div><div class="lbl">examples matched</div></div>
-      <div><div class="big">${t.fok}</div><div class="lbl">survived markup</div></div>
-      <div><div class="big">${t.lossy}</div><div class="lbl">expected misses</div></div>
-    </div>
-    <div class="frow head"><span>rule</span><span class="num">examples</span><span class="num">markup</span></div>
-    ${S.fudge.slice().sort((a,b) => (b.conform.fail+b.fudge.fail)-(a.conform.fail+a.fudge.fail)).map((r) => {
+  // The pane header carries the totals; a tally row inside the list only
+  // repeated them and fought the list's own grid.
+  $('list-head').innerHTML =
+    `<span class="${bad ? 'bad' : ''}">${bad ? bad + ' failing' : 'all passing'}</span>`
+    + `<span class="tot">${t.cok} examples · ${t.fok} variants</span>`;
+
+  // Same shape as a finding: where it happened, what it was, why.
+  $('list').innerHTML = S.fudge.slice()
+    .sort((x, y) => (y.conform.fail + y.fudge.fail) - (x.conform.fail + x.fudge.fail))
+    .map((r) => {
       const rb = r.conform.fail + r.fudge.fail;
-      return `<div class="frow click${rb?' bad':''}" data-rule="${esc(r.rule)}"><span>${esc(r.rule)}</span>
-        <span class="num">${r.conform.ok}/${r.conform.ok+r.conform.fail}</span>
-        <span class="num">${r.fudge.ok}/${r.fudge.ok+r.fudge.fail}</span>
-        ${r.failures.map(f=>`<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0,150))}</div>`).join('')}</div>`;
-    }).join('')}`;
+      return `<li data-rule="${esc(r.rule)}"${rb ? ' class="bad"' : ''}>
+        <span class="loc">${r.conform.ok}/${r.conform.ok + r.conform.fail}</span>
+        <span><span class="rid">${esc(r.rule)}</span>
+${r.name ? `<div class="m">${esc(r.name)}</div>` : ''}
+          ${r.failures.map((f) => `<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0, 140))}</div>`).join('')}
+        </span></li>`;
+    }).join('');
   wireFudgeRows();
 }
 
@@ -1130,8 +1143,9 @@ function run() {
     // The card stays for a loaded set — the text area gives way to a summary,
     // so the rules control and the file picker never go out of reach.
     $('io').hidden = S.mode === 'fudge';
-    $('guide').hidden = $('rule-docs').hidden = S.mode !== 'fudge';
     document.body.dataset.mode = S.mode;
+    $('rule-tools').hidden = S.mode !== 'fudge';
+    if (S.mode === 'fudge') $('results').hidden = false;
     const many = S.docs.length > 1;
     $('input').hidden = $('kind').hidden = many;
     $('loaded').hidden = !many;
@@ -1339,8 +1353,10 @@ function ruleBlock(id) {
 }
 
 function wireFudgeRows() {
-  for (const row of document.querySelectorAll('.frow.click')) {
+  for (const row of $('list').querySelectorAll('li[data-rule]')) {
     row.onclick = (e) => {
+      for (const o of $('list').querySelectorAll('li.on')) o.classList.remove('on');
+      row.classList.add('on');
       const why = e.target.closest('.why');
       if (why && why.dataset.ex) return selectInRules(why.dataset.ex);
       const block = ruleBlock(row.dataset.rule);
