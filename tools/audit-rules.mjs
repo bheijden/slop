@@ -12,7 +12,10 @@ const RULES = [];
 for (const d of ['rules', 'candidates']) for (const f of readdirSync(new URL(`../${d}`, import.meta.url).pathname)) {
   if (!f.endsWith('.json') || f === 'index.json') continue;
   const j = JSON.parse(readFileSync(new URL(`../${d}/${f}`, import.meta.url).pathname, 'utf8'));
-  if (!j.rules || j.role === 'style') continue;
+  // measured-* are views over the same rule ids and `variants` holds
+  // alternatives to rules that are already counted; including either would
+  // tally the same rule twice under one id.
+  if (!j.rules || j.name.startsWith('measured-') || j.name === 'variants' || j.role === 'style') continue;
   for (const r of compileRuleSet(j, j.name).rules) RULES.push(r);
 }
 const load = (k) => readdirSync(join(D, k)).filter(f => f.endsWith('.txt'))
