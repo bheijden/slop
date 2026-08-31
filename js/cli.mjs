@@ -188,7 +188,10 @@ function lintSource(name, src, kind, rules, opts) {
              // anchor somewhere to have an offset at all, but that anchor is an
              // artefact: reporting it as line:col points the reader at an
              // innocent word. Carry the flag so the reporter can say "document".
-             docLevel: m.docLevel || false, measure: m.badgeTitle || null };
+             docLevel: m.docLevel || false, measure: m.badgeTitle || null,
+             // The rates behind the threshold, so whoever reads the finding can
+             // judge the number instead of taking it on trust.
+             reference: r.reference || null };
   });
   return { file: name, words: countWords(text), findings };
 }
