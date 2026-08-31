@@ -244,6 +244,21 @@ async function main() {
     check('clicking a rule selects that whole rule',
       rl.starts === '{' && rl.hasId && rl.len > 100, JSON.stringify(rl));
 
+    // Malformed JSON names the line and puts the cursor on it.
+    const broken = await evaluate(`(async()=>{
+      const t=document.getElementById('rules-src');
+      t.value='{\\n  "name": "x",\\n  "rules": [\\n    { "id": "a", }\\n  ]\\n}';
+      t.dispatchEvent(new Event('input'));
+      await new Promise(r=>setTimeout(r,900));
+      const e=document.getElementById('rerr');
+      e.click();
+      const before=t.value.slice(0,t.selectionStart);
+      return JSON.stringify({shown:!e.hidden, msg:e.textContent, line:before.split('\\n').length})})()`);
+    const bk = JSON.parse(broken);
+    check('bad JSON names the line and the usual causes',
+      bk.shown && /Line 4/.test(bk.msg) && /trailing comma/.test(bk.msg), JSON.stringify(bk));
+    check('clicking the JSON error jumps to it', bk.line === 4, JSON.stringify(bk));
+
     // Replacing the text re-runs against whatever is there now.
     const own = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');

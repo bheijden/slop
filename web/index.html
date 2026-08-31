@@ -16,7 +16,7 @@
   /* Three clear surfaces rather than three near-identical ones: the page sits
      back, cards come forward, code blocks recess. */
   --paper:#EDEDE9; --card:#FDFDFC; --sunk:#E0E0DA; --hair:#D4D4CC;
-  --ink:#14161A; --muted:#5C5F66; --blue:#2D5BD6; --flag:#B93B37;
+  --ink:#14161A; --muted:#5C5F66; --blue:#2D5BD6; --flag:#B93B37; --ok:#2E7D4F;
   --mark:#FCE79B; --mark-edge:#D4A62E; --mark-on:#F9DA6B; --mark-ink:#14161A;
   --lift:0 1px 2px rgba(20,22,26,.05), 0 1px 1px rgba(20,22,26,.04);
   /* Side margin grows with the window up to a cap, then the content takes the
@@ -29,7 +29,7 @@
 @media (prefers-color-scheme:dark){
   :root:not([data-theme=light]){
     --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
-    --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60;
+    --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60; --ok:#6FBF8B;
     --mark:rgba(250,208,105,.20); --mark-edge:#A8842A; --mark-on:rgba(250,208,105,.40); --mark-ink:#F6F0E0;
     --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
     color-scheme:dark;
@@ -37,7 +37,7 @@
 }
 :root[data-theme=dark]{
   --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
-  --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60;
+  --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60; --ok:#6FBF8B;
   --mark:rgba(250,208,105,.20); --mark-edge:#A8842A; --mark-on:rgba(250,208,105,.40); --mark-ink:#F6F0E0;
   --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
   color-scheme:dark;
@@ -333,7 +333,8 @@ body[data-mode=fudge] #doc{display:none}
 body[data-mode=fudge] #views{display:none}
 .rtools{display:flex;gap:7px;align-items:center;width:100%}
 .rtools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
-.rerr{margin:8px 0 0;font:12px/1.5 var(--mono);color:var(--flag)}
+.rerr{margin:8px 0 0;font:12px/1.5 var(--mono);color:var(--flag);cursor:pointer}
+.rerr:hover{text-decoration:underline;text-underline-offset:3px}
 /* the rule-writing sections only belong to that mode */
 .ronly{display:none}
 body[data-mode=fudge] .ronly{display:block}
@@ -343,7 +344,8 @@ body[data-mode=fudge] .docs details:not(.ronly){display:none}
 body[data-mode=fudge] .list .rid{color:var(--ink)}
 body[data-mode=fudge] .list li.bad .rid{color:var(--flag)}
 .list li.good .loc,.list li.bad .loc{font-size:13px}
-.list li.good .loc{color:var(--muted)}
+.list li.good .loc{color:var(--ok)}
+body[data-mode=fudge] .list li.good.on{box-shadow:inset 2px 0 0 var(--ok)}
 .list li.bad .loc{color:var(--flag)}
 .list .counts{color:var(--muted);font-size:11.5px;margin-top:2px}
 /* only the phase that actually failed is marked, so the two are never read
@@ -1172,9 +1174,15 @@ function run() {
         + ` ${esc('—')} drop more to replace them`;
     }
     if (S.mode === 'fudge') {
-      const { sets, err } = readRuleSrc();
+      const { sets, err, pos } = readRuleSrc();
       $('rerr').hidden = !err;
       $('rerr').textContent = err || '';
+      $('rerr').onclick = pos === null || pos === undefined ? null : () => {
+        const ta = $('rules-src');
+        ta.focus(); ta.setSelectionRange(pos, Math.min(pos + 1, ta.value.length));
+        const lh = parseFloat(getComputedStyle(ta).lineHeight) || 20;
+        ta.scrollTop = Math.max(0, (ta.value.slice(0, pos).split('\n').length - 1) * lh - ta.clientHeight / 3);
+      };
       $('rmeta').textContent = sets.length ? `${sets[0].rules.length} rule${sets[0].rules.length === 1 ? '' : 's'}` : '';
       if (err || !sets.length) { S.fudge = null; $('score').textContent = ''; renderResults(); return; }
       S.fudge = null; renderResults();
@@ -1390,7 +1398,17 @@ function readRuleSrc() {
   if (!raw) return { sets: [], err: null };
   let json;
   try { json = JSON.parse(raw); }
-  catch (e) { return { sets: [], err: 'That is not valid JSON. ' + e.message }; }
+  catch (e) {
+    // The engine's message carries a character offset. A line number is more
+    // use, and the cursor going there is more use still.
+    const at = /position (\d+)/.exec(e.message);
+    const pos = at ? Math.min(+at[1], raw.length) : null;
+    const line = pos === null ? null : raw.slice(0, pos).split('\n').length;
+    return { sets: [], pos,
+      err: (line ? `Line ${line}: ` : '') + e.message.replace(/ in JSON at position.*$/, '')
+        + '. JSON allows no trailing comma after the last item, and every key and'
+        + ' string must use double quotes.' };
+  }
   const set = Array.isArray(json) ? { name: 'my-rules', rules: json } : json;
   if (!Array.isArray(set.rules)) return { sets: [], err: 'A rule set needs a "rules" array.' };
   set.name = set.name || 'my-rules';
