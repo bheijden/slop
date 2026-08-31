@@ -157,6 +157,14 @@ async function main() {
       return JSON.stringify({n:document.querySelectorAll('#list li[data-i]').length,
         marks:document.querySelectorAll('#doc mark').length})})()`);
     const ex = JSON.parse(example);
+    // The badge counts the rule's own unit, which differs per rule, so it has
+    // to say which rather than showing a bare multiplier.
+    const badges = await evaluate(`(()=>JSON.stringify(
+      [...document.querySelectorAll('#list .cnt')].map(n=>({b:n.textContent,t:n.title}))))()`);
+    const bd = JSON.parse(badges);
+    check('a count badge says what it counts',
+      bd.length >= 2 && bd.every(x => x.t && x.t.length > 5), JSON.stringify(bd));
+
     check('the example lints', ex.n > 0 && ex.marks > 0, JSON.stringify(ex));
 
     const dropped = await evaluate(`(async()=>{
