@@ -39,6 +39,32 @@ const splice = (t, at, len, ins) => t.slice(0, at) + ins + t.slice(at + len);
  * Build markup variants of `example` that leave the span [s,e) semantically intact.
  * @returns {{name:string, format:'md'|'html', lossless:boolean, source:string}[]}
  */
+// What a failure generally means. Every line here has to be true of every
+// instance of that failure, not just the common one: a wrong guess about the
+// cause costs more than saying nothing. Anything rule-specific belongs in the
+// rule's own `suggest`, not here.
+export const FAILURE_HELP = {
+  'no examples':
+    'A rule with no tests.hit example cannot be checked at all. Add one sentence it should flag.',
+  'false positive':
+    'The pattern matched a tests.miss example, so it is broader than intended. '
+    + 'A missing word boundary is the usual cause: "very" matches inside "every", "\\bvery\\b" does not.',
+  'example does not match':
+    'The pattern did not match a tests.hit example, so it is narrower than intended. '
+    + 'In JSON every backslash is doubled, so a word boundary is written "\\b". '
+    + 'Case is only ignored when flags include "i".',
+  fragile:
+    'The rule matched the plain sentence but not the same sentence carrying markup. '
+    + 'Literal spaces are the usual cause: they fail across a soft-wrapped line or a '
+    + 'non-breaking space, where "\\s+" holds.',
+};
+
+// A fudge failure is named after the variant that broke it, so anything that is
+// not one of the conformance kinds is a markup failure.
+export function failureHelp(kind) {
+  return FAILURE_HELP[kind] || FAILURE_HELP[String(kind).split(':')[0]] || FAILURE_HELP.fragile;
+}
+
 export function variants(example, s, e) {
   const out = [];
   const add = (name, format, lossless, source) => out.push({ name, format, lossless, source });

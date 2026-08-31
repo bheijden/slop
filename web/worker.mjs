@@ -5,7 +5,7 @@
 // forever. A worker is the only way to terminate that without freezing the tab.
 import { analyze, sentenceBounds, countWords, compileRuleSet } from '../js/engine.mjs';
 import { extractHtml, extractMarkdown, extractPlain, toSource } from '../js/extract.mjs';
-import { variants } from '../js/fudge.mjs';
+import { variants, failureHelp } from '../js/fudge.mjs';
 
 const EXTRACT = { html: extractHtml, md: extractMarkdown, txt: extractPlain };
 
@@ -64,7 +64,7 @@ function fudge({ sets }) {
   for (const raw of sets) {
     for (const rule of compileRuleSet(raw, raw.name).rules) {
       const t = rule.tests || { hit: [], miss: [] };
-      const row = { rule: rule.id, set: rule.set, name: rule.name,
+      const row = { rule: rule.id, set: rule.set, name: rule.name, suggest: rule.suggest || null,
                     conform: { ok: 0, fail: 0 }, fudge: { ok: 0, fail: 0, lossy: 0 }, failures: [] };
       if (!(t.hit || []).length) row.failures.push({ kind: 'no examples', detail: 'every rule needs a tests.hit example' });
       for (const ex of t.miss || []) {
@@ -82,6 +82,7 @@ function fudge({ sets }) {
           else { row.fudge.fail++; row.failures.push({ kind: v.name, detail: v.source }); }
         }
       }
+      for (const f of row.failures) f.help = failureHelp(f.kind);
       out.push(row);
     }
   }

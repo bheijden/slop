@@ -165,12 +165,13 @@ body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
 #pane-doc{grid-column:1}
 .divider{grid-column:2}
 #pane-list{grid-column:3}
-.pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative}
-.phead{position:sticky;top:0;z-index:2;background:var(--paper);padding:0 0 7px;
+.pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative;
+      background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:11px 14px}
+.phead{position:sticky;top:0;z-index:2;background:var(--card);padding:0 0 7px;
        display:flex;align-items:center;gap:8px;min-height:26px}
 #pane-list .phead{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-left:2px}
-#pane-list{padding-left:16px}
-#pane-doc{padding-right:4px}
+#pane-list{padding-left:14px}
+#pane-doc{padding-right:14px}
 .panes[data-layout=text] #doc{max-width:70ch}
 
 /* The control sits at the middle of the divider, where you would reach for it. */
@@ -956,7 +957,9 @@ function renderFudge() {
         <span class="loc">${r.conform.ok}/${r.conform.ok + r.conform.fail}</span>
         <span><span class="rid">${esc(r.rule)}</span>
 ${r.name ? `<div class="m">${esc(r.name)}</div>` : ''}
-          ${r.failures.map((f) => `<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0, 140))}</div>`).join('')}
+          ${rb || !r.suggest ? '' : `<div class="fix">${esc(r.suggest)}</div>`}
+          ${r.failures.map((f) => `<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0, 140))}</div>`
+            + (f.help ? `<div class="fix">${esc(f.help)}</div>` : '')).join('')}
         </span></li>`;
     }).join('');
   wireFudgeRows();

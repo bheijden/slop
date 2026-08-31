@@ -15,7 +15,7 @@ import process from 'node:process';
 import { readFileSync } from 'node:fs';
 import { loadBuiltinSets, loadLibrarySets, loadSetFile, findConfig, loadConfig } from '../js/config.mjs';
 import { extractMarkdown, extractHtml } from '../js/extract.mjs';
-import { testRules } from '../js/fudge.mjs';
+import { testRules, failureHelp } from '../js/fudge.mjs';
 
 const EXTRACT = { md: extractMarkdown, html: extractHtml };
 
@@ -81,7 +81,13 @@ if (fragile.size) {
 if (failures.length) {
   console.log('\nfailures:');
   const show = verbose ? failures : failures.slice(0, 15);
-  for (const [id, why, detail] of show) console.log(`  ${id.padEnd(22)} ${why.padEnd(28)} ${detail}`);
+  const seen = new Set();
+  for (const [id, why, detail] of show) {
+    console.log(`  ${id.padEnd(22)} ${why.padEnd(28)} ${detail}`);
+    // The guidance is per kind, not per rule, so say it once.
+    const help = failureHelp(why);
+    if (!seen.has(help)) { seen.add(help); console.log(`  ${' '.repeat(22)} ${help}`); }
+  }
   if (!verbose && failures.length > show.length) {
     console.log(`  ... ${failures.length - show.length} more (-v for all)`);
   }

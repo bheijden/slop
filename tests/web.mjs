@@ -181,6 +181,15 @@ async function main() {
     check('test-rules mode tests the template', fg.rows >= 2 && fg.prefilled > 200, JSON.stringify(fg));
     check('the template shows a real failure', /1 failing/.test(fg.score) && fg.why >= 1, JSON.stringify(fg));
 
+    // A failure says what that kind of failure generally means, the way a
+    // finding says how to fix the phrase it flagged.
+    const help = await evaluate(`(()=>{
+      const f=document.querySelector('#list li.bad .fix');
+      return JSON.stringify({text: f ? f.textContent : null})})()`);
+    const hp = JSON.parse(help);
+    check('a failure explains what that kind of failure means',
+      hp.text && /word boundary/.test(hp.text), JSON.stringify(hp));
+
     // A failure points back at the exact string in the editor that caused it.
     const link = await evaluate(`(async()=>{
       const why=document.querySelector('#list li.bad .why');
