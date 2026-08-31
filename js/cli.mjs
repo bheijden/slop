@@ -214,8 +214,11 @@ async function main() {
     for (const set of resolved.sets) {
       process.stdout.write(`\n${C.bold(set.name)} ${C.dim('- ' + (set.title || ''))}\n`);
       for (const r of set.rules) {
-        const on = rules.some((x) => x.id === r.id);
-        process.stdout.write(`  ${on ? C.green('on ') : C.dim('off')} ${r.id.padEnd(22)} ${r.name}\n`);
+        const live = rules.find((x) => x.id === r.id);
+        // A tuned rule behaves differently here than it does for whoever wrote
+        // it, which is worth saying out loud in the listing.
+        const tuned = live && live.tuned ? C.yellow(' tuned') : '';
+        process.stdout.write(`  ${live ? C.green('on ') : C.dim('off')} ${r.id.padEnd(22)} ${r.name}${tuned}\n`);
       }
     }
     process.stdout.write(`\n${rules.length} of ${resolved.available.length} rules active\n`);
@@ -234,6 +237,13 @@ async function main() {
       process.stdout.write(`\n  ${C.dim('mined from:')} ${r.from}${r.source ? ` ${C.dim('·')} ${r.source}` : ''}\n`);
     }
     if (r.evidence) process.stdout.write(`\n  ${C.dim('evidence:')} ${r.evidence}\n`);
+    if (r.reference) {
+      const u = r.reference.unit ? ` (${r.reference.unit})` : '';
+      process.stdout.write(`\n  ${C.dim('measured rates' + u + ':')}\n`);
+      for (const k of ['human', 'ai', 'tune']) {
+        if (r.reference[k]) process.stdout.write(`    ${C.dim(k === 'tune' ? 'tuning' : k)}  ${r.reference[k]}\n`);
+      }
+    }
     if (r.measured) process.stdout.write(`\n  ${C.dim('measured:')} ${r.measured}\n`);
     if (r.note) process.stdout.write(`\n  ${C.dim('note:')} ${r.note}\n`);
     const t = r.tests || {};

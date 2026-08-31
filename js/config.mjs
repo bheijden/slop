@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileRuleSet } from './engine.mjs';
+import { compileRuleSet, compileRule } from './engine.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const BUILTIN_DIR = path.join(HERE, '..', 'rules');
@@ -93,7 +93,7 @@ export function loadConfig(file) {
  * @param {boolean}  o.all      include rules marked "default":"off"
  * @returns {{rules: object[], sets: object[], available: object[]}}
  */
-export function resolveRules({ select = [], ignore = [], ruleSets = [], all = false, rulesDir, extraSets = [] } = {}) {
+export function resolveRules({ select = [], ignore = [], ruleSets = [], all = false, tune = {}, rulesDir, extraSets = [] } = {}) {
   const sets = [
     ...loadBuiltinSets(rulesDir),
     ...loadLibrarySets(),
@@ -152,6 +152,15 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
     if (ignoredIds.has(r.id) || ignoredSets.has(r.set)) return false;
     if (r.default === 'off' && !all && !explicit.has(r.id) && !explicitSets.has(r.set)) return false;
     return true;
+  // A rate that is right for one register is wrong for another, so a project
+  // can move a threshold without forking the rule. Only params are tunable:
+  // the pattern stays the rule author's.
+  }).map((r) => {
+    if (!tune[r.id]) return r;
+    // Recompiled, not patched: the finder closed over the original params when
+    // the set was compiled, so changing them afterwards would do nothing.
+    const params = { ...(r.params || {}), ...tune[r.id] };
+    return { ...compileRule({ ...r, params }, r.set), tuned: true };
   });
 
   return { rules, sets: active, available: everyRule };
@@ -166,6 +175,7 @@ export function mergeConfig(config = {}, flags = {}) {
     ruleSets: list(config.ruleSets, flags.ruleSets),
     all: flags.all ?? config.all ?? false,
     exclude: list(config.exclude, flags.exclude),
+    tune: { ...(config.tune || {}) },
     maxPer1000: flags.maxPer1000 ?? config.maxPer1000 ?? null,
     max: flags.max ?? config.max ?? null,
     severity: { ...(config.severity || {}), ...(flags.severity || {}) },

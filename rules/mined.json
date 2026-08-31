@@ -832,6 +832,12 @@
         "minMatches": 2,
         "minWords": 250,
         "minSentences": 5
+      },
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "No document of eighteen contained more than one occurrence. Highest rate 0.91.",
+        "ai": "Up to four occurrences and 4.63 per 1000 words. Ten of eighteen at or above 1.0.",
+        "tune": "Engineering documentation uses this ordinarily; this repository sat at 2.6 while reading naturally. Raise it or ignore the rule for prose that compares things for a living."
       }
     },
     {
@@ -1336,7 +1342,13 @@
       "note": "Threshold set below the floor of a 16-document human prose corpus, where nothing fell under 21 commas per 1000 words. The other half of the calibration is missing: there is no AI-written corpus here to check what rate models actually produce, so this is a floor derived from one side only.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "Nothing in a 16-document technical corpus fell below 21.6.",
+        "ai": "Not measured on the matched corpus. The Economist reports models short of commas against journalism and novels.",
+        "tune": "A floor derived from one side only. Measure your own corpus before trusting it."
+      }
     },
     {
       "id": "paren-scarcity",
@@ -1362,7 +1374,13 @@
       "note": "Zero is a deliberately literal reading of “hardly any”. It still fires on perfectly good human prose that simply never reaches for a parenthesis: one document in the 16-document corpus, about 6%.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "On the audit corpus: 6 hits in 6/18 human documents, 18 in 18/18 AI documents."
+      "evidence": "On the audit corpus: 6 hits in 6/18 human documents, 18 in 18/18 AI documents.",
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "16 documents ranged 0 to 110, and one in six used none at all.",
+        "ai": "Zero parentheses in all 18 documents of the matched corpus, in every register.",
+        "tune": "Fires only at zero. There is nothing to raise; ignore it for prose that legitimately never parenthesises."
+      }
     },
     {
       "id": "long-sentences",
@@ -1464,7 +1482,13 @@
       "note": "Do not read a hit here as evidence of AI authorship; it is an observation about your own draft. The three measurements are in research/log.md.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "0 to 55 across a 16-document technical corpus, median 16. Wildly variable, which is why the threshold is high.",
+        "ai": "Not separable. Four studies agree the em dash does not distinguish machine prose from human prose.",
+        "tune": "This is a style observation, not a tell. Set it wherever your own writing stops reading as emphatic."
+      }
     },
     {
       "id": "uniform-sentence-length",
@@ -1816,6 +1840,12 @@
         "miss": [
           "The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. "
         ]
+      },
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "0 to 2.7 across six registers, 18 documents. Technical writing is lowest at 0.8 to 0.9; academic highest at 2.7.",
+        "ai": "0 to 9.0 across the same six registers. Fourteen of eighteen documents at or above 3.0.",
+        "tune": "Raise it for prose that defines terms as it goes, such as a specification or a glossary. Lower it for chat, release notes and anything short."
       }
     }
   ]

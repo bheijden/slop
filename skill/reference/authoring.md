@@ -54,6 +54,7 @@ Optional fields, all printed by `explain <id>`:
 | `measured` | when a tell was measured and by whom, so a stale one can be recognised |
 | `from`, `source` | where a mined rule came from |
 | `evidence` | what it scored on a corpus |
+| `reference` | the rates measured behind a `density` or `rhythm` threshold, with `unit`, `human`, `ai` and `tune` fields. Informational: it exists so the threshold can be argued with |
 | `default` | `"off"` to keep a rule out of a run unless selected, `"on"` to run it even when its set is opt-in |
 
 Use it with `--rules ./house-style.json`, drop it in the repo's `rules/`

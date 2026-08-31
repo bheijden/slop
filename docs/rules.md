@@ -256,6 +256,46 @@ even though no content word is shared. It is a crude stand-in for
 part-of-speech tagging, and it only compares sentences that look like prose,
 because repeated code lines are legitimately templated.
 
+### Thresholds and registers
+
+A rate that is right for one register is wrong for another. A chat log will never
+carry an em dash; a paper might carry many. So a threshold is a starting point,
+not a fact, and three things keep it honest.
+
+**The observed rate travels with the finding.** Every document-level finding
+reports what it measured, not just that it crossed a line:
+
+```
+document  colon-appositive  12 in 1554 words, 7.7 per 1000, at or above 3
+```
+
+**A rule can record what was measured, and where.** The optional `reference`
+block is prose in named fields, printed by `slop explain`:
+
+```jsonc
+"reference": {
+  "unit": "per 1000 words",
+  "human": "0 to 2.7 across six registers. Technical writing lowest at 0.8.",
+  "ai":    "0 to 9.0. Fourteen of eighteen documents at or above 3.0.",
+  "tune":  "Raise it for prose that defines terms. Lower it for chat or release notes."
+}
+```
+
+It changes nothing at runtime. It exists so the number in `params` can be argued
+with, by someone who can see where it came from.
+
+**A project can move a threshold without forking the rule.** `tune` in
+`slop.json` overrides any rule's `params`, and only its params: the pattern stays
+the author's.
+
+```json
+{ "tune": { "colon-appositive": { "min": 6 },
+            "rather-than":      { "min": 2.5 } } }
+```
+
+`list` marks a tuned rule so nobody wonders why a shared rule behaves differently
+here.
+
 **What a rate rule claims.** Not that the construction is wrong: every one of
 them catches something good writers do on purpose. What separates machine prose
 is how often it reaches for the same shape. Set the threshold at the top of what
