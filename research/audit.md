@@ -369,6 +369,40 @@ change, down from 1.96. The gap narrowed; it did not close, and one rule change
 was never going to close it. What these rules are good for is the thing they were
 built for: pointing at worn phrasing so a writer can decide.
 
+## Pruned in the merge
+
+Merging ten sets into one made it worth asking whether any rule was already
+covered by another. `tools/find-redundant.mjs` answers it by testing whether
+every one of a rule's `tests.hit` examples is caught by some other rule. It looks
+at span rules only: document-level rules all fire on any fixture long enough to
+reach their word threshold, so coverage there says the fixture is long, not that
+the rules overlap.
+
+Three mined rules were entirely inside a shipped one and are gone:
+
+| dropped | already covered by |
+|---|---|
+| `seamless` | `wikipedia-ai/ai-vocab`, which matches the same word |
+| `underscore-importance` | `ai-vocab`, which matches `underscore` on its own |
+| `fast-paced-world` | `wikipedia-ai/landscape`, which takes any noun after the adjective |
+
+All three came from slop-gate, and their existence is a small finding in itself:
+two independently assembled vocabulary lists arrived at the same words.
+
+Two variants went with them. `not-just-nosub` won its comparison and became the
+shipped `not-just`, so the bench copy was a duplicate of a shipped rule.
+`not-just-tight` lost, dropping every true positive along with the noise.
+
+The echo bench went from four to two. `echo-aligned` and `echo-run3` each apply
+one of the two constraints that `echo-aligned-func` applies together, and all
+four scored identically, so the two single-constraint forms were components
+rather than competitors. What remains are the two composites: `echo-aligned-func`
+keyed on alignment, `echo-structural` on run length.
+
+What still shows as covered is all expected: `whole` inside `is-the-whole`, both
+upstream's; and each variant covering the rule it is a variant of, which is what
+a bench is for.
+
 ## Regrouped by evidence
 
 The scores live on the rules themselves. Every rule in `candidates/mined.json`

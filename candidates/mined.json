@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "slop": "0.1.0",
   "title": "Mined AI-slop tells",
-  "description": "Every tell this project mined itself, in one set. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. The full survey is in research/log.md and the measurements in research/audit.md.",
+  "description": "Every tell this project mined itself, in one set. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. Three rules were dropped in the merge because a shipped rule already matched everything they did: slop-gate's seamless, underscore-importance and fast-paced-world are all inside wikipedia-ai's ai-vocab and landscape. The full survey is in research/log.md and the measurements in research/audit.md.",
   "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
   "rules": [
     {
@@ -69,27 +69,6 @@
         ],
         "miss": [
           "We navigate the menu with arrow keys."
-        ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
-    },
-    {
-      "id": "fast-paced-world",
-      "name": "fast paced world",
-      "kind": "regex",
-      "pattern": "\\bin\\s+today['’]?s\\s+(?:fast-paced|digital|modern|ever-changing|competitive)\\s+(?:world|age|landscape|era|market)\\b",
-      "flags": "gi",
-      "description": "Flagged by slop-gate as an AI-writing tell: fast paced world.",
-      "suggest": "Delete it and start with the subject.",
-      "tests": {
-        "hit": [
-          "In today's fast-paced world, speed matters."
-        ],
-        "miss": [
-          "In today's release we fixed the parser."
         ]
       },
       "from": "slop-gate",
@@ -478,27 +457,6 @@
       "default": "off"
     },
     {
-      "id": "underscore-importance",
-      "name": "underscore importance",
-      "kind": "regex",
-      "pattern": "\\bunderscor(?:e|es|ed|ing)\\s+the\\s+(?:importance|need|value|significance|urgency)\\b",
-      "flags": "gi",
-      "description": "Flagged by slop-gate as an AI-writing tell: underscore importance.",
-      "suggest": "State the fact and let it carry itself.",
-      "tests": {
-        "hit": [
-          "The outage underscores the importance of backups."
-        ],
-        "miss": [
-          "Underscores separate the words."
-        ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
-    },
-    {
       "id": "moreover",
       "name": "moreover",
       "kind": "regex",
@@ -599,27 +557,6 @@
         ],
         "miss": [
           "The realm was ruled from the north."
-        ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
-    },
-    {
-      "id": "seamless",
-      "name": "seamless",
-      "kind": "regex",
-      "pattern": "\\bseamless(?:ly)?\\b",
-      "flags": "gi",
-      "description": "Flagged by slop-gate as an AI-writing tell: seamless.",
-      "suggest": "Describe what works without friction.",
-      "tests": {
-        "hit": [
-          "The migration was seamless."
-        ],
-        "miss": [
-          "The seam was stitched by hand."
         ]
       },
       "from": "slop-gate",
