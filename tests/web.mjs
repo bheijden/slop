@@ -259,6 +259,23 @@ async function main() {
       bk.shown && /Line 4/.test(bk.msg) && /trailing comma/.test(bk.msg), JSON.stringify(bk));
     check('clicking the JSON error jumps to it', bk.line === 4, JSON.stringify(bk));
 
+    // Two rules cannot answer to one id: it decides selection, ignoring and
+    // reporting, so a duplicate fails quietly rather than loudly.
+    const dup = await evaluate(`(async()=>{
+      const t=document.getElementById('rules-src');
+      t.value=JSON.stringify({name:'dup',rules:[1,2,3].map(()=>({id:'a',kind:'regex',
+        pattern:'foo',flags:'gi',description:'d',tests:{hit:['a foo b'],miss:['bar']}}))});
+      t.dispatchEvent(new Event('input'));
+      await new Promise(r=>setTimeout(r,1200));
+      const e=document.getElementById('rerr');
+      return JSON.stringify({shown:!e.hidden, msg:e.textContent,
+        head:document.getElementById('list-head').textContent,
+        rows:document.querySelectorAll('#list li[data-rule]').length})})()`);
+    const dp = JSON.parse(dup);
+    check('duplicate rule ids are refused with a reason',
+      dp.shown && /appears 3 times/.test(dp.msg) && dp.rows === 0 && dp.head === 'not run',
+      JSON.stringify(dp));
+
     // Replacing the text re-runs against whatever is there now.
     const own = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');

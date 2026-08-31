@@ -385,6 +385,19 @@ export function compileRule(rule, setName) {
 export function compileRuleSet(json, fallbackName) {
   const name = json.name || fallbackName;
   if (!Array.isArray(json.rules)) throw new Error(`rule set "${name}" has no rules array`);
+  // Ids address a rule everywhere: --select, --ignore, config, the lock file
+  // and the overlap collapse in analyze(). Two rules answering to one id is
+  // not a duplicate rule, it is an ambiguous one, and it fails quietly.
+  const seen = new Map();
+  for (const r of json.rules) {
+    if (!r || !r.id) continue;             // compileRule reports a missing id
+    seen.set(r.id, (seen.get(r.id) || 0) + 1);
+  }
+  const dupes = [...seen].filter(([, n]) => n > 1);
+  if (dupes.length) {
+    const list = dupes.map(([id, n]) => `"${id}" appears ${n} times`).join(', ');
+    throw new Error(`rule set "${name}": every rule needs its own id, but ${list}`);
+  }
   return {
     ...json, name,
     version: json.version || '0.0.0',

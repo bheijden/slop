@@ -1184,10 +1184,24 @@ function run() {
         ta.scrollTop = Math.max(0, (ta.value.slice(0, pos).split('\n').length - 1) * lh - ta.clientHeight / 3);
       };
       $('rmeta').textContent = sets.length ? `${sets[0].rules.length} rule${sets[0].rules.length === 1 ? '' : 's'}` : '';
-      if (err || !sets.length) { S.fudge = null; $('score').textContent = ''; renderResults(); return; }
+      if (err || !sets.length) {
+        S.fudge = null; $('score').textContent = ''; renderResults();
+        // renderFudge says "testing…" while it waits; nothing is waiting here.
+        $('list-head').textContent = err ? 'not run' : '';
+        return;
+      }
       S.fudge = null; renderResults();
       const res = await ask({ mode:'fudge', sets }, 60000);
-      if (!res.ok) return note(res.error);
+      if (!res.ok) {
+        S.fudge = null;
+        $('rerr').hidden = false;
+        $('rerr').onclick = null;
+        $('rerr').textContent = res.error;
+        $('score').textContent = '';
+        $('list-head').textContent = 'not run';
+        $('list').innerHTML = '';
+        return;
+      }
       S.fudge = res.results;
       const bad = res.results.reduce((a,r) => a + r.conform.fail + r.fudge.fail, 0);
       $('score').className = 'score' + (bad ? '' : ' zero');
@@ -1411,6 +1425,18 @@ function readRuleSrc() {
   }
   const set = Array.isArray(json) ? { name: 'my-rules', rules: json } : json;
   if (!Array.isArray(set.rules)) return { sets: [], err: 'A rule set needs a "rules" array.' };
+  // An id addresses a rule everywhere, so two rules cannot share one. Checked
+  // here as well as in the engine, to answer while you are still typing.
+  const seen = new Map();
+  for (const r of set.rules) if (r && r.id) seen.set(r.id, (seen.get(r.id) || 0) + 1);
+  const dupes = [...seen].filter(([, n]) => n > 1);
+  if (dupes.length) {
+    return { sets: [], err: 'Every rule needs its own id, but '
+      + dupes.map(([id, n]) => `"${id}" appears ${n} times`).join(', ')
+      + '. An id is how a rule is selected, ignored and reported, so it has to be unique.' };
+  }
+  const noId = set.rules.findIndex((r) => !r || !r.id);
+  if (noId >= 0) return { sets: [], err: `Rule ${noId + 1} has no "id". Every rule needs one.` };
   set.name = set.name || 'my-rules';
   return { sets: [set], err: null };
 }
