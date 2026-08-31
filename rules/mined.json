@@ -1791,6 +1791,32 @@
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
       "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+    },
+    {
+      "id": "colon-appositive",
+      "name": "Reaching for the colon",
+      "kind": "density",
+      "pattern": "[a-z,)]: +[a-z]",
+      "flags": "g",
+      "params": {
+        "min": 3.0,
+        "minWords": 250,
+        "minSentences": 5
+      },
+      "description": "A claim, a colon, then the expansion of the claim, over and over. One is good writing. The tell is the rate: measured over 36 matched documents, no human document exceeded 2.7 of these per 1000 words, while 14 of 18 AI documents were at or above 3.0, running to 9.0. The colon and its continuation must be on the same line, so a heading, a table intro or a colon opening a bulleted list is not counted; only the in-sentence form is.",
+      "suggest": "Vary the joins. Some of these want a full stop, some a comma, some the sentence turned around. Replacing every one with a dash or a semicolon swaps one habit for another.",
+      "note": "A rate, not a verdict on any single colon. A document about definitions will sit high for good reasons, so read a few before rewriting.",
+      "from": "reader report",
+      "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
+      "evidence": "On the audit corpus: 0 of 18 human documents at or above the threshold, 14 of 18 AI documents.",
+      "tests": {
+        "hit": [
+          "The bottleneck is not the solver: it is the model that feeds it. What closes the gap is a digital twin: a site-specific process model grounded in physics. The plant is a solver inside a solver: an outer optimizer searches while an inner one settles. Two things follow from this: derivatives come out exact, and scenarios come out nearly free. The second point matters more: thousands of variants compile into one program. Neither alternative reaches this: hand-written code is specialised only by human labour. The niche is narrow and referenceable: most sales in this industry move on references. The code is specialised per question: the framework compiles for the exact question asked. The bottleneck is not the solver: it is the model that feeds it. What closes the gap is a digital twin: a site-specific process model grounded in physics. The plant is a solver inside a solver: an outer optimizer searches while an inner one settles. Two things follow from this: derivatives come out exact, and scenarios come out nearly free. The second point matters more: thousands of variants compile into one program. Neither alternative reaches this: hand-written code is specialised only by human labour. The niche is narrow and referenceable: most sales in this industry move on references. The code is specialised per question: the framework compiles for the exact question asked. Operators do not read the model: they read the number it produces. That number has to survive a hostile question: where did this come from. The answer has to be short: the twin was calibrated last night against live data. "
+        ],
+        "miss": [
+          "The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. "
+        ]
+      }
     }
   ]
 }

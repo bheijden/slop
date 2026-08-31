@@ -256,6 +256,13 @@ even though no content word is shared. It is a crude stand-in for
 part-of-speech tagging, and it only compares sentences that look like prose,
 because repeated code lines are legitimately templated.
 
+**What a rate rule claims.** Not that the construction is wrong: every one of
+them catches something good writers do on purpose. What separates machine prose
+is how often it reaches for the same shape. Set the threshold at the top of what
+human writing does, not above zero, and word the `suggest` so it asks for
+variety instead of substitution. A rule that says "replace every one of these"
+moves the habit somewhere else.
+
 A density or rhythm rule is only as good as its threshold, so calibrate on your
 own corpus. The ones in `candidates/economist.json` come from a 16-document sample
 and are meant to be changed.
