@@ -199,6 +199,18 @@ async function main() {
     const ps = JSON.parse(pass);
     check('a passing rule shows no failure text', ps.why === 0 && !/Write/.test(ps.text || ''), JSON.stringify(ps));
 
+    // The list reads down in the same order as the rule set, so a row lines up
+    // with the rule above it in the editor rather than being sorted away from it.
+    const order = await evaluate(`(()=>{
+      const ids=[...document.querySelectorAll('#list li[data-rule]')].map(li=>li.dataset.rule);
+      const src=JSON.parse(document.getElementById('rules-src').value).rules.map(r=>r.id);
+      return JSON.stringify({ids, src, marks:[...document.querySelectorAll('#list li .loc')].map(n=>n.textContent)})})()`);
+    const od = JSON.parse(order);
+    check('results follow the order of the rule set',
+      JSON.stringify(od.ids) === JSON.stringify(od.src), JSON.stringify(od));
+    check('pass and fail are marked differently',
+      od.marks.includes('\u2713') && od.marks.includes('\u2715'), JSON.stringify(od.marks));
+
     // A failure points back at the exact string in the editor that caused it.
     const link = await evaluate(`(async()=>{
       const why=document.querySelector('#list li.bad .why');

@@ -340,6 +340,13 @@ body[data-mode=fudge] .ronly{display:block}
 body[data-mode=fudge] .docs details:not(.ronly){display:none}
 /* a result row points back at the rule that produced it */
 .list li.bad .rid{color:var(--flag)}
+body[data-mode=fudge] .list .rid{color:var(--ink)}
+body[data-mode=fudge] .list li.bad .rid{color:var(--flag)}
+.list li.good .loc,.list li.bad .loc{font-size:13px}
+.list li.good .loc{color:var(--muted)}
+.list li.bad .loc{color:var(--flag)}
+.list .counts{color:var(--muted);font-size:11.5px;margin-top:2px}
+.list li.bad .counts{color:var(--flag);opacity:.85}
 .list li .why{color:var(--flag);font-size:11.5px;padding-left:9px;
   border-left:2px solid var(--flag);margin:4px 0 2px;white-space:pre-wrap;word-break:break-word}
 .list li .why b{font-weight:600}
@@ -949,14 +956,18 @@ function renderFudge() {
     + `<span class="tot">${t.cok} examples · ${t.fok} variants</span>`;
 
   // Same shape as a finding: where it happened, what it was, why.
-  $('list').innerHTML = S.fudge.slice()
-    .sort((x, y) => (y.conform.fail + y.fudge.fail) - (x.conform.fail + x.fudge.fail))
+  // Source order, so the list reads down the same way the rule set does.
+  $('list').innerHTML = S.fudge
     .map((r) => {
       const rb = r.conform.fail + r.fudge.fail;
-      return `<li data-rule="${esc(r.rule)}"${rb ? ' class="bad"' : ''}>
-        <span class="loc">${r.conform.ok}/${r.conform.ok + r.conform.fail}</span>
+      const ex = r.conform.ok + r.conform.fail;
+      const mk = r.fudge.ok + r.fudge.fail;
+      return `<li data-rule="${esc(r.rule)}" class="${rb ? 'bad' : 'good'}">
+        <span class="loc">${rb ? '\u2715' : '\u2713'}</span>
         <span><span class="rid">${esc(r.rule)}</span>
 ${r.what ? `<div class="m">${esc(r.what)}</div>` : ''}
+          <div class="counts">${rb ? `${rb} failing of ` : 'passed all '}${ex} example${ex === 1 ? '' : 's'}`
+        + `${mk ? ` and ${mk} markup variant${mk === 1 ? '' : 's'}` : ''}</div>
           ${r.failures.map((f) => `<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0, 140))}</div>`
             + (f.help ? `<div class="fix">${esc(f.help)}</div>` : '')).join('')}
         </span></li>`;
