@@ -44,7 +44,7 @@ directive ("Delete the hedge and state the fact"), not a description.
 
 **Every `id` in a set must be unique.** An id is how a rule is selected, ignored,
 reported and recorded in the lock file, so two rules answering to one are
-ambiguous rather than duplicated. A set with a repeat is refused, naming the id.
+ambiguous, not duplicated. A set with a repeat is refused, naming the id.
 
 Optional fields, all printed by `explain <id>`:
 
@@ -131,7 +131,7 @@ node /tmp/slop/js/cli.mjs check --format json -r docs/ \
 Then read twenty hits of the worst offender. The hits themselves tell you the
 missing constraint. A worked example is in the repo's `docs/calibration.md`:
 `colon-triple` produced 45% of all findings on technical writing, and 16 of its
-21 hits were docstrings, matrix algebra and hardware lists rather than prose.
+21 hits were docstrings, matrix algebra and hardware lists, not prose.
 Requiring prose characters and a lowercase initial in each item removed every
 false positive without losing a single real hit, and the false positives went
 into `tests.miss`, so the regression is locked in.

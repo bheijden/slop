@@ -86,7 +86,7 @@ Installed profiles work the same way, and so does a `slop.json` entry:
 { "select": ["simonwillison", "wikipedia-ai", "style-plain"] }
 ```
 
-**One profile at a time.** Selecting two is refused rather than merged, because
+**One profile at a time.** Selecting two is refused instead of merged, because
 a document cannot sit in two registers at once and the two bands would report it
 as simultaneously too formal and not formal enough:
 

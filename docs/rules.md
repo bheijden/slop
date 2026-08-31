@@ -48,7 +48,7 @@ Or in `slop.json`, found by walking up from the working directory:
 
 Every rule ships enabled. `colon-triple` nearly did not: it produced 45% of all
 findings on a real corpus, and 16 of its 21 hits were docstrings, matrix algebra
-and hardware lists rather than prose. Tightening the rule beat disabling it: 5
+and hardware lists, not prose. Tightening the rule beat disabling it: 5
 hits, all genuine, with full recall on the examples. See
 [docs/calibration.md](docs/calibration.md) for the method.
 
@@ -128,7 +128,7 @@ slop add --force ./draft-rules.json
 ```
 
 A forced install is labelled and its failure is recorded in the lock, so
-`sets` keeps showing it as failing rather than quietly passing.
+`sets` goes on showing it as failing, and does not quietly pass it.
 
 A set built against a newer `slop` than yours is flagged too, since it may
 use a detector kind this engine does not have.
@@ -318,7 +318,7 @@ It earned its place immediately. The first run found four real bugs, listed in
 ---
 
 
-See also [calibration.md](calibration.md): how a noisy rule gets fixed rather than disabled.
+See also [calibration.md](calibration.md): how a noisy rule gets fixed instead of disabled.
 
 ---
 
@@ -356,7 +356,7 @@ content words, which works, but it is an approximation.
 - **English only.** The patterns are hard-coded English. Prose in another
   language passes almost silently. No findings is not evidence of clean prose.
 - **Heuristics, not proof.** `ai-vocab` firing once is coincidence; several
-  times is a tell. Use a budget rather than demanding zero.
+  times is a tell. Set a budget; do not demand zero.
 - **Long inline code spans are removed.** A single short token is kept. Anything
   with a space in it is treated as a code fragment and dropped.
 - **Markdown tables can trip `echo-triad`.** Set `"skipTables": true` in

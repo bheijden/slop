@@ -135,7 +135,7 @@ found it. Six human documents also use none, so as a document-level flag it runs
 at roughly three quarters precision and full recall on this corpus.
 
 One caveat that matters: all eighteen AI pieces came from one model on one
-prompt. This could be a habit of that model rather than a property of machine
+prompt. This could be a habit of that model, not a property of machine
 prose. The Economist's four-model result is what makes it credible.
 
 ### Rules that fire on humans and not on AI
@@ -207,7 +207,7 @@ and that the sets are carried by a few rules each.
 ## Variants: trying to fix the false firers
 
 Every original still ships unchanged. The alternatives were scored against the
-same corpus and are recorded as specifications below rather than as live rules.
+same corpus and are recorded as specifications below and not as live rules.
 
 ### What the false positives turned out to be
 
@@ -349,8 +349,8 @@ quietly misfires, and this is the cheaper half of the fix.
 
 ### Recorded, not kept as rules
 
-The alternatives were a set of their own for a while. They are specifications
-rather than rules: nothing was promoted, three of the four are a parameter or two
+The alternatives were a set of their own for a while. They are specifications,
+not rules: nothing was promoted, three of the four are a parameter or two
 on a rule that already exists, and a set of unpromoted alternatives sitting beside
 the originals invites someone to enable both and see the same shape reported
 twice. The measurements are above; the implementations are here, which is all it
@@ -380,7 +380,7 @@ Promoting one would be picking on taste and calling it measurement.
 
 `stacked-questions-run3` removed every false positive at no measurable cost, and
 is the strongest candidate for the next promotion. It is held back only because
-neither version fired on AI prose at all, so its recall is untested rather than
+neither version fired on AI prose at all, so its recall is untested, not
 confirmed.
 
 ### The honest limit
@@ -417,8 +417,8 @@ shipped `not-just`, so the bench copy was a duplicate of a shipped rule.
 
 The echo bench went from four to two. `echo-aligned` and `echo-run3` each apply
 one of the two constraints that `echo-aligned-func` applies together, and all
-four scored identically, so the two single-constraint forms were components
-rather than competitors. What remains are the two composites: `echo-aligned-func`
+four scored identically, so the two single-constraint forms were components,
+not competitors. What remains are the two composites: `echo-aligned-func`
 keyed on alignment, `echo-structural` on run length.
 
 What still shows as covered is all expected: `whole` inside `is-the-whole`, both
@@ -446,7 +446,7 @@ rule, not a place to put it.
 firing on one document moves its share by six points.
 
 **108 of 173 rules never fired at all.** On 34,000 words. Most of the library is
-untested by this exercise rather than validated by it.
+untested by this exercise , not validated by it.
 
 **The AI prose here is good.** It was written to a brief, by a capable model,
 with real points to make. It is not the unedited output that gave slop its name.

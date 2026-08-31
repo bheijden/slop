@@ -65,7 +65,7 @@ Calibrated against 30k words of real technical writing: **3 findings**
 <!-- slop-ignore-start -->
 (2 × `leverage`, 1 × `robust`), 0.1 per 1000 words. Precise on this corpus,
 <!-- slop-ignore-end -->
-though that corpus is documentation rather than marketing register.
+though that corpus is documentation, not marketing register.
 
 ### simonw thread → structural tells
 
@@ -134,7 +134,7 @@ about business, health and policy, and a human writing the same essays would
 produce them at the same rate. They only look like slop because the human
 baseline was not topic-matched. This is the exact failure sloptells avoids by
 matching baselines to register, and it is the strongest argument in this log
-for treating any raw frequency list as a lead rather than a finding.
+for treating any raw frequency list as a lead , not a finding.
 
 **What survived both filters.** Stripping proper nouns and topic n-grams leaves
 a residue of genuine constructions, and one of them is startling in its
@@ -179,7 +179,7 @@ descriptive appositive can still match.
 **The fiction set is shipped separately and off by default.** The creative
 constructions are real and consistent: voice barely above a whisper, heart
 pounding in her chest, a shiver down her spine, the words hung in the air,
-little did she know, maybe just maybe. Ten rules rather than 2500 phrases.
+little did she know, maybe just maybe. Ten rules, not 2500 phrases.
 Anyone linting fiction wants these, and nobody linting documentation has any
 use for them. That is what per-source sets are for.
 
@@ -499,7 +499,7 @@ metrically monotone. That is tell 10 in their checklist, and the thing sloptells
 describes as sentences that march in formation.
 
 That needed a seventh detector kind, `rhythm`, because it is a statistic over a
-distribution rather than a count of anything. Their German threshold transfers
+distribution, not a count of anything. Their German threshold transfers
 cleanly: sixteen documents of English human technical prose measured 0.49 to
 1.54, so 0.4 sits below all of them.
 
@@ -750,7 +750,7 @@ them in his writing, and that is a different question from detection. The rule
 says so in its own `measured` field.
 
 **Frequency lists conflate style with topic.** The slop-forensics essay trigrams
-are led by phrases that are fingerprints of the prompt set rather than tells.
+are led by phrases that are fingerprints of the prompt set instead of tells.
 The PubMed study proves the point on the same corpus with the same method: 2024
 excess vocabulary was almost entirely *style* words, while COVID-era excess
 vocabulary was almost entirely *content* words. Any list built without a

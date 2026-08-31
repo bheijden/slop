@@ -13,9 +13,9 @@
       "pattern": "—|\\s–\\s|\\s--\\s|\\s—\\s",
       "flags": "g",
       "severity": "warn",
-      "description": "An em dash, or an en dash or double hyphen standing in for one. Every occurrence, no threshold.",
+      "description": "An em dash, or an en dash or double hyphen standing in for one. Every occurrence, no threshold. This is a house-style rule and it is not optional: the owner of a document that carries it does not want em dashes in it.",
       "suggest": "A comma if the aside is light, a colon if what follows explains, brackets if it is a true aside, a full stop if it is really a second sentence.",
-      "measured": "This rule is a style preference, deliberately kept separate from the detection research. Four independent measurements agree the em dash does NOT distinguish machine prose from human prose: sloptells found acclaimed human writing uses more of them than models do (0.67 against 0.56 per 1000 characters); The Economist found only Claude above the human rate, with ChatGPT markedly below; humanizer-de states that a single em dash proves nothing; and this project's own corpus agreed. None of that is an argument for keeping them in your own writing, which is a different question and yours to answer.",
+      "measured": "The research is about detection and does not bear on this rule. Four independent measurements agree the em dash does NOT distinguish machine prose from human prose: sloptells found acclaimed human writing uses more of them than models do, 0.67 against 0.56 per 1000 characters; The Economist found only Claude above the human rate, with ChatGPT markedly below; humanizer-de states that a single em dash proves nothing; and this project's own corpus agreed. So do not cite a hit here as evidence of authorship. None of it is a reason to leave one in a document whose style forbids them.",
       "tests": {
         "hit": [
           "The migration took a week — longer than anyone expected.",
@@ -31,7 +31,7 @@
       "from": "house style",
       "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
       "evidence": "On the audit corpus: 40 hits in 8/18 human documents, 0 in 0/18 AI documents.",
-      "note": "Ships on where the mined set is loaded at all, because it is a house-style preference rather than a detection claim. See `measured` for what the research actually says about em dashes, which is the opposite."
+      "note": "Ships on wherever this set is loaded. If a document should keep its em dashes, ignore the rule for that project with --ignore em-dash or an ignore entry in slop.json, which is a decision someone makes once, not per finding."
     },
     {
       "id": "leverage",
@@ -809,24 +809,30 @@
     },
     {
       "id": "rather-than",
-      "name": "“rather than”",
-      "kind": "regex",
+      "name": "“rather than”, repeatedly",
+      "kind": "density",
       "pattern": "\\brather\\s+than\\b",
-      "flags": "gi",
-      "description": "The 2026 flagship tell: models reach for “rather than” where humans write “instead of” or rephrase. Measured at ×5.0 vs humans.",
-      "suggest": "Write “instead of”, or rephrase so the contrast is not needed.",
+      "flags": "g",
+      "description": "The 2026 flagship tell, and a rate rather than a phrase. One \"rather than\" is ordinary English. Measured over 36 matched documents: no human document contained more than one, while AI documents ran to four, up to 4.63 per 1000 words. This needs both two occurrences and a rate above one per 1000 words before it says anything.",
+      "suggest": "Vary them. Some are \"instead of\", some want the sentence turned around, and some should stay. Swapping every one for \"not X\" trades a tic for a worse tic.",
       "tests": {
         "hit": [
-          "The compounds dissolve in water rather than reaching your eyes."
+          "The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. "
         ],
         "miss": [
-          "He would rather walk than wait."
+          "The pipeline reads each record and validates it against the shared schema, which both teams can edit and which has drifted twice this year. We chose Postgres rather than a document store, because the reporting side needs joins and nobody wanted to write them by hand. The worker retries; it does not drop the message. Operators are paged when the queue backs up, not emailed, because email is where alerts go to be ignored. The schema is versioned, and migrating in place is something we gave up on after the second outage. Failures are logged and the log rotates nightly, so a bad afternoon is still readable the next morning. Records are batched for throughput, which matters more than latency here. The retry budget is fixed instead of exponential, because a fixed number is easier to reason about at three in the morning. An operator reviews the dead letter queue each Friday, now that the volume has dropped. Most of what is in there comes from one upstream partner who has never answered a ticket. We reject their malformed records at the edge now, which cut the volume by ninety percent in a fortnight. The runbook still says to check it daily and nobody has updated the page. The alert threshold is stale too, set for a volume we stopped seeing in March. We lowered it once, forgot about it, and the queue has run clean since. Eleven records are sitting in the dead letter queue this morning, all from the same source. We suspect a date parsing bug on their side and have stopped guessing about it."
         ]
       },
-      "note": "measured collateral: low, but it is ordinary English — expect this one to need calibration on technical prose",
+      "note": "Was a per-occurrence rule and fired 45 times on this repository, where \"rather than\" is ordinary technical English. The tell was always the rate: sloptells measured a ratio, not a phrase.",
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents."
+      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents.",
+      "params": {
+        "min": 1.0,
+        "minMatches": 2,
+        "minWords": 250,
+        "minSentences": 5
+      }
     },
     {
       "id": "not-x-but-y",

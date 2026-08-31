@@ -484,7 +484,7 @@
       "name": "Colon into a triple",
       "severity": "warn",
       "description": "A colon opening onto three or more comma-separated prose items: “separate ports, processes, and local state”. The most common shape LLM prose uses to sound concrete. Tightened from upstream: items must read as prose, not as code, measurements or proper-noun lists.",
-      "suggest": "Fine in a real list. Suspect when it is prose padding out to three items.",
+      "suggest": "Check the three items are the real count. Cut to the ones that carry weight, or drop the colon and write the sentence out.",
       "kind": "regex",
       "pattern": ":\\s+[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39},\\s+[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39},\\s+(?:and\\s+|or\\s+)?[a-z][^.!?;:\\n,=\\[\\]\\(\\)\\{\\}\"'\\/\\\\|_~^%*+<>&#@$\\u2192\\u21d2\\u2194\\u00b0]{1,39}(?=[.!?\\n])",
       "flags": "g",
@@ -511,7 +511,8 @@
           "Laptop: Alienware m15 R4, Intel Wi-Fi 6 AX200, Ubuntu 20.",
           "iw shows HE-MCS 11 at 1 Gbps, signal -30 to -40 dBm, 0% packet loss."
         ]
-      }
+      },
+      "note": "Fires on genuine three-item lists, which are fine. The tell is a colon padding out to three when two would do, and no pattern can tell those apart. Read the list before rewriting it."
     },
     {
       "id": "heres-the-twist",

@@ -72,15 +72,37 @@ is gzipped into the URL fragment, which browsers never send to a server.
 ... check --share -r docs/      # one link carrying the whole tree
 ```
 
-Use it when the person asked for a review rather than a rewrite, or when a
+Use it when the person asked for a review and not a rewrite, or when a
 finding is a judgement call that is theirs to make.
+
+## Keeping a finding
+
+Some findings are the right call to leave. Two things make that decision sound.
+
+**Read the rule before deciding.** `explain <id>` prints `note` and `measured`
+alongside the fix. `note` says what the rule is known to get wrong, which is the
+place a genuine exception is described. `measured` says when and how a tell was
+measured; where it reports that a tell does not indicate authorship, that is a
+statement about detection and not a licence to skip the rule.
+
+**A house-style rule is not a judgement call.** `em-dash` is the example: the
+evidence says em dashes do not indicate a machine wrote something, and the rule
+exists because the owner does not want them. Keeping ninety-nine of them because
+the research is equivocal is the wrong reading. If a project should keep its em
+dashes, say so and add `--ignore em-dash` once, instead of defending each hit.
+
+**A rate is not an occurrence.** `rather-than` and the other `density` rules fire
+on the whole document, not on a phrase, and the badge shows the rate. Fix them by
+<!-- slop-ignore-start -->
+varying, not by replacing every instance with the same thing: swapping every
+"rather than" for "not X" trades one tic for another.
+<!-- slop-ignore-end -->
 
 ## Not every finding is a defect
 
 These are style smells, not errors. `ai-vocab` firing once is coincidence;
 several times is a tell. Leave a hit alone when the flagged phrasing is
-the clearest option, and say why rather than rewriting into something
-worse.
+the clearest option. Say why, and leave it.
 
 Findings never fail a run on their own. Set a budget when you want one to:
 
@@ -116,7 +138,7 @@ records where it came from and what it scored on a matched human/AI corpus, and
 which carries no signal in documentation, and the few the audit measured firing
 more on human prose than AI. Say so if a user wants one, and select it by id.
 
-The five `style-` sets are off by default and match a house style rather than
+The five `style-` sets are off by default. They match a house style instead of
 hunting tells; only one can be selected at a time.
 
 ```bash
@@ -124,7 +146,7 @@ hunting tells; only one can be selected at a time.
 ```
 
 One rule inside `mined` is on wherever that set is loaded: `em-dash`, which flags
-every em dash. It is house style rather than a tell, so say so if a user asks why
+every em dash. It is house style, not a tell, so say so if a user asks why
 it fired; `explain em-dash` gives the evidence, which points the other way.
 
 A project can install more. Rule sets are versioned packages, recorded in

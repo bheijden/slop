@@ -69,6 +69,8 @@ const OVERRIDES = {
     },
   },
   'colon-triple': {
+    suggest: 'Check the three items are the real count. Cut to the ones that carry weight, or drop the colon and write the sentence out.',
+    note: 'Fires on genuine three-item lists, which are fine. The tell is a colon padding out to three when two would do, and no pattern can tell those apart. Read the list before rewriting it.',
     pattern: String.raw`:\s+${COLON_ITEM},\s+${COLON_ITEM},\s+(?:and\s+|or\s+)?${COLON_ITEM}(?=[.!?\n])`,
     description: 'A colon opening onto three or more comma-separated prose items: \u201cseparate ports, processes, and local state\u201d. The most common shape LLM prose uses to sound concrete. Tightened from upstream: items must read as prose, not as code, measurements or proper-noun lists.',
     tests: {
