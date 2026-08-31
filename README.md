@@ -69,22 +69,18 @@ slop check --format json docs/ -r        # for agents and scripts
 
 ## Rules
 
-Two sets ship on:
+Three sets ship on:
 
 | set | rules | |
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
+| `mined` | 65 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
-Two more ship off by default. `mined` is 80 tells this project gathered
-itself, each recording where it came from and how it scored against a matched
-human/AI corpus. The five `style-` sets match a register, from the Economist to
-plain English, instead of hunting tells.
-
-```sh
-slop check --rules candidates/mined.json --select mined docs/ -r
-slop add https://example.com/house-style.json
-```
+`mined` carries 15 more rules that stay off: the creative-writing register, and
+the handful the audit measured firing more on human prose than AI. Select one by
+id to run it. The five `style-` sets are off too, and match a register rather
+than hunting tells.
 
 Rules are data: a set is a JSON file with its own test examples, so adding one
 never means touching the linter.

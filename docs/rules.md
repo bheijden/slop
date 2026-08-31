@@ -12,9 +12,10 @@ sharing and writing them.
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 
-Two sets ship on. Everything this project mined itself lives in one opt-in set,
-`mined`, whose rules each record their origin in `from` and `source` and their
-score in `evidence`. The `em-dash` rule inside it is marked `"default": "on"` and runs wherever that set
+Three sets ship on. Everything this project mined itself is in `mined`, whose
+rules each record their origin in `from` and `source` and their score in
+`evidence`. 15 of its 80 stay off by default: the creative-writing
+register and the rules the audit measured firing more on human prose than AI. The `em-dash` rule inside it is marked `"default": "on"` and runs wherever that set
 is loaded. It is house style, not a tell. `slop explain em-dash` gives the
 evidence, which points the other way.
 
@@ -304,7 +305,9 @@ It is important\nto note that this works.         md:soft-wrap
 ```
 
 A variant that turns a HIT into a MISS is a bug, either in extraction or in the rule
+<!-- slop-ignore-start -->
 being too tight for real files. Variants that genuinely delete words (inline
+<!-- slop-ignore-end -->
 code) are marked lossy and only reported for information.
 
 That is how you refine a rule. Write the example, run `fudge`, and fix whatever
@@ -341,7 +344,9 @@ The last row is not a to-do list. Those five need human annotation, and the
 paper says so. A linter that claimed them would be lying.
 
 There is a second ceiling: this engine matches patterns over spans, with no
+<!-- slop-ignore-start -->
 part-of-speech information. That is why `leverage`, `harness` and `foster` are
+<!-- slop-ignore-end -->
 hard. They are slop as verbs and ordinary English as nouns, and a regex cannot
 tell the difference. The `frame` detector approximates syntax by wildcarding
 content words, which works, but it is an approximation.

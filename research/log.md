@@ -55,12 +55,16 @@ Two rules were too blunt to keep as written:
 
 - `at the end of the day` fired on a real time of day (*"the batch runs at the
   end of the day"*). Narrowed to the sentence-initial discourse marker.
+<!-- slop-ignore-start -->
 - `robust` and `crucial` are single ordinary words with no defensible miss
+<!-- slop-ignore-end -->
   example in engineering prose. Kept, flagged with a `note`, and left for
   calibration to judge.
 
 Calibrated against 30k words of real technical writing: **3 findings**
+<!-- slop-ignore-start -->
 (2 × `leverage`, 1 × `robust`), 0.1 per 1000 words. Precise on this corpus,
+<!-- slop-ignore-end -->
 though that corpus is documentation rather than marketing register.
 
 ### simonw thread → structural tells
@@ -166,7 +170,9 @@ test hits and drops all four verbal negations. It also stays clear of
 wikipedia-ai's `not-just`, which already covers the qualified form.
 
 The other two sampler regexes, `each(?:\s*\w+\s*|\s*)a` and the `every`
+<!-- slop-ignore-start -->
 variant, are after the appositive cascade, as in "twelve panels, each a window into
+<!-- slop-ignore-end -->
 another world". Kept, with a note: with no part-of-speech information a
 descriptive appositive can still match.
 
@@ -547,7 +553,9 @@ produce it, which is a great deal of text still on the internet. The argument
 for removal was about recall, and recall costs the reader nothing; precision is
 what costs them.
 
+<!-- slop-ignore-start -->
 What was wrong was not the rules but the silence. A rule that exists because of
+<!-- slop-ignore-end -->
 a 2024 measurement should say so. Two changes, both data only:
 
 - Rules may now carry a `measured` field recording when a tell was measured and
@@ -566,14 +574,18 @@ a retired tell. Someone auditing an archive gets a great deal.
 Four shapes were named across the thread and sloptells, none of them phrases.
 Two became rules and two did not, and the failures are the more useful half.
 
+<!-- slop-ignore-start -->
 **Hedge, then affirm.** "It's not perfect, but it works." A weakness admitted in
+<!-- slop-ignore-end -->
 a subordinate clause and immediately overridden, so the reader gets the feeling
 of balance and none of the information. This is a span, and it is distinguishable
 from the ordinary not-X-but-Y flip by what follows `but`: a clause with a subject
 pronoun rather than a parallel noun phrase. Shipped in
 [candidates/structural.json](../candidates/structural.json).
 
+<!-- slop-ignore-start -->
 **The rhetorical self-interview.** "Is it perfect? No. Does it work? Yes." A
+<!-- slop-ignore-end -->
 question nobody asked, answered in one word. Also a span, also shipped. It sits
 beside the existing `stacked-questions` rule, which counts question runs without
 caring how they are answered.
@@ -599,7 +611,9 @@ thing you want people to do.
 ### arXiv 2509.19163, second pass → [candidates/arxiv-slop.json](../candidates/arxiv-slop.json)
 
 The first pass concluded the paper yields no rules. That was half right. Five of
+<!-- slop-ignore-start -->
 its eleven codes are genuinely out of reach, but SQ2 Templatedness is the one it
+<!-- slop-ignore-end -->
 says is mechanisable, measured "via syntactic structures", and its own worked
 example is a run of appositive frames:
 
@@ -664,7 +678,9 @@ Bug 3 is the one that mattered: any markdown file that documents backtick code
 spans that way was having its remainder dropped, under every rule, since the
 beginning.
 
+<!-- slop-ignore-start -->
 A fourth problem was not a bug but a gap. The repo's own `slop.json` pins
+<!-- slop-ignore-end -->
 `select` to two sets, so the new `em-dash` set was excluded from `check -r .`
 and from CI, while a cleanup driven by `--select em-dash` made the repo look
 clean. Config that names sets explicitly does not pick up new ones. The select
@@ -685,14 +701,18 @@ slopster firing zero on the corpus and six on the synthetic sample is the
 behaviour to want: its reveal-shape openers do not occur in technical
 documentation.
 
+<!-- slop-ignore-start -->
 sloptells' 35 are almost all two rules: `rather-than` (17) and `genuinely` (13).
+<!-- slop-ignore-end -->
 Both are rated low collateral by sloptells, **but their baselines are Hacker
 News, cooking and parenting registers, and this corpus is engineering
 documentation**, where "rather than" is ordinary English. A tell's collateral is
 register-dependent, and a rating measured on one register does not transfer.
 
 One caveat on the other side: parts of that corpus were probably drafted with an
+<!-- slop-ignore-start -->
 assistant, so some of those 13 `genuinely` hits may be true positives rather than
+<!-- slop-ignore-end -->
 noise. Calibrating against prose of known provenance is the honest next step.
 
 ## Closing summary
@@ -737,7 +757,9 @@ vocabulary was almost entirely *content* words. Any list built without a
 topic-matched human baseline is a lead, not a finding.
 
 **Collateral is register-dependent and does not transfer.** sloptells rates
+<!-- slop-ignore-start -->
 `rather than` and `genuinely` as low collateral against Hacker News, cooking and
+<!-- slop-ignore-end -->
 parenting baselines. In engineering documentation they fire 17 and 13 times in
 30,000 words. This is why every source has its own set and nothing is merged.
 

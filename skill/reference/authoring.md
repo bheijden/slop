@@ -111,7 +111,7 @@ It is important\nto note that this works.      md:soft-wrap
 ```
 
 A lossless variant that turns a hit into a miss is a bug, either in extraction or in
-a rule too tight for real files. Variants that genuinely delete words (a long
+a rule too tight for real files. Variants that actually delete words (a long
 inline code span) are marked lossy and reported for information only.
 
 Write the example first, run `fudge`, then fix whatever it reports.

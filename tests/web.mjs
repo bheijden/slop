@@ -136,19 +136,21 @@ async function main() {
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
     check('every set has a set-level toggle', D.total >= 8, String(D.total));
-    check('shipped sets on, candidates off',
+    // simonwillison and wikipedia-ai run whole. mined ships on but holds rules
+    // that are off, so it reads as partly on rather than fully checked.
+    check('shipped sets run, candidate sets do not',
       JSON.stringify(D.on) === JSON.stringify(['simonwillison', 'wikipedia-ai']),
       D.on.join(','));
 
-    // The mined set is opt-in, but the house-style em-dash rule inside it asks
-    // to run, and the page has to honour that or it silently stops firing.
+    // mined ships on with a subset of its rules off, so the house-style em-dash
+    // rule has to be running while its set reads as only partly enabled.
     const optin = await evaluate(`(()=>{
       const box=document.querySelector('#rules input[data-rule="em-dash"]');
       const set=document.querySelector('#rules input[data-toggle="mined"]');
       return JSON.stringify({rule: box ? box.checked : null,
         setFullyOn: set ? set.checked && !set.indeterminate : null})})()`);
     const oi = JSON.parse(optin);
-    check('a rule may opt in from an off-by-default set',
+    check('a set can run with only some of its rules on',
       oi.rule === true && oi.setFullyOn === false, JSON.stringify(oi));
     check('code blocks have copy buttons', w.copyButtons >= 4, String(w.copyButtons));
 

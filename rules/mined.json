@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "slop": "0.1.0",
   "title": "Mined AI-slop tells",
-  "description": "Every tell this project mined itself, in one set. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. Three rules were dropped in the merge because a shipped rule already matched everything they did: slop-gate's seamless, underscore-importance and fast-paced-world are all inside wikipedia-ai's ai-vocab and landscape. The full survey is in research/log.md and the measurements in research/audit.md.",
+  "description": "Every tell this project mined itself, in one set, on by default. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. Three rules were dropped in the merge because a shipped rule already matched everything they did: slop-gate's seamless, underscore-importance and fast-paced-world are all inside wikipedia-ai's ai-vocab and landscape. The full survey is in research/log.md and the measurements in research/audit.md.",
   "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
   "rules": [
     {
@@ -31,7 +31,6 @@
       "from": "house style",
       "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
       "evidence": "On the audit corpus: 40 hits in 8/18 human documents, 0 in 0/18 AI documents.",
-      "default": "on",
       "note": "Ships on where the mined set is loaded at all, because it is a house-style preference rather than a detection claim. See `measured` for what the research actually says about em dashes, which is the opposite."
     },
     {
@@ -52,8 +51,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents."
     },
     {
       "id": "navigate-complexities",
@@ -73,8 +71,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "comprehensive-guide",
@@ -94,8 +91,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "transformative",
@@ -115,8 +111,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "cutting-edge",
@@ -136,8 +131,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "empower",
@@ -157,8 +151,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "unlock-value",
@@ -178,8 +171,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "harness",
@@ -199,8 +191,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "streamline",
@@ -220,8 +211,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "proactive",
@@ -241,8 +231,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "feel-free",
@@ -262,8 +251,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "end-of-the-day",
@@ -285,8 +273,7 @@
       "note": "narrowed to the sentence-initial discourse marker; the literal time of day is not a tell",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "in-conclusion",
@@ -306,8 +293,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "dive-in",
@@ -327,8 +313,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "when-it-comes-to",
@@ -348,8 +333,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "game-changer",
@@ -369,8 +353,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "top-notch",
@@ -390,8 +373,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "treasure-trove",
@@ -411,8 +393,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "embark-on",
@@ -432,8 +413,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "foster-a",
@@ -453,8 +433,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "moreover",
@@ -475,7 +454,8 @@
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
       "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: Fired on 4 of 18 human documents and 0 AI ones: \"Moreover,\" and \"Additionally,\" are ordinary formal English. Select it by id to run it."
     },
     {
       "id": "elevate",
@@ -496,8 +476,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "robust",
@@ -518,8 +497,7 @@
       "note": "single ordinary word; expect false positives in engineering prose",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 2 in 1/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 2 in 1/18 AI documents."
     },
     {
       "id": "crucial",
@@ -537,7 +515,7 @@
           "The crux of the argument is simpler."
         ]
       },
-      "note": "single ordinary word; expect false positives",
+      "note": "single ordinary word; expect false positives Off by default: Fired on human prose and not on AI prose. The bare word is too common to carry the tell on its own. Select it by id to run it.",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
@@ -561,8 +539,7 @@
       },
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "genuinely",
@@ -583,8 +560,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 5 in 4/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 5 in 4/18 AI documents."
     },
     {
       "id": "that-said",
@@ -604,8 +580,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "the-real-question",
@@ -626,8 +601,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "heres-what",
@@ -647,8 +621,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "one-of-those",
@@ -669,8 +642,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "feels-like",
@@ -691,8 +663,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "curious-engagement",
@@ -712,8 +683,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "the-actual",
@@ -733,8 +703,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "privilege-of",
@@ -754,8 +723,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "taught-me",
@@ -775,8 +743,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "the-lesson-q",
@@ -797,8 +764,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "not-because-because",
@@ -818,8 +784,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "youre-not-alone",
@@ -840,8 +805,7 @@
       },
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "rather-than",
@@ -862,8 +826,7 @@
       "note": "measured collateral: low, but it is ordinary English — expect this one to need calibration on technical prose",
       "from": "sloptells",
       "source": "https://sloptells.com/tells.md",
-      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents."
     },
     {
       "id": "not-x-but-y",
@@ -889,8 +852,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 4 in 3/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 4 in 3/18 AI documents."
     },
     {
       "id": "extends-far-beyond",
@@ -915,8 +877,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "another-critical",
@@ -939,8 +900,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "essay-announce",
@@ -964,8 +924,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "valuable-insights",
@@ -988,8 +947,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "multi-pronged",
@@ -1012,8 +970,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "turning-point",
@@ -1036,8 +993,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "closer-look",
@@ -1060,8 +1016,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "inextricably-linked",
@@ -1083,8 +1038,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "stock-metaphor",
@@ -1109,7 +1063,8 @@
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it."
     },
     {
       "id": "moral-uplift",
@@ -1132,8 +1087,7 @@
       },
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "each-a",
@@ -1156,8 +1110,7 @@
       "note": "No part-of-speech information is available here, so an appositive with a genuinely descriptive noun can still match. Kept because the construction is distinctive enough to be worth a look.",
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "reveal-shape",
@@ -1179,8 +1132,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "not-in-job-description",
@@ -1200,8 +1152,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "the-part-people-skip",
@@ -1221,8 +1172,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "negation-correction",
@@ -1245,7 +1195,8 @@
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it."
     },
     {
       "id": "era-of",
@@ -1265,8 +1216,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "whether-youre-a",
@@ -1287,8 +1237,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "think-of-it-as",
@@ -1308,8 +1257,7 @@
       },
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "hedge-then-affirm",
@@ -1333,8 +1281,7 @@
       },
       "from": "structural",
       "source": "https://x.com/simonw/status/2093277255438860358",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "rhetorical-selfqa",
@@ -1357,8 +1304,7 @@
       },
       "from": "structural",
       "source": "https://x.com/simonw/status/2093277255438860358",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "comma-scarcity",
@@ -1384,8 +1330,7 @@
       "note": "Threshold set below the floor of a 16-document human prose corpus, where nothing fell under 21 commas per 1000 words. The other half of the calibration is missing: there is no AI-written corpus here to check what rate models actually produce, so this is a floor derived from one side only.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "paren-scarcity",
@@ -1411,8 +1356,7 @@
       "note": "Zero is a deliberately literal reading of “hardly any”. It still fires on perfectly good human prose that simply never reaches for a parenthesis: one document in the 16-document corpus, about 6%.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "On the audit corpus: 6 hits in 6/18 human documents, 18 in 18/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 6 hits in 6/18 human documents, 18 in 18/18 AI documents."
     },
     {
       "id": "long-sentences",
@@ -1437,8 +1381,7 @@
       },
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "nominalisation-pileup",
@@ -1463,8 +1406,7 @@
       },
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents.",
-      "default": "off"
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents."
     },
     {
       "id": "triad-density",
@@ -1490,8 +1432,7 @@
       "note": "The human corpus topped out at 3.1 per 1000 words, so 8 is well clear of it. Deliberately conservative: coordinated triples are ordinary English and only their frequency is a tell.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "em-dash-density",
@@ -1517,8 +1458,7 @@
       "note": "Do not read a hit here as evidence of AI authorship; it is an observation about your own draft. The three measurements are in research/log.md.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "uniform-sentence-length",
@@ -1531,7 +1471,7 @@
       },
       "description": "Sentence lengths that barely vary. humanizer-de measures this as stddev_mean_ratio and requires at least 0.4 in every register profile it ships; sloptells describes the same thing as sentences that march in formation. The badge is the coefficient of variation — standard deviation over mean sentence length.",
       "suggest": "Cut one sentence in half and let another run long. Rhythm is what stops correct prose from reading as generated.",
-      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone.",
+      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone. Off by default: Fired on 4 of 18 human documents against 1 AI one, and sentence-length variation measured the same on both corpora: median 0.52 either way. Select it by id to run it.",
       "tests": {
         "hit": [
           "The worker reads each record from the queue and checks its schema. The schema lives in a shared repository that both teams can edit. A record that fails the check is written to a separate log. The log is rotated every night and kept for thirty days. An operator reviews the log each morning before the standup meeting. Most of the failures come from a single partner in the north. That partner has been sending malformed dates since the middle of March. We opened a ticket with their integration team on the same day. The ticket has not received a reply from anyone on their side. We now reject their malformed records at the edge of the system. The change was fifteen lines and shipped on a Tuesday afternoon. Nobody on the team noticed the change had gone out at all. The operator noticed because she stopped being paged at six each morning. She sent a short message to the channel to say so. That message has been pinned in the channel ever since that day. The queue has now run clean for four consecutive months without trouble. We have not touched the retry logic in any way since then. Eleven records are sitting in the dead letter queue this morning. All eleven of them came from the same partner in the north. We check the queue on Friday afternoons now instead of every day. The runbook still tells the operator to check it every single morning. Somebody on the team should update that page in the runbook. So far nobody has found the time to go and do it."
@@ -1569,8 +1509,7 @@
       },
       "from": "humanizer-de",
       "source": "https://github.com/marmbiz/humanizer-de",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "templated-frame",
@@ -1596,8 +1535,7 @@
       },
       "from": "arxiv-slop",
       "source": "https://arxiv.org/abs/2509.19163",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
     },
     {
       "id": "barely-a-whisper",
@@ -1621,7 +1559,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "heart-pounding",
@@ -1645,7 +1584,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "shiver-down-spine",
@@ -1669,7 +1609,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "sun-dipped-horizon",
@@ -1693,7 +1634,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "felt-like-eternity",
@@ -1717,7 +1659,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "words-hung-in-air",
@@ -1741,7 +1684,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "little-did-know",
@@ -1765,7 +1709,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "maybe-just-maybe",
@@ -1789,7 +1734,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "face-it-together",
@@ -1812,7 +1758,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     },
     {
       "id": "something-else-entirely",
@@ -1836,7 +1783,8 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off"
+      "default": "off",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
     }
   ]
 }

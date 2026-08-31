@@ -168,7 +168,9 @@ move older than the technology it is meant to detect:
 ### Rules that fire on both about equally
 
 `not-just` (5 human, 3 AI), `stranded-auxiliary` (2 and 2), `note-that` (1 and
+<!-- slop-ignore-start -->
 1), `robust` (1 and 2). These carry no information about authorship either way.
+<!-- slop-ignore-end -->
 `not-just` is the interesting one: its human hits are ordinary English rather
 than the rhetorical flip it is aimed at.
 
@@ -209,7 +211,9 @@ same corpus and are recorded as specifications below rather than as live rules.
 
 ### What the false positives turned out to be
 
+<!-- slop-ignore-start -->
 Reading the actual matched text settled the design. Every `echo-triad` hit on
+<!-- slop-ignore-end -->
 human prose shares a **topic** phrase, not a structure:
 
 <!-- slop-ignore-start -->

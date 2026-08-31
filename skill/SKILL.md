@@ -79,7 +79,7 @@ finding is a judgement call that is theirs to make.
 
 These are style smells, not errors. `ai-vocab` firing once is coincidence;
 several times is a tell. Leave a hit alone when the flagged phrasing is
-genuinely the clearest option, and say why rather than rewriting into something
+the clearest option, and say why rather than rewriting into something
 worse.
 
 Findings never fail a run on their own. Set a budget when you want one to:
@@ -105,18 +105,22 @@ use `--format github` for inline pull-request annotations.
 in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
-Two sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
-of published catalogues. The full list is in [reference/rules.md](reference/rules.md).
+Three sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
+of published catalogues, and `mined` (65), everything this project gathered
+itself from research papers, style guides and other detectors. Each mined rule
+records where it came from and what it scored on a matched human/AI corpus, and
+`explain` prints both. The shipped catalogue is in
+[reference/rules.md](reference/rules.md).
 
-Two more are in the repository and off by default. `mined` (80 rules) is
-everything this project gathered itself, from research papers, style guides and
-other detectors; each rule records where it came from and what it scored on a
-matched human/AI corpus, which `explain` prints. The `style-` sets (52 rules
-across five registers) match a house style rather than hunt tells, and only one
-can be selected at a time.
+`mined` holds 15 further rules that stay off: the creative-writing register,
+which carries no signal in documentation, and the few the audit measured firing
+more on human prose than AI. Say so if a user wants one, and select it by id.
+
+The five `style-` sets are off by default and match a house style rather than
+hunting tells; only one can be selected at a time.
 
 ```bash
-... check --rules candidates/mined.json --select mined docs/ -r
+... check --rules candidates/style-plain.json --select style-plain docs/ -r
 ```
 
 One rule inside `mined` is on wherever that set is loaded: `em-dash`, which flags

@@ -1,5 +1,6 @@
 {
   "sets": [
+    "mined.json",
     "simonwillison.json",
     "wikipedia-ai.json"
   ]
