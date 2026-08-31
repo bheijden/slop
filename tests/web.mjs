@@ -211,6 +211,17 @@ async function main() {
     check('pass and fail are marked differently',
       od.marks.includes('\u2713') && od.marks.includes('\u2715'), JSON.stringify(od.marks));
 
+    // The two phases have independent totals, so only the one that failed is
+    // marked; a single failure count spanning both would be unreadable.
+    const counts = await evaluate(`(()=>{
+      const li=document.querySelector('#list li.bad');
+      return JSON.stringify({text: li.querySelector('.counts').textContent,
+        red: [...li.querySelectorAll('.counts .x')].map(n=>n.textContent)})})()`);
+    const ct = JSON.parse(counts);
+    check('each test phase reports its own total',
+      /1 of 2 examples/.test(ct.text) && /22 of 22 markup variants/.test(ct.text)
+      && ct.red.length === 1 && /examples/.test(ct.red[0]), JSON.stringify(ct));
+
     // A failure points back at the exact string in the editor that caused it.
     const link = await evaluate(`(async()=>{
       const why=document.querySelector('#list li.bad .why');
