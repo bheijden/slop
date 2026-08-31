@@ -371,41 +371,18 @@ built for: pointing at worn phrasing so a writer can decide.
 
 ## Regrouped by evidence
 
-The rules are also grouped by how they behaved, not by where they came from.
-`tools/group-by-evidence.mjs` derives four sets from the numbers above and writes
-them to `candidates/`. Nothing is moved or removed: every rule still lives in its
-original set, and each copy records its origin in `from` and its measurement in
-`evidence`.
+The scores live on the rules themselves. Every rule in `candidates/mined.json`
+carries an `evidence` field saying what it did on this corpus, alongside `from`
+and `source` saying where it came from. `slop explain <rule>` prints all three,
+and `tools/group-by-evidence.mjs` recomputes them when the corpus grows.
 
-| set | rules | criterion |
-|---|---|---|
-| `measured-proven` | 12 | fired on AI and either never on human, or at least 3x more on AI |
-| `measured-even` | 4 | fired about equally on both |
-| `measured-noisy` | 11 | fired more on human than on AI |
-| `measured-untested` | 94 | never fired on either side |
+Across the 83 mined rules: 6 fire on AI and rarely or never on human, 6 fire more
+on human than AI, 1 fires about equally, and 70 never fired at all.
 
-They are views, not copies. A rule id is global, so `no-chain` in
-`measured-proven` is the same rule as `no-chain` in `simonwillison`; enabling one
-enables both, and a document that trips it yields one finding rather than two.
-
-### The number, and why it is not a result
-
-On the audit corpus:
-
-| | human/1000 | AI/1000 | ratio |
-|---|---|---|---|
-| shipped default | 4.14 | 1.01 | 0.2x |
-| `measured-proven` | **0.46** | **3.73** | **8.1x** |
-
-**That 8.1x is circular and must not be quoted as a finding.** The twelve rules
-were selected because they scored well on this corpus, then scored on the same
-corpus. Any twelve rules chosen that way would look good. It is a hypothesis
-worth testing, not evidence, and testing it needs a corpus the selection never
-saw.
-
-That is the honest reason `measured-proven` is off by default, despite scoring
-forty times better than the shipped set on paper. The next useful piece of
-work is a second corpus, not another rule.
+These used to be four separate sets, `measured-proven` and friends. They were
+views over the same rule ids, which made them easy to double count and added four
+entries to a list that was already too long. The grouping is a property of a
+rule, not a place to put it.
 
 ## What this does not show
 

@@ -11,7 +11,12 @@ sharing and writing them.
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
-| `em-dash` | 1 | House style: flags every em dash. A preference, not a tell. `slop explain em-dash` gives the evidence, which points the other way. |
+
+Two sets ship on. Everything this project mined itself lives in one opt-in set,
+`mined`, whose rules each record their origin in `from` and `source` and their
+score in `evidence`. The `em-dash` rule inside it is marked `"default": "on"` and runs wherever that set
+is loaded. It is house style, not a tell. `slop explain em-dash` gives the
+evidence, which points the other way.
 
 ```sh
 slop list                    # every rule and whether it is active

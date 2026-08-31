@@ -230,6 +230,10 @@ async function main() {
     if (r.pattern) process.stdout.write(`  pattern:  /${r.pattern}/${r.flags || ''}\n`);
     process.stdout.write(`\n  ${r.description}\n`);
     if (r.suggest) process.stdout.write(`\n  ${C.cyan('fix:')} ${r.suggest}\n`);
+    if (r.from) {
+      process.stdout.write(`\n  ${C.dim('mined from:')} ${r.from}${r.source ? ` ${C.dim('·')} ${r.source}` : ''}\n`);
+    }
+    if (r.evidence) process.stdout.write(`\n  ${C.dim('evidence:')} ${r.evidence}\n`);
     if (r.measured) process.stdout.write(`\n  ${C.dim('measured:')} ${r.measured}\n`);
     if (r.note) process.stdout.write(`\n  ${C.dim('note:')} ${r.note}\n`);
     const t = r.tests || {};

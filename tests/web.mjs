@@ -135,10 +135,21 @@ async function main() {
       return JSON.stringify({total:boxes.length, on});
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
-    check('every set has a set-level toggle', D.total >= 15, String(D.total));
+    check('every set has a set-level toggle', D.total >= 8, String(D.total));
     check('shipped sets on, candidates off',
-      JSON.stringify(D.on) === JSON.stringify(['em-dash', 'simonwillison', 'wikipedia-ai']),
+      JSON.stringify(D.on) === JSON.stringify(['simonwillison', 'wikipedia-ai']),
       D.on.join(','));
+
+    // The mined set is opt-in, but the house-style em-dash rule inside it asks
+    // to run, and the page has to honour that or it silently stops firing.
+    const optin = await evaluate(`(()=>{
+      const box=document.querySelector('#rules input[data-rule="em-dash"]');
+      const set=document.querySelector('#rules input[data-toggle="mined"]');
+      return JSON.stringify({rule: box ? box.checked : null,
+        setFullyOn: set ? set.checked && !set.indeterminate : null})})()`);
+    const oi = JSON.parse(optin);
+    check('a rule may opt in from an off-by-default set',
+      oi.rule === true && oi.setFullyOn === false, JSON.stringify(oi));
     check('code blocks have copy buttons', w.copyButtons >= 4, String(w.copyButtons));
 
     const example = await evaluate(`(async()=>{document.getElementById('b-example').click();

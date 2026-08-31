@@ -6,12 +6,15 @@
     "em-dash"
   ],
   "ignore": [],
-  "ruleSets": [],
+  "ruleSets": [
+    "candidates/mined.json"
+  ],
   "exclude": [
     "vendor/",
     "node_modules/"
   ],
   "$comment2": "These docs are table-heavy, and parallel table rows trip echo-triad.",
   "skipTables": true,
-  "maxPer1000": 3.0
+  "maxPer1000": 3.0,
+  "$comment3": "em-dash is this repo's house style. It lives in the mined set, so that set is loaded and the single rule selected by id."
 }

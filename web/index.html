@@ -696,7 +696,8 @@ function addSet(set, on = true) {
   S.sets = S.sets.filter((s) => s.name !== set.name);
   S.sets.push(set);
   for (const r of set.rules) {
-    if (on && r.default !== 'off') S.active.add(r.id);
+    // An opt-in set still runs any rule that explicitly asks to.
+    if (on ? r.default !== 'off' : r.default === 'on') S.active.add(r.id);
     S.byId[r.id] = { id: r.id, rule: r.id, set: set.name, name: r.name,
                      why: r.description, suggest: r.suggest };
   }
