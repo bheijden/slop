@@ -190,6 +190,15 @@ async function main() {
     check('a failure explains what that kind of failure means',
       hp.text && /word boundary/.test(hp.text), JSON.stringify(hp));
 
+    // A rule that passes must carry nothing that reads as a complaint.
+    const pass = await evaluate(`(()=>{
+      const li=[...document.querySelectorAll('#list li[data-rule]')].find(x=>!x.classList.contains('bad'));
+      return JSON.stringify({rule: li && li.dataset.rule,
+        why: li ? li.querySelectorAll('.why,.fix').length : -1,
+        text: li ? li.textContent.replace(/\\s+/g,' ').trim() : null})})()`);
+    const ps = JSON.parse(pass);
+    check('a passing rule shows no failure text', ps.why === 0 && !/Write/.test(ps.text || ''), JSON.stringify(ps));
+
     // A failure points back at the exact string in the editor that caused it.
     const link = await evaluate(`(async()=>{
       const why=document.querySelector('#list li.bad .why');

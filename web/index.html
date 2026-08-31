@@ -956,8 +956,7 @@ function renderFudge() {
       return `<li data-rule="${esc(r.rule)}"${rb ? ' class="bad"' : ''}>
         <span class="loc">${r.conform.ok}/${r.conform.ok + r.conform.fail}</span>
         <span><span class="rid">${esc(r.rule)}</span>
-${r.name ? `<div class="m">${esc(r.name)}</div>` : ''}
-          ${rb || !r.suggest ? '' : `<div class="fix">${esc(r.suggest)}</div>`}
+${r.what ? `<div class="m">${esc(r.what)}</div>` : ''}
           ${r.failures.map((f) => `<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0, 140))}</div>`
             + (f.help ? `<div class="fix">${esc(f.help)}</div>` : '')).join('')}
         </span></li>`;

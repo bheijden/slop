@@ -64,7 +64,10 @@ function fudge({ sets }) {
   for (const raw of sets) {
     for (const rule of compileRuleSet(raw, raw.name).rules) {
       const t = rule.tests || { hit: [], miss: [] };
-      const row = { rule: rule.id, set: rule.set, name: rule.name, suggest: rule.suggest || null,
+      const row = { rule: rule.id, set: rule.set, name: rule.name,
+                    // what the rule is for, which is the useful context on any row;
+                    // `suggest` is advice to a prose author and means nothing here.
+                    what: rule.name || rule.description || null,
                     conform: { ok: 0, fail: 0 }, fudge: { ok: 0, fail: 0, lossy: 0 }, failures: [] };
       if (!(t.hit || []).length) row.failures.push({ kind: 'no examples', detail: 'every rule needs a tests.hit example' });
       for (const ex of t.miss || []) {
