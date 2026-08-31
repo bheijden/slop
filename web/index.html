@@ -327,7 +327,11 @@ body.resizing{cursor:col-resize;user-select:none}
 #rules-src:focus{outline:none}
 #rules-src::placeholder{color:var(--muted)}
 .rerr{margin:8px 2px 0;font:12px/1.5 var(--mono);color:var(--flag)}
-.rdocs{margin-top:22px}
+.rdocs{margin-top:26px}
+/* the results here are a short table, not a document pane, so the split view
+   should not reserve 70vh for it */
+body[data-mode=fudge] .panes{height:auto}
+body[data-mode=fudge] #pane-list,body[data-mode=fudge] .divider{display:none}
 /* a result row points back at the rule that produced it */
 .frow.click{cursor:pointer}
 .frow.click:hover span:first-child{text-decoration:underline;text-underline-offset:3px}
@@ -412,57 +416,6 @@ body.resizing{cursor:col-resize;user-select:none}
       </div>
     </div>
     <p class="rerr" id="rerr" hidden></p>
-
-    <div class="docs rdocs">
-      <details>
-        <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
-        <div class="body">
-          <p><b>Conformance</b> runs every example you wrote: each <code>tests.hit</code>
-          must match, each <code>tests.miss</code> must not. That is what catches the
-          <code>very</code> rule below, whose pattern has no word boundaries and so
-          fires on "E<b>very</b> request".</p>
-          <p><b>Fudging</b> then rewrites each hit 27 ways with the markup real files
-          carry, and requires the rule to still fire:</p>
-<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
-It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
-It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
-&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span></pre>
-          <p>A rule that passes a clean sentence but fails a marked-up one will miss
-          things in real files. Soft-wrapped markdown is the usual culprit: a sentence
-          broken across two lines at column 80 stops matching, and nothing tells you.</p>
-        </div>
-      </details>
-      <details>
-        <summary>The rule format<span class="hint">eight kinds</span></summary>
-        <div class="body">
-          <p><code>regex</code> covers most rules. The other seven count things a regex
-          cannot express, such as repeated sentence shapes or a rate across a whole
-          document. All eight, with their parameters, are in the
-          <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule format
-          reference</a>.</p>
-          <p>Wrap your rules in a set and the file is shareable as it is:
-          <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.</p>
-        </div>
-      </details>
-      <details>
-        <summary>Using your rules for real<span class="hint">page, URL or CLI</span></summary>
-        <div class="body">
-          <p>Three ways in, all the same file:</p>
-<pre>drop the .json on the check page               <span class="c"># or use its rules panel</span>
-?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
-slop check --rules house-style.json docs/ -r   <span class="c"># command line</span></pre>
-          <p>Passing tests means a rule does what you wrote. It does not mean the rule
-          is worth having. For that, run it over prose you did not write it against and
-          read the hits:</p>
-<pre>slop check --rules mine.json --select mine ~/writing -r</pre>
-          <p>A rule firing on a lot of good prose is a rule to tighten, whatever its
-          examples say. Two worked examples, one tightened and one kept with its false
-          firing documented, are in
-          <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
-          and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
-        </div>
-      </details>
-    </div>
   </div>
 
   <div class="results" id="results" hidden>
@@ -511,6 +464,57 @@ slop check --rules house-style.json docs/ -r   <span class="c"># command line</s
       </div>
     </div>
     </div>
+  </div>
+
+  <div class="docs rdocs" id="rule-docs" hidden>
+    <details>
+      <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
+      <div class="body">
+        <p><b>Conformance</b> runs every example you wrote: each <code>tests.hit</code>
+        must match, each <code>tests.miss</code> must not. That is what catches the
+        <code>very</code> rule below, whose pattern has no word boundaries and so
+        fires on "E<b>very</b> request".</p>
+        <p><b>Fudging</b> then rewrites each hit 27 ways with the markup real files
+        carry, and requires the rule to still fire:</p>
+<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
+It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
+It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
+&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span></pre>
+        <p>A rule that passes a clean sentence but fails a marked-up one will miss
+        things in real files. Soft-wrapped markdown is the usual culprit: a sentence
+        broken across two lines at column 80 stops matching, and nothing tells you.</p>
+      </div>
+    </details>
+    <details>
+      <summary>The rule format<span class="hint">eight kinds</span></summary>
+      <div class="body">
+        <p><code>regex</code> covers most rules. The other seven count things a regex
+        cannot express, such as repeated sentence shapes or a rate across a whole
+        document. All eight, with their parameters, are in the
+        <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule format
+        reference</a>.</p>
+        <p>Wrap your rules in a set and the file is shareable as it is:
+        <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Using your rules for real<span class="hint">page, URL or CLI</span></summary>
+      <div class="body">
+        <p>Three ways in, all the same file:</p>
+<pre>drop the .json on the check page               <span class="c"># or use its rules panel</span>
+?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
+slop check --rules house-style.json docs/ -r   <span class="c"># command line</span></pre>
+        <p>Passing tests means a rule does what you wrote. It does not mean the rule
+        is worth having. For that, run it over prose you did not write it against and
+        read the hits:</p>
+<pre>slop check --rules mine.json --select mine ~/writing -r</pre>
+        <p>A rule firing on a lot of good prose is a rule to tighten, whatever its
+        examples say. Two worked examples, one tightened and one kept with its false
+        firing documented, are in
+        <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
+        and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
+      </div>
+    </details>
   </div>
 
   <div class="docs">
@@ -919,7 +923,8 @@ const step = (d) => {
 };
 
 function renderFudge() {
-  $('r-title').textContent = 'Rule tests';
+  const set = S.fudge && S.fudge.length ? S.fudge[0].set : null;
+  $('r-title').textContent = set ? `Results for ${set}` : 'Results';
   $('list').innerHTML = '';
   const d = $('doc'); d.className = '';
   if (!S.fudge) { d.innerHTML = '<p class="err" style="color:var(--muted)">Testing…</p>'; return; }
@@ -1125,7 +1130,8 @@ function run() {
     // The card stays for a loaded set — the text area gives way to a summary,
     // so the rules control and the file picker never go out of reach.
     $('io').hidden = S.mode === 'fudge';
-    $('guide').hidden = S.mode !== 'fudge';
+    $('guide').hidden = $('rule-docs').hidden = S.mode !== 'fudge';
+    document.body.dataset.mode = S.mode;
     const many = S.docs.length > 1;
     $('input').hidden = $('kind').hidden = many;
     $('loaded').hidden = !many;
