@@ -79,6 +79,11 @@ finding is a judgement call that is theirs to make.
 
 Some findings are the right call to leave. Two things make that decision sound.
 
+**The fix is an instruction, not a question.** `suggest` says what to do. Where a
+rule has a known exception it is recorded in `note`, and `explain` prints it.
+A finding closed on the strength of something the rule itself said should cite
+`note`, not a reading of the instruction.
+
 **Read the rule before deciding.** `explain <id>` prints `note` and `measured`
 alongside the fix. `note` says what the rule is known to get wrong, which is the
 place a genuine exception is described. `measured` says when and how a tell was

@@ -42,6 +42,27 @@ hold back a set that fails.
 agent acts on. Both appear in `--format json`, so write `suggest` as a
 directive ("Delete the hedge and state the fact"), not a description.
 
+### `suggest` is the imperative; `description` and `note` carry the argument
+
+An agent acts on `suggest`. Anything in it that can be read as permission will be
+read that way, and the finding will be closed unaddressed with the rule's own
+words as the reason. This has happened here twice, so it is written down.
+
+| goes in `suggest` | goes in `description` or `note` |
+|---|---|
+| Delete the hedge and state the fact. | Fires on genuine three-item lists, which are fine. |
+| Name the actor in front of the verb. | Two of fourteen reference papers sit above this edge. |
+| Find an aside this document already has and bracket it. | Some good human writing never parenthesises. |
+
+Phrases to keep out of `suggest`: *fine in*, *nothing here is wrong*, *no need*,
+*acceptable*, *leave it*, *optional*, *this is a fit judgement*, and any
+*if you do not…* clause offering the reader a way out.
+
+The caveats are real and must be recorded, which is what `note` is for. A rule
+whose failure mode is written down is a different thing from one that quietly
+misfires; a rule that licenses inaction in its instruction field is a third thing,
+and it is the one to avoid.
+
 **Every `id` in a set must be unique.** An id is how a rule is selected, ignored,
 reported and recorded in the lock file, so two rules answering to one are
 ambiguous, not duplicated. A set with a repeat is refused, naming the id.

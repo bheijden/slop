@@ -11,6 +11,7 @@ jobs:
         with: { node-version: '20' }
       - run: node tests/run.mjs
       - run: node tests/tune.mjs
+      - run: node tests/suggest.mjs
 
   candidates:
     name: candidate rule sets

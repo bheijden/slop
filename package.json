@@ -7,7 +7,7 @@
     "slop": "./js/cli.mjs"
   },
   "scripts": {
-    "test": "node tests/run.mjs && node tests/run.mjs candidates/*.json && node tests/tune.mjs && node tests/web.mjs",
+    "test": "node tests/run.mjs && node tests/run.mjs candidates/*.json && node tests/tune.mjs && node tests/suggest.mjs && node tests/web.mjs",
     "lint": "node js/cli.mjs check -r .",
     "build-rules": "node tools/build-rules.mjs",
     "serve": "python3 -m http.server 8000",
