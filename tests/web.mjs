@@ -177,6 +177,28 @@ async function main() {
     check('test-rules mode tests the template', fg.rows >= 2 && fg.prefilled > 200, JSON.stringify(fg));
     check('the template shows a real failure', /1 failing/.test(fg.score) && fg.why >= 1, JSON.stringify(fg));
 
+    // A failure points back at the exact string in the editor that caused it.
+    const link = await evaluate(`(async()=>{
+      const why=document.querySelector('.frow.bad .why');
+      why.click();
+      await new Promise(r=>setTimeout(r,200));
+      const ta=document.getElementById('rules-src');
+      return JSON.stringify({picked: ta.value.slice(ta.selectionStart, ta.selectionEnd)})})()`);
+    const lk = JSON.parse(link);
+    check('clicking a failure selects the example in the editor',
+      lk.picked === 'Every request is logged to disk.', JSON.stringify(lk));
+
+    const rowLink = await evaluate(`(async()=>{
+      const row=document.querySelector('.frow.bad');
+      row.click();
+      await new Promise(r=>setTimeout(r,200));
+      const ta=document.getElementById('rules-src');
+      const sel=ta.value.slice(ta.selectionStart, ta.selectionEnd);
+      return JSON.stringify({starts: sel.slice(0,1), hasId: /"id":\\s*"very"/.test(sel), len: sel.length})})()`);
+    const rl = JSON.parse(rowLink);
+    check('clicking a rule selects that whole rule',
+      rl.starts === '{' && rl.hasId && rl.len > 100, JSON.stringify(rl));
+
     // Replacing the text re-runs against whatever is there now.
     const own = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');

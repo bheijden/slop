@@ -78,11 +78,11 @@ button,select,textarea,input{font:inherit;color:inherit}
 
 /* input — one card: the text, what to do with it, and which rules run. */
 .io{margin:22px 0 0}
-#input-card{
+.iocard{
   position:relative;border:1px solid var(--hair);border-radius:10px;background:var(--card);
   box-shadow:var(--lift);transition:border-color .12s,background .12s;
 }
-#input-card:focus-within{border-style:solid;border-color:var(--blue)}
+.iocard:focus-within{border-style:solid;border-color:var(--blue)}
 body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
 #input{
   display:block;width:100%;min-height:132px;max-height:52vh;overflow:auto;resize:vertical;
@@ -319,14 +319,21 @@ body.resizing{cursor:col-resize;user-select:none}
 .rset[open] summary::before{content:"−"}
 /* the rule-writing guide, shown in test-rules mode */
 .guide{margin:22px 0 26px}
-.guide #rules-src{
-  width:100%;box-sizing:border-box;border:0;background:transparent;resize:vertical;
-  min-height:300px;padding:13px 14px;color:var(--ink);
-  font:12.5px/1.55 var(--mono);tab-size:2;
+#rules-src{
+  display:block;width:100%;min-height:300px;max-height:60vh;overflow:auto;resize:vertical;
+  border:0;background:none;padding:14px 16px 10px;color:inherit;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;tab-size:2;
 }
-.guide #rules-src:focus{outline:none}
+#rules-src:focus{outline:none}
+#rules-src::placeholder{color:var(--muted)}
 .rerr{margin:8px 2px 0;font:12px/1.5 var(--mono);color:var(--flag)}
 .rdocs{margin-top:22px}
+/* a result row points back at the rule that produced it */
+.frow.click{cursor:pointer}
+.frow.click:hover span:first-child{text-decoration:underline;text-underline-offset:3px}
+.frow .why{cursor:pointer}
+.frow .why:hover{background:var(--sunk)}
+.frow .why b{font-weight:600;color:var(--flag)}
 /* The set box is the whole set in one click. Indeterminate means partly on,
    which is the honest third state for a set you have picked rules out of. */
 .rset summary .setbox{flex:none;margin:0;cursor:pointer}
@@ -371,7 +378,7 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 
   <div class="io" id="io">
-    <div class="card" id="input-card">
+    <div class="card iocard" id="input-card">
       <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
       <div class="loaded" id="loaded" hidden></div>
       <div class="tools">
@@ -395,9 +402,9 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 
   <div class="guide" id="guide" hidden>
-    <div class="card">
-      <textarea id="rules-src" spellcheck="false"
-        aria-label="A rule set to test"></textarea>
+    <div class="card iocard">
+      <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
+        placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
       <div class="tools">
         <button class="chip" id="b-rreset">Reset to template</button>
         <button class="chip" id="b-rfile">Choose a file</button>
@@ -929,11 +936,12 @@ function renderFudge() {
     <div class="frow head"><span>rule</span><span class="num">examples</span><span class="num">markup</span></div>
     ${S.fudge.slice().sort((a,b) => (b.conform.fail+b.fudge.fail)-(a.conform.fail+a.fudge.fail)).map((r) => {
       const rb = r.conform.fail + r.fudge.fail;
-      return `<div class="frow${rb?' bad':''}"><span>${esc(r.rule)}</span>
+      return `<div class="frow click${rb?' bad':''}" data-rule="${esc(r.rule)}"><span>${esc(r.rule)}</span>
         <span class="num">${r.conform.ok}/${r.conform.ok+r.conform.fail}</span>
         <span class="num">${r.fudge.ok}/${r.fudge.ok+r.fudge.fail}</span>
-        ${r.failures.map(f=>`<div class="why">${esc(f.kind)} — ${esc(String(f.detail).slice(0,150))}</div>`).join('')}</div>`;
+        ${r.failures.map(f=>`<div class="why" data-ex="${esc(String(f.detail))}"><b>${esc(f.kind)}</b> · ${esc(String(f.detail).slice(0,150))}</div>`).join('')}</div>`;
     }).join('')}`;
+  wireFudgeRows();
 }
 
 // The tree only exists for a multi-document load; a single file keeps the
@@ -1292,6 +1300,48 @@ $('grip').addEventListener('keydown', (e) => {
   if (e.key === 'Home') { e.preventDefault(); setLayout('list'); }
   if (e.key === 'End') { e.preventDefault(); setLayout('text'); }
 });
+
+/* A result points back at the text that produced it, the way a finding points
+   at a line. Clicking a rule selects that rule in the editor; clicking the
+   reason selects the exact example string that failed. */
+function selectInRules(needle) {
+  const ta = $('rules-src');
+  const i = ta.value.indexOf(needle);
+  if (i < 0) return;
+  ta.focus();
+  ta.setSelectionRange(i, i + needle.length);
+  // Textareas do not scroll to a selection on their own. Measure a line and
+  // put the match a third of the way down the visible area.
+  const line = parseFloat(getComputedStyle(ta).lineHeight) || 20;
+  const before = ta.value.slice(0, i).split('\n').length - 1;
+  ta.scrollTop = Math.max(0, before * line - ta.clientHeight / 3);
+}
+
+// The whole rule object, found from its id, so clicking a row shows the rule
+// rather than two words of it.
+function ruleBlock(id) {
+  const src = $('rules-src').value;
+  const at = src.search(new RegExp('"id"\\s*:\\s*"' + id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"'));
+  if (at < 0) return null;
+  let start = src.lastIndexOf('{', at);
+  let depth = 0;
+  for (let i = start; i < src.length; i++) {
+    if (src[i] === '{') depth++;
+    else if (src[i] === '}' && --depth === 0) return src.slice(start, i + 1);
+  }
+  return null;
+}
+
+function wireFudgeRows() {
+  for (const row of document.querySelectorAll('.frow.click')) {
+    row.onclick = (e) => {
+      const why = e.target.closest('.why');
+      if (why && why.dataset.ex) return selectInRules(why.dataset.ex);
+      const block = ruleBlock(row.dataset.rule);
+      if (block) selectInRules(block);
+    };
+  }
+}
 
 /* ---- test-rules mode: the user's own set, tested here ------------------- */
 const RULE_TEMPLATE = "{\n  \"name\": \"my-rules\",\n  \"version\": \"0.1.0\",\n  \"rules\": [\n    {\n      \"id\": \"utilise\",\n      \"kind\": \"regex\",\n      \"pattern\": \"\\\\butili[sz]e[sd]?\\\\b\",\n      \"flags\": \"gi\",\n      \"description\": \"Formal where plain would do.\",\n      \"suggest\": \"Write \\\"use\\\".\",\n      \"tests\": {\n        \"hit\":  [\"We utilise the cache for this.\"],\n        \"miss\": [\"The utility ran overnight.\"]\n      }\n    },\n    {\n      \"id\": \"very\",\n      \"kind\": \"regex\",\n      \"pattern\": \"very\",\n      \"flags\": \"gi\",\n      \"description\": \"An intensifier that weakens the word after it.\",\n      \"suggest\": \"Cut it, or pick a stronger word.\",\n      \"tests\": {\n        \"hit\":  [\"The import step was very slow.\"],\n        \"miss\": [\"Every request is logged to disk.\"]\n      }\n    }\n  ]\n}";
