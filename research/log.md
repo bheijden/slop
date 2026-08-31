@@ -30,6 +30,7 @@ source.
 | [slop-forensics](https://github.com/sam-paech/slop-forensics) | per-domain n-gram lists | essay-domain trigrams, heavily topic-contaminated |
 | [simonw tweet thread](https://x.com/simonw/status/2093277255438860358) | replies | structural tells; 3 further sources |
 | [sloptells.com](https://sloptells.com) | measured against human baselines | 14 rules, and the em-dash verdict |
+| balanced semicolon antithesis | reader report | nothing, and the negative is recorded below |
 | [louisabraham](https://louisabraham.github.io) | banned-word list | not found — no such article on the site |
 | [humanizer-de](https://github.com/marmbiz/humanizer-de) | 72 patterns, German | 2 rules, including sentence-length variation |
 
@@ -685,6 +686,45 @@ A fourth problem was not a bug but a gap. The repo's own `slop.json` pins
 and from CI, while a cleanup driven by `--select em-dash` made the repo look
 clean. Config that names sets explicitly does not pick up new ones. The select
 list now includes it.
+
+### Balanced semicolon antithesis, tested and rejected
+
+Proposed from a real reading: "the mechanics are in the appendix; the
+consequences are what count" reads like a machine, and the shape generalises to
+*the X is Y; the Z is W*. It is a recognisable rhetorical tic and worth a
+measurement.
+
+Four formulations were counted over the 36-document matched corpus.
+
+| pattern | human | AI |
+|---|---|---|
+| `the X is Y; the Z is W`, the exact shape | 0 | 0 |
+| same word opening both halves of a semicolon | 7 | 17 |
+| semicolon followed by determiner, noun, copula | 0 | 0 |
+| a copula on both sides of a semicolon | 5 | 10 |
+
+**The exact shape does not occur at all**, in 34,000 words of either corpus. It
+is too rare to certify from data this size.
+
+The looser forms separate no better. Per document the counts are 0 fifteen times
+then 1, 2, 4 for human writing, and 0 ten times then 1, 1, 1, 1, 2, 3, 3, 5 for
+AI. Human maximum four, AI maximum five.
+
+<!-- slop-ignore-start -->
+And what the loose pattern catches on the human side answers the question on its
+own. "should communicate, not one thing, but all things; should…" is Emerson.
+"where it is, is day; where…" is Stevenson. "No book lay open at his elbow; no…"
+is the AI half, and it is the same device.
+<!-- slop-ignore-end -->
+
+Balanced antithesis across a semicolon is a rhetorical figure that good writers
+reach for deliberately, which puts it in the same class as `echo-triad`: real,
+recognisable, and not evidence of anything about who wrote it.
+
+One thing the measurement does show. The shape appears eleven times in this
+project's own documentation and zero to four times in any human document
+measured, so the reading that prompted this was accurate about the prose in
+front of it. A habit of one writer is not a tell, and no rule shipped.
 
 ## Calibration so far
 
