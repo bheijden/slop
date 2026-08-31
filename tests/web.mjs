@@ -165,12 +165,29 @@ async function main() {
     const mn = JSON.parse(many);
     check('dropping several files builds a tree', mn.files === 2 && mn.tree, JSON.stringify(mn));
 
+    // The page prefills its own rule set, one rule of which fails on purpose,
+    // so the mode demonstrates what a failure looks like without being loaded.
     const fudge = await evaluate(`(async()=>{document.getElementById('m-fudge').click();
-      await new Promise(r=>setTimeout(r,9000));
+      await new Promise(r=>setTimeout(r,4000));
       return JSON.stringify({rows: document.querySelectorAll('.frow').length,
-        score: document.getElementById('score').textContent})})()`);
+        score: document.getElementById('score').textContent,
+        prefilled: document.getElementById('rules-src').value.length,
+        why: document.querySelectorAll('.why').length})})()`);
     const fg = JSON.parse(fudge);
-    check('test-rules mode runs', fg.rows > 10 && /failing/.test(fg.score), JSON.stringify(fg));
+    check('test-rules mode tests the template', fg.rows >= 2 && fg.prefilled > 200, JSON.stringify(fg));
+    check('the template shows a real failure', /1 failing/.test(fg.score) && fg.why >= 1, JSON.stringify(fg));
+
+    // Replacing the text re-runs against whatever is there now.
+    const own = await evaluate(`(async()=>{
+      const t=document.getElementById('rules-src');
+      t.value=JSON.stringify({name:'t',rules:[{id:'x',kind:'regex',pattern:'\\\\bfoo\\\\b',flags:'gi',
+        description:'d',tests:{hit:['a foo b'],miss:['football']}}]});
+      t.dispatchEvent(new Event('input'));
+      await new Promise(r=>setTimeout(r,3000));
+      return JSON.stringify({score: document.getElementById('score').textContent,
+        rows: document.querySelectorAll('.frow').length})})()`);
+    const ow = JSON.parse(own);
+    check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
 
     check('no exception during interaction', errors.length === 0, errors.slice(0, 2).join(' | '));
 

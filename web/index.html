@@ -318,11 +318,15 @@ body.resizing{cursor:col-resize;user-select:none}
 .rset summary::before{content:"+";color:var(--blue);width:9px;flex:none;font-size:11px}
 .rset[open] summary::before{content:"−"}
 /* the rule-writing guide, shown in test-rules mode */
-.guide{max-width:74ch;margin:26px 0 30px;padding:0 2px}
-.guide h2{font-size:15px;font-weight:600;margin:26px 0 8px;letter-spacing:-.01em}
-.guide h2:first-child{margin-top:0}
-.guide p{margin:0 0 10px;font-size:13.5px;line-height:1.62;color:var(--ink)}
-.guide pre{margin:0 0 12px}
+.guide{margin:22px 0 26px}
+.guide #rules-src{
+  width:100%;box-sizing:border-box;border:0;background:transparent;resize:vertical;
+  min-height:300px;padding:13px 14px;color:var(--ink);
+  font:12.5px/1.55 var(--mono);tab-size:2;
+}
+.guide #rules-src:focus{outline:none}
+.rerr{margin:8px 2px 0;font:12px/1.5 var(--mono);color:var(--flag)}
+.rdocs{margin-top:22px}
 /* The set box is the whole set in one click. Indeterminate means partly on,
    which is the honest third state for a set you have picked rules out of. */
 .rset summary .setbox{flex:none;margin:0;cursor:pointer}
@@ -391,51 +395,67 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 
   <div class="guide" id="guide" hidden>
-    <h2>Write a rule</h2>
-    <p>A rule is JSON. The <code>tests</code> are what make it checkable, so every rule
-    below has them.</p>
-<pre>{ <span class="p">"id"</span>: "utilise", <span class="p">"kind"</span>: "regex",
-  <span class="p">"pattern"</span>: "\\butili[sz]e[sd]?\\b", <span class="p">"flags"</span>: "gi",
-  <span class="p">"description"</span>: "Formal where plain would do.",
-  <span class="p">"suggest"</span>: "Write \"use\".",
-  <span class="p">"tests"</span>: { <span class="p">"hit"</span>:  ["We utilise the cache."],
-             <span class="p">"miss"</span>: ["The utility ran overnight."] } }</pre>
-    <p>Wrap one or more in a set and you have a file you can share:
-    <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.
-    Eight <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule kinds</a>
-    exist; <code>regex</code> covers most of them. The others count things a regex
-    cannot express, like repeated sentence shapes or a rate across a whole document.</p>
+    <div class="card">
+      <textarea id="rules-src" spellcheck="false"
+        aria-label="A rule set to test"></textarea>
+      <div class="tools">
+        <button class="chip" id="b-rreset">Reset to template</button>
+        <button class="chip" id="b-rfile">Choose a file</button>
+        <span class="n" id="rmeta"></span>
+      </div>
+    </div>
+    <p class="rerr" id="rerr" hidden></p>
 
-    <h2>Load it</h2>
-    <p>Three ways in, all equivalent:</p>
-<pre>drop the .json on this page                    <span class="c"># or use the rules panel</span>
-?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
-slop check --rules house-style.json docs/ -r   <span class="c"># same file, command line</span></pre>
-
-    <h2>Test it</h2>
-    <p>Two phases, both below. <b>Conformance</b> runs every example: each
-    <code>hit</code> must match, each <code>miss</code> must not.
-    <b>Fudging</b> then rewrites each hit 27 ways with the markup real files carry
-    and requires the rule to still fire:</p>
+    <div class="docs rdocs">
+      <details>
+        <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
+        <div class="body">
+          <p><b>Conformance</b> runs every example you wrote: each <code>tests.hit</code>
+          must match, each <code>tests.miss</code> must not. That is what catches the
+          <code>very</code> rule below, whose pattern has no word boundaries and so
+          fires on "E<b>very</b> request".</p>
+          <p><b>Fudging</b> then rewrites each hit 27 ways with the markup real files
+          carry, and requires the rule to still fire:</p>
 <pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
 It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
 It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
-&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span>
-&lt;p&gt;It is important &lt;!-- note --&gt; to note …     <span class="c">html:comment-before-word</span></pre>
-    <p>A rule that passes a clean sentence but fails a marked-up one will miss things in
-    real files. Soft-wrapped markdown is the usual culprit: a sentence broken across
-    two lines at column 80 stops matching, and nothing tells you.</p>
-
-    <h2>Then measure it</h2>
-    <p>Passing tests means a rule does what you wrote. It does not mean the rule is
-    worth having. For that, run it over prose you did not write it against and read
-    the hits:</p>
+&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span></pre>
+          <p>A rule that passes a clean sentence but fails a marked-up one will miss
+          things in real files. Soft-wrapped markdown is the usual culprit: a sentence
+          broken across two lines at column 80 stops matching, and nothing tells you.</p>
+        </div>
+      </details>
+      <details>
+        <summary>The rule format<span class="hint">eight kinds</span></summary>
+        <div class="body">
+          <p><code>regex</code> covers most rules. The other seven count things a regex
+          cannot express, such as repeated sentence shapes or a rate across a whole
+          document. All eight, with their parameters, are in the
+          <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule format
+          reference</a>.</p>
+          <p>Wrap your rules in a set and the file is shareable as it is:
+          <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Using your rules for real<span class="hint">page, URL or CLI</span></summary>
+        <div class="body">
+          <p>Three ways in, all the same file:</p>
+<pre>drop the .json on the check page               <span class="c"># or use its rules panel</span>
+?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
+slop check --rules house-style.json docs/ -r   <span class="c"># command line</span></pre>
+          <p>Passing tests means a rule does what you wrote. It does not mean the rule
+          is worth having. For that, run it over prose you did not write it against and
+          read the hits:</p>
 <pre>slop check --rules mine.json --select mine ~/writing -r</pre>
-    <p>A rule firing on a lot of good prose is a rule to tighten, whatever its examples
-    say. Two worked examples, one tightened and one kept with its false firing
-    documented, are in
-    <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
-    and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
+          <p>A rule firing on a lot of good prose is a rule to tighten, whatever its
+          examples say. Two worked examples, one tightened and one kept with its false
+          firing documented, are in
+          <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
+          and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
+        </div>
+      </details>
+    </div>
   </div>
 
   <div class="results" id="results" hidden>
@@ -901,7 +921,7 @@ function renderFudge() {
     {cok:0,cbad:0,fok:0,fbad:0,lossy:0});
   const bad = t.cbad + t.fbad;
   d.innerHTML = `<div class="tallies">
-      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${S.sets.map(s=>s.name).join(' · ')}</div></div>
+      <div><div class="big${bad?' bad':''}">${bad ? bad + ' failing' : 'All passing'}</div><div class="lbl">${esc([...new Set(S.fudge.map(r=>r.set))].join(" · "))}</div></div>
       <div><div class="big">${t.cok}</div><div class="lbl">examples matched</div></div>
       <div><div class="big">${t.fok}</div><div class="lbl">survived markup</div></div>
       <div><div class="big">${t.lossy}</div><div class="lbl">expected misses</div></div>
@@ -1107,8 +1127,13 @@ function run() {
         + ` ${esc('—')} drop more to replace them`;
     }
     if (S.mode === 'fudge') {
+      const { sets, err } = readRuleSrc();
+      $('rerr').hidden = !err;
+      $('rerr').textContent = err || '';
+      $('rmeta').textContent = sets.length ? `${sets[0].rules.length} rule${sets[0].rules.length === 1 ? '' : 's'}` : '';
+      if (err || !sets.length) { S.fudge = null; $('score').textContent = ''; renderResults(); return; }
       S.fudge = null; renderResults();
-      const res = await ask({ mode:'fudge', sets:S.sets }, 60000);
+      const res = await ask({ mode:'fudge', sets }, 60000);
       if (!res.ok) return note(res.error);
       S.fudge = res.results;
       const bad = res.results.reduce((a,r) => a + r.conform.fail + r.fudge.fail, 0);
@@ -1267,6 +1292,29 @@ $('grip').addEventListener('keydown', (e) => {
   if (e.key === 'Home') { e.preventDefault(); setLayout('list'); }
   if (e.key === 'End') { e.preventDefault(); setLayout('text'); }
 });
+
+/* ---- test-rules mode: the user's own set, tested here ------------------- */
+const RULE_TEMPLATE = "{\n  \"name\": \"my-rules\",\n  \"version\": \"0.1.0\",\n  \"rules\": [\n    {\n      \"id\": \"utilise\",\n      \"kind\": \"regex\",\n      \"pattern\": \"\\\\butili[sz]e[sd]?\\\\b\",\n      \"flags\": \"gi\",\n      \"description\": \"Formal where plain would do.\",\n      \"suggest\": \"Write \\\"use\\\".\",\n      \"tests\": {\n        \"hit\":  [\"We utilise the cache for this.\"],\n        \"miss\": [\"The utility ran overnight.\"]\n      }\n    },\n    {\n      \"id\": \"very\",\n      \"kind\": \"regex\",\n      \"pattern\": \"very\",\n      \"flags\": \"gi\",\n      \"description\": \"An intensifier that weakens the word after it.\",\n      \"suggest\": \"Cut it, or pick a stronger word.\",\n      \"tests\": {\n        \"hit\":  [\"The import step was very slow.\"],\n        \"miss\": [\"Every request is logged to disk.\"]\n      }\n    }\n  ]\n}";
+
+function readRuleSrc() {
+  const raw = $('rules-src').value.trim();
+  if (!raw) return { sets: [], err: null };
+  let json;
+  try { json = JSON.parse(raw); }
+  catch (e) { return { sets: [], err: 'That is not valid JSON. ' + e.message }; }
+  const set = Array.isArray(json) ? { name: 'my-rules', rules: json } : json;
+  if (!Array.isArray(set.rules)) return { sets: [], err: 'A rule set needs a "rules" array.' };
+  set.name = set.name || 'my-rules';
+  return { sets: [set], err: null };
+}
+
+$('b-rreset').onclick = () => { $('rules-src').value = RULE_TEMPLATE; run(); };
+$('b-rfile').onclick = () => pickFile('.json', async (file) => {
+  $('rules-src').value = await file.text(); run();
+});
+$('rules-src').addEventListener('input', run);
+$('rules-src').value = RULE_TEMPLATE;
+
 for (const [id, mode] of [['m-check','check'],['m-fudge','fudge']]) $(id).onclick = () => {
   S.mode = mode;
   $('m-check').setAttribute('aria-pressed', String(mode === 'check'));
