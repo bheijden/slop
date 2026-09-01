@@ -37,6 +37,8 @@ jobs:
       # method rather than data. That is a decision to read, not to merge, so
       # the job fails and says so.
       - name: Rebuild the word list
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           node tools/load-bearing.mjs \
             --days "${{ github.event.inputs.days || 28 }}" \

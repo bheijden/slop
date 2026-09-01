@@ -18,7 +18,6 @@
 // Exit 0 wrote or nothing to do, 1 churn over the ceiling, 2 could not fetch.
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 
@@ -37,7 +36,23 @@ const arg = (name, dflt) => {
   const i = process.argv.indexOf(name);
   return i < 0 ? dflt : process.argv[i + 1];
 };
-const gh = (path) => JSON.parse(execFileSync('gh', ['api', path], { encoding: 'utf8', maxBuffer: 1 << 28 }));
+// Plain fetch rather than the gh CLI, so this runs anywhere Node does. A token
+// is used when one is in the environment, because unauthenticated calls from a
+// shared runner address run into the rate limit quickly; without one it still
+// works, at 60 calls an hour, and this makes one call.
+async function gh(path) {
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+  const res = await fetch(`https://api.github.com/${path}`, {
+    headers: { accept: 'application/vnd.github+json',
+               ...(token ? { authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!res.ok) {
+    console.error(`load-bearing: GitHub API said ${res.status} ${res.statusText} for ${path}`);
+    if (res.status === 403) console.error('  rate limited; set GITHUB_TOKEN to raise the limit');
+    process.exit(2);
+  }
+  return res.json();
+}
 
 function leadWords(js) {
   const d = JSON.parse(js.slice(js.indexOf('{')).trim().replace(/;$/, ''));
@@ -48,7 +63,7 @@ function leadWords(js) {
 }
 
 async function snapshots(days) {
-  const commits = gh(`repos/${REPO}/commits?path=analysis.js&per_page=${days}`);
+  const commits = await gh(`repos/${REPO}/commits?path=analysis.js&per_page=${days}`);
   const out = [];
   for (const c of commits) {
     const url = `https://raw.githubusercontent.com/${REPO}/${c.sha}/analysis.js`;
