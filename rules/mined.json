@@ -541,33 +541,6 @@
       }
     },
     {
-      "id": "moreover",
-      "name": "moreover",
-      "match": {
-        "kind": "regex",
-        "pattern": "(?:^|[.!?]\\s+|\\n)(?:Moreover|Furthermore|Additionally|Notably)\\s*,",
-        "flags": "gi"
-      },
-      "notable": {
-        ">": 0
-      },
-      "description": "Flagged by slop-gate as an AI-writing tell: moreover.",
-      "suggest": "Join the sentences, or delete the connective.",
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "offBecause": "Measured on the audit corpus it fired on 4 of 18 human documents and 0 AI ones. \"Moreover\" and \"Additionally\" are ordinary formal English.",
-      "tests": {
-        "hit": [
-          "The build is faster. Moreover, it uses less memory."
-        ],
-        "miss": [
-          "The moreover clause was struck."
-        ]
-      }
-    },
-    {
       "id": "elevate",
       "name": "elevate",
       "match": {
@@ -616,34 +589,6 @@
         ],
         "miss": [
           "Robustness was never the concern."
-        ]
-      }
-    },
-    {
-      "id": "crucial",
-      "name": "crucial",
-      "match": {
-        "kind": "regex",
-        "pattern": "\\bcrucial\\b",
-        "flags": "gi"
-      },
-      "notable": {
-        ">": 0
-      },
-      "description": "Flagged by slop-gate as an AI-writing tell: crucial.",
-      "suggest": "Say why it matters, or drop the intensifier.",
-      "note": "single ordinary word; expect false positives",
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose. The bare word is too common to carry a tell on its own.",
-      "tests": {
-        "hit": [
-          "Caching is crucial for latency."
-        ],
-        "miss": [
-          "The crux of the argument is simpler."
         ]
       }
     },
@@ -1300,37 +1245,6 @@
       }
     },
     {
-      "id": "stock-metaphor",
-      "name": "Stock essay metaphors",
-      "match": {
-        "kind": "regex",
-        "pattern": "\\b(?:a\\s+|the\\s+)?double[- ]edged\\s+sword\\b|\\blevel(?:s|ed|led|ing|ling)?\\s+the\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?level\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?delicate\\s+balancing\\s+act\\b|\\b(?:a\\s+|the\\s+)?virtuous\\s+cycle\\b|\\bfertile\\s+ground\\s+for\\b|\\b(?:a\\s+|the\\s+)?driving\\s+force\\s+behind\\b|\\bone[- ]size[- ]fits[- ]all\\b|\\b(?:a\\s+|the\\s+)?cautionary\\s+tale\\b",
-        "flags": "gi"
-      },
-      "notable": {
-        ">": 0
-      },
-      "description": "The fixed stock of metaphors that essay-shaped generation reaches for: double-edged sword, level playing field, virtuous cycle, driving force behind, one-size-fits-all.",
-      "suggest": "Drop the metaphor and state the mechanism, or find one that belongs to this subject.",
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
-      "tests": {
-        "hit": [
-          "Automation is a double-edged sword.",
-          "The API levels the playing field for small teams.",
-          "This creates a virtuous cycle of trust.",
-          "There is no one-size-fits-all answer."
-        ],
-        "miss": [
-          "He balanced the tray with one hand.",
-          "The sword was mounted above the fireplace."
-        ]
-      }
-    },
-    {
       "id": "moral-uplift",
       "name": "Moral-uplift closers",
       "match": {
@@ -1460,35 +1374,6 @@
         ],
         "miss": [
           "The parts department closed at five."
-        ]
-      }
-    },
-    {
-      "id": "negation-correction",
-      "name": "Negation then correction, across a sentence break",
-      "match": {
-        "kind": "regex",
-        "pattern": "\\b(?:is|was|are|were|do|does|did|can|could|would)n['’]t\\s+[^.!?\\n]{3,70}[.!?]\\s+(?:It|That|They|You)(?:['’]s|\\s+(?:is|was|are|were|do|does|did))\\b",
-        "flags": "gi"
-      },
-      "notable": {
-        ">": 0
-      },
-      "description": "\"X isn't A. It's B.\" — the correction split over two sentences, so a within-sentence rule misses it.",
-      "suggest": "Say what it is. The denial adds nothing the assertion does not.",
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
-      "tests": {
-        "hit": [
-          "The bottleneck wasn't the database. It was the retry loop.",
-          "This isn't a rewrite. That's a rescue."
-        ],
-        "miss": [
-          "The database wasn't reachable.",
-          "It isn't clear yet whether the fix holds."
         ]
       }
     },
@@ -1834,36 +1719,6 @@
       }
     },
     {
-      "id": "uniform-sentence-length",
-      "name": "Sentences march in formation",
-      "match": {
-        "kind": "rhythm"
-      },
-      "notable": {
-        "<=": 0.4,
-        "needs": {
-          "words": 250,
-          "sentences": 8
-        }
-      },
-      "description": "Sentence lengths that barely vary. humanizer-de measures this as stddev_mean_ratio and requires at least 0.4 in every register profile it ships; sloptells describes the same thing as sentences that march in formation. The badge is the coefficient of variation — standard deviation over mean sentence length.",
-      "suggest": "Cut one sentence in half and let another run long. Rhythm is what stops correct prose from reading as generated.",
-      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone.",
-      "from": "humanizer-de",
-      "source": "https://github.com/marmbiz/humanizer-de",
-      "evidence": "On the audit corpus: 4 hits in 4/18 human documents, 1 in 1/18 AI documents.",
-      "default": "off",
-      "offBecause": "The threshold comes from humanizer-de's German profiles. Checked against English, sixteen documents of human technical prose ran 0.49 to 1.54, so the edge sits below all of them and the measurement does not separate the two corpora.",
-      "tests": {
-        "hit": [
-          "The worker reads each record from the queue and checks its schema. The schema lives in a shared repository that both teams can edit. A record that fails the check is written to a separate log. The log is rotated every night and kept for thirty days. An operator reviews the log each morning before the standup meeting. Most of the failures come from a single partner in the north. That partner has been sending malformed dates since the middle of March. We opened a ticket with their integration team on the same day. The ticket has not received a reply from anyone on their side. We now reject their malformed records at the edge of the system. The change was fifteen lines and shipped on a Tuesday afternoon. Nobody on the team noticed the change had gone out at all. The operator noticed because she stopped being paged at six each morning. She sent a short message to the channel to say so. That message has been pinned in the channel ever since that day. The queue has now run clean for four consecutive months without trouble. We have not touched the retry logic in any way since then. Eleven records are sitting in the dead letter queue this morning. All eleven of them came from the same partner in the north. We check the queue on Friday afternoons now instead of every day. The runbook still tells the operator to check it every single morning. Somebody on the team should update that page in the runbook. So far nobody has found the time to go and do it."
-        ],
-        "miss": [
-          "Short. The worker reads each record from the queue and checks it against a schema that lives in a shared repository both teams can edit, which sounded sensible at the time and has since caused two outages. A record that fails is logged. The log rotates nightly. An operator reviews it each morning before standup, and most of what she finds comes from one partner in the north who has been sending malformed dates since March, a fact we established within an hour and have been unable to act on since. We opened a ticket. No reply. We now reject their malformed records at the edge instead, which took fifteen lines and shipped on a Tuesday afternoon with no announcement, no review beyond the usual one, and no ceremony of any kind. Nobody noticed. The operator noticed, because she stopped being paged at six, and she sent a two-word message to the channel that has been pinned there ever since and remains the only recognition that change will ever get. Four months clean. The retry logic is untouched. Eleven records sit in the dead letter queue this morning, all from the same partner, and we check on Fridays now rather than daily even though the runbook, which nobody has updated, still says every morning. Somebody should fix that. Nobody will. The wider lesson, if there is one, is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed was the only person the system had actually been hurting all along, which is roughly how these things go everywhere I have worked. Four months. No pages. Nobody asked."
-        ]
-      }
-    },
-    {
       "id": "paired-dash-aside",
       "name": "Paired em-dash asides",
       "match": {
@@ -1940,8 +1795,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "“I know,” she said, her voice barely above a whisper.",
@@ -1970,8 +1823,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Her heart was pounding in her chest.",
@@ -2000,8 +1851,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The sound sent a shiver down her spine.",
@@ -2030,8 +1879,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The sun dipped below the horizon, casting long shadows.",
@@ -2060,8 +1907,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The silence felt like an eternity.",
@@ -2090,8 +1935,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The words hung in the air between them.",
@@ -2120,8 +1963,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Little did she know what waited upstairs.",
@@ -2150,8 +1991,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Maybe, just maybe, they would make it.",
@@ -2180,8 +2019,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Whatever came next, they would face it together.",
@@ -2209,8 +2046,6 @@
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "This was something else entirely.",

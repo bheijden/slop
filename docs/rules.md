@@ -9,15 +9,25 @@ sharing and writing them.
 
 | set | rules | what it covers |
 |---|---|---|
+| `mined` | 76 | Everything this project gathered itself, from research papers, style guides, other detectors and reader reports. Each rule records where it came from and how it scored. |
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 
-Three sets ship on. Everything this project mined itself is in `mined`, whose
-rules each record their origin in `from` and `source` and their score in
-`evidence`. 15 of its 80 stay off by default: the creative-writing
-register and the rules the audit measured firing more on human prose than AI. The `em-dash` rule inside it is marked `"default": "on"` and runs wherever that set
-is loaded. It is house style, not a tell. `slop explain em-dash` gives the
-evidence, which points the other way.
+Off by default, alongside the five style profiles:
+
+| set | rules | what it is |
+|---|---|---|
+| `unreproduced` | 5 | Patterns published elsewhere that this repo's corpus measured running the other way: they fired on human documents and not on AI ones. Kept because 36 documents is a small corpus and a pattern that fails on technical prose may hold on another register. |
+
+Three sets ship on, and every rule in them runs. Everything this project mined
+itself is in `mined`, whose rules each record their origin in `from` and
+`source` and their score in `evidence`. Nothing there is held back: a rule that
+never fires on your register costs nothing to leave on, and the ten
+creative-writing rules are silent on documentation. The five the audit measured
+firing on human prose and not on AI prose were a different case, because those
+do fire, so they moved out to `candidates/unreproduced.json` where turning one
+on is a deliberate act. The `em-dash` rule is house style rather than a tell;
+`slop explain em-dash` gives the evidence, which points the other way.
 
 ```sh
 slop list                    # every rule and whether it is active
@@ -30,7 +40,7 @@ slop explain note-that       # one rule in full
 ```sh
 slop check --select wikipedia-ai docs/ -r        # one set
 slop check --ignore promo,landscape docs/ -r     # drop two rules
-slop check --select colon-triple docs/ -r        # one rule, even though it is off by default
+slop check --select colon-triple docs/ -r        # one rule on its own
 slop check --all docs/ -r                        # everything
 ```
 
@@ -264,8 +274,8 @@ the top, which is useful while you are still writing the pattern.
 
 ```
 rule sets: simonwillison, wikipedia-ai  (38 rules)
-conformance: 182 pass, 0 fail
-fudging:     3066 pass, 0 fail  (86 expected misses on lossy markup)
+conformance: 198 pass, 0 fail
+fudging:     3267 pass, 0 fail  (117 expected misses on lossy markup)
 ```
 
 Two phases:

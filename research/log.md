@@ -177,12 +177,19 @@ variant, are after the appositive cascade, as in "twelve panels, each a window i
 another world". Kept, with a note: with no part-of-speech information a
 descriptive appositive can still match.
 
-**The fiction set is shipped separately and off by default.** The creative
-constructions are real and consistent: voice barely above a whisper, heart
-pounding in her chest, a shiver down her spine, the words hung in the air,
-little did she know, maybe just maybe. Ten rules, not 2500 phrases.
-Anyone linting fiction wants these, and nobody linting documentation has any
-use for them. That is what per-source sets are for.
+**The fiction rules ship on.** The creative constructions are real and
+<!-- slop-ignore-start -->
+consistent: voice barely above a whisper, heart pounding in her chest, a shiver
+down her spine, the words hung in the air, little did she know, maybe just
+maybe. Ten rules, not 2500 phrases.
+<!-- slop-ignore-end -->
+They were off by default at first, on the reasoning that nobody linting
+documentation has any use for them. That was the wrong test. A rule that does
+not fire on your register costs nothing to leave on, and the point is removing
+tics rather than matching a distribution, so a tell that is only ever going to
+be silent on your prose is not worth making anyone opt into. Measured against
+the 29k-word human technical corpus the ten fire zero times; the only hits in
+this repo are the sentence above, which names the patterns.
 
 ### Measuring AI "Slop" in Text → no rules, but a coverage map
 

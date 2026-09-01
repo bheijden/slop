@@ -140,22 +140,29 @@ async function main() {
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
     check('every set has a set-level toggle', D.total >= 8, String(D.total));
-    // simonwillison and wikipedia-ai run whole. mined ships on but holds rules
-    // that are off, so it reads as partly on rather than fully checked.
+    // All three shipped sets run whole; candidates are loaded but unchecked.
     check('shipped sets run, candidate sets do not',
-      JSON.stringify(D.on) === JSON.stringify(['simonwillison', 'wikipedia-ai']),
+      JSON.stringify(D.on) === JSON.stringify(['mined', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
 
-    // mined ships on with a subset of its rules off, so the house-style em-dash
-    // rule has to be running while its set reads as only partly enabled.
-    const optin = await evaluate(`(()=>{
+    // Partly on is a third state. Turning one rule off has to leave the set
+    // running and show it as neither fully on nor off.
+    const optin = await evaluate(`(async()=>{
       const box=document.querySelector('#rules input[data-rule="em-dash"]');
-      const set=document.querySelector('#rules input[data-toggle="mined"]');
-      return JSON.stringify({rule: box ? box.checked : null,
-        setFullyOn: set ? set.checked && !set.indeterminate : null})})()`);
+      const set=()=>document.querySelector('#rules input[data-toggle="mined"]');
+      const before={rule:box.checked, full:set().checked && !set().indeterminate};
+      box.click(); await new Promise(r=>setTimeout(r,600));
+      const off={rule:document.querySelector('#rules input[data-rule="em-dash"]').checked,
+                 partly:set().indeterminate};
+      document.querySelector('#rules input[data-rule="em-dash"]').click();
+      await new Promise(r=>setTimeout(r,600));
+      const back={full:set().checked && !set().indeterminate};
+      return JSON.stringify({before, off, back})})()`);
     const oi = JSON.parse(optin);
     check('a set can run with only some of its rules on',
-      oi.rule === true && oi.setFullyOn === false, JSON.stringify(oi));
+      oi.before.rule === true && oi.before.full === true
+      && oi.off.rule === false && oi.off.partly === true && oi.back.full === true,
+      JSON.stringify(oi));
     check('code blocks have copy buttons', w.copyButtons >= 4, String(w.copyButtons));
 
     const example = await evaluate(`(async()=>{document.getElementById('b-example').click();
