@@ -75,7 +75,7 @@ Three sets ship on:
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
-| `ai-tells` | 76 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
+| `ai-tells` | 77 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
 Every rule in those three runs. A rule that never fires on your register costs
 nothing to leave on, so nothing is held back for being narrow. The five patterns

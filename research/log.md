@@ -11,6 +11,42 @@ source.
 - Rejected patterns and why
 - The em-dash question
 
+## The semicolon (2026-09-01)
+
+A reader reported that AI overuses the semicolon. The rate does not show it. On
+the 36-document audit corpus AI runs 4.87 per 1000 words against 3.61 for human,
+a ratio of 1.35, and the human maximum of 24.7 is well above the AI maximum of
+15.9. Human use is bimodal. Nine of eighteen human documents contain no
+semicolon at all, and three contain almost all of them.
+
+Splitting the genre-matched corpus explains why. In literary prose the two are
+indistinguishable, 15.0 per 1000 words against 14.8. Every gap is elsewhere.
+Across technical documentation and government prose, no human document uses a
+semicolon and five of six AI documents do. So the reader is right about what
+they saw, but the mechanism is register rather than volume, and a rate rule
+would report the human essayists and miss the AI technical writing.
+
+Four constructions were scored per document against both corpora.
+
+| pattern | human | AI | kept |
+|---|---|---|---|
+| negation, semicolon, correction | 0/18 | 7/18 | yes |
+| two or more semicolons in one sentence | 0/18 | 7/18 | no, see below |
+| "Some X; others Y" | 0/18 | 2/18 | no, two occurrences |
+| "; it/they <verb>" | 3/18 | 5/18 | no, too weak |
+
+The first two both scored 0 of 18 human documents, which the 18-document corpus
+was too small to distinguish. Against 176,000 further words of human academic
+papers, wire copy and product writing, the semicolon series fired on 19 of 35
+news documents and 5 of 14 papers; the correction pattern fired twice in the
+whole 176,000 words. The series is how a human journalist writes a list, and
+only the small corpus made it look otherwise.
+
+`semicolon-correction` ships. Verbal negation is required, because the three
+human matches on a looser draft were all the determiner: "no longer upright;
+he", "no reference to former roses; they", "no such pipes; the".
+
+
 ## Sources surveyed
 
 | source | kind | yield |

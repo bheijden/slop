@@ -133,7 +133,7 @@ in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
 Three sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
-of published catalogues, and `ai-tells` (76), everything this project gathered
+of published catalogues, and `ai-tells` (77), everything this project gathered
 itself from research papers, style guides and other detectors. Each mined rule
 records where it came from and what it scored on a matched human/AI corpus, and
 `explain` prints both. The shipped catalogue is in

@@ -45,5 +45,5 @@ which is most hand-written markdown, and nothing reported a problem. The rule
 tests would never have caught it either, since they use single-line examples.
 Only running those examples through markup found it.
 
-That is the argument for keeping `tests.hit` in every rule. The examples are not
-there to prove the regex works; they are the raw material for the fudger.
+That is the argument for keeping `tests.hit` in every rule. The examples are the
+raw material for the fudger, not a demonstration that the regex works.

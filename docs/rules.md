@@ -9,7 +9,7 @@ sharing and writing them.
 
 | set | rules | what it covers |
 |---|---|---|
-| `ai-tells` | 76 | Everything this project gathered itself, from research papers, style guides, other detectors and reader reports. Each rule records where it came from and how it scored. |
+| `ai-tells` | 77 | Everything this project gathered itself, from research papers, style guides, other detectors and reader reports. Each rule records where it came from and how it scored. |
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 

@@ -2098,6 +2098,40 @@
           "The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. "
         ]
       }
+    },
+    {
+      "id": "semicolon-correction",
+      "name": "The denial, a semicolon, the restatement",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|was|are|were|has|have|had|do|does|did|will|would|can|could)\\s+not\\b[^;.!?\\n]{3,90};\\s+(?:it|they|he|she|we|this|that|the)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        ">": 0
+      },
+      "description": "A claim is denied, a semicolon follows, and the corrected version arrives in the same sentence: \"the system has not reduced harm; it has relocated the burden\". The semicolon is doing the work a full stop or a plain \"but\" would do, and the shape repeats. Measured across 88 human documents and 193,000 words the construction appeared twice; across 18 AI documents and 17,000 words it appeared eleven times, in seven of them. Only verbal negation counts: \"no longer upright; he\" and \"no reference to former roses; they\" are the determiner, and human essayists write those.",
+      "suggest": "Make it two sentences, or lead with the positive claim and cut the denial. Turning every one into a dash or a full stop swaps one habit for another, so vary how the correction arrives.",
+      "note": "The semicolon itself is not the tell. Human writers use semicolons at the same rate as AI in literary prose, 15.0 against 14.8 per 1000 words; what separates the two is this construction and the registers it turns up in.",
+      "from": "reader report",
+      "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
+      "evidence": "0 of 18 human documents in the audit corpus, 7 of 18 AI documents. Against 176,000 further words of human academic papers, wire copy and product writing: 2 documents of 70.",
+      "tests": {
+        "hit": [
+          "The system has not reduced harm; it has relocated the burden onto the person harmed.",
+          "She did not abandon plant-based eating; she widened it, food by food.",
+          "The standard library did not become less correct during those four years; the world around it moved.",
+          "Conventional food, in this account, was not merely fattening; it was contaminating.",
+          "A great many security fixes are not one-line corrections to a single driver; they require reworking an internal interface."
+        ],
+        "miss": [
+          "Man is timid and apologetic; he is no longer upright.",
+          "These roses make no reference to former roses or to better ones; they are for what they are.",
+          "The port is busy; the operators are turning ships away.",
+          "It was not the solver. It was the model.",
+          "The tagger is not accurate, but it is fast."
+        ]
+      }
     }
   ]
 }
