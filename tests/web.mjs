@@ -199,7 +199,7 @@ async function main() {
         bound: (li.querySelector('.rate .rb')||{}).textContent,
         boundTitle: (li.querySelector('.rate .rb')||{}).title,
         sub: (li.querySelector('.rsub')||{}).textContent,
-        marks: document.querySelectorAll('#doc mark.rate').length,
+        marks: document.querySelectorAll('#doc mark.occ').length,
         lit: document.querySelectorAll('#doc mark.on').length})})()`);
     const rt = JSON.parse(rate);
     check('a rate shows its value, unit and the bound it crossed',
@@ -210,6 +210,26 @@ async function main() {
       /\d+ occurrences? in \d+ words/.test(rt.sub || ''), JSON.stringify(rt));
     check('the occurrences behind a rate are painted and light up together',
       rt.marks > 1 && rt.lit > 1, JSON.stringify(rt));
+
+    // The hover card is a second render path and kept the raw measure string
+    // long after the row stopped using it.
+    const tip = await evaluate(`(async()=>{
+      const out={};
+      for (const [k,sel] of [['row','#list li.doclevel'],['mark','#doc mark.occ']]) {
+        document.querySelector(sel).dispatchEvent(new MouseEvent('mouseenter',{bubbles:false}));
+        await new Promise(r=>setTimeout(r,300));
+        const t=document.getElementById('tip');
+        out[k]={val:(t.querySelector('.rate b')||{}).textContent,
+                sub:(t.querySelector('.rsub')||{}).textContent,
+                raw:!!t.querySelector('.tip-count')};
+      }
+      return JSON.stringify(out)})()`);
+    const tp = JSON.parse(tip);
+    check('hovering a rate shows it laid out, not as a measure string',
+      // 0 is a real value here: a scarcity rule reports an absence.
+      ['row','mark'].every(k => tp[k].val && Number.isFinite(Number(tp[k].val))
+        && /\d+ occurrences? in \d+ words/.test(tp[k].sub || '') && !tp[k].raw),
+      JSON.stringify(tp));
 
     const dropped = await evaluate(`(async()=>{
       const dt = new DataTransfer();

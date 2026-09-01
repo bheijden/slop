@@ -244,18 +244,24 @@ body.resizing{cursor:col-resize;user-select:none}
 /* A doc-level finding measures the whole document, so it shows a rate rather
    than a quoted phrase: what the document reached, the edge it crossed, and
    the count the rate was computed from. */
-.list .rate{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin:3px 0 1px}
-.list .rate b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
-.list .rate .ru{color:var(--muted);font-size:11.5px}
-.list .rate .rb{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums;
+.rate{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin:3px 0 1px}
+.rate b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.rate .ru{color:var(--muted);font-size:11.5px}
+.rate .rb{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums;
   color:var(--flag);border:1px solid var(--hair);border-radius:999px;
-  padding:1.5px 7px;white-space:nowrap;cursor:help}
-.list .rsub{color:var(--muted);font-size:11.5px;margin:0 0 3px;font-variant-numeric:tabular-nums}
+  padding:1.5px 7px;white-space:nowrap}
+.list .rate .rb{cursor:help}
+.rsub{color:var(--muted);font-size:11.5px;margin:0 0 3px;font-variant-numeric:tabular-nums}
+/* The hover card is narrower than the list row and sits above the fix, which
+   carries its own rule, so the rate needs a little more room under it. */
+.tip .rate{margin-top:4px}
+.tip .rate b{font-size:17px}
+.tip .rsub{margin-bottom:6px}
 
 /* An occurrence behind a rate is evidence for a measurement, not a flagged
    phrase, so it is underlined rather than filled in until it is selected. */
-#doc mark.rate{background:none;box-shadow:inset 0 -1px 0 var(--mark-edge)}
-#doc mark.rate:hover,#doc mark.rate.on{background:var(--mark-on);box-shadow:inset 0 -2px 0 var(--mark-edge)}
+#doc mark.occ{background:none;box-shadow:inset 0 -1px 0 var(--mark-edge)}
+#doc mark.occ:hover,#doc mark.occ.on{background:var(--mark-on);box-shadow:inset 0 -2px 0 var(--mark-edge)}
 
 /* the rules control: a panel under the bar, not a documentation section */
 .pop{
@@ -850,8 +856,8 @@ function renderResults() {
   $('doc').innerHTML = results.map((r, di) => {
     const body = useSrc ? ((srcs[di] || {}).src || '') : r.text;
     const ranges = byDoc[di].flatMap(([f, gi]) => f.docLevel
-      ? (f.occurrences || []).map((o) => useSrc ? [o.srcStart, o.srcEnd, gi, 'rate', 1]
-                                                 : [o.start, o.end, gi, 'rate', 1])
+      ? (f.occurrences || []).map((o) => useSrc ? [o.srcStart, o.srcEnd, gi, 'occ', 1]
+                                                 : [o.start, o.end, gi, 'occ', 1])
       : [useSrc ? [f.srcStart, f.srcEnd, gi, '', 0] : [f.start, f.end, gi, '', 0]]);
     const head = multi ? `<h3 class="fname"><span class="nm">${esc(r.name)}</span>`
       + `<span class="ct${r.findings.length ? '' : ' clean'}">${r.findings.length || 'clean'}</span></h3>` : '';
@@ -877,7 +883,7 @@ function renderResults() {
   for (const li of $('list').querySelectorAll('li[data-i]')) {
     const f = S.flat[+li.dataset.i];
     li.onclick = () => select(+li.dataset.i);
-    li.onmouseenter = () => showTip(li, { ...S.byId[f.rule], measure: f.measure });
+    li.onmouseenter = () => showTip(li, { ...S.byId[f.rule], measure: f.measure, rate: f.rate });
     li.onmouseleave = hideTip;
   }
 
@@ -972,7 +978,8 @@ function showTip(el, info) {
     + (info.name ? `<div class="tip-name">${esc(info.name)}</div>` : '')
     // What the ×N counts, which differs per rule: "no" items for a chain,
     // echoing sentences for an echo, questions in a row for a run.
-    + (info.measure ? `<div class="tip-count">${esc(info.measure)}</div>` : '')
+    + (info.rate ? rateBlock(info)
+       : info.measure ? `<div class="tip-count">${esc(info.measure)}</div>` : '')
     + (info.why ? `<div class="tip-why">${esc(info.why)}</div>` : '')
     + (info.suggest ? `<div class="tip-fix">${esc(info.suggest)}</div>` : '');
   t.classList.add('on');
