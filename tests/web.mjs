@@ -142,7 +142,7 @@ async function main() {
     check('every set has a set-level toggle', D.total >= 8, String(D.total));
     // All three shipped sets run whole; candidates are loaded but unchecked.
     check('shipped sets run, candidate sets do not',
-      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'simonwillison', 'wikipedia-ai']),
+      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'load-bearing', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
 
     // Partly on is a third state. Turning one rule off has to leave the set

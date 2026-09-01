@@ -2132,6 +2132,38 @@
           "The tagger is not accurate, but it is fast."
         ]
       }
+    },
+    {
+      "id": "load-bearing-adverbs",
+      "name": "merely, plainly, quietly, genuinely",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:merely|plainly|quietly|genuinely)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        ">": 0
+      },
+      "description": "Four words that separate on their own. Each is characteristic of the arriving vocabulary group in louisabraham/load-bearing, at 14 to 34 times the rate of the other nine groups over 461,000 pull request descriptions, and each is close to absent from this repo's human corpus: across 88 human documents the four appear once in total, and across 18 AI documents they appear 23 times in 12 of them. They are adverbs of stance, not of manner: they tell a reader how firmly to take the sentence rather than adding anything to it.",
+      "suggest": "Cut the word and read the sentence again. If it lost something, the sentence was leaning on the adverb for a certainty it had not earned, so make the claim itself weaker or stronger. \"Merely\" usually wants the sentence turned around to say what the thing is.",
+      "note": "Mined by tools/load-bearing.mjs, which requires two independent sources to agree: upstream lift of at least 10 over their corpus, and at most 2% of human documents against at least 20% of AI documents in ours. The bar without the lift floor also returns absorb, confined and discipline, which upstream does not rank at all. The pattern cannot tell the stance sense from the manner sense: \"spoke quietly\" and \"merely nodded\" are matched the same as \"quietly asserts\". That costs little in practice, because the four words together appear once across the 88 human documents whichever sense is meant, but a narrative passage will trip it.",
+      "from": "louisabraham/load-bearing",
+      "source": "https://github.com/louisabraham/load-bearing",
+      "evidence": "1 occurrence across 88 human documents; 23 occurrences across 12 of 18 AI documents.",
+      "tests": {
+        "hit": [
+          "A tagger that fails on the variety is not merely inaccurate.",
+          "The review board should say so plainly before it votes.",
+          "What the report quietly asserts is that the defect predates the release.",
+          "The asymmetry it introduces is genuinely new."
+        ],
+        "miss": [
+          "The council approved the plan on Tuesday evening.",
+          "It was a mere formality, and the plain answer is no.",
+          "The room was quiet and her surprise was genuine.",
+          "The merit of the approach is that it is genuine work."
+        ]
+      }
     }
   ]
 }

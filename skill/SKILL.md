@@ -132,14 +132,14 @@ use `--format github` for inline pull-request annotations.
 in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
-Three sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
-of published catalogues, and `ai-tells` (77), everything this project gathered
+Four sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
+of published catalogues, and `ai-tells` (78), everything this project gathered
 itself from research papers, style guides and other detectors. Each mined rule
 records where it came from and what it scored on a matched human/AI corpus, and
 `explain` prints both. The shipped catalogue is in
 [reference/rules.md](reference/rules.md).
 
-Every rule in those three sets runs; none is held back. The five patterns the
+Every rule in those sets runs; none is held back. `load-bearing` is a fourth, one rule measuring how far a document's vocabulary spreads across a cluster measured over 461,000 pull request descriptions; it is rebuilt from upstream rather than written here. The five patterns the
 audit measured firing on human prose and not on AI prose are in
 `candidates/unreproduced.json`, off, and turning one on means accepting findings
 the measurement says are not evidence of AI authorship.

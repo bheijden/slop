@@ -1,0 +1,79 @@
+# Keeps rules/load-bearing.json in step with louisabraham/load-bearing.
+#
+# Upstream refits daily and publishes the cheapest of eight restarts, so the
+# file changes most days without the vocabulary moving: measured over five days
+# it was byte-identical three times and turned over 20% once, from a refit. The
+# trigger here is the word list rather than the file, so quiet days cost one
+# API call and nothing else.
+name: load-bearing
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # after their 06:20 UTC run has landed
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "how many daily snapshots to pool"
+        default: "28"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Exits 1 when churn is over the ceiling, which is upstream changing
+      # method rather than data. That is a decision to read, not to merge, so
+      # the job fails and says so.
+      - name: Rebuild the word list
+        run: node tools/load-bearing.mjs --days "${{ github.event.inputs.days || 28 }}"
+
+      - name: Did anything change
+        id: diff
+        run: |
+          if git diff --quiet -- rules/load-bearing.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "words<<EOF"
+              node -e "const j=require('./rules/load-bearing.json');const s=j.snapshot;console.log(\`v\${j.version}, \${s.words} words pooled from \${s.snapshots} snapshots, upstream \${s.upstream}\`)"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      # The fixtures are hand-written and stay fixed. If the vocabulary has
+      # moved far enough that they stop behaving, that is the signal, not a
+      # thing to regenerate around.
+      - name: The rule still has to pass its own tests
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          node tests/run.mjs
+          node tests/suggest.mjs
+          node js/cli.mjs check -r .
+
+      - name: Open a pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: load-bearing-update
+          title: "load-bearing: refresh the vocabulary"
+          body: |
+            ${{ steps.diff.outputs.words }}
+
+            Rebuilt from [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing)
+            by `tools/load-bearing.mjs`. The word list moved by more than the 10% floor, so this is
+            a real refresh rather than a refit landing in the same place.
+
+            The threshold is not re-derived here. It was set against an audit corpus that is not in
+            this repository, so if the list has moved a long way the rule may want re-auditing
+            before this is merged: `node tools/load-bearing.mjs --mine <corpus>`.
+          commit-message: "load-bearing: refresh the vocabulary"
+          add-paths: rules/load-bearing.json

@@ -9,9 +9,10 @@ sharing and writing them.
 
 | set | rules | what it covers |
 |---|---|---|
-| `ai-tells` | 77 | Everything this project gathered itself, from research papers, style guides, other detectors and reader reports. Each rule records where it came from and how it scored. |
+| `ai-tells` | 78 | Everything this project gathered itself, from research papers, style guides, other detectors and reader reports. Each rule records where it came from and how it scored. |
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
+| `load-bearing` | 1 | One measurement of how far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing). Rebuilt from upstream by `tools/load-bearing.mjs`. |
 
 Off by default, alongside the five style profiles:
 
@@ -19,7 +20,7 @@ Off by default, alongside the five style profiles:
 |---|---|---|
 | `unreproduced` | 5 | Patterns published elsewhere that this repo's corpus measured running the other way: they fired on human documents and not on AI ones. Kept because 36 documents is a small corpus and a pattern that fails on technical prose may hold on another register. |
 
-Three sets ship on, and every rule in them runs. Everything this project mined
+Four sets ship on, and every rule in them runs. Everything this project mined
 itself is in `ai-tells`, whose rules each record their origin in `from` and
 `source` and their score in `evidence`. Nothing there is held back: a rule that
 never fires on your register costs nothing to leave on, and the ten

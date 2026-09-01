@@ -1,6 +1,7 @@
 {
   "sets": [
     "ai-tells.json",
+    "load-bearing.json",
     "simonwillison.json",
     "wikipedia-ai.json"
   ]
