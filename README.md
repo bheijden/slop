@@ -75,12 +75,13 @@ Three sets ship on:
 |---|---|---|
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
-| `mined` | 65 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
+| `mined` | 76 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
-`mined` carries 15 more rules that stay off: the creative-writing register, and
-the handful the audit measured firing more on human prose than AI. Select one by
-id to run it. The five `style-` sets are off too, and match a register rather
-than hunting tells.
+Every rule in those three runs. A rule that never fires on your register costs
+nothing to leave on, so nothing is held back for being narrow. The five patterns
+the audit measured firing on human prose and not on AI prose do fire, so they sit
+in `candidates/unreproduced.json` instead, off. The five `style-` sets are off
+too, and match a register rather than hunting tells.
 
 Rules are data: a set is a JSON file with its own test examples, so adding one
 never means touching the linter.

@@ -139,9 +139,10 @@ records where it came from and what it scored on a matched human/AI corpus, and
 `explain` prints both. The shipped catalogue is in
 [reference/rules.md](reference/rules.md).
 
-`mined` holds 15 further rules that stay off: the creative-writing register,
-which carries no signal in documentation, and the few the audit measured firing
-more on human prose than AI. Say so if a user wants one, and select it by id.
+Every rule in those three sets runs; none is held back. The five patterns the
+audit measured firing on human prose and not on AI prose are in
+`candidates/unreproduced.json`, off, and turning one on means accepting findings
+the measurement says are not evidence of AI authorship.
 
 The five `style-` sets are off by default. They match a house style instead of
 hunting tells; only one can be selected at a time.

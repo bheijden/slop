@@ -13,22 +13,21 @@ checked.
 
 | set | rules | |
 |---|---|---|
-| [`mined`](mined.json) | 83 | Mined AI-slop tells |
-| [`style-academic`](style-academic.json) | 11 | Formal scholarly register |
+| [`style-academic`](style-academic.json) | 9 | Formal scholarly register |
 | [`style-conversational`](style-conversational.json) | 8 | Conversational register |
-| [`style-economist`](style-economist.json) | 12 | Economist house style |
-| [`style-newsroom`](style-newsroom.json) | 10 | Newsroom wire-service style |
-| [`style-plain`](style-plain.json) | 11 | Plain English |
-| [`variants`](variants.json) | 8 | Rule variants under evaluation |
+| [`style-economist`](style-economist.json) | 9 | Economist house style |
+| [`style-newsroom`](style-newsroom.json) | 6 | Newsroom wire-service style |
+| [`style-plain`](style-plain.json) | 10 | Plain English |
+| [`unreproduced`](unreproduced.json) | 5 | Tells the audit did not reproduce |
 
-`mined` holds every tell this project gathered itself, from ten sources that used
-to be ten sets. Each rule records where it came from in `from` and `source`, and
-what it scored on the audit corpus in `evidence`, so merging the sets did not
-lose the provenance. `slop explain <rule>` prints all three.
+The tells this project mined are not here: they graduated into
+[`../rules/mined.json`](../rules/mined.json) and ship on.
 
 The five `style-` profiles are registers rather than tells, and are described in
-[../docs/styles.md](../docs/styles.md). Alternative formulations of the
-rules that fire on human prose are recorded as specifications in
+[../docs/styles.md](../docs/styles.md). `unreproduced` holds patterns published
+elsewhere that this repo's corpus measured running the other way, firing on human
+documents and not on AI ones; each rule records what was measured. Alternative
+formulations of rules that fire on human prose are recorded as specifications in
 [../research/audit.md](../research/audit.md) rather than as a set, so nothing
 unpromoted sits here waiting to be switched on beside the rule it duplicates.
 

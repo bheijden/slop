@@ -44,13 +44,13 @@ number. The last column is this repo's usual 30k words of human technical
 documentation, which is out of register for all five on purpose and shows the
 size of the gap rather than the centre of the band.
 
-| profile | rules | the register | on 30k words of technical prose |
+| profile | rules | the register | on the audit corpus, 18 human documents, 17.3k words |
 |---|---|---|---|
-| [`style-plain`](../candidates/style-plain.json) | 11 | Plain English. Everyday words, a named actor, one idea to a sentence, the reader as "you". | 15 findings, 12 documents |
-| [`style-conversational`](../candidates/style-conversational.json) | 8 | Warm spoken register for consumer software. Contractions, "you" and "we", a question answered in the next line. | 28 findings, 12 documents |
-| [`style-newsroom`](../candidates/style-newsroom.json) | 10 | Wire service. Third person past tense, one idea to a sentence, every contested claim attributed with the verb "said". | 39 findings, 17 documents |
-| [`style-economist`](../candidates/style-economist.json) | 12 | Economist house style. Concrete, active, about twenty words to a sentence, Anglo-Saxon in preference to Latinate. | 21 findings, 11 documents |
-| [`style-academic`](../candidates/style-academic.json) | 11 | Formal scholarly. Citations, hedged claims, measurement fronted, nothing contracted. | 74 findings, 16 documents |
+| [`style-plain`](../candidates/style-plain.json) | 10 | Plain English. Everyday words, a named actor, one idea to a sentence, the reader as "you". | 28 findings, 15 documents |
+| [`style-conversational`](../candidates/style-conversational.json) | 8 | Warm spoken register for consumer software. Contractions, "you" and "we", a question answered in the next line. | 53 findings, 17 documents |
+| [`style-newsroom`](../candidates/style-newsroom.json) | 6 | Wire service. Third person past tense, one idea to a sentence, every contested claim attributed with the verb "said". | 48 findings, 17 documents |
+| [`style-economist`](../candidates/style-economist.json) | 9 | Economist house style. Concrete, active, about twenty words to a sentence, Anglo-Saxon in preference to Latinate. | 42 findings, 16 documents |
+| [`style-academic`](../candidates/style-academic.json) | 9 | Formal scholarly. Citations, hedged claims, measurement fronted, nothing contracted. | 52 findings, 18 documents |
 
 The bands really are opposed. Two passages of about 300 words, one plainly
 conversational and one plainly scholarly, run over both of the profiles built
