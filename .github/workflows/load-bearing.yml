@@ -4,7 +4,9 @@
 # file changes most days without the vocabulary moving: measured over five days
 # it was byte-identical three times and turned over 20% once, from a refit. The
 # trigger here is the word list rather than the file, so quiet days cost one
-# API call and nothing else.
+# API call and nothing else. A day that does move the list commits straight to
+# main once the rule has passed its own tests; a move over the ceiling fails the
+# job instead, because nothing here can re-check the threshold.
 name: load-bearing
 
 on:
@@ -22,7 +24,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update:
@@ -68,21 +69,21 @@ jobs:
           node tests/suggest.mjs
           node js/cli.mjs check -r .
 
-      - name: Open a pull request
+      - name: Commit it
         if: steps.diff.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: load-bearing-update
-          title: "load-bearing: refresh the vocabulary"
-          body: |
-            ${{ steps.diff.outputs.words }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add rules/load-bearing.json
+          git commit -m "load-bearing: refresh the vocabulary
 
-            Rebuilt from [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing)
-            by `tools/load-bearing.mjs`. The word list moved by more than the 10% floor, so this is
-            a real refresh rather than a refit landing in the same place.
+          ${{ steps.diff.outputs.words }}
 
-            The threshold is not re-derived here and cannot be: it was set once, by hand, and
-            nothing in this repository can check it. That is what the 40% ceiling is for. Below it
-            the list has moved but the measurement it feeds has not changed shape.
-          commit-message: "load-bearing: refresh the vocabulary"
-          add-paths: rules/load-bearing.json
+          Rebuilt from https://github.com/louisabraham/load-bearing by
+          tools/load-bearing.mjs. The word list moved by more than the 10% floor,
+          so this is a real refresh rather than a refit landing in the same place.
+
+          The threshold is not re-derived here and cannot be: it was set once, by
+          hand, against a corpus that is not in this repository. That is what the
+          40% ceiling is for."
+          git push origin HEAD:main
