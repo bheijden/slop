@@ -396,7 +396,16 @@ function verdictOf(rule) {
 export function compileRule(rule, setName) {
   if (!rule.id) throw new Error('every rule needs an id');
   const m = rule.match;
-  if (!m || !m.kind) throw new Error(`rule "${rule.id}": needs a "match" with a kind`);
+  if (!m || !m.kind) {
+    // A set written before the match/notable split carries `kind` and `params`
+    // at the top level. Say so, because the bare message sends people hunting.
+    if (rule.kind) {
+      throw new Error(`rule "${rule.id}": written in the old shape. Move "kind" and `
+        + `"params" into "match", and add a "notable" saying when it reports `
+        + `(a per-occurrence rule is { ">": 0 }). See docs/rules.md.`);
+    }
+    throw new Error(`rule "${rule.id}": needs a "match" with a kind`);
+  }
   const build = MATCHERS[m.kind];
   if (!build) throw new Error(`rule "${rule.id}": unknown kind "${m.kind}" (expected ${KINDS.join(', ')})`);
   // Matchers read their own settings off `match`; the old shape put them at the

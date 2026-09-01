@@ -269,6 +269,10 @@ async function main() {
         if (r.reference[k]) process.stdout.write(`    ${C.dim(k === 'tune' ? 'tuning' : k)}  ${r.reference[k]}\n`);
       }
     }
+    if (r.default === 'off') {
+      process.stdout.write(`\n  ${C.dim('off by default:')} ${r.offBecause || 'no reason recorded'}\n`
+        + `  ${C.dim('turn it on with:')} --select ${r.id}\n`);
+    }
     if (r.measured) process.stdout.write(`\n  ${C.dim('measured:')} ${r.measured}\n`);
     if (r.note) process.stdout.write(`\n  ${C.dim('note:')} ${r.note}\n`);
     const t = r.tests || {};

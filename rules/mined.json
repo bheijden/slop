@@ -553,11 +553,11 @@
       },
       "description": "Flagged by slop-gate as an AI-writing tell: moreover.",
       "suggest": "Join the sentences, or delete the connective.",
-      "note": "Off by default: Fired on 4 of 18 human documents and 0 AI ones: \"Moreover,\" and \"Additionally,\" are ordinary formal English. Select it by id to run it.",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
       "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
       "default": "off",
+      "offBecause": "Measured on the audit corpus it fired on 4 of 18 human documents and 0 AI ones. \"Moreover\" and \"Additionally\" are ordinary formal English.",
       "tests": {
         "hit": [
           "The build is faster. Moreover, it uses less memory."
@@ -632,11 +632,12 @@
       },
       "description": "Flagged by slop-gate as an AI-writing tell: crucial.",
       "suggest": "Say why it matters, or drop the intensifier.",
-      "note": "single ordinary word; expect false positives Off by default: Fired on human prose and not on AI prose. The bare word is too common to carry the tell on its own. Select it by id to run it.",
+      "note": "single ordinary word; expect false positives",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
       "default": "off",
+      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose. The bare word is too common to carry a tell on its own.",
       "tests": {
         "hit": [
           "Caching is crucial for latency."
@@ -1311,11 +1312,11 @@
       },
       "description": "The fixed stock of metaphors that essay-shaped generation reaches for: double-edged sword, level playing field, virtuous cycle, driving force behind, one-size-fits-all.",
       "suggest": "Drop the metaphor and state the mechanism, or find one that belongs to this subject.",
-      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it.",
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
       "default": "off",
+      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
       "tests": {
         "hit": [
           "Automation is a double-edged sword.",
@@ -1475,11 +1476,11 @@
       },
       "description": "\"X isn't A. It's B.\" — the correction split over two sentences, so a within-sentence rule misses it.",
       "suggest": "Say what it is. The denial adds nothing the assertion does not.",
-      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it.",
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
       "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
       "default": "off",
+      "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
       "tests": {
         "hit": [
           "The bottleneck wasn't the database. It was the retry loop.",
@@ -1847,11 +1848,12 @@
       },
       "description": "Sentence lengths that barely vary. humanizer-de measures this as stddev_mean_ratio and requires at least 0.4 in every register profile it ships; sloptells describes the same thing as sentences that march in formation. The badge is the coefficient of variation — standard deviation over mean sentence length.",
       "suggest": "Cut one sentence in half and let another run long. Rhythm is what stops correct prose from reading as generated.",
-      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone. Off by default: Fired on 4 of 18 human documents against 1 AI one, and sentence-length variation measured the same on both corpora: median 0.52 either way. Select it by id to run it.",
+      "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone.",
       "from": "humanizer-de",
       "source": "https://github.com/marmbiz/humanizer-de",
       "evidence": "On the audit corpus: 4 hits in 4/18 human documents, 1 in 1/18 AI documents.",
       "default": "off",
+      "offBecause": "The threshold comes from humanizer-de's German profiles. Checked against English, sixteen documents of human technical prose ran 0.49 to 1.54, so the edge sits below all of them and the measurement does not separate the two corpora.",
       "tests": {
         "hit": [
           "The worker reads each record from the queue and checks its schema. The schema lives in a shared repository that both teams can edit. A record that fails the check is written to a separate log. The log is rotated every night and kept for thirty days. An operator reviews the log each morning before the standup meeting. Most of the failures come from a single partner in the north. That partner has been sending malformed dates since the middle of March. We opened a ticket with their integration team on the same day. The ticket has not received a reply from anyone on their side. We now reject their malformed records at the edge of the system. The change was fifteen lines and shipped on a Tuesday afternoon. Nobody on the team noticed the change had gone out at all. The operator noticed because she stopped being paged at six each morning. She sent a short message to the channel to say so. That message has been pinned in the channel ever since that day. The queue has now run clean for four consecutive months without trouble. We have not touched the retry logic in any way since then. Eleven records are sitting in the dead letter queue this morning. All eleven of them came from the same partner in the north. We check the queue on Friday afternoons now instead of every day. The runbook still tells the operator to check it every single morning. Somebody on the team should update that page in the runbook. So far nobody has found the time to go and do it."
@@ -1935,11 +1937,11 @@
       },
       "description": "The single most over-represented construction in the creative-writing lists. It heads both the phrase list and the trigram list.",
       "suggest": "Let the line carry the volume, or say how loud they actually were.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "“I know,” she said, her voice barely above a whisper.",
@@ -1965,11 +1967,11 @@
       },
       "description": "Interior-state telegraphing, and a redundancy: the heart is already in the chest.",
       "suggest": "Cut it, or give the body something specific to do.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Her heart was pounding in her chest.",
@@ -1995,11 +1997,11 @@
       },
       "description": "The stock somatic reaction, present in four separate spellings in the shipped phrase list.",
       "suggest": "Pick a reaction that belongs to this character and this moment.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The sound sent a shiver down her spine.",
@@ -2025,11 +2027,11 @@
       },
       "description": "The establishing-shot sunset, usually followed by shadows being cast. Four of its fragments make the top-twenty trigrams.",
       "suggest": "Say what time it is, or cut to what happens next.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The sun dipped below the horizon, casting long shadows.",
@@ -2055,11 +2057,11 @@
       },
       "description": "Duration inflation in place of an actual duration.",
       "suggest": "Give the real interval, or show what filled it.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The silence felt like an eternity.",
@@ -2085,11 +2087,11 @@
       },
       "description": "The beat of significance dropped after a line of dialogue, so the reader knows it landed.",
       "suggest": "Trust the line. If it needs help, the line is the problem.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "The words hung in the air between them.",
@@ -2115,11 +2117,11 @@
       },
       "description": "Narrator-flagged foreshadowing, including the closer that promises a sequel.",
       "suggest": "Delete it. The reader finds out anyway, and the tease costs the surprise.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Little did she know what waited upstairs.",
@@ -2145,11 +2147,11 @@
       },
       "description": "The wistful closer. Both halves ship as separate entries in the phrase list, which is how often they co-occur.",
       "suggest": "End on the last real thing that happened.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Maybe, just maybe, they would make it.",
@@ -2175,11 +2177,11 @@
       },
       "description": "The resolve-and-embrace ending, which resolves nothing.",
       "suggest": "Let the last scene stand without a summary of how everyone felt about it.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "Whatever came next, they would face it together.",
@@ -2204,11 +2206,11 @@
       },
       "description": "Withholding as a substitute for description: the thing is named only as not-the-other-thing.",
       "suggest": "Name it. If it cannot be named yet, describe what the character can actually perceive.",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
       "from": "antislop-fiction",
       "source": "https://github.com/sam-paech/antislop-sampler",
       "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "default": "off",
+      "offBecause": "This is the creative-writing register. The construction is a real and consistent tell in AI fiction, but it does not occur in technical, business or reference prose, where the rule would only ever be dead weight. Turn it on when you are linting fiction.",
       "tests": {
         "hit": [
           "This was something else entirely.",
