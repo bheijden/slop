@@ -1,8 +1,11 @@
 {
-  "name": "mined",
+  "name": "ai-tells",
+  "aliases": [
+    "mined"
+  ],
   "version": "0.1.0",
   "slop": "0.2.0",
-  "title": "Mined tells",
+  "title": "AI tells",
   "description": "Every tell this project mined itself, in one set, on by default. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. Three rules were dropped in the merge because a shipped rule already matched everything they did: slop-gate's seamless, underscore-importance and fast-paced-world are all inside wikipedia-ai's ai-vocab and landscape. The full survey is in research/log.md and the measurements in research/audit.md.",
   "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
   "rules": [

@@ -133,7 +133,7 @@ in full, including examples of what it flags and what it deliberately allows.
 read this before deciding a finding is wrong.
 
 Three sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
-of published catalogues, and `mined` (76), everything this project gathered
+of published catalogues, and `ai-tells` (76), everything this project gathered
 itself from research papers, style guides and other detectors. Each mined rule
 records where it came from and what it scored on a matched human/AI corpus, and
 `explain` prints both. The shipped catalogue is in
@@ -151,7 +151,7 @@ hunting tells; only one can be selected at a time.
 ... check --rules candidates/style-plain.json --select style-plain docs/ -r
 ```
 
-One rule inside `mined` is on wherever that set is loaded: `em-dash`, which flags
+One rule inside `ai-tells` is on wherever that set is loaded: `em-dash`, which flags
 every em dash. It is house style, not a tell, so say so if a user asks why
 it fired; `explain em-dash` gives the evidence, which points the other way.
 

@@ -21,7 +21,7 @@ checked.
 | [`unreproduced`](unreproduced.json) | 5 | Tells the audit did not reproduce |
 
 The tells this project mined are not here: they graduated into
-[`../rules/mined.json`](../rules/mined.json) and ship on.
+[`../rules/ai-tells.json`](../rules/ai-tells.json) and ship on.
 
 The five `style-` profiles are registers rather than tells, and are described in
 [../docs/styles.md](../docs/styles.md). `unreproduced` holds patterns published

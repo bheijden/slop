@@ -142,14 +142,14 @@ async function main() {
     check('every set has a set-level toggle', D.total >= 8, String(D.total));
     // All three shipped sets run whole; candidates are loaded but unchecked.
     check('shipped sets run, candidate sets do not',
-      JSON.stringify(D.on) === JSON.stringify(['mined', 'simonwillison', 'wikipedia-ai']),
+      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
 
     // Partly on is a third state. Turning one rule off has to leave the set
     // running and show it as neither fully on nor off.
     const optin = await evaluate(`(async()=>{
       const box=document.querySelector('#rules input[data-rule="em-dash"]');
-      const set=()=>document.querySelector('#rules input[data-toggle="mined"]');
+      const set=()=>document.querySelector('#rules input[data-toggle="ai-tells"]');
       const before={rule:box.checked, full:set().checked && !set().indeterminate};
       box.click(); await new Promise(r=>setTimeout(r,600));
       const off={rule:document.querySelector('#rules input[data-rule="em-dash"]').checked,

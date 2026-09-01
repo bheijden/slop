@@ -109,6 +109,13 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
     byName.set(s.name, s);
   }
   const active = [...byName.values()];
+  // A renamed set answers to what it used to be called, so a slop.json or a
+  // shared link written against the old name keeps working. Aliases resolve
+  // names and nothing else: putting one in `byName` would enumerate the set
+  // twice and double every finding. A real set of that name always wins.
+  for (const s of active) {
+    for (const a of s.aliases || []) if (!byName.has(a)) byName.set(a, s);
+  }
   const everyRule = active.flatMap((s) => s.rules);
   const byId = new Map(everyRule.map((r) => [r.id, r]));
 

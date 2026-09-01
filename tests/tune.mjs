@@ -7,8 +7,18 @@ const DOC = ('The bottleneck is not the solver: it is the model. '
   + 'The plant is a solver inside a solver: an outer optimizer searches. '
   + 'Two things follow: derivatives are exact, and scenarios are cheap. ').repeat(12);
 const a = find(base), b = find(tuned);
+// A renamed set answers to its old name. An alias must resolve a name and
+// nothing more: putting it in the map the active sets are enumerated from
+// loaded the set twice and doubled every finding.
+const byOld = resolveRules({ select: ['mined'] });
+const byNew = resolveRules({ select: ['ai-tells'] });
+const ids = base.rules.map((r) => r.id);
+
 const ok = [
   ['default fires', a.fires(DOC)],
+  ['an alias selects the renamed set',
+    byOld.rules.length === byNew.rules.length && byOld.rules.length > 0],
+  ['an alias does not load the set twice', new Set(ids).size === ids.length],
   ['tuned does not', !b.fires(DOC)],
   ['tuned still matches', b.find(DOC).length === a.find(DOC).length],
   ['tuned is marked', b.tuned === true],

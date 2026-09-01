@@ -9,7 +9,7 @@ import { compileRuleSet } from '../js/engine.mjs';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const D = process.env.AUDIT || join(ROOT, 'audit');
-const FILE = join(ROOT, 'candidates/mined.json');
+const FILE = join(ROOT, 'rules/ai-tells.json');
 
 const set = JSON.parse(readFileSync(FILE, 'utf8'));
 const compiled = compileRuleSet(set, set.name).rules;
@@ -33,5 +33,5 @@ set.rules.forEach((def, i) => {
   }
 });
 writeFileSync(FILE, JSON.stringify(set, null, 2) + '\n');
-console.log(`mined.json: ${set.rules.length} rules re-scored`);
+console.log(`ai-tells.json: ${set.rules.length} rules re-scored`);
 for (const [k, v] of Object.entries(tally)) console.log(`  ${String(v).padStart(3)}  ${k}`);
