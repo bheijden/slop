@@ -1,6 +1,6 @@
 {
   "name": "load-bearing",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "slop": "0.1.0",
   "title": "Load-bearing vocabulary (louisabraham)",
   "description": "Words that mark out how AI writes, taken from Louis Abraham's load-bearing project. That project sorts GitHub pull request descriptions into ten groups by vocabulary alone, and one group grew from under 1 per cent of them in January 2025 to 37 per cent by August 2026. This set holds one rule, which measures how far a document's vocabulary spreads across that group's words.\n\nIt is the only set here that updates itself: tools/load-bearing.mjs rebuilds it from upstream and CI opens a pull request when the word list has really moved. Nothing upstream is labelled, though. There are no human and AI classes in it, only ten clusters and the timing of one, and its authors say the group is mostly Claude with no guarantee. Every human and AI number on the rule is this repo's own audit corpus, not theirs.",
