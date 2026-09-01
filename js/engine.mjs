@@ -380,6 +380,11 @@ function verdictOf(rule) {
       // A bare count with no `per` is span behaviour: report each occurrence
       // and say nothing about the document as a whole.
       docLevel: Boolean(per) || metric !== undefined,
+      // The same numbers as `measure`, kept apart so a caller can lay them out
+      // itself. `measure` is one line for a terminal; a page wants the parts.
+      rate: { value: shown, per, unit, op: hit[0], threshold: hit[1],
+              count, words, detail: detail || null,
+              kind: metric !== undefined ? 'variation' : 'rate' },
       measure: metric !== undefined
         ? `${detail || ''}, variation ${shown} ${where}`.replace(/^, /, '')
         : per ? `${count} in ${words} ${unit}, ${shown} per ${per} ${where}`
@@ -464,7 +469,7 @@ export function analyze(text, rules) {
       const start = first ? first.start : (w ? w.index : 0);
       const end = first ? first.end : (w ? w.index + w[0].length : 0);
       raw.push({ start, end, rule, count: v.count, docLevel: true,
-                 badge: v.measure, badgeTitle: v.measure,
+                 badge: v.measure, badgeTitle: v.measure, rate: v.rate,
                  spans: v.occurrences.map((o) => ({ start: o.start, end: o.end })) });
     } else {
       for (const m of v.occurrences) raw.push({ ...m, rule });

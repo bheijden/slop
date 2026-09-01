@@ -173,6 +173,44 @@ async function main() {
 
     check('the example lints', ex.n > 0 && ex.marks > 0, JSON.stringify(ex));
 
+    // A doc-level finding measures the document rather than quoting a phrase.
+    // It used to dump its whole measure string into the slot styled for a
+    // quoted phrase, and its occurrences were never painted at all.
+    const rate = await evaluate(`(async()=>{
+      const t=document.getElementById('input');
+      t.value=${JSON.stringify(('The rollout went ahead: the team shipped it. ' +
+        'We chose the staged path rather than the big-bang one. ' +
+        'The cache warmed first: the reads followed. ' +
+        'They picked latency rather than throughput. ' +
+        'The queue drained slowly: the workers kept up. ' +
+        'It was measured rather than guessed. ').repeat(12))};
+      t.dispatchEvent(new Event('input'));
+      await new Promise(r=>setTimeout(r,2000));
+      // A scarcity rule reports an absence and so has no occurrences to paint.
+      // Pick a rate that counted something.
+      const li=[...document.querySelectorAll('#list li.doclevel')]
+        .find(n=>!/^0 occurrences/.test((n.querySelector('.rsub')||{}).textContent||''));
+      if(!li) return JSON.stringify({rows:document.querySelectorAll('#list li[data-i]').length});
+      li.click();
+      await new Promise(r=>setTimeout(r,400));
+      return JSON.stringify({
+        value: (li.querySelector('.rate b')||{}).textContent,
+        unit: (li.querySelector('.rate .ru')||{}).textContent,
+        bound: (li.querySelector('.rate .rb')||{}).textContent,
+        boundTitle: (li.querySelector('.rate .rb')||{}).title,
+        sub: (li.querySelector('.rsub')||{}).textContent,
+        marks: document.querySelectorAll('#doc mark.rate').length,
+        lit: document.querySelectorAll('#doc mark.on').length})})()`);
+    const rt = JSON.parse(rate);
+    check('a rate shows its value, unit and the bound it crossed',
+      Number(rt.value) > 0 && /per \d+ words/.test(rt.unit || '')
+      && /[\u2265\u2264<>]\s?\d/.test(rt.bound || '') && (rt.boundTitle || '').length > 10,
+      JSON.stringify(rt));
+    check('a rate says what it counted',
+      /\d+ occurrences? in \d+ words/.test(rt.sub || ''), JSON.stringify(rt));
+    check('the occurrences behind a rate are painted and light up together',
+      rt.marks > 1 && rt.lit > 1, JSON.stringify(rt));
+
     const dropped = await evaluate(`(async()=>{
       const dt = new DataTransfer();
       dt.items.add(new File(['# T\\n\\nIt is important to note that x. No a, no b, no c.\\n'], 'drop.md'));

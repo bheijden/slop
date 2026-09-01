@@ -46,11 +46,25 @@ function checkOne({ name, src, kind }, rules) {
       // byte-identical to what the terminal writes.
       rule: m.rule.id, set: m.rule.set, severity: m.rule.severity || 'warn',
       name: m.rule.name, why: m.rule.description, suggest: m.rule.suggest || null,
-      // A density or rhythm finding measures the whole document. Its offsets are
-      // an anchor, not a location, so the page must not paint them as a span.
-      docLevel: m.docLevel || false, measure: m.badgeTitle || null,
       count: m.count ?? null,
-      match: text.slice(m.start, m.end), sentence: text.slice(ss, se)
+      match: text.slice(m.start, m.end), sentence: text.slice(ss, se),
+      // A rate or rhythm finding measures the whole document, so its own offsets
+      // are an anchor rather than a location. The occurrences behind the rate
+      // are real spans though, and the page paints those.
+      docLevel: m.docLevel || false, measure: m.badgeTitle || null,
+      rate: m.rate || null,
+      occurrences: (m.spans || []).map((o) => {
+        const os = toSource(runs, o.start), oe = toSource(runs, o.end);
+        const c = lineCol(starts, os);
+        const wa = Math.max(0, o.start - 34);
+        const wb = Math.min(text.length, o.end + 34);
+        return { line: c.line, col: c.col, match: text.slice(o.start, o.end),
+                 context: (wa > 0 ? '\u2026' : '') + text.slice(wa, wb).replace(/\s+/g, ' ').trim()
+                          + (wb < text.length ? '\u2026' : ''),
+                 // Page-only, stripped before the findings are copied out.
+                 start: o.start, end: o.end, srcStart: os, srcEnd: oe };
+      }),
+      reference: m.rule.reference || null
     };
   });
   return { name, kind, findings, text, words: countWords(text) };

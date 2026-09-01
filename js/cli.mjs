@@ -189,6 +189,9 @@ function lintSource(name, src, kind, rules, opts) {
              // artefact: reporting it as line:col points the reader at an
              // innocent word. Carry the flag so the reporter can say "document".
              docLevel: m.docLevel || false, measure: m.badgeTitle || null,
+             // `measure` is one line for a terminal. `rate` is the same numbers
+             // apart, so a consumer can lay them out or threshold on them.
+             rate: m.rate || null,
              // Where the rate came from. A document-level finding without its
              // occurrences is a number nobody can act on.
              occurrences: (m.spans || []).map((sp) => {

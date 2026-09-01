@@ -241,6 +241,22 @@ body.resizing{cursor:col-resize;user-select:none}
 .list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
 .list .fix{color:var(--muted);font-size:11.5px;line-height:1.55}
 
+/* A doc-level finding measures the whole document, so it shows a rate rather
+   than a quoted phrase: what the document reached, the edge it crossed, and
+   the count the rate was computed from. */
+.list .rate{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin:3px 0 1px}
+.list .rate b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.list .rate .ru{color:var(--muted);font-size:11.5px}
+.list .rate .rb{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums;
+  color:var(--flag);border:1px solid var(--hair);border-radius:999px;
+  padding:1.5px 7px;white-space:nowrap;cursor:help}
+.list .rsub{color:var(--muted);font-size:11.5px;margin:0 0 3px;font-variant-numeric:tabular-nums}
+
+/* An occurrence behind a rate is evidence for a measurement, not a flagged
+   phrase, so it is underlined rather than filled in until it is selected. */
+#doc mark.rate{background:none;box-shadow:inset 0 -1px 0 var(--mark-edge)}
+#doc mark.rate:hover,#doc mark.rate.on{background:var(--mark-on);box-shadow:inset 0 -2px 0 var(--mark-edge)}
+
 /* the rules control: a panel under the bar, not a documentation section */
 .pop{
   position:absolute;bottom:calc(100% + 8px);right:0;z-index:40;width:380px;
@@ -752,8 +768,31 @@ const currentSrc = () => (currentDocs()[S.doc] || {}).src || '';
 
 const note = (m) => { $('score').innerHTML = m ? `<span class="err">${esc(m)}</span>` : ''; };
 
+// A rate reads as numbers, not as a sentence: the value it reached, the unit it
+// is measured in, and the bound it crossed, each in its own place.
+const OP_GLYPH = { '>=': '\u2265', '<=': '\u2264', '>': '>', '<': '<' };
+const OP_WORDS = { '>=': (t, u) => `${t} ${u} or more`, '>': (t, u) => `more than ${t} ${u}`,
+                   '<=': (t, u) => `${t} ${u} or less`, '<': (t, u) => `less than ${t} ${u}` };
+
+function rateBlock(f) {
+  const r = f.rate;
+  if (!r) return `<div class="m">${esc(f.measure || f.name)}</div>`;
+  const unit = r.kind === 'variation' ? 'sentence-length variation' : `per ${r.per} ${r.unit}`;
+  const sub = r.kind === 'variation' ? (r.detail || '')
+    : `${r.count} occurrence${r.count === 1 ? '' : 's'} in ${r.words} words`;
+  const words = (OP_WORDS[r.op] || ((t, u) => `${r.op} ${t} ${u}`))(r.threshold, unit);
+  return `<div class="rate"><b>${esc(String(r.value))}</b><span class="ru">${esc(unit)}</span>`
+    + `<span class="rb" title="this rule reports at ${esc(words)}">`
+    + `${OP_GLYPH[r.op] || esc(r.op)} ${esc(String(r.threshold))}</span></div>`
+    + (sub ? `<div class="rsub">${esc(sub)}</div>` : '');
+}
+
 function marked(body, ranges, keepBlank) {
-  const ok = ranges.slice().sort((a,b) => a[0]-b[0]).filter((r,i,a) => i === 0 || r[0] >= a[i-1][1]);
+  // [start, end, findingIndex, class, priority]. A real span outranks a rate's
+  // occurrence where the two overlap, so a flagged phrase is never hidden by
+  // the evidence behind a measurement.
+  const ok = ranges.slice().sort((a,b) => a[0]-b[0] || a[4]-b[4])
+    .filter((r,i,a) => i === 0 || r[0] >= a[i-1][1]);
   const out = [];
   let pos = 0;
   for (const line of body.split('\n')) {
@@ -761,10 +800,12 @@ function marked(body, ranges, keepBlank) {
     pos = e + 1;
     if (!line.trim() && !keepBlank) continue;
     let html = '', last = s;
-    for (const [rs, re, i] of ok) {
+    for (const [rs, re, i, cls] of ok) {
       if (re <= s || rs >= e) continue;
       const a = Math.max(rs, s), b = Math.min(re, e);
-      html += esc(body.slice(last, a)) + `<mark data-i="${i}"${i === S.sel ? ' class="on"' : ''}>${esc(body.slice(a, b))}</mark>`;
+      const c = `${cls || ''}${i === S.sel ? ' on' : ''}`.trim();
+      html += esc(body.slice(last, a))
+        + `<mark data-i="${i}"${c ? ` class="${c}"` : ''}>${esc(body.slice(a, b))}</mark>`;
       last = b;
     }
     out.push(`<p>${html + esc(body.slice(last, e)) || '<br>'}</p>`);
@@ -808,8 +849,10 @@ function renderResults() {
   $('doc').className = useSrc ? 'source' : 'prose';
   $('doc').innerHTML = results.map((r, di) => {
     const body = useSrc ? ((srcs[di] || {}).src || '') : r.text;
-    const ranges = byDoc[di].filter(([f]) => !f.docLevel)
-      .map(([f, gi]) => useSrc ? [f.srcStart, f.srcEnd, gi] : [f.start, f.end, gi]);
+    const ranges = byDoc[di].flatMap(([f, gi]) => f.docLevel
+      ? (f.occurrences || []).map((o) => useSrc ? [o.srcStart, o.srcEnd, gi, 'rate', 1]
+                                                 : [o.start, o.end, gi, 'rate', 1])
+      : [useSrc ? [f.srcStart, f.srcEnd, gi, '', 0] : [f.start, f.end, gi, '', 0]]);
     const head = multi ? `<h3 class="fname"><span class="nm">${esc(r.name)}</span>`
       + `<span class="ct${r.findings.length ? '' : ' clean'}">${r.findings.length || 'clean'}</span></h3>` : '';
     return `<section class="filesec" data-doc="${di}">${head}<div class="fbody">${marked(body, ranges, useSrc)}</div></section>`;
@@ -826,7 +869,7 @@ function renderResults() {
     const rows = byDoc[di].map(([f, gi]) => `<li data-i="${gi}" class="${gi === S.sel ? 'on' : ''}${f.docLevel ? ' doclevel' : ''}">
         <span class="loc">${f.docLevel ? 'doc' : `${f.line}:${f.col}`}</span>
         <span><span class="rid">${esc(f.rule)}</span>${f.count && !f.docLevel ? ` <span class="loc cnt" title="${esc(f.measure || '')}">×${f.count}</span>` : ''}
-          <div class="m">${esc(f.docLevel ? (f.measure || f.name) : f.match)}</div>
+          ${f.docLevel ? rateBlock(f) : `<div class="m">${esc(f.match)}</div>`}
           ${f.suggest ? `<div class="fix">${esc(f.suggest)}</div>` : ''}</span></li>`).join('');
     if (!multi) return rows;
     return `<li class="fgroup" data-doc="${di}">${esc(r.name)}</li>` + (rows || '<li class="none">no findings</li>');
@@ -877,7 +920,18 @@ function resultJson() {
   const files = results.map((r) => ({
     file: r.name,
     words: r.words,
-    findings: r.findings.map(({ srcStart, srcEnd, start, end, ...keep }) => ({ file: r.name, ...keep }))
+    // The page carries offsets the CLI has no use for, on the finding and on
+    // each occurrence. Strip both in place, keeping key order, so copied output
+    // matches --format json.
+    findings: r.findings.map((f) => {
+      const out = { file: r.name };
+      for (const [k, v] of Object.entries(f)) {
+        if (k === 'srcStart' || k === 'srcEnd' || k === 'start' || k === 'end') continue;
+        out[k] = k === 'occurrences'
+          ? v.map(({ start, end, srcStart, srcEnd, ...o }) => o) : v;
+      }
+      return out;
+    })
   }));
   const total = files.reduce((a, f) => a + f.findings.length, 0);
   const words = files.reduce((a, f) => a + f.words, 0);
