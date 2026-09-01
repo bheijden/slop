@@ -23,7 +23,7 @@ const load = (k) => readdirSync(join(D, k)).filter(f => f.endsWith('.txt'))
               return { f, text, reg: f.split('-')[0], words: (text.match(W) || []).length }; });
 const human = load('human'), ai = load('ai');
 
-const hit = (r, docs) => { const out = []; for (const d of docs) { let m = []; try { m = r.find(d.text); } catch {}
+const hit = (r, docs) => { const out = []; for (const d of docs) { let m = []; try { m = r.fires(d.text) ? r.find(d.text) : []; } catch {}
   for (const x of m) out.push({ doc: d.f, reg: d.reg, text: d.text.slice(x.start, x.end).replace(/\s+/g, ' ').slice(0, 62) }); } return out; };
 
 const rows = RULES.map(r => { const h = hit(r, human), a = hit(r, ai);

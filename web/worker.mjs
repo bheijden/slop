@@ -71,16 +71,19 @@ function fudge({ sets }) {
                     conform: { ok: 0, fail: 0 }, fudge: { ok: 0, fail: 0, lossy: 0 }, failures: [] };
       if (!(t.hit || []).length) row.failures.push({ kind: 'no examples', detail: 'every rule needs a tests.hit example' });
       for (const ex of t.miss || []) {
-        if (rule.find(ex).length === 0) row.conform.ok++;
+        if (!rule.fires(ex)) row.conform.ok++;
         else { row.conform.fail++; row.failures.push({ kind: 'false positive', detail: ex }); }
       }
       for (const ex of t.hit || []) {
+        if (!rule.fires(ex)) { row.conform.fail++; row.failures.push({ kind: 'example does not match', detail: ex }); continue; }
         const hits = rule.find(ex);
-        if (!hits.length) { row.conform.fail++; row.failures.push({ kind: 'example does not match', detail: ex }); continue; }
+        // A metric rule counts nothing, so there is no span for the fudger to
+        // preserve; the passage still has to be judged the same way.
+        const [s0, e0] = hits.length ? [hits[0].start, hits[0].end] : [0, Math.min(ex.length, 1)];
         row.conform.ok++;
-        for (const v of variants(ex, hits[0].start, hits[0].end)) {
+        for (const v of variants(ex, s0, e0)) {
           const { text } = EXTRACT[v.format](v.source, {});
-          if (rule.find(text).length) { if (v.lossless) row.fudge.ok++; }
+          if (rule.fires(text)) { if (v.lossless) row.fudge.ok++; }
           else if (!v.lossless) row.fudge.lossy++;
           else { row.fudge.fail++; row.failures.push({ kind: v.name, detail: v.source }); }
         }

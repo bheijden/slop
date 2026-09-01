@@ -159,8 +159,8 @@ export function resolveRules({ select = [], ignore = [], ruleSets = [], all = fa
     if (!tune[r.id]) return r;
     // Recompiled, not patched: the finder closed over the original params when
     // the set was compiled, so changing them afterwards would do nothing.
-    const params = { ...(r.params || {}), ...tune[r.id] };
-    return { ...compileRule({ ...r, params }, r.set), tuned: true };
+    const notable = { ...(r.notable || {}), ...tune[r.id] };
+    return { ...compileRule({ ...r, notable }, r.set), tuned: true };
   });
 
   return { rules, sets: active, available: everyRule };

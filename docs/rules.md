@@ -212,121 +212,36 @@ Fetching a rule set runs someone else's patterns over your text. The browser
 caps a runaway rule with the worker timeout; **the CLI does not**, so read a
 rule set before pointing production CI at a URL you do not control.
 
-**Eight detector kinds.** Most rules are `regex`; the other seven are
-parameterised algorithms for things a regex cannot express.
+**Seven matcher kinds.** A matcher finds occurrences; `notable` decides whether
+they are worth reporting. `density` used to be an eighth kind and is gone: a rate
+is a verdict, not a way of matching.
 
-| `kind` | fields | detects |
+| `match.kind` | fields | finds |
 |---|---|---|
-| `regex` | `pattern`, `flags` | a pattern. 33 of the 38 built-ins. |
-| `chain` | `pattern`, `headTest`, `itemLabel` | `"no X, no Y, no Z"` lists, counting items |
-| `echo` | `params.minGram`, `params.minRun` | consecutive sentences sharing a skeleton |
-| `question-chain` | `params.minRun` | runs of consecutive questions |
-| `anaphora` | `params.minRun` | consecutive sentences opening on the same word |
-| `density` | `pattern`, `params.min` or `params.max` | a document-level *rate* rather than a span |
-| `rhythm` | `params.maxCV` | sentence-length variation, as stddev over mean |
-| `frame` | `params.gram`, `params.minRun` | consecutive sentences sharing a *syntactic* frame |
+| `regex` | `pattern`, `flags` | occurrences of a pattern. Most rules. |
+| `chain` | `pattern`, `headTest`, `itemLabel` | `"no X, no Y, no Z"` lists, counting the items |
+| `echo` | `minGram`, `minRun`, `anchored`, `minFuncWords` | consecutive sentences sharing a word skeleton |
+| `question-chain` | `minRun` | runs of consecutive questions |
+| `anaphora` | `minRun` | consecutive sentences opening on the same word |
+| `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
+| `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
 
-A `density` rule counts matches per 1000 words over the whole document and
-fires once, not per match. `params.min` catches pile-up, `params.max` catches
-*scarcity*, which is a real tell. The Economist found LLM prose uses **fewer**
-commas, semicolons and parentheses than human writing, not more. It refuses to
-run below `params.minWords` (250 by default), and a prose gate skips anything
-that is not prose at all, because a config dump or a diff has no commas either.
-Whether something is prose is a question about vocabulary, not about sentence
-length: prose is mostly closed-class words and code is not, so
-`params.minFunctionWords` (0.12 by default) is what separates them. Sentence
-length must not be the gate, because that would exclude exactly the documents a
-sentence-length band exists to catch. `params.minSentences` guards the sample
-size, and `params.minSentenceWords` and `params.maxSentenceWords` are available
-as explicit guards.
+**`notable` says when the count matters.**
 
-Setting both `params.min` and `params.max` makes the rule an out-of-band check:
-silent between the two, firing on either side. That is what
-[docs/styles.md](styles.md) builds writing-style profiles out of.
-
-`rhythm` is the other document-level kind. It has no pattern: it measures the
-coefficient of variation of sentence length and fires when prose is metrically
-monotone. Both kinds share the prose gate and both report once per document.
-
-`frame` is what `echo` cannot do. `echo` looks for repeated *words*; `frame`
-wildcards the content words and compares only the closed class, so
-"Dr. Smith, a researcher at Oxford University, found that…" matches
-"Professor Johnson, a scientist at Cambridge University, discovered that…"
-even though no content word is shared. It is a crude stand-in for
-part-of-speech tagging, and it only compares sentences that look like prose,
-because repeated code lines are legitimately templated.
-
-### `suggest` is the imperative; `description` and `note` carry the argument
-
-An agent acts on `suggest`. Anything in it that can be read as permission will be
-read that way, and the finding will be closed unaddressed with the rule's own
-words as the reason. This has happened here twice, so it is written down.
-
-| goes in `suggest` | goes in `description` or `note` |
+| | |
 |---|---|
-| Delete the hedge and state the fact. | Fires on genuine three-item lists, which are fine. |
-| Name the actor in front of the verb. | Two of fourteen reference papers sit above this edge. |
-| Find an aside this document already has and bracket it. | Some good human writing never parenthesises. |
+| `{ "above": 0 }` | any occurrence at all. Every span rule looks like this. |
+| `{ "above": 3, "per": 1000 }` | a habit: 3 or more per 1000 words |
+| `{ "below": 1, "per": 1000 }` | an absence, which is also a tell |
+| `{ "between": [30, 85], "per": 1000 }` | outside a band, either side |
 
-Phrases to keep out of `suggest`: *fine in*, *nothing here is wrong*, *no need*,
-*acceptable*, *leave it*, *optional*, *this is a fit judgement*, and any
-*if you do not…* clause offering the reader a way out.
+`needs` refuses to judge a document too small for the rate to mean anything:
+`{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
+250 words, 5 sentences and a prose gate, so rates stay off config dumps and diffs.
 
-The caveats are real and must be recorded, which is what `note` is for. A rule
-whose failure mode is written down is a different thing from one that quietly
-misfires; a rule that licenses inaction in its instruction field is a third thing,
-and it is the one to avoid.
-
-### Thresholds and registers
-
-A rate that is right for one register is wrong for another. A chat log will never
-carry an em dash; a paper might carry many. So a threshold is a starting point,
-not a fact, and three things keep it honest.
-
-**The observed rate travels with the finding.** Every document-level finding
-reports what it measured, not just that it crossed a line:
-
-```
-document  colon-appositive  12 in 1554 words, 7.7 per 1000, at or above 3
-```
-
-**A rule can record what was measured, and where.** The optional `reference`
-block is prose in named fields, printed by `slop explain`:
-
-```jsonc
-"reference": {
-  "unit": "per 1000 words",
-  "human": "0 to 2.7 across six registers. Technical writing lowest at 0.8.",
-  "ai":    "0 to 9.0. Fourteen of eighteen documents at or above 3.0.",
-  "tune":  "Raise it for prose that defines terms. Lower it for chat or release notes."
-}
-```
-
-It changes nothing at runtime. It exists so the number in `params` can be argued
-with, by someone who can see where it came from.
-
-**A project can move a threshold without forking the rule.** `tune` in
-`slop.json` overrides any rule's `params`, and only its params: the pattern stays
-the author's.
-
-```json
-{ "tune": { "colon-appositive": { "min": 6 },
-            "rather-than":      { "min": 2.5 } } }
-```
-
-`list` marks a tuned rule so nobody wonders why a shared rule behaves differently
-here.
-
-**What a rate rule claims.** Not that the construction is wrong: every one of
-them catches something good writers do on purpose. What separates machine prose
-is how often it reaches for the same shape. Set the threshold at the top of what
-human writing does, not above zero, and word the `suggest` so it asks for
-variety instead of substitution. A rule that says "replace every one of these"
-moves the habit somewhere else.
-
-A density or rhythm rule is only as good as its threshold, so calibrate on your
-own corpus. The ones in `candidates/economist.json` come from a 16-document sample
-and are meant to be changed.
+A count is discrete and a rate is continuous, so they compare differently:
+`above: 0` on a count means at least one, while `above: 3` on a rate means 3.0
+or more.
 
 `tests.hit` and `tests.miss` are required, and they are not decoration. See
 below.

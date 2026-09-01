@@ -2,7 +2,7 @@
   "name": "style-conversational",
   "role": "style",
   "version": "0.2.0",
-  "slop": "0.1.0",
+  "slop": "0.2.0",
   "title": "Conversational register",
   "description": "A warm, spoken register: the voice the Mailchimp Content Style Guide describes and is itself written in, the plain-language guidance behind it, and the long-form house style of 37signals. The register is defined more by what it asks for than by what it rules out, so seven of these eight bands are floors, with the register’s own maximum recorded in each `measured` field and no edge on the far side. That is a real limitation and not a design: a document can run further into the permitted direction than any document in either corpus and this profile stays quiet. Only the rhythm band is two-sided. Every edge was measured over a 19-document reference corpus in the target register and contrasted with 12 documents of local technical prose in another register. The numbers are one reading of one corpus and they are the first thing to change: a finding that keeps coming back is sometimes a reason to move the band rather than the document.",
   "source": "https://styleguide.mailchimp.com/",
@@ -108,21 +108,26 @@
     {
       "id": "style-conversational-contraction-low",
       "name": "Fewer contractions than this register uses",
-      "kind": "density",
-      "pattern": "\\b\\w+['’](?:s|t|re|ve|ll|d|m)\\b",
-      "flags": "gi",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "max": 6,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b\\w+['’](?:s|t|re|ve|ll|d|m)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "below": 6,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Contracted forms — it’s, you’re, don’t, that’s — counted per 1000 words. This register runs 10 to 65 per 1000 across the reference corpus, with a median of 19, and it has no upper edge: no quantity of contraction reads as too spoken here, and none is recorded above which one would. At or below 6 the document is written out in full forms throughout, which lands nearer a memo than a conversation. It is a measurement of fit, not a defect: plenty of good writing sits outside it.",
       "suggest": "Contractions are scarcer here than the conversational band expects, which is 6 or more per 1000 words. Let the spoken forms stand where they already sound natural read aloud.",
-      "measured": "floor 6/1000. Reference corpus, 19 documents / 24,363 words in the target register: 9.71 (min) / 10.38 (p10) / 18.80 (median) / 38.01 (p90) / 64.77 (max). The floor sits 38% below the reference minimum rather than at p10, and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 6.35 (median) / 27.27 (max), and 6 of 12 cross it. The far side is unmeasured: no ceiling is shipped, so a document may run above 65 per 1000 and this rule stays quiet.",
       "note": "Sourced: “Feel free to use contractions” (Mailchimp Content Style Guide, TL;DR) and “They’re great! They give your writing an informal, friendly tone” (Grammar and Mechanics). The Federal Plain Language Guidelines put the same point as “‘Write as you talk’ is a common rule of writing readably, and the best way to do that is to use contractions.” The pattern also counts possessive ’s, which lifts the rate for documents full of names; both corpora carry the same lift, so the two are comparable. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. The formal technical document in tests.hit is prose, not a config dump: it is genuinely below this register’s floor, which is the rule working rather than failing. It only sat in tests.miss while the prose gate was excluding it for having long sentences. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "floor 6/1000. Reference corpus, 19 documents / 24,363 words in the target register: 9.71 (min) / 10.38 (p10) / 18.80 (median) / 38.01 (p90) / 64.77 (max). The floor sits 38% below the reference minimum rather than at p10, and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 6.35 (median) / 27.27 (max), and 6 of 12 cross it. The far side is unmeasured: no ceiling is shipped, so a document may run above 65 per 1000 and this rule stays quiet.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period.",
@@ -137,21 +142,26 @@
     {
       "id": "style-conversational-second-person-low",
       "name": "The reader is addressed less than this register expects",
-      "kind": "density",
-      "pattern": "\\b(?:you|your|yours|you['’](?:re|ve|ll|d))\\b",
-      "flags": "gi",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "max": 6,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:you|your|yours|you['’](?:re|ve|ll|d))\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "below": 6,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Second-person pronouns — you, your, yours — per 1000 words. This register runs 8 to 53 per 1000 with a reference median of 21, and there is no upper edge: it has no quantity of “you” it objects to, and none is recorded. At or below 6 the document describes a system rather than speaking to a person. It is a measurement of fit, not a defect: reference and analytic prose are doing a different job.",
       "suggest": "The reader is addressed less often here than the conversational band expects, which is 6 or more second-person pronouns per 1000 words. Address the reader directly and let each sentence say who does what.",
-      "measured": "floor 6/1000. Reference corpus, 19 documents / 24,363 words in the target register: 7.83 (min) / 10.06 (p10) / 21.18 (median) / 41.01 (p90) / 53.33 (max). The floor sits 23% below the reference minimum and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 1.58 (median) / 48.48 (max), and 8 of 12 cross it — that gap between the medians, 21.18 against 1.58, is the sharpest separation in the set and is the specificity of the register rather than a rate of misfires. The far side is unmeasured: no ceiling is shipped.",
       "note": "Sourced: “More than any other single technique, using ‘you’ pulls users into your document and makes it relevant to them” (Federal Plain Language Guidelines, March 2011, section on pronouns). Mailchimp states the same aim as “Don’t market at people; communicate with them.” Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. The formal technical document in tests.hit is prose, not a config dump: it is genuinely below this register’s floor, which is the rule working rather than failing. It only sat in tests.miss while the prose gate was excluding it for having long sentences. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "floor 6/1000. Reference corpus, 19 documents / 24,363 words in the target register: 7.83 (min) / 10.06 (p10) / 21.18 (median) / 41.01 (p90) / 53.33 (max). The floor sits 23% below the reference minimum and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 1.58 (median) / 48.48 (max), and 8 of 12 cross it — that gap between the medians, 21.18 against 1.58, is the sharpest separation in the set and is the specificity of the register rather than a rate of misfires. The far side is unmeasured: no ceiling is shipped.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period.",
@@ -166,21 +176,26 @@
     {
       "id": "style-conversational-first-person-low",
       "name": "Fewer first-person pronouns than this register uses",
-      "kind": "density",
-      "pattern": "\\b(?:I|we|us|our|my|me)\\b",
-      "flags": "g",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "max": 2,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:I|we|us|our|my|me)\\b",
+        "flags": "g"
+      },
+      "notable": {
+        "below": 2,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "First-person pronouns — I, we, us, our, my, me — per 1000 words. This register runs 4 to 44 per 1000 with a reference median of 15, and there is no upper edge. At or below 2 the document has no visible speaker, which reads as institutional rather than personal. It is a measurement of fit, not a defect: a document can have good reasons to keep its authors out of frame.",
       "suggest": "First-person pronouns are scarcer here than the conversational band expects, which is more than 2 per 1000 words. Let the document say who is speaking.",
-      "measured": "floor 2/1000. Reference corpus, 19 documents / 24,363 words in the target register: 4.35 (min) / 7.19 (p10) / 14.99 (median) / 38.81 (p90) / 43.64 (max), and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 0.00 (median) / 24.83 (max), and 7 of 12 cross it. Version 0.1.0 of this rule reported that one reference document sat at zero and that roughly 5% of the register’s own prose fell below the floor; that document was the Getting Real front matter, a list of chapter titles admitted by a prose gate that was too wide, and the claim does not survive the narrower gate. The far side is unmeasured: no ceiling is shipped.",
       "note": "Sourced: “Refer to Mailchimp as ‘we,’ not ‘it’” (Mailchimp Content Style Guide, Grammar and Mechanics) and “Using ‘we’ to refer to your agency makes your agency more approachable” (Federal Plain Language Guidelines). Pattern caveat, taken from the shared metric vocabulary: the flags are case-sensitive, so a capitalised “We” or “Our” at the head of a sentence is not counted and the rate understates first-person presence. Both corpora were measured with the same pattern, so the band is internally consistent, but a document that opens most sentences with “We” reads lower here than it deserves. The in-register example below is a case in point: it is full of “We know” and “We have” and still measures only 13 per 1000. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. The formal technical document in tests.hit is prose, not a config dump: it is genuinely below this register’s floor, which is the rule working rather than failing. It only sat in tests.miss while the prose gate was excluding it for having long sentences. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "floor 2/1000. Reference corpus, 19 documents / 24,363 words in the target register: 4.35 (min) / 7.19 (p10) / 14.99 (median) / 38.81 (p90) / 43.64 (max), and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 0.00 (median) / 24.83 (max), and 7 of 12 cross it. Version 0.1.0 of this rule reported that one reference document sat at zero and that roughly 5% of the register’s own prose fell below the floor; that document was the Getting Real front matter, a list of chapter titles admitted by a prose gate that was too wide, and the claim does not survive the narrower gate. The far side is unmeasured: no ceiling is shipped.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period.",
@@ -195,21 +210,26 @@
     {
       "id": "style-conversational-question-low",
       "name": "Fewer questions than this register puts to the reader",
-      "kind": "density",
-      "pattern": "\\?",
-      "flags": "g",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "max": 0,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\?",
+        "flags": "g"
+      },
+      "notable": {
+        "below": 0,
         "per": 1000,
-        "minWords": 1000,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 1000,
+          "sentences": 5
+        }
       },
       "description": "Question marks per 1000 words, over documents of 1000 words or more. This register runs 0 to 12 per 1000 with a reference median of 3.3, and there is no upper edge: a run of questions is one of the things it does on purpose. At exactly zero, across a thousand words or more, the document never turns to the reader and never uses the question-and-answer shape this register builds explanations from. It is a measurement of fit, not a defect: a shorter piece that happens to ask nothing is ordinary here, which is why this rule does not look at one.",
       "suggest": "Nothing is put to the reader as a question, and the conversational band expects at least one across a document this long. A question heading, or a question the next paragraph answers, is the usual way in.",
-      "measured": "floor 0/1000, the most conservative floor the metric allows, over documents of 1000 words or more. Reference corpus, 19 documents / 24,363 words in the target register: 0.00 (min) / 0.00 (p10) / 3.29 (median) / 10.60 (p90) / 11.92 (max). The length threshold is the whole of this rule’s calibration and it was measured rather than chosen. At the set’s usual 250-word threshold this rule reports 4 of 19 reference documents — 21% of the register’s own prose — because a short help article that asks nothing is unremarkable here; all four sit between 597 and 840 words. Every one of the 9 reference documents at or above 1000 words asks at least one question, so the threshold takes the reference crossing rate from 4/19 to 0/9 while leaving the separation intact: 3 of the 5 local documents at or above 1000 words still cross. The far side is unmeasured: no ceiling is shipped, and a document may run above 12 per 1000 with nothing said here.",
       "note": "Weakest rule in the set: params.max is 0, so it fires only on prose containing literally no question at all. Conversational writing asks questions far more often than never, but no corpus measurement was available to set a real floor, so the threshold stays where it cannot produce a false positive. Raise it once you have measured your own reference corpus. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "floor 0/1000, the most conservative floor the metric allows, over documents of 1000 words or more. Reference corpus, 19 documents / 24,363 words in the target register: 0.00 (min) / 0.00 (p10) / 3.29 (median) / 10.60 (p90) / 11.92 (max). The length threshold is the whole of this rule’s calibration and it was measured rather than chosen. At the set’s usual 250-word threshold this rule reports 4 of 19 reference documents — 21% of the register’s own prose — because a short help article that asks nothing is unremarkable here; all four sit between 597 and 840 words. Every one of the 9 reference documents at or above 1000 words asks at least one question, so the threshold takes the reference crossing rate from 4/19 to 0/9 while leaving the separation intact: 3 of the 5 local documents at or above 1000 words still cross. The far side is unmeasured: no ceiling is shipped, and a document may run above 12 per 1000 with nothing said here.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period.\nProvision of the replacement capability is contingent on the completion of the procurement exercise, which was initiated in the previous quarter. Evaluation of the responses is carried out by a panel drawn from the finance function and the technology function. The composition of that panel is determined by the governance framework and is not subject to variation at local discretion. Notification of the outcome is issued to all participants at the same time, and an explanation of the scoring is made available on request. Retention of the evaluation material is governed by the records schedule. Where an objection is received, suspension of the award is automatic until the objection has been considered. Resolution of an objection is normally achieved within twenty working days of its receipt.\nPreparation of the transition plan is the responsibility of the receiving organisation. Consultation with the outgoing supplier is expected, although the extent of that consultation is a matter for local determination. Verification of the inventory is completed before the transfer of responsibility takes effect. Any discrepancy identified during verification is recorded in the exception log and is subject to investigation by the assurance function. Certification that the inventory is accurate is provided by the accountable officer. Publication of the certification is not required, but retention of it is mandatory for the duration of the arrangement.\nMeasurement of performance against the agreed indicators is undertaken quarterly. Presentation of the measurement is standardised across all participating organisations to permit comparison. Interpretation of the comparison is a matter for the oversight board, and variation between organisations is not in itself an indication of underperformance. Where sustained deterioration is observed, initiation of an improvement plan is required. Approval of an improvement plan is delegated to the chair of the oversight board. Monitoring of progress against an improvement plan is conducted monthly until the indicators have returned to the expected range.\nProvision of training is arranged centrally, and attendance is recorded for the purposes of assurance. Completion of the mandatory modules is a precondition of access to the production environment. Withdrawal of access follows automatically where completion has lapsed, and restoration of access requires the intervention of the service desk. Maintenance of the training material is the responsibility of the capability function, and revision of the material is undertaken annually or on the introduction of a significant change. Distribution of the revised material is by notification through the usual channels.\nConsideration of the longer-term arrangement has been deferred pending the outcome of the review. Publication of the review is expected in the autumn, and consultation on its recommendations will follow. Adoption of any recommendation is subject to the approval of the responsible committee. Until such approval has been obtained, continuation of the present arrangement is authorised. Clarification on any aspect of this notice is available from the programme office, and correspondence should be addressed through the established route rather than to individual members of staff. Acknowledgement of correspondence is issued within five working days. Substantive response is provided within twenty working days, except where the complexity of the matter requires an extension, in which case notification of the extension is issued before the expiry of the original period.\nRegistration of an interest in the successor arrangement is now open, and expressions of interest are collected through the standard form. Submission of the form constitutes acknowledgement of the published terms. Assessment of expressions of interest is undertaken in the order of receipt, and confirmation of registration is issued automatically. Amendment of a registration is permitted until the closing date, after which withdrawal is the only variation available. Publication of the list of registered organisations is scheduled for the first working day of the following month. Distribution of the associated documentation is by secure transfer only, and confirmation of receipt is required within three working days. Failure to confirm receipt results in the suspension of the registration until the position has been clarified. Reinstatement of a suspended registration is at the discretion of the programme office and is subject to the availability of capacity within the assessment schedule.\nRetention of the registration record is governed by the same schedule that applies to the evaluation material, and destruction of the record at the end of the retention period is automatic. Notification of impending destruction is not issued, and extraction of any information required for local purposes is the responsibility of the registering organisation. Provision of a copy of the record on request is subject to the usual verification of identity. Determination of a request for a copy is made within twenty working days, and refusal of a request is accompanied by a statement of the grounds relied upon. Escalation of a refusal is available through the established route, and consideration of an escalation is undertaken by an officer who was not involved in the original determination."
@@ -222,21 +242,26 @@
     {
       "id": "style-conversational-nominalisation-high",
       "name": "More nominalisations than this register uses",
-      "kind": "density",
-      "pattern": "\\b\\w{4,}(?:tion|ment|ance|ence|ity|ness|ism)s?\\b",
-      "flags": "gi",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "min": 55,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b\\w{4,}(?:tion|ment|ance|ence|ity|ness|ism)s?\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 55,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Nouns built out of verbs — implementation, authorisation, availability — per 1000 words. This register runs 8 to 51 per 1000 with a reference median of 30. At or above 55 the document is describing actions rather than performing them, with the verbs buried under the nouns. It is a measurement of fit, not a defect: some subjects have no shorter name for the thing.",
       "suggest": "Nominalisations run heavier here than the conversational band expects, which is under 55 per 1000 words. Turn the nouns back into verbs: “the implementation of the validation” is “validating”.",
-      "measured": "ceiling 55/1000. Reference corpus, 19 documents / 24,363 words in the target register: 8.27 (min) / 13.87 (p10) / 30.10 (median) / 48.97 (p90) / 51.44 (max). The edge sits 7% above the reference maximum and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 14.16 / 22.34 (median) / 92.50 (max), and 3 of 12 cross it. The economist candidate set puts its own ceiling at 70 on a slightly wider pattern, so 55 to 70 is the zone this band measures alone and above 70 the two report together.",
       "note": "Sourced: the Federal Plain Language Guidelines call these hidden verbs and ask for “the strongest, most direct form of the verb possible”; Mailchimp asks for plain English and for cutting the fluff. The pattern is the shared metric vocabulary’s, one suffix narrower than the economist set’s, so the two rates are close but not identical. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "ceiling 55/1000. Reference corpus, 19 documents / 24,363 words in the target register: 8.27 (min) / 13.87 (p10) / 30.10 (median) / 48.97 (p90) / 51.44 (max). The edge sits 7% above the reference maximum and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 14.16 / 22.34 (median) / 92.50 (max), and 3 of 12 cross it. The economist candidate set puts its own ceiling at 70 on a slightly wider pattern, so 55 to 70 is the zone this band measures alone and above 70 the two report together.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period."
@@ -250,21 +275,26 @@
     {
       "id": "style-conversational-passive-high",
       "name": "More passive constructions than this register uses",
-      "kind": "density",
-      "pattern": "\\b(?:is|are|was|were|be|been|being)\\s+\\w+(?:ed|en)\\b",
-      "flags": "gi",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "min": 12,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|are|was|were|be|been|being)\\s+\\w+(?:ed|en)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 12,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Auxiliary plus past participle — is required, was completed, are distributed — per 1000 words. This register runs 0 to 10 per 1000 with a reference median of 4.3. At or above 12 most of what happens in the document happens to something, with whoever did it out of frame. It is a measurement of fit, not a defect: sometimes the action matters more than the actor, which the guide says in as many words.",
       "suggest": "Passive constructions run heavier here than the conversational band expects, which is under 12 per 1000 words. Put the actor back in front of the verb.",
-      "measured": "ceiling 12/1000, set above both corpora, which is why it is a quiet rule. Reference corpus, 19 documents / 24,363 words in the target register: 0.00 (min) / 0.44 (p10) / 4.28 (median) / 6.81 (p90) / 9.77 (max). Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 3.48 (median) / 8.50 (max). The edge sits 23% above the higher of the two maxima, so 0 of the 31 measured documents cross it and the rule has no observed hit of any kind. It is proven live only by the off-register example below, which runs 54 per 1000. Of every band here this is the one whose edge rests least on observation: the distance between it and the highest thing ever measured is a judgement, not a finding.",
       "note": "Sourced: “Use active voice” (Mailchimp Content Style Guide, Grammar and Mechanics), which also states the exception this rule cannot see: “when you want to specifically emphasize the action over the subject … this is fine.” Pattern caveat: it counts “is interested” and “is based”, which are not agentive passives, and it misses “gets rebuilt”. As a rate over 250-plus words the noise is roughly constant across documents; as a verdict on any single sentence it would be poor. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "ceiling 12/1000, set above both corpora, which is why it is a quiet rule. Reference corpus, 19 documents / 24,363 words in the target register: 0.00 (min) / 0.44 (p10) / 4.28 (median) / 6.81 (p90) / 9.77 (max). Local corpus, 12 documents / 15,120 words of human technical prose: 0.00 / 3.48 (median) / 8.50 (max). The edge sits 23% above the higher of the two maxima, so 0 of the 31 measured documents cross it and the rule has no observed hit of any kind. It is proven live only by the off-register example below, which runs 54 per 1000. Of every band here this is the one whose edge rests least on observation: the distance between it and the highest thing ever measured is a judgement, not a finding.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period."
@@ -278,21 +308,26 @@
     {
       "id": "style-conversational-long-word-high",
       "name": "Longer words than this register uses",
-      "kind": "density",
-      "pattern": "\\b[A-Za-z]{12,}\\b",
-      "flags": "g",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "min": 35,
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b[A-Za-z]{12,}\\b",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 35,
         "per": 1000,
-        "minWords": 250,
-        "minSentences": 5
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Words of twelve letters or more, per 1000 words. This register runs 6 to 28 per 1000 with a reference median of 12. At or above 35 about one word in 28 is a long Latinate one, which is heavier going than this register asks a reader to carry on a phone. It is a measurement of fit, not a defect: some domains have long names for things and no shorter ones.",
       "suggest": "Long words run heavier here than the conversational band expects, which is under 35 per 1000 words. Reach for the shorter word where one exists.",
-      "measured": "ceiling 35/1000. Reference corpus, 19 documents / 24,363 words in the target register: 6.02 (min) / 7.88 (p10) / 11.92 (median) / 21.12 (p90) / 27.58 (max), and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 1.75 / 12.89 (median) / 38.03 (max), and 1 of 12 crosses it. Version 0.1.0 called this the weakest separator in the set on the grounds that the corpora overlapped almost completely at the edge; at the narrower prose gate the reference maximum falls from 38.26 to 27.58, because the documents that carried the highest long-word rates were navigation chrome and a table of contents rather than prose, and the overlap at the edge goes away. The two distributions still sit close together through the middle — medians 11.92 against 12.89 — so this remains the band that separates least, but it no longer reports the register’s own writing.",
       "note": "Sourced: “Use short words and sentences” (Mailchimp Content Style Guide, Grammar and Mechanics). Twelve letters is the shared metric vocabulary’s cut, not the guide’s: the guide gives no length. Of every band here this is the one to retune first if the document has a technical vocabulary, since a domain term of twelve letters is not a register choice at all. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "ceiling 35/1000. Reference corpus, 19 documents / 24,363 words in the target register: 6.02 (min) / 7.88 (p10) / 11.92 (median) / 21.12 (p90) / 27.58 (max), and 0 of 19 reference documents cross it. Local corpus, 12 documents / 15,120 words of human technical prose: 1.75 / 12.89 (median) / 38.03 (max), and 1 of 12 crosses it. Version 0.1.0 called this the weakest separator in the set on the grounds that the corpora overlapped almost completely at the edge; at the narrower prose gate the reference maximum falls from 38.26 to 27.58, because the documents that carried the highest long-word rates were navigation chrome and a table of contents rather than prose, and the overlap at the edge goes away. The two distributions still sit close together through the middle — medians 11.92 against 12.89 — so this remains the band that separates least, but it no longer reports the register’s own writing.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "The implementation of the notification service was completed prior to the commencement of the migration. Documentation of the configuration is maintained by the platform organisation, and the specification was approved at the conclusion of the consultation. Identification of the affected population is performed by an automated classification process, and the results are distributed to the operations department each morning. The determination of eligibility depends on the availability of the registration record. Where reconciliation of the two representations is required, an escalation is raised for consideration by the governance committee. The recommendation of that committee is recorded in the minutes and tracked to completion. Accountability for the transformation programme sits with the transformation office. That office produces a monthly presentation covering the utilisation of the estate, the distribution of incidents, and the progress of remediation activity. Deviation from the published specification is treated as an exception and requires the authorisation of the architecture function. Assessment of the operational impact is undertaken before any modification of the environment is scheduled. The service desk operates from eight in the morning until six in the evening on working days. Staff are asked to consult the intranet before a ticket is raised. A summary of open items is circulated to team leads every Friday, and older records are archived after ninety days. The expectation is that the introduction of the new arrangement will result in a reduction of manual intervention over the course of the year. Confirmation of that expectation awaits the completion of the current measurement period. The continuation of the existing process is therefore approved until the publication of the assessment. Communication of the decision to the affected teams was delegated to the programme management function last month. Further guidance will follow in due course, and the relevant material has been placed on the intranet, where it will remain until the next revision of the operating model. Questions may be directed to the service desk, which holds a standing instruction to route them onward. No change to the current arrangement is anticipated before the end of the reporting period."
@@ -306,19 +341,25 @@
     {
       "id": "style-conversational-rhythm-off-band",
       "name": "Sentence lengths outside the range this register moves in",
-      "kind": "rhythm",
-      "default": "off",
-      "severity": "info",
-      "params": {
-        "maxCV": 0.45,
-        "minCV": 1.85,
-        "minWords": 250,
-        "minSentences": 8
+      "match": {
+        "kind": "rhythm"
+      },
+      "notable": {
+        "between": [
+          0.45,
+          1.85
+        ],
+        "needs": {
+          "words": 250,
+          "sentences": 8
+        }
       },
       "description": "Sentence-length variation, as the coefficient of variation: standard deviation over mean. The one two-sided band in this set, and the only one whose permitted direction is bounded. This register runs 0.41 to 1.76 with a reference median of 0.71. At or below 0.45 the sentences are close to a single length: correct, readable prose that does not move the way speech moves. At or above 1.85 the length swings further than anything measured in the register, which reads as lurching rather than spoken. It is a measurement of fit, not a defect.",
       "suggest": "Sentence lengths sit outside the range this register moves in, which is a variation between 0.45 and 1.85. Below it, let one sentence run long and the next one land short; above it, the swings are wider than speech makes.",
-      "measured": "band cv 0.45 to 1.85, and the least evidenced band in the set on both edges. Reference corpus, 19 documents / 24,363 words in the target register: 0.41 (min) / 0.48 (p10) / 0.71 (median) / 1.39 (p90) / 1.76 (max). Local corpus, 12 documents / 15,120 words of human technical prose: 0.49 (min) / 0.75 (median) / 1.54 (max). The low edge at 0.45 sits between the reference minimum and p10 and reports 2 of 19 reference documents, which is 11% of the register’s own prose and the only band here that does so; the value that would clear the reference corpus is 0.40, and 0.40 is exactly humanizer-de/uniform-sentence-length, so at that setting this rule would be a duplicate of a rule that already exists. It is shipped at 0.45 knowing both of those things. The high edge at 1.85 sits 5% above the reference maximum, is crossed by 0 of the 31 measured documents, and is proven live only by the example below.",
       "note": "The least directly sourced rule in the set, labelled as such on purpose, and the first to retune or drop. Neither guide states anything about sentence-length variation; the nearest thing is Mailchimp’s “When in doubt, read your writing out loud”, and speech is neither metronomic nor arbitrary. The numbers came from measuring the reference corpus; the reasoning behind wanting numbers at all did not. Version 0.1.0 shipped only the low edge; the high edge is added here so the rule describes a band rather than a floor, but it is an edge drawn just outside the observed range and no source asks for it. Prose gate: 35 words a sentence, the engine default 4 on the short side. Derived rather than chosen. Sorted by words per sentence, the reference corpus runs 8.3 to 22.9 and then jumps to 39.9 and 78.8; the local corpus runs 13.3 to 30.3 and then jumps to 38.0, 43.5, 57.9, 57.9, 79.5 and 135.8. Every document above those jumps that was read turned out to be headings, a table, navigation chrome or a bulleted file listing that the extractor had flattened into one long pseudo-sentence, so 35 sits in the empty band between the prose and the markup in both corpora and keeps 19 of 21 reference documents. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
+      "measured": "band cv 0.45 to 1.85, and the least evidenced band in the set on both edges. Reference corpus, 19 documents / 24,363 words in the target register: 0.41 (min) / 0.48 (p10) / 0.71 (median) / 1.39 (p90) / 1.76 (max). Local corpus, 12 documents / 15,120 words of human technical prose: 0.49 (min) / 0.75 (median) / 1.54 (max). The low edge at 0.45 sits between the reference minimum and p10 and reports 2 of 19 reference documents, which is 11% of the register’s own prose and the only band here that does so; the value that would clear the reference corpus is 0.40, and 0.40 is exactly humanizer-de/uniform-sentence-length, so at that setting this rule would be a duplicate of a rule that already exists. It is shipped at 0.45 knowing both of those things. The high edge at 1.85 sits 5% above the reference maximum, is crossed by 0 of the 31 measured documents, and is proven live only by the example below.",
+      "default": "off",
+      "severity": "info",
       "tests": {
         "hit": [
           "Your account is ready, and the first thing to do is add a list. Click the button at the top and give the new list a short name. Names are easy to change later, so pick one and move on for now. The next screen asks for a reply address that your readers will see. Use a real inbox here, because people will hit reply more than you expect. Then upload a file, or paste the addresses in, whichever is easier today. We check the file as it arrives and tell you about any rows we cannot read. Fixing those rows now is much quicker than fixing them after a send. When the list looks right, hit save, and the dashboard opens by itself. From there you can build a first campaign, or stop and come back later. Nothing is lost if you close the tab, since drafts are kept for a month. Most people build the campaign the same day, because the momentum is useful. Pick a template that is close enough, and edit the words before the pictures. The words are what carry the message, and the pictures only help a little. Send a test to yourself, and read it on a phone before you read it anywhere else. If the subject line looks long on that screen, cut it down until it fits. Then send the thing, and let the numbers arrive in their own good time. You will learn more from the second send than you ever will from the first. A second campaign takes about half the time, because the hard choices are behind you. Keep a note of what you changed, since memory is a good deal worse than a short list. The archive holds every send, so an old subject line is never more than a click away. Come back on Monday and read the numbers once, then leave them alone until Friday. Nobody has ever learned much that is useful from refreshing a dashboard on the day of a send.",

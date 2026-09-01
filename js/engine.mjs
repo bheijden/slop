@@ -1,10 +1,16 @@
-// The rule engine. Eight detector kinds, all driven by data from rules/*.json.
+// The rule engine, in two halves.
+//
+// A MATCHER finds occurrences and knows nothing about whether they matter.
+// A VERDICT (`notable`) decides whether a count is worth reporting, and at what
+// rate. Splitting them is what lets one pattern be judged several ways, and what
+// lets every rule report both its occurrences and its rate: those used to be a
+// choice between a span kind and the old `density` kind.
 //
 // Behaviour is deliberately identical to the upstream LLM cliche highlighter,
 // which is what tests/conformance lets us prove. Do not "improve" a detector
 // here without regenerating the rule tests.
 
-export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'density', 'rhythm', 'frame'];
+export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'rhythm', 'frame'];
 
 const CHAIN_BODY = String.raw`[^,.;:!?\n–—…]*`;
 const CHAIN_SEP = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+|\s*[;&–—]\s*(?:and\s+|or\s+)?|\s+-{1,2}\s+)`;
@@ -188,97 +194,34 @@ function functionWordRatio(text) {
   return n / toks.length;
 }
 
-function densityFinder(rule) {
+function densityMatcher(rule) {
+  // Just the matches. Whether there are too many, or too few, is `notable`.
   const re = reOf(rule);
-  const { per = 1000, min, max, minWords = 250, minMatches = 0, unit = 'words',
-          prose = true, minSentences = 5, maxSentenceWords = 200, minSentenceWords = 1,
-          minFunctionWords = 0.12 } = rule.params || {};
-  if (min === undefined && max === undefined) {
-    throw new Error(`rule "${rule.id}": a density rule needs params.min or params.max`);
-  }
-  return (text) => {
-    const words = (text.match(DENSITY_WORD) || []).length;
-    const total = unit === 'chars' ? text.length : words;
-    if (total < minWords) return [];
-
-    // A rate over something that is not prose is meaningless, and scarcity
-    // rules are the worst affected: a config dump or a diff has no commas at
-    // all. Gate on there being enough sentences, of a plausible length.
-    if (prose) {
-      const sentences = (text.match(/[.!?](?=\s|$)/g) || []).length;
-      if (sentences < minSentences) return [];
-      if (functionWordRatio(text) < minFunctionWords) return [];
-      const perSentence = words / sentences;
-      if (perSentence > maxSentenceWords || perSentence < minSentenceWords) return [];
-    }
-    let count = 0;
-    let first = null;
-    for (const m of text.matchAll(re)) {
-      count += 1;
-      if (first === null) first = m;
-    }
-    if (count < minMatches) return [];
-    const rate = (count / total) * per;
-    const high = min !== undefined && rate >= min;
-    const low = max !== undefined && rate <= max;
-    if (!high && !low) return [];
-
-    // Pile-up anchors on the first offender so the reader can see one. Scarcity
-    // often has nothing to point at, so it anchors on the first word.
-    let start = 0;
-    let end = 0;
-    if (high && first) {
-      start = first.index;
-      end = first.index + first[0].length;
-    } else {
-      const w = DENSITY_WORD.exec(text);
-      DENSITY_WORD.lastIndex = 0;
-      if (!w) return [];
-      start = w.index;
-      end = w.index + w[0].length;
-    }
-    const shown = rate >= 10 ? Math.round(rate) : Math.round(rate * 10) / 10;
-    return [{ start, end, count, docLevel: true, badge: `${shown}/${per}`,
-              badgeTitle: `${count} in ${total} ${unit}, ${shown} per ${per}, `
-                          + `${high ? `at or above ${min}` : `at or below ${max}`}` }];
-  };
+  return (text) => [...text.matchAll(re)].map((m) => ({ start: m.index, end: m.index + m[0].length }));
 }
 
 // Sentence-length variation, as a coefficient of variation: standard deviation
 // over mean. Low means every sentence is the same length, what sloptells calls
 // "sentences that march in formation" and what humanizer-de measures as
 // stddev_mean_ratio. Prose that is correct, readable and metrically monotone.
-function rhythmFinder(rule) {
-  const { maxCV, minCV, minWords = 250, minSentences = 8,
-          maxSentenceWords = 200, minSentenceWords = 1, minFunctionWords = 0.12 } = rule.params || {};
-  if (maxCV === undefined && minCV === undefined) {
-    throw new Error(`rule "${rule.id}": a rhythm rule needs params.maxCV or params.minCV`);
-  }
+// Sentence-length variation as a coefficient of variation: standard deviation
+// over mean. The only matcher that counts nothing, so it reports a metric and
+// no occurrences, and its `notable` compares against that metric instead of a
+// rate. sloptells calls a low value "sentences that march in formation".
+function rhythmMatcher(rule) {
+  const { maxSentenceWords = 200, minSentenceWords = 1 } = rule.match || {};
   return (text) => {
-    if ((text.match(DENSITY_WORD) || []).length < minWords) return [];
-    if (functionWordRatio(text) < minFunctionWords) return [];
-    const parts = text.split(/(?<=[.!?])\s+/);
     const lens = [];
-    for (const part of parts) {
+    for (const part of text.split(/(?<=[.!?])\s+/)) {
       const n = (part.match(DENSITY_WORD) || []).length;
       if (n > 0) lens.push(n);
     }
-    if (lens.length < minSentences) return [];
-    const mean = lens.reduce((a, b) => a + b, 0) / lens.length;
-    if (mean > maxSentenceWords || mean < minSentenceWords) return [];
-    const sd = Math.sqrt(lens.reduce((a, b) => a + (b - mean) ** 2, 0) / lens.length);
-    const cv = sd / mean;
-    if (!((maxCV !== undefined && cv <= maxCV) || (minCV !== undefined && cv >= minCV))) return [];
-
-    const w = DENSITY_WORD.exec(text);
-    DENSITY_WORD.lastIndex = 0;
-    if (!w) return [];
-    const shown = Math.round(cv * 100) / 100;
-    return [{ start: w.index, end: w.index + w[0].length, count: lens.length, docLevel: true,
-              badge: `cv ${shown}`,
-              badgeTitle: `${lens.length} sentences averaging ${Math.round(mean)} words, `
-                          + `variation ${shown}, ${maxCV !== undefined && cv <= maxCV
-                              ? `at or below ${maxCV}` : `at or above ${minCV}`}` }];
+    if (!lens.length) return { occurrences: [], metric: null };
+    const mean = lens.reduce((x, y) => x + y, 0) / lens.length;
+    if (mean > maxSentenceWords || mean < minSentenceWords) return { occurrences: [], metric: null };
+    const sd = Math.sqrt(lens.reduce((x, y) => x + (y - mean) ** 2, 0) / lens.length);
+    return { occurrences: [], metric: sd / mean, sentences: lens.length,
+             detail: `${lens.length} sentences averaging ${Math.round(mean)} words` };
   };
 }
 
@@ -364,10 +307,9 @@ function frameFinder(rule) {
   };
 }
 
-const BUILDERS = {
-  regex: regexFinder,
-  density: densityFinder,
-  rhythm: rhythmFinder,
+const MATCHERS = {
+  regex: densityMatcher,          // one matcher: occurrences of a pattern
+  rhythm: rhythmMatcher,
   frame: frameFinder,
   chain: chainFinder,
   echo: echoFinder,
@@ -375,11 +317,98 @@ const BUILDERS = {
   anaphora: anaphoraFinder
 };
 
+
+// ---- the verdict ----------------------------------------------------------
+
+// `notable` says when a count is worth reporting:
+//   { above: 0 }                       any occurrence at all
+//   { above: 3, per: 1000 }            a habit: 3 or more per 1000 words
+//   { below: 1, per: 1000 }            an absence, which is also a tell
+//   { between: [30, 85], per: 1000 }   outside a band, either side
+// `needs` refuses to judge a document too short for the rate to mean anything.
+// A prose gate keeps rates off config dumps and diffs, where they are noise.
+function verdictOf(rule) {
+  const n = rule.notable;
+  if (!n) throw new Error(`rule "${rule.id}": needs a "notable" saying when it reports`);
+  const band = Array.isArray(n.between) ? n.between : null;
+  if (band === null && n.above === undefined && n.below === undefined) {
+    throw new Error(`rule "${rule.id}": "notable" needs above, below or between`);
+  }
+  const per = n.per || null;
+  const needs = n.needs || {};
+  const minWords = needs.words ?? (per ? 250 : 0);
+  const minSentences = needs.sentences ?? (per ? 5 : 0);
+  const minFunctionWords = needs.functionWords ?? (per ? 0.12 : 0);
+  // A rate over one occurrence is arithmetic, not evidence. `needs.matches`
+  // says how many it takes before the rate is worth believing.
+  const minMatches = needs.matches ?? 0;
+
+  return (text, { occurrences, metric, sentences, detail }) => {
+    const words = (text.match(DENSITY_WORD) || []).length;
+    const count = occurrences.length;
+    // A metric matcher reports its own value; a counting one reports a rate,
+    // or a bare count when `per` is absent.
+    const value = metric !== undefined && metric !== null ? metric
+                : per ? (words ? (count / words) * per : 0)
+                : count;
+    if (metric === null) return { fires: false };
+    if (per || metric !== undefined) {
+      if (words < minWords) return { fires: false };
+      if (minSentences) {
+        const sents = sentences ?? (text.match(/[.!?](?=\s|$)/g) || []).length;
+        if (sents < minSentences) return { fires: false };
+      }
+      if (minFunctionWords && functionWordRatio(text) < minFunctionWords) return { fires: false };
+    }
+    if (minMatches && count < minMatches) return { fires: false };
+    const lo = band ? band[0] : n.below;
+    const hi = band ? band[1] : n.above;
+    // A count of occurrences is discrete and a rate is continuous, so they
+    // compare differently: `above: 0` on a count means at least one, while
+    // `above: 3` on a rate means 3.0 or more.
+    const discrete = !per && metric === undefined;
+    const under = lo !== undefined && (discrete ? value < lo : value <= lo);
+    const over = hi !== undefined && (discrete ? value > hi : value >= hi);
+    if (!under && !over) return { fires: false };
+
+    const shown = per || metric !== undefined
+      ? (value >= 10 ? Math.round(value) : Math.round(value * 100) / 100) : value;
+    const unit = n.unit || 'words';
+    const where = under ? `at or below ${lo}` : `at or above ${hi}`;
+    return {
+      fires: true, value, count, words,
+      // A bare count with no `per` is the old span behaviour: report each
+      // occurrence and say nothing about the document.
+      docLevel: Boolean(per) || metric !== undefined,
+      measure: metric !== undefined
+        ? `${detail || ''}, variation ${shown}, ${where}`.replace(/^, /, '')
+        : per ? `${count} in ${words} ${unit}, ${shown} per ${per}, ${where}`
+              : `${count}`,
+    };
+  };
+}
+
 export function compileRule(rule, setName) {
   if (!rule.id) throw new Error('every rule needs an id');
-  const build = BUILDERS[rule.kind];
-  if (!build) throw new Error(`rule "${rule.id}": unknown kind "${rule.kind}" (expected ${KINDS.join(', ')})`);
-  return { ...rule, set: rule.set || setName, severity: rule.severity || 'warn', find: build(rule) };
+  const m = rule.match;
+  if (!m || !m.kind) throw new Error(`rule "${rule.id}": needs a "match" with a kind`);
+  const build = MATCHERS[m.kind];
+  if (!build) throw new Error(`rule "${rule.id}": unknown kind "${m.kind}" (expected ${KINDS.join(', ')})`);
+  // Matchers read their own settings off `match`; the old shape put them at the
+  // top level and in `params`, which is why one pattern needed one threshold.
+  const matcher = build({ ...m, id: rule.id, params: m });
+  const judge = verdictOf(rule);
+  const run = (text) => {
+    const got = matcher(text);
+    return Array.isArray(got) ? { occurrences: got } : got;
+  };
+  return {
+    ...rule, set: rule.set || setName, severity: rule.severity || 'warn',
+    // Occurrences, always, whatever the verdict says. The two used to be fused.
+    find: (text) => run(text).occurrences,
+    judge: (text) => { const r = run(text); return { ...judge(text, r), occurrences: r.occurrences }; },
+    fires: (text) => judge(text, run(text)).fires,
+  };
 }
 
 export function compileRuleSet(json, fallbackName) {
@@ -423,9 +452,22 @@ export function compareVersions(a, b) {
 export function analyze(text, rules) {
   const raw = [];
   for (const rule of rules) {
-    for (const m of rule.find(text)) {
-      m.rule = rule;
-      raw.push(m);
+    const v = rule.judge(text);
+    if (!v.fires) continue;
+    if (v.docLevel) {
+      // One finding for the document, carrying the occurrences so a reader can
+      // see both the rate and where it came from. Anchored on the first match,
+      // or the first word when there is nothing to point at.
+      const first = v.occurrences[0];
+      const w = DENSITY_WORD.exec(text);
+      DENSITY_WORD.lastIndex = 0;
+      const start = first ? first.start : (w ? w.index : 0);
+      const end = first ? first.end : (w ? w.index + w[0].length : 0);
+      raw.push({ start, end, rule, count: v.count, docLevel: true,
+                 badge: v.measure, badgeTitle: v.measure,
+                 spans: v.occurrences.map((o) => ({ start: o.start, end: o.end })) });
+    } else {
+      for (const m of v.occurrences) raw.push({ ...m, rule });
     }
   }
   raw.sort((a, b) => a.start - b.start || b.end - a.end);

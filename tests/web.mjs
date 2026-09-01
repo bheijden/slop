@@ -99,7 +99,11 @@ async function main() {
       new Promise((res) => { const i = ++id; pending.set(i, res); ws.send(JSON.stringify({ id: i, method, params })); });
     const evaluate = async (expression) => {
       const r = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-      if (r.result?.exceptionDetails) throw new Error(r.result.exceptionDetails.text);
+      if (r.result?.exceptionDetails) {
+        const d = r.result.exceptionDetails;
+        throw new Error((d.exception?.description || d.text || 'page threw')
+          + `\n    while evaluating: ${expression.replace(/\s+/g, ' ').slice(0, 120)}`);
+      }
       return r.result?.result?.value;
     };
 
@@ -285,7 +289,8 @@ async function main() {
     const dup = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');
       t.value=JSON.stringify({name:'dup',rules:[1,2,3].map(()=>({id:'a',kind:'regex',
-        pattern:'foo',flags:'gi',description:'d',tests:{hit:['a foo b'],miss:['bar']}}))});
+        match:{kind:'regex',pattern:'foo',flags:'gi'},notable:{above:0},
+        description:'d',suggest:'s',tests:{hit:['a foo b'],miss:['bar']}}))});
       t.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,1200));
       const e=document.getElementById('rerr');
@@ -300,8 +305,9 @@ async function main() {
     // Replacing the text re-runs against whatever is there now.
     const own = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');
-      t.value=JSON.stringify({name:'t',rules:[{id:'x',kind:'regex',pattern:'\\\\bfoo\\\\b',flags:'gi',
-        description:'d',tests:{hit:['a foo b'],miss:['football']}}]});
+      t.value=JSON.stringify({name:'t',rules:[{id:'x',name:'x',
+        match:{kind:'regex',pattern:'\\\\bfoo\\\\b',flags:'gi'}, notable:{above:0},
+        description:'d',suggest:'s',tests:{hit:['a foo b'],miss:['football']}}]});
       t.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,3000));
       return JSON.stringify({score: document.getElementById('score').textContent,

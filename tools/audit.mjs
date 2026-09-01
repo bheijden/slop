@@ -48,7 +48,7 @@ function tally(docs) {
     words += d.words;
     for (const r of RULES) {
       let n = 0;
-      try { n = r.find(d.text).length; } catch { n = 0; }
+      try { n = r.fires(d.text) ? Math.max(1, r.find(d.text).length) : 0; } catch { n = 0; }
       if (!n) continue;
       spans.set(r.id, (spans.get(r.id) || 0) + n);
       docsHit.set(r.id, (docsHit.get(r.id) || 0) + 1);

@@ -185,20 +185,25 @@ for (const p of api.patterns) {
   };
   if (NOTES[p.id]) rule.note = NOTES[p.id];
   if (f.kind === 'regex') {
-    rule.kind = 'regex';
-    rule.pattern = f.re.source;
-    rule.flags = f.re.flags;
+    rule.match = { kind: 'regex', pattern: f.re.source, flags: f.re.flags };
   } else if (f.kind === 'chain') {
-    rule.kind = 'chain';
-    rule.pattern = f.re.source;
-    rule.flags = f.re.flags;
-    rule.headTest = f.headTest.source;
-    rule.itemLabel = f.itemLabel;
+    rule.match = { kind: 'chain', pattern: f.re.source, flags: f.re.flags,
+                   headTest: f.headTest.source, itemLabel: f.itemLabel };
   } else {
-    Object.assign(rule, ALGO[p.id]);
+    // The algorithmic kinds carry their settings in `match` like everything else.
+    const a = ALGO[p.id];
+    rule.match = { kind: a.kind, ...(a.params || {}) };
   }
+  // Every one of these upstream rules reports each occurrence, which is what a
+  // bare count above zero means.
+  rule.notable = { above: 0 };
   rule.tests = casesFor(p.id);
-  if (OVERRIDES[p.id]) Object.assign(rule, OVERRIDES[p.id]);
+  if (OVERRIDES[p.id]) {
+    const o = { ...OVERRIDES[p.id] };
+    // an override may replace the pattern, which now lives inside `match`
+    if (o.pattern) { rule.match = { ...rule.match, pattern: o.pattern }; delete o.pattern; }
+    Object.assign(rule, o);
+  }
   sets[setName].push(rule);
 }
 
@@ -262,7 +267,7 @@ for (const [key, rules] of Object.entries(sets)) {
   const out = { ...META[key], rules };
   fs.writeFileSync(path.join(ROOT, 'rules', key + '.json'), JSON.stringify(out, null, 2) + '\n');
   const kinds = {};
-  for (const r of rules) kinds[r.kind] = (kinds[r.kind] || 0) + 1;
+  for (const r of rules) kinds[r.match.kind] = (kinds[r.match.kind] || 0) + 1;
   const tests = rules.reduce((a, r) => a + r.tests.hit.length + r.tests.miss.length, 0);
   console.log(`${key.padEnd(14)} ${String(rules.length).padStart(2)} rules  ${JSON.stringify(kinds)}  ${tests} test cases`);
 }

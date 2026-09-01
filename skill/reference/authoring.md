@@ -3,7 +3,7 @@
 ## Contents
 
 - Rule format
-- The eight detector kinds
+- The seven matcher kinds and the `notable` verdict
 - Testing a rule set (the fudger)
 - Fixing a noisy rule
 
@@ -23,9 +23,8 @@ hold back a set that fails.
     {
       "id": "utilise",
       "name": "\"utilise\" for \"use\"",
-      "kind": "regex",
-      "pattern": "\\butili[sz]e[sd]?\\b",
-      "flags": "gi",
+      "match":   { "kind": "regex", "pattern": "\\butili[sz]e[sd]?\\b", "flags": "gi" },
+      "notable": { "above": 0 },
       "severity": "error",
       "description": "\"Utilise\" is never better than \"use\".",
       "suggest": "Write \"use\".",
@@ -81,26 +80,38 @@ Optional fields, all printed by `explain <id>`:
 Use it with `--rules ./house-style.json`, drop it in the repo's `rules/`
 directory, or point the web page at it with `#rules=<url>`.
 
-## The eight detector kinds
+## The seven matcher kinds
 
-| `kind` | fields | detects |
+**Seven matcher kinds.** A matcher finds occurrences; `notable` decides whether
+they are worth reporting. `density` used to be an eighth kind and is gone: a rate
+is a verdict, not a way of matching.
+
+| `match.kind` | fields | finds |
 |---|---|---|
-| `regex` | `pattern`, `flags` | a pattern — most rules |
+| `regex` | `pattern`, `flags` | occurrences of a pattern. Most rules. |
 | `chain` | `pattern`, `headTest`, `itemLabel` | `"no X, no Y, no Z"` lists, counting the items |
-| `echo` | `params.minGram`, `params.minRun` | consecutive sentences sharing a skeleton |
-| `question-chain` | `params.minRun` | runs of consecutive questions |
-| `anaphora` | `params.minRun` | consecutive sentences opening on the same word |
-| `density` | `pattern`, `params.min` or `params.max` | a document-level *rate* rather than a span |
-| `rhythm` | `params.maxCV` | sentence-length variation, as stddev over mean |
-| `frame` | `params.gram`, `params.minRun` | consecutive sentences sharing a *syntactic* frame |
+| `echo` | `minGram`, `minRun`, `anchored`, `minFuncWords` | consecutive sentences sharing a word skeleton |
+| `question-chain` | `minRun` | runs of consecutive questions |
+| `anaphora` | `minRun` | consecutive sentences opening on the same word |
+| `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
+| `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
 
-`density` is the odd one out: it reports a rate per 1000 words for the document
-as a whole and fires once. `params.min` catches pile-up, `params.max` catches
-scarcity. It needs `params.minWords` worth of text (250 by default) and skips
-anything that does not read as prose. `rhythm` is the same shape with no
-pattern: it measures sentence-length variation and fires when every sentence is
-the same length. `frame` catches repeated sentence *shapes* where `echo` needs
-repeated words.
+**`notable` says when the count matters.**
+
+| | |
+|---|---|
+| `{ "above": 0 }` | any occurrence at all. Every span rule looks like this. |
+| `{ "above": 3, "per": 1000 }` | a habit: 3 or more per 1000 words |
+| `{ "below": 1, "per": 1000 }` | an absence, which is also a tell |
+| `{ "between": [30, 85], "per": 1000 }` | outside a band, either side |
+
+`needs` refuses to judge a document too small for the rate to mean anything:
+`{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
+250 words, 5 sentences and a prose gate, so rates stay off config dumps and diffs.
+
+A count is discrete and a rate is continuous, so they compare differently:
+`above: 0` on a count means at least one, while `above: 3` on a rate means 3.0
+or more.
 
 Patterns are JavaScript regular expressions. `flags` only needs `i`; matching is
 always global.

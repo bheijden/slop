@@ -1,7 +1,7 @@
 {
   "name": "mined",
   "version": "0.1.0",
-  "slop": "0.1.0",
+  "slop": "0.2.0",
   "title": "Mined AI-slop tells",
   "description": "Every tell this project mined itself, in one set, on by default. The two shipped sets are ports of other people's work and stay separate; these were gathered from published research, style guides and other detectors, then measured against a matched human/AI corpus. Each rule records where it came from in `from` and `source`, and what it scored in `evidence`. Three rules were dropped in the merge because a shipped rule already matched everything they did: slop-gate's seamless, underscore-importance and fast-paced-world are all inside wikipedia-ai's ai-vocab and landscape. The full survey is in research/log.md and the measurements in research/audit.md.",
   "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
@@ -9,13 +9,22 @@
     {
       "id": "em-dash",
       "name": "Em dash",
-      "kind": "regex",
-      "pattern": "—|\\s–\\s|\\s--\\s|\\s—\\s",
-      "flags": "g",
-      "severity": "warn",
+      "match": {
+        "kind": "regex",
+        "pattern": "—|\\s–\\s|\\s--\\s|\\s—\\s",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "An em dash, or an en dash or double hyphen standing in for one. Every occurrence, no threshold. This is a house-style rule and it is not optional: the owner of a document that carries it does not want em dashes in it.",
       "suggest": "A comma if the aside is light, a colon if what follows explains, brackets if it is a true aside, a full stop if it is really a second sentence.",
+      "note": "Ships on wherever this set is loaded. If a document should keep its em dashes, ignore the rule for that project with --ignore em-dash or an ignore entry in slop.json, which is a decision someone makes once, not per finding.",
       "measured": "The research is about detection and does not bear on this rule. Four independent measurements agree the em dash does NOT distinguish machine prose from human prose: sloptells found acclaimed human writing uses more of them than models do, 0.67 against 0.56 per 1000 characters; The Economist found only Claude above the human rate, with ChatGPT markedly below; humanizer-de states that a single em dash proves nothing; and this project's own corpus agreed. So do not cite a hit here as evidence of authorship. None of it is a reason to leave one in a document whose style forbids them.",
+      "from": "house style",
+      "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
+      "evidence": "On the audit corpus: 40 hits in 8/18 human documents, 0 in 0/18 AI documents.",
+      "severity": "warn",
       "tests": {
         "hit": [
           "The migration took a week — longer than anyone expected.",
@@ -27,20 +36,24 @@
           "It is a well-known problem in the parser.",
           "Run it with --force to install anyway."
         ]
-      },
-      "from": "house style",
-      "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
-      "evidence": "On the audit corpus: 40 hits in 8/18 human documents, 0 in 0/18 AI documents.",
-      "note": "Ships on wherever this set is loaded. If a document should keep its em dashes, ignore the rule for that project with --ignore em-dash or an ignore entry in slop.json, which is a decision someone makes once, not per finding."
+      }
     },
     {
       "id": "leverage",
       "name": "leverage",
-      "kind": "regex",
-      "pattern": "\\bleverage(s|d)?\\b(?!\\s+(?:ratio|effect|point))",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bleverage(s|d)?\\b(?!\\s+(?:ratio|effect|point))",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: leverage.",
       "suggest": "Write \"use\".",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents.",
       "tests": {
         "hit": [
           "We leverage the cache to cut latency."
@@ -48,19 +61,24 @@
         "miss": [
           "The leverage ratio held through the quarter."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents."
+      }
     },
     {
       "id": "navigate-complexities",
       "name": "navigate complexities",
-      "kind": "regex",
-      "pattern": "\\bnavigat(?:e|es|ing)\\s+the\\s+complexit(?:y|ies)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bnavigat(?:e|es|ing)\\s+the\\s+complexit(?:y|ies)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: navigate complexities.",
       "suggest": "Name the task: handle it, work through it.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The team navigates the complexities of migration."
@@ -68,19 +86,24 @@
         "miss": [
           "We navigate the menu with arrow keys."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "comprehensive-guide",
       "name": "comprehensive guide",
-      "kind": "regex",
-      "pattern": "\\b(?:comprehensive|complete|ultimate|definitive)\\s+guide\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:comprehensive|complete|ultimate|definitive)\\s+guide\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: comprehensive guide.",
       "suggest": "Drop it. A good guide proves itself.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This comprehensive guide covers deployment."
@@ -88,19 +111,24 @@
         "miss": [
           "The guide covers deployment."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "transformative",
       "name": "transformative",
-      "kind": "regex",
-      "pattern": "\\btransformative\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\btransformative\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: transformative.",
       "suggest": "Show the change concretely.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The release was transformative for the team."
@@ -108,19 +136,24 @@
         "miss": [
           "The transformation completed overnight."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "cutting-edge",
       "name": "cutting edge",
-      "kind": "regex",
-      "pattern": "\\bcutting[-\\s]+edge\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bcutting[-\\s]+edge\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: cutting edge.",
       "suggest": "Say what is actually new.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Our cutting edge platform ships today."
@@ -128,19 +161,24 @@
         "miss": [
           "The cutting tool was sharp."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "empower",
       "name": "empower",
-      "kind": "regex",
-      "pattern": "\\bempower(?:s|ed|ing)?\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bempower(?:s|ed|ing)?\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: empower.",
       "suggest": "Say what it lets people do.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The dashboard empowers teams to decide faster."
@@ -148,19 +186,24 @@
         "miss": [
           "Power was restored at noon."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "unlock-value",
       "name": "unlock value",
-      "kind": "regex",
-      "pattern": "\\bunlock(?:s|ed|ing)?\\s+(?:the\\s+|its\\s+|their\\s+|new\\s+|real\\s+|full\\s+)?(?:value|potential|insights?|possibilit(?:y|ies)|growth)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bunlock(?:s|ed|ing)?\\s+(?:the\\s+|its\\s+|their\\s+|new\\s+|real\\s+|full\\s+)?(?:value|potential|insights?|possibilit(?:y|ies)|growth)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: unlock value.",
       "suggest": "Say what becomes possible.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This unlocks the value hidden in your logs."
@@ -168,19 +211,24 @@
         "miss": [
           "She unlocked the door at seven."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "harness",
       "name": "harness",
-      "kind": "regex",
-      "pattern": "\\bharness(?:es|ed|ing)?\\s+the\\s+(?:power|potential|strength|capabilit(?:y|ies))\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bharness(?:es|ed|ing)?\\s+the\\s+(?:power|potential|strength|capabilit(?:y|ies))\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: harness.",
       "suggest": "Say what it uses and for what.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "We harness the power of the GPU."
@@ -188,19 +236,24 @@
         "miss": [
           "The horse harness needed repair."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "streamline",
       "name": "streamline",
-      "kind": "regex",
-      "pattern": "\\bstreamlin(?:e|es|ed|ing)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bstreamlin(?:e|es|ed|ing)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: streamline.",
       "suggest": "Say what was removed.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The change streamlines onboarding."
@@ -208,19 +261,24 @@
         "miss": [
           "The stream lined up with the bank."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "proactive",
       "name": "proactive",
-      "kind": "regex",
-      "pattern": "\\bproactive(?:ly)?\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bproactive(?:ly)?\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: proactive.",
       "suggest": "Say what you do and when.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "We proactively monitor the queue."
@@ -228,19 +286,24 @@
         "miss": [
           "The reaction was immediate."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "feel-free",
       "name": "feel free",
-      "kind": "regex",
-      "pattern": "\\b(?:feel\\s+free\\s+to|do(?:n['’]t|\\s+not)\\s+hesitate\\s+to)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:feel\\s+free\\s+to|do(?:n['’]t|\\s+not)\\s+hesitate\\s+to)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: feel free.",
       "suggest": "Delete it. Just say the thing.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Feel free to reach out with questions."
@@ -248,19 +311,25 @@
         "miss": [
           "The team felt free of the deadline."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "end-of-the-day",
       "name": "end of the day",
-      "kind": "regex",
-      "pattern": "(?:^|[.!?]\\s+|\\n)At\\s+the\\s+end\\s+of\\s+the\\s+day\\s*,",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|[.!?]\\s+|\\n)At\\s+the\\s+end\\s+of\\s+the\\s+day\\s*,",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: end of the day.",
       "suggest": "Cut it, or say what actually decides the matter.",
+      "note": "narrowed to the sentence-initial discourse marker; the literal time of day is not a tell",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "At the end of the day, latency is what users feel."
@@ -269,20 +338,24 @@
           "The batch runs at the end of the day.",
           "We reconcile the ledger at the end of the day and go home."
         ]
-      },
-      "note": "narrowed to the sentence-initial discourse marker; the literal time of day is not a tell",
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "in-conclusion",
       "name": "in conclusion",
-      "kind": "regex",
-      "pattern": "(?:^|[.!?]\\s+|\\n)(?:In\\s+conclusion|To\\s+conclude|In\\s+summary|To\\s+sum\\s+up)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|[.!?]\\s+|\\n)(?:In\\s+conclusion|To\\s+conclude|In\\s+summary|To\\s+sum\\s+up)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: in conclusion.",
       "suggest": "Delete it and write the conclusion.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "In conclusion, the migration succeeded."
@@ -290,19 +363,24 @@
         "miss": [
           "The conclusion of the proof follows."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "dive-in",
       "name": "dive in",
-      "kind": "regex",
-      "pattern": "\\blet['’]?s\\s+(?:dive|jump)\\s+(?:in|into)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\blet['’]?s\\s+(?:dive|jump)\\s+(?:in|into)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: dive in.",
       "suggest": "Start with the thing itself.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Let's dive into the architecture."
@@ -310,19 +388,24 @@
         "miss": [
           "The diver went into the water."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "when-it-comes-to",
       "name": "when it comes to",
-      "kind": "regex",
-      "pattern": "\\bwhen\\s+it\\s+comes\\s+to\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bwhen\\s+it\\s+comes\\s+to\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: when it comes to.",
       "suggest": "Name the subject directly.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "When it comes to latency, caching helps."
@@ -330,19 +413,24 @@
         "miss": [
           "The invoice comes to sixty euro."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "game-changer",
       "name": "game changer",
-      "kind": "regex",
-      "pattern": "\\bgame[-\\s]+chang(?:er|ing)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bgame[-\\s]+chang(?:er|ing)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: game changer.",
       "suggest": "Say what changed and for whom.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The new index is a game changer."
@@ -350,19 +438,24 @@
         "miss": [
           "The game changed at half time."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "top-notch",
       "name": "top notch",
-      "kind": "regex",
-      "pattern": "\\btop[-\\s]+notch\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\btop[-\\s]+notch\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: top notch.",
       "suggest": "Say what makes it good.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The support team is top notch."
@@ -370,19 +463,24 @@
         "miss": [
           "The notch was cut at the top."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "treasure-trove",
       "name": "treasure trove",
-      "kind": "regex",
-      "pattern": "\\btreasure\\s+trove\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\btreasure\\s+trove\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: treasure trove.",
       "suggest": "Say what is in it.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The logs are a treasure trove of detail."
@@ -390,19 +488,24 @@
         "miss": [
           "They found treasure in the wreck."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "embark-on",
       "name": "embark on",
-      "kind": "regex",
-      "pattern": "\\bembark(?:s|ed|ing)?\\s+(?:on|upon)\\s+(?:a|an|this|the|our)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bembark(?:s|ed|ing)?\\s+(?:on|upon)\\s+(?:a|an|this|the|our)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: embark on.",
       "suggest": "Say what you are starting.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "We embark on a journey of migration."
@@ -410,19 +513,24 @@
         "miss": [
           "Passengers embark at gate four."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "foster-a",
       "name": "foster a",
-      "kind": "regex",
-      "pattern": "\\bfoster(?:s|ed|ing)?\\s+(?:a|an)\\s+(?:sense|culture|environment|spirit|climate)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bfoster(?:s|ed|ing)?\\s+(?:a|an)\\s+(?:sense|culture|environment|spirit|climate)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: foster a.",
       "suggest": "Say what people actually do.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The ritual fosters a culture of ownership."
@@ -430,19 +538,26 @@
         "miss": [
           "They foster two children."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "moreover",
       "name": "moreover",
-      "kind": "regex",
-      "pattern": "(?:^|[.!?]\\s+|\\n)(?:Moreover|Furthermore|Additionally|Notably)\\s*,",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|[.!?]\\s+|\\n)(?:Moreover|Furthermore|Additionally|Notably)\\s*,",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: moreover.",
       "suggest": "Join the sentences, or delete the connective.",
+      "note": "Off by default: Fired on 4 of 18 human documents and 0 AI ones: \"Moreover,\" and \"Additionally,\" are ordinary formal English. Select it by id to run it.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
+      "default": "off",
       "tests": {
         "hit": [
           "The build is faster. Moreover, it uses less memory."
@@ -450,21 +565,24 @@
         "miss": [
           "The moreover clause was struck."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "note": "Off by default: Fired on 4 of 18 human documents and 0 AI ones: \"Moreover,\" and \"Additionally,\" are ordinary formal English. Select it by id to run it."
+      }
     },
     {
       "id": "elevate",
       "name": "elevate",
-      "kind": "regex",
-      "pattern": "\\belevat(?:e|es|ed|ing)\\s+(?:the|your|our|their)\\s+(?:\\w+\\s+){0,2}(?:experience|game|brand|standards?|conversation|discourse)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\belevat(?:e|es|ed|ing)\\s+(?:the|your|our|their)\\s+(?:\\w+\\s+){0,2}(?:experience|game|brand|standards?|conversation|discourse)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: elevate.",
       "suggest": "Say what improves and by how much.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This elevates the customer experience."
@@ -473,19 +591,25 @@
           "The elevator reached the top floor.",
           "The elevator reached the top floor."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "robust",
       "name": "robust",
-      "kind": "regex",
-      "pattern": "\\brobust\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\brobust\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: robust.",
       "suggest": "Name the specific strength: what does it survive?",
+      "note": "single ordinary word; expect false positives in engineering prose",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 2 in 1/18 AI documents.",
       "tests": {
         "hit": [
           "We built a robust pipeline."
@@ -493,20 +617,26 @@
         "miss": [
           "Robustness was never the concern."
         ]
-      },
-      "note": "single ordinary word; expect false positives in engineering prose",
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 2 in 1/18 AI documents."
+      }
     },
     {
       "id": "crucial",
       "name": "crucial",
-      "kind": "regex",
-      "pattern": "\\bcrucial\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bcrucial\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: crucial.",
       "suggest": "Say why it matters, or drop the intensifier.",
+      "note": "single ordinary word; expect false positives Off by default: Fired on human prose and not on AI prose. The bare word is too common to carry the tell on its own. Select it by id to run it.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "default": "off",
       "tests": {
         "hit": [
           "Caching is crucial for latency."
@@ -514,21 +644,24 @@
         "miss": [
           "The crux of the argument is simpler."
         ]
-      },
-      "note": "single ordinary word; expect false positives Off by default: Fired on human prose and not on AI prose. The bare word is too common to carry the tell on its own. Select it by id to run it.",
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off"
+      }
     },
     {
       "id": "realm",
       "name": "realm",
-      "kind": "regex",
-      "pattern": "\\bin\\s+the\\s+realm\\s+of\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bin\\s+the\\s+realm\\s+of\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Flagged by slop-gate as an AI-writing tell: realm.",
       "suggest": "Name the field plainly.",
+      "from": "slop-gate",
+      "source": "https://github.com/hwajongpark/slop-gate",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "In the realm of distributed systems, clocks lie."
@@ -536,19 +669,24 @@
         "miss": [
           "The realm was ruled from the north."
         ]
-      },
-      "from": "slop-gate",
-      "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "genuinely",
       "name": "“genuinely”",
-      "kind": "regex",
-      "pattern": "\\bgenuinely\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bgenuinely\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The intensifier models reach for to signal sincerity. Fifty-three times the human rate, and the highest-ratio tell measured. Measured at ×53 vs humans.",
       "suggest": "Delete it. If the claim needs the word, the claim is not carrying itself.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 5 in 4/18 AI documents.",
       "tests": {
         "hit": [
           "The thock with each press is genuinely addictive.",
@@ -557,19 +695,24 @@
         "miss": [
           "The genuine article costs twice as much."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 5 in 4/18 AI documents."
+      }
     },
     {
       "id": "that-said",
       "name": "“That said, …”",
-      "kind": "regex",
-      "pattern": "(?:^|[.!?]\\s+|\\n)That\\s+said\\s*,",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|[.!?]\\s+|\\n)That\\s+said\\s*,",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The pivot connective used to perform balance, at nineteen times the human rate. Measured at ×19 vs humans.",
       "suggest": "Cut it, or make the contrast explicit.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The salt preserves it. That said, there are practical limits."
@@ -577,19 +720,24 @@
         "miss": [
           "Everything that said otherwise was wrong."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "the-real-question",
       "name": "“the real question is …”",
-      "kind": "regex",
-      "pattern": "\\bthe\\s+real\\s+(?:question|issue|problem|reason|answer|story|risk)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthe\\s+real\\s+(?:question|issue|problem|reason|answer|story|risk)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Reframing as insight: announcing what the real issue is, rather than stating it. Measured at ×30 vs humans.",
       "suggest": "State the issue. Calling it the real one adds nothing.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The real question to ask yourself is why you want to learn.",
@@ -598,19 +746,24 @@
         "miss": [
           "A real question deserves a real answer."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "heres-what",
       "name": "“here's what actually happened”",
-      "kind": "regex",
-      "pattern": "\\b(?:here|there)(?:['’]s|\\s+is)\\s+what\\s+(?:surprised|struck|got|actually|really|nobody|no\\s+one|I)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:here|there)(?:['’]s|\\s+is)\\s+what\\s+(?:surprised|struck|got|actually|really|nobody|no\\s+one|I)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The staged reveal, promising a payoff before delivering one. Measured at ×18 vs humans.",
       "suggest": "Deliver the point without announcing it first.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "But here's what surprised me most: the first year was different."
@@ -618,19 +771,24 @@
         "miss": [
           "Here is what you asked for."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "one-of-those",
       "name": "“one of those X”",
-      "kind": "regex",
-      "pattern": "\\b(?:is|was|are|were)\\s+one\\s+of\\s+those\\s+(?:[\\w-]+\\s+){0,2}(?:moments?|cases?|situations?|things?|days?|problems?|bugs?|projects?|posts?|places?)\\b|\\bone\\s+of\\s+those\\s+[\\w-]+\\s+where\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|was|are|were)\\s+one\\s+of\\s+those\\s+(?:[\\w-]+\\s+){0,2}(?:moments?|cases?|situations?|things?|days?|problems?|bugs?|projects?|posts?|places?)\\b|\\bone\\s+of\\s+those\\s+[\\w-]+\\s+where\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "False familiarity: filing the topic into a recognisable genre of situations the reader is assumed to share. Measured at ×12 vs humans.",
       "suggest": "Describe this case rather than the genre.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This is one of those rare boring-is-good moments.",
@@ -639,19 +797,24 @@
         "miss": [
           "She was one of those who stayed."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "feels-like",
       "name": "“(this) feels like”",
-      "kind": "regex",
-      "pattern": "\\b(?:it|this|that|which)\\s+feels\\s+like\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:it|this|that|which)\\s+feels\\s+like\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Hedging with vibes: reporting an impression where a human states an opinion or a fact. Measured at ×12 vs humans.",
       "suggest": "State the opinion, or the fact.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This feels like a step change for the team.",
@@ -660,19 +823,24 @@
         "miss": [
           "The fabric feels like linen."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "curious-engagement",
       "name": "“curious what others think”",
-      "kind": "regex",
-      "pattern": "\\b(?:I['’]m\\s+)?curious\\s+(?:what|how|whether|if)\\s+(?:others|you|anyone|people)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:I['’]m\\s+)?curious\\s+(?:what|how|whether|if)\\s+(?:others|you|anyone|people)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The engagement-bait closer, soliciting replies rather than ending. Measured at ×10 vs humans.",
       "suggest": "End on the point. If you want replies, ask something specific.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Curious what others think about this approach."
@@ -680,19 +848,24 @@
         "miss": [
           "I was curious how the parser handled it."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "the-actual",
       "name": "“the actual X”",
-      "kind": "regex",
-      "pattern": "\\bthe\\s+actual\\s+[\\w-]+\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthe\\s+actual\\s+[\\w-]+\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Emphatic “actual” used to signal that the real thing is finally being named. Measured at ×8.2 vs humans.",
       "suggest": "Name it without the emphasis.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The actual failure mode is subtler than that."
@@ -700,19 +873,24 @@
         "miss": [
           "Actual costs came in under budget."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "privilege-of",
       "name": "“the privilege of …”",
-      "kind": "regex",
-      "pattern": "\\bthe\\s+privilege\\s+of\\s+\\w+ing\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthe\\s+privilege\\s+of\\s+\\w+ing\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Announced gratitude. Not observed in the human baseline at all. Measured at only in AI.",
       "suggest": "Say what you did and with whom.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "I've had the privilege of working alongside talented people."
@@ -720,19 +898,24 @@
         "miss": [
           "Privilege escalation was the root cause."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "taught-me",
       "name": "“X taught me Y”",
-      "kind": "regex",
-      "pattern": "\\btaught\\s+me\\s+(?:something|a\\s+lot|one\\s+thing|that|this)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\btaught\\s+me\\s+(?:something|a\\s+lot|one\\s+thing|that|this)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The lesson-extraction move that converts an anecdote into a moral. Measured at only in AI.",
       "suggest": "Report what happened and let the reader draw the lesson.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Closing those deals taught me something important."
@@ -740,19 +923,24 @@
         "miss": [
           "My teacher taught me French."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "the-lesson-q",
       "name": "“The lesson? …”",
-      "kind": "regex",
-      "pattern": "(?:^|\\n|[.!?]\\s+)(?:\\*\\*)?The\\s+(?:real\\s+)?(?:lesson|takeaway|wins?|kicker|upshot)\\??(?:\\*\\*)?\\s*[?:]",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|\\n|[.!?]\\s+)(?:\\*\\*)?The\\s+(?:real\\s+)?(?:lesson|takeaway|wins?|kicker|upshot)\\??(?:\\*\\*)?\\s*[?:]",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The rhetorical-question header that packages a conclusion. Measured at construct.",
       "suggest": "State the conclusion as a sentence.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The lesson? Ship earlier.",
@@ -761,19 +949,24 @@
         "miss": [
           "The lesson plan covered three topics."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "not-because-because",
       "name": "“Not because X. Because Y.”",
-      "kind": "regex",
-      "pattern": "\\bNot\\s+because\\s+[^.!?\\n]{2,60}[.!?]\\s+Because\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bNot\\s+because\\s+[^.!?\\n]{2,60}[.!?]\\s+Because\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The negation-then-reason couplet, split across two sentences for cadence. Measured at construct.",
       "suggest": "Give the reason once.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Not because I'm done. Because I'm finally starting."
@@ -781,19 +974,24 @@
         "miss": [
           "We stopped, not because it failed but because it finished."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "youre-not-alone",
       "name": "“You're not alone”",
-      "kind": "regex",
-      "pattern": "\\byou(?:['’]re|\\s+are)\\s+not\\s+(?:imagining\\s+it|crazy|alone)\\s*(?=[.,!?:;—–]|$)",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\byou(?:['’]re|\\s+are)\\s+not\\s+(?:imagining\\s+it|crazy|alone)\\s*(?=[.,!?:;—–]|$)",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Pre-emptive reassurance addressed to a reader who did not ask for it. Measured at only in AI.",
       "suggest": "Cut it. State the situation.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "You're not imagining it: hiring really has slowed.",
@@ -802,19 +1000,38 @@
         "miss": [
           "You are not alone in the building after six."
         ]
-      },
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "rather-than",
       "name": "“rather than”, repeatedly",
-      "kind": "density",
-      "pattern": "\\brather\\s+than\\b",
-      "flags": "g",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\brather\\s+than\\b",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 1.0,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5,
+          "matches": 2
+        }
+      },
       "description": "The 2026 flagship tell, and a rate rather than a phrase. One \"rather than\" is ordinary English. Measured over 36 matched documents: no human document contained more than one, while AI documents ran to four, up to 4.63 per 1000 words. This needs both two occurrences and a rate above one per 1000 words before it says anything.",
       "suggest": "Vary them: \"instead of\" where it fits, a turned sentence where that reads better. Do not replace every one with the same substitute, which moves the tic rather than removing it.",
+      "note": "Was a per-occurrence rule and fired 45 times on this repository, where \"rather than\" is ordinary technical English. The tell was always the rate: sloptells measured a ratio, not a phrase. Some occurrences are the right word and should stand; that is a judgement to make per sentence while bringing the rate down, not a reason to leave the rate alone.",
+      "from": "sloptells",
+      "source": "https://sloptells.com/tells.md",
+      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents.",
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "No document of eighteen contained more than one occurrence. Highest rate 0.91.",
+        "ai": "Up to four occurrences and 4.63 per 1000 words. Ten of eighteen at or above 1.0.",
+        "tune": "Engineering documentation uses this ordinarily; this repository sat at 2.6 while reading naturally. Raise it or ignore the rule for prose that compares things for a living."
+      },
       "tests": {
         "hit": [
           "The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. The pipeline reads each record and validates it against the shared schema. We chose Postgres rather than a document store because the reporting side needs joins. The worker retries rather than dropping the message on the floor. Operators are paged rather than emailed when the queue backs up overnight. The schema is versioned rather than migrated in place, which we learned the hard way. Failures are logged rather than swallowed, and the log is rotated every night. "
@@ -822,32 +1039,24 @@
         "miss": [
           "The pipeline reads each record and validates it against the shared schema, which both teams can edit and which has drifted twice this year. We chose Postgres rather than a document store, because the reporting side needs joins and nobody wanted to write them by hand. The worker retries; it does not drop the message. Operators are paged when the queue backs up, not emailed, because email is where alerts go to be ignored. The schema is versioned, and migrating in place is something we gave up on after the second outage. Failures are logged and the log rotates nightly, so a bad afternoon is still readable the next morning. Records are batched for throughput, which matters more than latency here. The retry budget is fixed instead of exponential, because a fixed number is easier to reason about at three in the morning. An operator reviews the dead letter queue each Friday, now that the volume has dropped. Most of what is in there comes from one upstream partner who has never answered a ticket. We reject their malformed records at the edge now, which cut the volume by ninety percent in a fortnight. The runbook still says to check it daily and nobody has updated the page. The alert threshold is stale too, set for a volume we stopped seeing in March. We lowered it once, forgot about it, and the queue has run clean since. Eleven records are sitting in the dead letter queue this morning, all from the same source. We suspect a date parsing bug on their side and have stopped guessing about it."
         ]
-      },
-      "note": "Was a per-occurrence rule and fired 45 times on this repository, where \"rather than\" is ordinary technical English. The tell was always the rate: sloptells measured a ratio, not a phrase. Some occurrences are the right word and should stand; that is a judgement to make per sentence while bringing the rate down, not a reason to leave the rate alone.",
-      "from": "sloptells",
-      "source": "https://sloptells.com/tells.md",
-      "evidence": "On the audit corpus: 2 hits in 2/18 human documents, 24 in 10/18 AI documents.",
-      "params": {
-        "min": 1.0,
-        "minMatches": 2,
-        "minWords": 250,
-        "minSentences": 5
-      },
-      "reference": {
-        "unit": "per 1000 words",
-        "human": "No document of eighteen contained more than one occurrence. Highest rate 0.91.",
-        "ai": "Up to four occurrences and 4.63 per 1000 words. Ten of eighteen at or above 1.0.",
-        "tune": "Engineering documentation uses this ordinarily; this repository sat at 2.6 while reading naturally. Raise it or ignore the rule for prose that compares things for a living."
       }
     },
     {
       "id": "not-x-but-y",
       "name": "“Not X but Y” (unqualified)",
-      "kind": "regex",
-      "pattern": "\\bnot\\s+(?:a|an|the|about|in|of|by|for|with|from)\\s+[^.!?\\n;]{2,50}?,?\\s+but\\s+(?:rather\\s+)?(?:a|an|the|about|in|of|by|for|with|from)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bnot\\s+(?:a|an|the|about|in|of|by|for|with|from)\\s+[^.!?\\n;]{2,50}?,?\\s+but\\s+(?:rather\\s+)?(?:a|an|the|about|in|of|by|for|with|from)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The negation flip without a just/only/merely qualifier: “not a tool but a partner”. Slop Score weights this construction at 25% of its entire score, on its own, separate from word lists.",
       "suggest": "Say what it is. The negated half is usually a straw man nobody proposed.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 4 in 3/18 AI documents.",
       "tests": {
         "hit": [
           "It is not a tool but a partner.",
@@ -861,19 +1070,24 @@
           "She did not buy the car but rented one instead.",
           "We are not in a hurry but we should start soon."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 4 in 3/18 AI documents."
+      }
     },
     {
       "id": "extends-far-beyond",
       "name": "“Extends far beyond”",
-      "kind": "regex",
-      "pattern": "\\b(?:extend|extends|extended|extending|go|goes|going|went|reach|reaches|reaching|stretch|stretches|move|moves|moving)\\s+(?:far\\s+|well\\s+)?beyond\\s+(?:mere|simple|simply|simplistic|just|the\\s+surface|surface[- ]level)\\b|\\b(?:extend|extends|extended|extending|go|goes|going|went)\\s+far\\s+beyond\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:extend|extends|extended|extending|go|goes|going|went|reach|reaches|reaching|stretch|stretches|move|moves|moving)\\s+(?:far\\s+|well\\s+)?beyond\\s+(?:mere|simple|simply|simplistic|just|the\\s+surface|surface[- ]level)\\b|\\b(?:extend|extends|extended|extending|go|goes|going|went)\\s+far\\s+beyond\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Significance inflation. Seventeen variants of this construction appear in the essay-domain trigram list, making it the single most repeated shape there.",
       "suggest": "Say what it covers. “Far beyond” is doing the work a specific noun should do.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The impact extends far beyond the engineering team.",
@@ -886,19 +1100,24 @@
           "The garden goes beyond the fence.",
           "Sales grew beyond our forecast."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "another-critical",
       "name": "“Another critical aspect”",
-      "kind": "regex",
-      "pattern": "\\banother\\s+(?:critical|crucial|key|important|significant|essential|vital)\\s+(?:aspect|component|factor|element|consideration|dimension|piece|part|area)\\b|\\banother\\s+layer\\s+of\\s+complexity\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\banother\\s+(?:critical|crucial|key|important|significant|essential|vital)\\s+(?:aspect|component|factor|element|consideration|dimension|piece|part|area)\\b|\\banother\\s+layer\\s+of\\s+complexity\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The section-transition tic that stitches paragraphs together without saying how they relate.",
       "suggest": "Name the relationship. If the next point is a consequence, a caveat or a contrast, say which.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Another critical aspect is monitoring.",
@@ -909,19 +1128,24 @@
           "We shipped another critical fix on Friday.",
           "There is another aspect to consider."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "essay-announce",
       "name": "The essay announces itself",
-      "kind": "regex",
-      "pattern": "\\bthis\\s+(?:essay|article|post|piece|paper|report|guide|section)\\s+(?:will\\s+)?(?:explores?|examines?|delves?|investigates?|discusses?|argues?|aims?\\s+to|seeks?\\s+to|sets?\\s+out\\s+to)\\b|\\bin\\s+this\\s+(?:essay|article|post|piece)\\s*,",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthis\\s+(?:essay|article|post|piece|paper|report|guide|section)\\s+(?:will\\s+)?(?:explores?|examines?|delves?|investigates?|discusses?|argues?|aims?\\s+to|seeks?\\s+to|sets?\\s+out\\s+to)\\b|\\bin\\s+this\\s+(?:essay|article|post|piece)\\s*,",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Prose that opens by describing itself. Three inflections of “this essay explores” survive into the essay-domain trigram list.",
       "suggest": "Delete the sentence and start with the argument. The reader can see what they are reading.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "This essay explores the causes of the collapse.",
@@ -933,19 +1157,24 @@
           "This essay is due Friday.",
           "The article explores a cave system."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "valuable-insights",
       "name": "“Provides valuable insights”",
-      "kind": "regex",
-      "pattern": "\\b(?:provide|provides|provided|offer|offers|offered|yield|yields|give|gives|gain|gains|gaining|deliver|delivers)\\s+(?:us\\s+|you\\s+)?(?:a\\s+|some\\s+|valuable\\s+|useful\\s+|deeper\\s+|key\\s+|important\\s+)*insights?\\b|\\b(?:gain|gains|gaining|develop|develops)\\s+(?:a\\s+)?(?:deeper|better|richer|nuanced)\\s+understanding\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:provide|provides|provided|offer|offers|offered|yield|yields|give|gives|gain|gains|gaining|deliver|delivers)\\s+(?:us\\s+|you\\s+)?(?:a\\s+|some\\s+|valuable\\s+|useful\\s+|deeper\\s+|key\\s+|important\\s+)*insights?\\b|\\b(?:gain|gains|gaining|develop|develops)\\s+(?:a\\s+)?(?:deeper|better|richer|nuanced)\\s+understanding\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Claiming the reader learned something instead of telling them what. Both halves recur across the essay trigram list.",
       "suggest": "State the insight. If it will not fit in a sentence it was not one.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The survey provides valuable insights into churn.",
@@ -956,19 +1185,24 @@
           "Her insight was that the lock was held too long.",
           "He offered to help with the migration."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "multi-pronged",
       "name": "“Requires a multi-pronged approach”",
-      "kind": "regex",
-      "pattern": "\\b(?:requires?|demands?|needs?|calls?\\s+for|takes?|warrants?)\\s+(?:a\\s+|an\\s+)?(?:multi[- ]?(?:faceted|pronged|layered|dimensional)|holistic|comprehensive|nuanced|forward[- ]thinking|two[- ]pronged|three[- ]pronged)\\s+(?:approach|strategy|solution|response|effort|framework)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:requires?|demands?|needs?|calls?\\s+for|takes?|warrants?)\\s+(?:a\\s+|an\\s+)?(?:multi[- ]?(?:faceted|pronged|layered|dimensional)|holistic|comprehensive|nuanced|forward[- ]thinking|two[- ]pronged|three[- ]pronged)\\s+(?:approach|strategy|solution|response|effort|framework)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The non-answer that concludes a problem statement by declining to pick anything.",
       "suggest": "List the prongs. If there are three, name them; if there is one, say so.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Addressing this requires a multi-faceted approach.",
@@ -979,19 +1213,24 @@
           "The migration requires a database backup.",
           "This needs a second reviewer."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "turning-point",
       "name": "“Marked a significant turning point”",
-      "kind": "regex",
-      "pattern": "\\bmark(?:s|ed|ing)?\\s+(?:a\\s+|an\\s+|the\\s+)?(?:significant|major|pivotal|critical|key|important|decisive|watershed)?\\s*(?:turning\\s+point|inflection\\s+point|pivotal\\s+moment|watershed\\s+moment|sea\\s+change)\\b|\\b(?:a|the)\\s+(?:significant|major|pivotal|critical|decisive|watershed)\\s+turning\\s+point\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bmark(?:s|ed|ing)?\\s+(?:a\\s+|an\\s+|the\\s+)?(?:significant|major|pivotal|critical|key|important|decisive|watershed)?\\s*(?:turning\\s+point|inflection\\s+point|pivotal\\s+moment|watershed\\s+moment|sea\\s+change)\\b|\\b(?:a|the)\\s+(?:significant|major|pivotal|critical|decisive|watershed)\\s+turning\\s+point\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Retrospective grandeur applied to whatever the paragraph just described.",
       "suggest": "Say what changed and when. Let the reader decide whether it was a turning point.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The release marked a significant turning point for the project.",
@@ -1002,19 +1241,24 @@
           "The road turns left at the point.",
           "Mark reviewed the deployment."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "closer-look",
       "name": "“A closer examination reveals”",
-      "kind": "regex",
-      "pattern": "\\b(?:a\\s+)?(?:closer|deeper|more\\s+careful)\\s+(?:look|examination|inspection|analysis|reading)\\s+(?:at\\s+[^.!?\\n;]{1,40}\\s+)?reveals?\\b|\\bupon\\s+(?:closer|further)\\s+(?:examination|inspection|reflection)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:a\\s+)?(?:closer|deeper|more\\s+careful)\\s+(?:look|examination|inspection|analysis|reading)\\s+(?:at\\s+[^.!?\\n;]{1,40}\\s+)?reveals?\\b|\\bupon\\s+(?:closer|further)\\s+(?:examination|inspection|reflection)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Teasing the finding in a clause before delivering it, which costs a sentence and adds nothing.",
       "suggest": "Report the finding. The reader does not need to be told you looked closely.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "A closer examination reveals a second bottleneck.",
@@ -1025,19 +1269,24 @@
           "Take a closer look at line 40.",
           "The examination revealed nothing unusual."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "inextricably-linked",
       "name": "“Inextricably linked”",
-      "kind": "regex",
-      "pattern": "\\b(?:inextricably|intrinsically|inherently|fundamentally)\\s+(?:linked|tied|bound|connected|intertwined)\\b|\\b(?:deeply|closely|tightly)\\s+intertwined\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:inextricably|intrinsically|inherently|fundamentally)\\s+(?:linked|tied|bound|connected|intertwined)\\b|\\b(?:deeply|closely|tightly)\\s+intertwined\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "A high-register way of saying “related” that adds a syllable count instead of a claim.",
       "suggest": "Say how they are linked, and in which direction.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Pay and retention are inextricably linked.",
@@ -1047,19 +1296,26 @@
           "The cables are linked at the junction box.",
           "The accounts are connected to one login."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "stock-metaphor",
       "name": "Stock essay metaphors",
-      "kind": "regex",
-      "pattern": "\\b(?:a\\s+|the\\s+)?double[- ]edged\\s+sword\\b|\\blevel(?:s|ed|led|ing|ling)?\\s+the\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?level\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?delicate\\s+balancing\\s+act\\b|\\b(?:a\\s+|the\\s+)?virtuous\\s+cycle\\b|\\bfertile\\s+ground\\s+for\\b|\\b(?:a\\s+|the\\s+)?driving\\s+force\\s+behind\\b|\\bone[- ]size[- ]fits[- ]all\\b|\\b(?:a\\s+|the\\s+)?cautionary\\s+tale\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:a\\s+|the\\s+)?double[- ]edged\\s+sword\\b|\\blevel(?:s|ed|led|ing|ling)?\\s+the\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?level\\s+playing\\s+field\\b|\\b(?:a\\s+|the\\s+)?delicate\\s+balancing\\s+act\\b|\\b(?:a\\s+|the\\s+)?virtuous\\s+cycle\\b|\\bfertile\\s+ground\\s+for\\b|\\b(?:a\\s+|the\\s+)?driving\\s+force\\s+behind\\b|\\bone[- ]size[- ]fits[- ]all\\b|\\b(?:a\\s+|the\\s+)?cautionary\\s+tale\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The fixed stock of metaphors that essay-shaped generation reaches for: double-edged sword, level playing field, virtuous cycle, driving force behind, one-size-fits-all.",
       "suggest": "Drop the metaphor and state the mechanism, or find one that belongs to this subject.",
+      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "default": "off",
       "tests": {
         "hit": [
           "Automation is a double-edged sword.",
@@ -1071,21 +1327,24 @@
           "He balanced the tray with one hand.",
           "The sword was mounted above the fireplace."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it."
+      }
     },
     {
       "id": "moral-uplift",
       "name": "Moral-uplift closers",
-      "kind": "regex",
-      "pattern": "\\b(?:challenge|challenges|challenging|question|questions|disrupt|disrupts)\\s+the\\s+status\\s+quo\\b|\\bconfront(?:s|ed|ing)?\\s+(?:uncomfortable|hard|difficult|inconvenient)\\s+truths?\\b|\\bfoster(?:s|ed|ing)?\\s+a\\s+sense\\s+of\\s+(?:community|belonging|shared\\s+\\w+|purpose)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:challenge|challenges|challenging|question|questions|disrupt|disrupts)\\s+the\\s+status\\s+quo\\b|\\bconfront(?:s|ed|ing)?\\s+(?:uncomfortable|hard|difficult|inconvenient)\\s+truths?\\b|\\bfoster(?:s|ed|ing)?\\s+a\\s+sense\\s+of\\s+(?:community|belonging|shared\\s+\\w+|purpose)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The uplift that closes a section without committing to anything: challenge the status quo, confront uncomfortable truths, foster a sense of belonging.",
       "suggest": "Cut it, or name who has to do what.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "We must challenge the status quo.",
@@ -1096,19 +1355,25 @@
           "The status quo held for a decade.",
           "The truth was simpler than that."
         ]
-      },
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "each-a",
       "name": "“…, each a …” appositive cascade",
-      "kind": "regex",
-      "pattern": ",\\s+each\\s+(?:one\\s+)?an?\\s+\\w+(?:\\s+\\w+)?\\s+(?:to|into|of|in|for|toward|towards)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": ",\\s+each\\s+(?:one\\s+)?an?\\s+\\w+(?:\\s+\\w+)?\\s+(?:to|into|of|in|for|toward|towards)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The appositive flourish that turns a list into a cascade of significance. One of only three regexes the antislop sampler ships, alongside not-X-but-Y.",
       "suggest": "End the sentence after the list, or say what each item actually does.",
+      "note": "No part-of-speech information is available here, so an appositive with a genuinely descriptive noun can still match. Kept because the construction is distinctive enough to be worth a look.",
+      "from": "antislop",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Twelve panels, each a window into another world.",
@@ -1118,20 +1383,24 @@
           "We reviewed the files, each a few hundred lines long.",
           "Give each a chance to finish."
         ]
-      },
-      "note": "No part-of-speech information is available here, so an appositive with a genuinely descriptive noun can still match. Kept because the construction is distinctive enough to be worth a look.",
-      "from": "antislop",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "reveal-shape",
       "name": "Reveal-shape tell",
-      "kind": "regex",
-      "pattern": "\\b(?:what|the thing)\\s+(?:nobody|no\\s+one|most\\s+people|everyone)\\s+(?:tells?|knows?|gets?\\s+wrong|miss(?:es)?|overlooks?|talks?\\s+about|does)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:what|the thing)\\s+(?:nobody|no\\s+one|most\\s+people|everyone)\\s+(?:tells?|knows?|gets?\\s+wrong|miss(?:es)?|overlooks?|talks?\\s+about|does)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The \"here's the hidden truth people get wrong\" framing, which survives rewording because it is a shape rather than a phrase.",
       "suggest": "State the thing directly instead of teasing it, and stop casting the reader as the one getting it wrong.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "What nobody tells you is that the migration takes a week.",
@@ -1141,19 +1410,24 @@
           "Nobody told us the deadline had moved.",
           "Most people prefer the shorter route."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "not-in-job-description",
       "name": "\"Not in the job description\"",
-      "kind": "regex",
-      "pattern": "\\b(?:is|was)?\\s*n[o']?t\\s+in\\s+the\\s+job\\s+description\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|was)?\\s*n[o']?t\\s+in\\s+the\\s+job\\s+description\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The stock reveal that the real work is the unglamorous part.",
       "suggest": "Say what the work actually was.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Debugging the vendor's SDK was not in the job description."
@@ -1161,19 +1435,24 @@
         "miss": [
           "The job description listed three requirements."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "the-part-people-skip",
       "name": "\"The part people skip\"",
-      "kind": "regex",
-      "pattern": "\\bthe\\s+part\\s+(?:that\\s+)?(?:people|everyone|most\\s+readers|nobody|no\\s+one)\\s+(?:skips?|misses?|overlooks?|ignores?)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthe\\s+part\\s+(?:that\\s+)?(?:people|everyone|most\\s+readers|nobody|no\\s+one)\\s+(?:skips?|misses?|overlooks?|ignores?)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Gesturing at a neglected detail rather than stating it. Close cousin of the shipped `thats-the-part`.",
       "suggest": "Name the detail.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Here is the part everyone skips."
@@ -1181,19 +1460,26 @@
         "miss": [
           "The parts department closed at five."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "negation-correction",
       "name": "Negation then correction, across a sentence break",
-      "kind": "regex",
-      "pattern": "\\b(?:is|was|are|were|do|does|did|can|could|would)n['’]t\\s+[^.!?\\n]{3,70}[.!?]\\s+(?:It|That|They|You)(?:['’]s|\\s+(?:is|was|are|were|do|does|did))\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|was|are|were|do|does|did|can|could|would)n['’]t\\s+[^.!?\\n]{3,70}[.!?]\\s+(?:It|That|They|You)(?:['’]s|\\s+(?:is|was|are|were|do|does|did))\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "\"X isn't A. It's B.\" — the correction split over two sentences, so a within-sentence rule misses it.",
       "suggest": "Say what it is. The denial adds nothing the assertion does not.",
+      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "default": "off",
       "tests": {
         "hit": [
           "The bottleneck wasn't the database. It was the retry loop.",
@@ -1203,21 +1489,24 @@
           "The database wasn't reachable.",
           "It isn't clear yet whether the fix holds."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
-      "default": "off",
-      "note": "Off by default: Fired on human prose and not on AI prose in the audit. Select it by id to run it."
+      }
     },
     {
       "id": "era-of",
       "name": "\"In an era of …\"",
-      "kind": "regex",
-      "pattern": "(?:^|[.!?]\\s+|\\n)In\\s+(?:an?\\s+)?(?:era|age|world|time)\\s+of\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "(?:^|[.!?]\\s+|\\n)In\\s+(?:an?\\s+)?(?:era|age|world|time)\\s+of\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Scene-setting opener that delays the subject.",
       "suggest": "Delete it and start with the subject.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "In an era of cheap compute, correctness is the constraint."
@@ -1225,19 +1514,24 @@
         "miss": [
           "The era of mainframes ended quietly."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "whether-youre-a",
       "name": "\"Whether you're an X or a Y\"",
-      "kind": "regex",
-      "pattern": "\\bwhether\\s+you(?:['’]re|\\s+are)\\s+(?:an?\\s+)[\\w-]+\\s+or\\s+(?:an?\\s+)[\\w-]+\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bwhether\\s+you(?:['’]re|\\s+are)\\s+(?:an?\\s+)[\\w-]+\\s+or\\s+(?:an?\\s+)[\\w-]+\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The false-inclusive opener that addresses everyone and therefore no one.",
       "suggest": "Address the reader you actually have.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Whether you're a beginner or an expert, this guide helps."
@@ -1246,19 +1540,24 @@
           "We will ship it whether you are ready or not.",
           "Whether you are ready or not, it ships."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "think-of-it-as",
       "name": "\"Think of X as …\"",
-      "kind": "regex",
-      "pattern": "\\bthink\\s+of\\s+(?:it|this|that|(?:the|your|a|an)\\s+[\\w-]+|[\\w-]+)\\s+as\\s+(?:an?|the)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bthink\\s+of\\s+(?:it|this|that|(?:the|your|a|an)\\s+[\\w-]+|[\\w-]+)\\s+as\\s+(?:an?|the)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The explanatory analogy reflex, reached for before the plain description.",
       "suggest": "Describe the thing before reaching for a metaphor.",
+      "from": "slopster",
+      "source": "https://github.com/t0ddharris/slopster",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Think of the cache as a shelf near the door."
@@ -1266,19 +1565,24 @@
         "miss": [
           "I think of her often."
         ]
-      },
-      "from": "slopster",
-      "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "hedge-then-affirm",
       "name": "Hedge, then affirm",
-      "kind": "regex",
-      "pattern": "\\b(?:it|this|that)(?:(?:['\\u2019]s|\\s+is|\\s+was)\\s+not|\\s+(?:isn|wasn)['\\u2019]t)\\s+(?:a\\s+|the\\s+|going\\s+to\\s+)?[\\w-]+(?:\\s+[\\w-]+)?,\\s+but\\s+(?:it|they|this|that|you|we|the)\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:it|this|that)(?:(?:['\\u2019]s|\\s+is|\\s+was)\\s+not|\\s+(?:isn|wasn)['\\u2019]t)\\s+(?:a\\s+|the\\s+|going\\s+to\\s+)?[\\w-]+(?:\\s+[\\w-]+)?,\\s+but\\s+(?:it|they|this|that|you|we|the)\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The concession that costs nothing: “It's not perfect, but it works.” A weakness is admitted in a subordinate clause and immediately overridden, so the reader gets the feeling of balance without any of the information.",
       "suggest": "Say what is wrong with it, and how much that matters. If the answer is “not much”, drop the first half.",
+      "from": "structural",
+      "source": "https://x.com/simonw/status/2093277255438860358",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "It's not perfect, but it works.",
@@ -1290,19 +1594,24 @@
           "This is not a drill.",
           "It's not a bug but a feature."
         ]
-      },
-      "from": "structural",
-      "source": "https://x.com/simonw/status/2093277255438860358",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "rhetorical-selfqa",
       "name": "Asking yourself an easy question",
-      "kind": "regex",
-      "pattern": "\\b(?:is|was|are|does|did|do|will|can|should)\\s+(?:it|this|that|they|there|you|we)\\b[^.!?\\n]{0,40}\\?\\s+(?:No|Not\\s+(?:really|quite|exactly)|Yes|Absolutely|Probably\\s+not)[.!,]",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:is|was|are|does|did|do|will|can|should)\\s+(?:it|this|that|they|there|you|we)\\b[^.!?\\n]{0,40}\\?\\s+(?:No|Not\\s+(?:really|quite|exactly)|Yes|Absolutely|Probably\\s+not)[.!,]",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The self-interview: “Is it perfect? No. Does it work? Yes.” A question nobody asked, answered in one word, twice in a row.",
       "suggest": "State the answer. The question was never in doubt or you would not have written it.",
+      "from": "structural",
+      "source": "https://x.com/simonw/status/2093277255438860358",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Is it perfect? No. But it ships.",
@@ -1313,32 +1622,27 @@
           "Is it perfect? Depends who you ask.",
           "Does this scale? The benchmark says forty thousand a second."
         ]
-      },
-      "from": "structural",
-      "source": "https://x.com/simonw/status/2093277255438860358",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "comma-scarcity",
       "name": "Too few commas",
-      "kind": "density",
-      "pattern": ",",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 5,
-        "max": 20
+      "match": {
+        "kind": "regex",
+        "pattern": ",",
+        "flags": "g"
+      },
+      "notable": {
+        "below": 20,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "LLM prose uses fewer commas than human prose. The Economist compared 55,940 sentences of its own journalism, CNN, the New York Times, the Washington Post and novels from 1950 to 2022 against four models rewriting the same articles, and found the models short of commas, semicolons and parentheses alike.",
       "suggest": "No single sentence is wrong. The document as a whole reads as a run of flat declaratives; vary the shapes.",
-      "tests": {
-        "hit": [
-          "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
-        ],
-        "miss": [
-          "The system reads the file, one line at a time, and parses each line into a record. Records go to a queue, where a worker picks them up, validates them, and either drops them or writes them on. Invalid records are logged, dropped, and counted. Valid ones reach the database, which applies them in order, in batches, committing each batch together. If a batch fails, the whole batch is retried; after three failures it moves to a dead letter queue. An operator reviews that queue each morning, and most of what is in there, it turns out, is malformed input from a single upstream partner. We opened a ticket in March, which is still open, so we now reject their malformed records at the edge, which cut the dead letter volume by about ninety percent. What remains are genuine bugs, on our side, and we fix those as they appear. The edge rejection, when we finally wrote it, was fifteen lines. It shipped on a Tuesday, quietly, and nobody noticed except the operator (who stopped getting paged at six in the morning). She sent a message to say so, and that message, pinned in the channel ever since, is the only performance review the change will ever get. The queue has run clean for four months, and we have not touched the retry logic since. Eleven records sit in the dead letter queue, all from the same partner, and we suspect a date parsing bug on their side. They have not replied. We check on Fridays now, rather than daily, and nothing else has changed. The runbook, which still says daily, is stale; so is the alert threshold, set for the old volume, lowered once, and then forgotten about entirely by everyone involved."
-        ]
-      },
       "note": "Threshold set below the floor of a 16-document human prose corpus, where nothing fell under 21 commas per 1000 words. The other half of the calibration is missing: there is no AI-written corpus here to check what rate models actually produce, so this is a floor derived from one side only.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
@@ -1348,21 +1652,7 @@
         "human": "Nothing in a 16-document technical corpus fell below 21.6.",
         "ai": "Not measured on the matched corpus. The Economist reports models short of commas against journalism and novels.",
         "tune": "A floor derived from one side only. Measure your own corpus before trusting it."
-      }
-    },
-    {
-      "id": "paren-scarcity",
-      "name": "No parentheses at all",
-      "kind": "density",
-      "pattern": "[()]",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 6,
-        "max": 0
       },
-      "description": "The Economist found that models use “hardly any parentheses”. This fires only at zero, over a document long enough for zero to mean something.",
-      "suggest": "An aside in parentheses is among the cheapest ways to vary rhythm. A long document with none is unusual.",
       "tests": {
         "hit": [
           "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
@@ -1370,7 +1660,27 @@
         "miss": [
           "The system reads the file, one line at a time, and parses each line into a record. Records go to a queue, where a worker picks them up, validates them, and either drops them or writes them on. Invalid records are logged, dropped, and counted. Valid ones reach the database, which applies them in order, in batches, committing each batch together. If a batch fails, the whole batch is retried; after three failures it moves to a dead letter queue. An operator reviews that queue each morning, and most of what is in there, it turns out, is malformed input from a single upstream partner. We opened a ticket in March, which is still open, so we now reject their malformed records at the edge, which cut the dead letter volume by about ninety percent. What remains are genuine bugs, on our side, and we fix those as they appear. The edge rejection, when we finally wrote it, was fifteen lines. It shipped on a Tuesday, quietly, and nobody noticed except the operator (who stopped getting paged at six in the morning). She sent a message to say so, and that message, pinned in the channel ever since, is the only performance review the change will ever get. The queue has run clean for four months, and we have not touched the retry logic since. Eleven records sit in the dead letter queue, all from the same partner, and we suspect a date parsing bug on their side. They have not replied. We check on Fridays now, rather than daily, and nothing else has changed. The runbook, which still says daily, is stale; so is the alert threshold, set for the old volume, lowered once, and then forgotten about entirely by everyone involved."
         ]
+      }
+    },
+    {
+      "id": "paren-scarcity",
+      "name": "No parentheses at all",
+      "match": {
+        "kind": "regex",
+        "pattern": "[()]",
+        "flags": "g"
       },
+      "notable": {
+        "below": 0,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 6
+        }
+      },
+      "description": "The Economist found that models use “hardly any parentheses”. This fires only at zero, over a document long enough for zero to mean something.",
+      "suggest": "An aside in parentheses is among the cheapest ways to vary rhythm. A long document with none is unusual.",
       "note": "Zero is a deliberately literal reading of “hardly any”. It still fires on perfectly good human prose that simply never reaches for a parenthesis: one document in the 16-document corpus, about 6%.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
@@ -1380,21 +1690,38 @@
         "human": "16 documents ranged 0 to 110, and one in six used none at all.",
         "ai": "Zero parentheses in all 18 documents of the matched corpus, in every register.",
         "tune": "Fires only at zero. There is nothing to raise; ignore it for prose that legitimately never parenthesises."
+      },
+      "tests": {
+        "hit": [
+          "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
+        ],
+        "miss": [
+          "The system reads the file, one line at a time, and parses each line into a record. Records go to a queue, where a worker picks them up, validates them, and either drops them or writes them on. Invalid records are logged, dropped, and counted. Valid ones reach the database, which applies them in order, in batches, committing each batch together. If a batch fails, the whole batch is retried; after three failures it moves to a dead letter queue. An operator reviews that queue each morning, and most of what is in there, it turns out, is malformed input from a single upstream partner. We opened a ticket in March, which is still open, so we now reject their malformed records at the edge, which cut the dead letter volume by about ninety percent. What remains are genuine bugs, on our side, and we fix those as they appear. The edge rejection, when we finally wrote it, was fifteen lines. It shipped on a Tuesday, quietly, and nobody noticed except the operator (who stopped getting paged at six in the morning). She sent a message to say so, and that message, pinned in the channel ever since, is the only performance review the change will ever get. The queue has run clean for four months, and we have not touched the retry logic since. Eleven records sit in the dead letter queue, all from the same partner, and we suspect a date parsing bug on their side. They have not replied. We check on Fridays now, rather than daily, and nothing else has changed. The runbook, which still says daily, is stale; so is the alert threshold, set for the old volume, lowered once, and then forgotten about entirely by everyone involved."
+        ]
       }
     },
     {
       "id": "long-sentences",
       "name": "Sentences run long",
-      "kind": "density",
-      "pattern": "[.!?](?=\\s|$)",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 4,
-        "max": 20
+      "match": {
+        "kind": "regex",
+        "pattern": "[.!?](?=\\s|$)",
+        "flags": "g"
+      },
+      "notable": {
+        "below": 20,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 4
+        }
       },
       "description": "Fewer than 20 sentence endings per 1000 words is an average sentence of 50 words or more. Long sentences with few short ones among them were one of the Economist's confirmed markers, alongside sparse punctuation.",
       "suggest": "Break the longest ones. A short sentence after a long one is what makes the long one readable.",
+      "from": "economist",
+      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The system reads the file and parses each line into a record before writing the records to a queue from which a worker takes them off in order to validate them, dropping the invalid ones into a log and passing the valid ones onward to the database, which applies them in order and in batches so that each batch commits together rather than record by record. If a batch fails then the whole batch is retried until after three failures it moves into a dead letter queue that an operator reviews every morning and where most entries turn out to be malformed input from a single upstream partner with whom we opened a ticket back in March of last year. That ticket remains open to this day, which is the reason we now reject their malformed records at the edge rather than waiting for them to fail downstream, a change that cut the dead letter volume by roughly ninety percent within a fortnight of shipping it out to production. What is left in the queue each morning are the genuine bugs on our own side, which we fix as and when they appear rather than batching them into a sprint that would delay the ones that actually matter to the partners still sending us traffic every hour of the day. The edge rejection itself was a fifteen line change that shipped on a Tuesday afternoon without any announcement and which nobody noticed at all except the operator who simply stopped being paged at six in the morning and sent a message saying so, a message that has been pinned in the channel ever since and remains the only performance review that particular change is ever going to receive from anyone on the team or outside it, which is roughly the fate of most good infrastructure work anywhere."
@@ -1402,24 +1729,30 @@
         "miss": [
           "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
         ]
-      },
-      "from": "economist",
-      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "nominalisation-pileup",
       "name": "Nominalisations pile up",
-      "kind": "density",
-      "pattern": "\\b\\w{4,}(?:tions?|ments?|ances?|ences?|ities|ity|ness|isations?|izations?)\\b",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 5,
-        "min": 70
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b\\w{4,}(?:tions?|ments?|ances?|ences?|ities|ity|ness|isations?|izations?)\\b",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 70,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "All four models the Economist tested favoured nominalisations: verbs turned into nouns, so that things are described rather than done. Counted per thousand words.",
       "suggest": "Turn the nouns back into verbs. “The implementation of the validation” is “validating”.",
+      "from": "economist",
+      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
+      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents.",
       "tests": {
         "hit": [
           "The implementation of the validation process requires the identification of malformed records prior to their transmission. The application of these transformations depends on the availability of the configuration. The determination of batch size is a function of the utilisation of the queue and the expectation of throughput. The reconciliation of the two systems necessitates the establishment of a correspondence between their representations. Documentation of the procedure is a precondition for the authorisation of the deployment. Verification of the calculation is the responsibility of the operator, whose participation in the investigation follows from the escalation of the notification. The examination of the distribution reveals a concentration of failures in a limited population of partners. The introduction of edge rejection resulted in a reduction of the accumulation of records in the dead letter queue. The observation of this improvement led to the cancellation of the daily inspection and its replacement with a weekly examination. The continuation of the ticket without resolution reflects a lack of engagement on the part of the partner organisation. Communication of the specification was completed at the initiation of the integration, and the expectation of conformance was made explicit in the documentation. The persistence of the deviation therefore constitutes a violation of that agreement. Consideration of an escalation to the account management function is under discussion, though the preference of the engineering organisation remains the accommodation of the deviation through the transformation of the input rather than the pursuit of a correction at the source of the transmission. Confirmation of that decision awaits the completion of the current planning cycle and the allocation of capacity to the integration team."
@@ -1427,24 +1760,31 @@
         "miss": [
           "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
         ]
-      },
-      "from": "economist",
-      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "On the audit corpus: 0 hits in 0/18 human documents, 1 in 1/18 AI documents."
+      }
     },
     {
       "id": "triad-density",
       "name": "Rule of three, repeatedly",
-      "kind": "density",
-      "pattern": "\\b\\w+,\\s+\\w+,\\s+and\\s+\\w+\\b",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 5,
-        "min": 8
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b\\w+,\\s+\\w+,\\s+and\\s+\\w+\\b",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 8,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Rule-of-three constructions were among the rhetorical devices the Economist found all four models reaching for. One tricolon is good writing; a page of them is a tic, so this counts them instead of flagging each.",
       "suggest": "Keep the best one. Two items are usually the honest count, and a fourth would have broken the spell.",
+      "note": "The human corpus topped out at 3.1 per 1000 words, so 8 is well clear of it. Deliberately conservative: coordinated triples are ordinary English and only their frequency is a tell.",
+      "from": "economist",
+      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The pipeline is fast, reliable, and cheap. It reads, validates, and writes without pausing. Operators want visibility, control, and confidence. The design favours simplicity, clarity, and speed over cleverness. Records are parsed, checked, and stored in a single pass. Failures are logged, counted, and retried. The result is a system that is quick to build, easy to run, and cheap to keep alive. We measured latency, throughput, and error rate across the fleet. Each partner is onboarded, verified, and monitored before their traffic is accepted. Reviewers check the schema, the tests, and the docs before merging. The runbook lists the symptom, the cause, and the fix for every alert. Alerts are routed, acknowledged, and resolved inside the same tool. The dashboard shows volume, latency, and failures on one screen. Engineers are expected to read, understand, and question the runbook before their first shift. Onboarding covers the pipeline, the queue, and the database in that order. The retry policy balances speed, safety, and cost. We chose durability, simplicity, and observability over raw throughput. The queue guarantees order, delivery, and durability within a partition. Partners are ranked by volume, quality, and responsiveness each quarter. The worst offenders are contacted, warned, and eventually throttled. That process is documented, automated, and reviewed twice a year by the platform team. New partners are sandboxed, sampled, and promoted only once their error rate settles down for a while. The quarterly review covers volume, quality, and cost for every partner in the programme. Findings are written up, circulated, and archived in the same repository. Actions are assigned, tracked, and closed inside the quarter. The template asks for a summary, a decision, and an owner on the first page. Nothing ships without a test, a metric, and a rollback plan agreed first. The platform team owns the queue, the schema, and the retry policy outright."
@@ -1452,33 +1792,27 @@
         "miss": [
           "The system reads the file. It parses each line into a record. The records go to a queue. A worker takes them off the queue. It validates them. Invalid records are logged and dropped. Valid records go to the database. The database applies them in order. Each batch is committed together. If a batch fails the whole batch is retried. After three failures the batch moves to a dead letter queue. An operator reviews that queue every morning. Most entries turn out to be malformed input. They come from one upstream partner. We opened a ticket with them in March. The ticket is still open. We now reject their malformed records at the edge instead. That reduced the dead letter volume by ninety percent. The remaining failures are genuine bugs on our side. We fix them as they appear. The edge rejection was a fifteen line change. It shipped on a Tuesday afternoon. Nobody noticed it. The operator stopped getting paged at six in the morning. She sent a message to say so. That message is pinned in the channel. It is the only performance review that change will ever get. The queue has run clean for four months now. We have not touched the retry logic since. The dead letter queue holds eleven records. All eleven are from the same partner. We suspect a date parsing bug on their side. They have not replied to the ticket. We check the queue on Fridays now instead of daily. Nothing else has changed. The runbook still says to check daily. Someone should update it. Nobody has. The alert threshold is also stale. It was set for the old volume. We lowered it once and then forgot about it entirely."
         ]
-      },
-      "note": "The human corpus topped out at 3.1 per 1000 words, so 8 is well clear of it. Deliberately conservative: coordinated triples are ordinary English and only their frequency is a tell.",
-      "from": "economist",
-      "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "em-dash-density",
       "name": "Em dashes pile up",
-      "kind": "density",
-      "pattern": "—",
-      "flags": "g",
-      "params": {
-        "minWords": 250,
-        "minSentences": 5,
-        "min": 35
+      "match": {
+        "kind": "regex",
+        "pattern": "—",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 35,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "NOT an AI tell. Three independent measurements agree the em dash does not separate machine prose from human prose: sloptells found acclaimed human writing uses MORE of them than models do, 0.67 against 0.56 per 1000 characters; the Economist found only Claude above the human rate, with ChatGPT markedly below it; and this project's own corpus measurement agreed. The rule is here for the one thing a rate can honestly say — at this density they have stopped doing any work, whoever wrote them.",
       "suggest": "Some of these are commas, some are colons, and one or two are full stops. Em dashes stay emphatic only while they stay rare.",
-      "tests": {
-        "hit": [
-          "The system reads the file — one line at a time — and parses it into records. Records go to a queue — a worker picks them up — and validates them. Invalid records are logged — then dropped. Valid ones reach the database — which applies them in order. Each batch commits together — all or nothing. If a batch fails — and they do fail — the whole batch is retried. After three failures — a threshold we picked arbitrarily — it moves to a dead letter queue. An operator reviews that queue — every morning without fail — and most entries turn out to be malformed input. One partner — the same one each time — is responsible. We opened a ticket in March — still open — and now reject their records at the edge. The change was fifteen lines — no more than that — and shipped on a Tuesday. Nobody noticed — nobody except the operator — who stopped being paged at six. She sent a message — two words, no punctuation — and it is pinned in the channel to this day. That message — for what it is worth — is the only review the change will get. The queue has run clean for four months — a record for us — and the retry logic is untouched. Eleven records sit in the dead letter queue — all from the same partner — and we suspect a date parsing bug. They have not replied — they rarely do — so we check on Fridays now rather than daily. The runbook — still saying daily — is stale, and so is the alert threshold, which was set for the old volume and then forgotten about by everyone. Someone should fix both — nobody has — and at this point nobody is going to until the next incident forces it."
-        ],
-        "miss": [
-          "The system reads the file, one line at a time, and parses each line into a record. Records go to a queue, where a worker picks them up, validates them, and either drops them or writes them on. Invalid records are logged, dropped, and counted. Valid ones reach the database, which applies them in order, in batches, committing each batch together. If a batch fails, the whole batch is retried; after three failures it moves to a dead letter queue. An operator reviews that queue each morning, and most of what is in there, it turns out, is malformed input from a single upstream partner. We opened a ticket in March, which is still open, so we now reject their malformed records at the edge, which cut the dead letter volume by about ninety percent. What remains are genuine bugs, on our side, and we fix those as they appear. The edge rejection, when we finally wrote it, was fifteen lines. It shipped on a Tuesday, quietly, and nobody noticed except the operator (who stopped getting paged at six in the morning). She sent a message to say so, and that message, pinned in the channel ever since, is the only performance review the change will ever get. The queue has run clean for four months, and we have not touched the retry logic since. Eleven records sit in the dead letter queue, all from the same partner, and we suspect a date parsing bug on their side. They have not replied. We check on Fridays now, rather than daily, and nothing else has changed. The runbook, which still says daily, is stale; so is the alert threshold, set for the old volume, lowered once, and then forgotten about entirely by everyone involved."
-        ]
-      },
       "note": "Do not read a hit here as evidence of AI authorship; it is an observation about your own draft. The three measurements are in research/log.md.",
       "from": "economist",
       "source": "https://www.economist.com/culture/2026/07/30/how-to-spot-ai-writing",
@@ -1488,20 +1822,36 @@
         "human": "0 to 55 across a 16-document technical corpus, median 16. Wildly variable, which is why the threshold is high.",
         "ai": "Not separable. Four studies agree the em dash does not distinguish machine prose from human prose.",
         "tune": "This is a style observation, not a tell. Set it wherever your own writing stops reading as emphatic."
+      },
+      "tests": {
+        "hit": [
+          "The system reads the file — one line at a time — and parses it into records. Records go to a queue — a worker picks them up — and validates them. Invalid records are logged — then dropped. Valid ones reach the database — which applies them in order. Each batch commits together — all or nothing. If a batch fails — and they do fail — the whole batch is retried. After three failures — a threshold we picked arbitrarily — it moves to a dead letter queue. An operator reviews that queue — every morning without fail — and most entries turn out to be malformed input. One partner — the same one each time — is responsible. We opened a ticket in March — still open — and now reject their records at the edge. The change was fifteen lines — no more than that — and shipped on a Tuesday. Nobody noticed — nobody except the operator — who stopped being paged at six. She sent a message — two words, no punctuation — and it is pinned in the channel to this day. That message — for what it is worth — is the only review the change will get. The queue has run clean for four months — a record for us — and the retry logic is untouched. Eleven records sit in the dead letter queue — all from the same partner — and we suspect a date parsing bug. They have not replied — they rarely do — so we check on Fridays now rather than daily. The runbook — still saying daily — is stale, and so is the alert threshold, which was set for the old volume and then forgotten about by everyone. Someone should fix both — nobody has — and at this point nobody is going to until the next incident forces it."
+        ],
+        "miss": [
+          "The system reads the file, one line at a time, and parses each line into a record. Records go to a queue, where a worker picks them up, validates them, and either drops them or writes them on. Invalid records are logged, dropped, and counted. Valid ones reach the database, which applies them in order, in batches, committing each batch together. If a batch fails, the whole batch is retried; after three failures it moves to a dead letter queue. An operator reviews that queue each morning, and most of what is in there, it turns out, is malformed input from a single upstream partner. We opened a ticket in March, which is still open, so we now reject their malformed records at the edge, which cut the dead letter volume by about ninety percent. What remains are genuine bugs, on our side, and we fix those as they appear. The edge rejection, when we finally wrote it, was fifteen lines. It shipped on a Tuesday, quietly, and nobody noticed except the operator (who stopped getting paged at six in the morning). She sent a message to say so, and that message, pinned in the channel ever since, is the only performance review the change will ever get. The queue has run clean for four months, and we have not touched the retry logic since. Eleven records sit in the dead letter queue, all from the same partner, and we suspect a date parsing bug on their side. They have not replied. We check on Fridays now, rather than daily, and nothing else has changed. The runbook, which still says daily, is stale; so is the alert threshold, set for the old volume, lowered once, and then forgotten about entirely by everyone involved."
+        ]
       }
     },
     {
       "id": "uniform-sentence-length",
       "name": "Sentences march in formation",
-      "kind": "rhythm",
-      "params": {
-        "maxCV": 0.4,
-        "minWords": 250,
-        "minSentences": 8
+      "match": {
+        "kind": "rhythm"
+      },
+      "notable": {
+        "below": 0.4,
+        "needs": {
+          "words": 250,
+          "sentences": 8
+        }
       },
       "description": "Sentence lengths that barely vary. humanizer-de measures this as stddev_mean_ratio and requires at least 0.4 in every register profile it ships; sloptells describes the same thing as sentences that march in formation. The badge is the coefficient of variation — standard deviation over mean sentence length.",
       "suggest": "Cut one sentence in half and let another run long. Rhythm is what stops correct prose from reading as generated.",
       "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone. Off by default: Fired on 4 of 18 human documents against 1 AI one, and sentence-length variation measured the same on both corpora: median 0.52 either way. Select it by id to run it.",
+      "from": "humanizer-de",
+      "source": "https://github.com/marmbiz/humanizer-de",
+      "evidence": "On the audit corpus: 4 hits in 4/18 human documents, 1 in 1/18 AI documents.",
+      "default": "off",
       "tests": {
         "hit": [
           "The worker reads each record from the queue and checks its schema. The schema lives in a shared repository that both teams can edit. A record that fails the check is written to a separate log. The log is rotated every night and kept for thirty days. An operator reviews the log each morning before the standup meeting. Most of the failures come from a single partner in the north. That partner has been sending malformed dates since the middle of March. We opened a ticket with their integration team on the same day. The ticket has not received a reply from anyone on their side. We now reject their malformed records at the edge of the system. The change was fifteen lines and shipped on a Tuesday afternoon. Nobody on the team noticed the change had gone out at all. The operator noticed because she stopped being paged at six each morning. She sent a short message to the channel to say so. That message has been pinned in the channel ever since that day. The queue has now run clean for four consecutive months without trouble. We have not touched the retry logic in any way since then. Eleven records are sitting in the dead letter queue this morning. All eleven of them came from the same partner in the north. We check the queue on Friday afternoons now instead of every day. The runbook still tells the operator to check it every single morning. Somebody on the team should update that page in the runbook. So far nobody has found the time to go and do it."
@@ -1509,26 +1859,31 @@
         "miss": [
           "Short. The worker reads each record from the queue and checks it against a schema that lives in a shared repository both teams can edit, which sounded sensible at the time and has since caused two outages. A record that fails is logged. The log rotates nightly. An operator reviews it each morning before standup, and most of what she finds comes from one partner in the north who has been sending malformed dates since March, a fact we established within an hour and have been unable to act on since. We opened a ticket. No reply. We now reject their malformed records at the edge instead, which took fifteen lines and shipped on a Tuesday afternoon with no announcement, no review beyond the usual one, and no ceremony of any kind. Nobody noticed. The operator noticed, because she stopped being paged at six, and she sent a two-word message to the channel that has been pinned there ever since and remains the only recognition that change will ever get. Four months clean. The retry logic is untouched. Eleven records sit in the dead letter queue this morning, all from the same partner, and we check on Fridays now rather than daily even though the runbook, which nobody has updated, still says every morning. Somebody should fix that. Nobody will. The wider lesson, if there is one, is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed was the only person the system had actually been hurting all along, which is roughly how these things go everywhere I have worked. Four months. No pages. Nobody asked."
         ]
-      },
-      "from": "humanizer-de",
-      "source": "https://github.com/marmbiz/humanizer-de",
-      "evidence": "On the audit corpus: 4 hits in 4/18 human documents, 1 in 1/18 AI documents.",
-      "default": "off"
+      }
     },
     {
       "id": "paired-dash-aside",
       "name": "Paired em-dash asides",
-      "kind": "density",
-      "pattern": "—[^—.!?\\n]{3,80}—",
-      "flags": "g",
-      "params": {
-        "min": 6,
-        "minWords": 250,
-        "minSentences": 5
+      "match": {
+        "kind": "regex",
+        "pattern": "—[^—.!?\\n]{3,80}—",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 6,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "Not the em dash itself — that tell is dead three times over — but the paired parenthetical aside, which humanizer-de flags as a cluster pattern rather than a single signal. Their governing rule is the one this project keeps arriving at: count clusters, never singletons.",
       "suggest": "Some of these are commas and some are brackets. A paired aside works when it is the only one on the page.",
       "note": "The human corpus topped out at 3.6 per 1000 words, so 6 leaves clear air. This counts asides, not dashes, and is a different measurement from em-dash-density in the economist set.",
+      "from": "humanizer-de",
+      "source": "https://github.com/marmbiz/humanizer-de",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "The worker reads each record — one at a time — and checks its schema. The schema — a shared file both teams edit — has drifted twice this year. A failing record goes to a log, which the operator — who starts at seven — reviews each morning. Most failures come from one partner — the same one every quarter — in the north. That partner has been sending malformed dates — always the same field — since March. We opened a ticket — our third with them — on the same afternoon. Nobody replied. We now reject the records at the edge — a fifteen line change — instead of waiting for them to fail downstream. It shipped on a Tuesday — quietly, as these things do — and nobody noticed. The operator noticed, because the six o'clock page — the one that had been waking her for months — simply stopped. She sent a message — two words, no punctuation — to the channel. That message — pinned ever since — is the only recognition the change will get. The queue has run clean for four months — a record for this team — and the retry logic is untouched. Eleven records — all from the same partner — sit in the dead letter queue. We check on Fridays now — rather than daily — because the volume no longer justifies it. The runbook — still saying daily — is out of date. Somebody ought to fix it — everybody agrees — and so far nobody has done anything. The wider lesson — if there is one at all — is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed — the only one the system had been hurting — was not in the room when it was planned. Four months — no pages — and nobody has asked once. The dashboard — rebuilt twice since — still shows the old alert threshold."
@@ -1536,23 +1891,26 @@
         "miss": [
           "Short. The worker reads each record from the queue and checks it against a schema that lives in a shared repository both teams can edit, which sounded sensible at the time and has since caused two outages. A record that fails is logged. The log rotates nightly. An operator reviews it each morning before standup, and most of what she finds comes from one partner in the north who has been sending malformed dates since March, a fact we established within an hour and have been unable to act on since. We opened a ticket. No reply. We now reject their malformed records at the edge instead, which took fifteen lines and shipped on a Tuesday afternoon with no announcement, no review beyond the usual one, and no ceremony of any kind. Nobody noticed. The operator noticed, because she stopped being paged at six, and she sent a two-word message to the channel that has been pinned there ever since and remains the only recognition that change will ever get. Four months clean. The retry logic is untouched. Eleven records sit in the dead letter queue this morning, all from the same partner, and we check on Fridays now rather than daily even though the runbook, which nobody has updated, still says every morning. Somebody should fix that. Nobody will. The wider lesson, if there is one, is that the smallest change on the board turned out to be the one that mattered, and that the person who noticed was the only person the system had actually been hurting all along, which is roughly how these things go everywhere I have worked. Four months. No pages. Nobody asked."
         ]
-      },
-      "from": "humanizer-de",
-      "source": "https://github.com/marmbiz/humanizer-de",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "templated-frame",
       "name": "Repeated syntactic frame",
-      "kind": "frame",
-      "params": {
+      "match": {
+        "kind": "frame",
         "gram": 8,
         "minRun": 3,
         "anchors": 2
       },
+      "notable": {
+        "above": 0
+      },
       "description": "Three or more consecutive sentences built on the same syntactic frame, with different words in the slots. The paper's own example is a run of “Dr. Smith, a researcher at Oxford University, found that…”. The `echo` detector cannot see this, because every content word differs; what repeats is the shape. Content words are wildcarded and only the closed class is compared, so the badge shows the frame that repeated.",
       "suggest": "Vary the sentence shapes, or collapse the run into one sentence and a list. Three identical frames read as a form someone filled in.",
       "note": "A crude stand-in for part-of-speech tagging, which this engine does not have. It found zero false positives in 30,300 words of human technical prose, but the guard doing most of that work is the requirement that a frame contain at least two closed-class anchors — without it, code and table rows match each other.",
+      "from": "arxiv-slop",
+      "source": "https://arxiv.org/abs/2509.19163",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
       "tests": {
         "hit": [
           "Dr. Smith, a researcher at Oxford University, found that the effect was small. Professor Johnson, a scientist at Cambridge University, discovered that it held. Dr. Williams, an expert at Yale University, confirmed that the result was real.",
@@ -1562,19 +1920,26 @@
           "The parser is fast. We rewrote it last spring after the incident that took the queue down for a morning. Nobody has touched it since, which is probably for the best.",
           "Dr. Smith found that the effect was small. The team at Cambridge could not reproduce it. A third group tried a different measure entirely and gave up."
         ]
-      },
-      "from": "arxiv-slop",
-      "source": "https://arxiv.org/abs/2509.19163",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way."
+      }
     },
     {
       "id": "barely-a-whisper",
       "name": "“Voice barely above a whisper”",
-      "kind": "regex",
-      "pattern": "\\bvoice\\s+(?:was\\s+)?barely\\s+(?:above\\s+)?(?:a\\s+)?(?:whisper|audible)\\b|\\bbarely\\s+above\\s+a\\s+whisper\\b|\\b(?:whispered|said|asked|murmured)[^.!?\\n]{0,20},?\\s+voice\\s+barely\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bvoice\\s+(?:was\\s+)?barely\\s+(?:above\\s+)?(?:a\\s+)?(?:whisper|audible)\\b|\\bbarely\\s+above\\s+a\\s+whisper\\b|\\b(?:whispered|said|asked|murmured)[^.!?\\n]{0,20},?\\s+voice\\s+barely\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The single most over-represented construction in the creative-writing lists. It heads both the phrase list and the trigram list.",
       "suggest": "Let the line carry the volume, or say how loud they actually were.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "“I know,” she said, her voice barely above a whisper.",
@@ -1585,21 +1950,26 @@
           "He whispered the password.",
           "The whisper carried across the hall."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "heart-pounding",
       "name": "“Heart pounding in her chest”",
-      "kind": "regex",
-      "pattern": "\\b(?:heart|pulse)\\s+(?:was\\s+)?(?:pounding|hammering|thudding|racing|hammered|pounded|thundering)\\s+(?:in|against)\\s+(?:my|his|her|their|its|the)\\s+(?:chest|ribs|throat|ears)\\b|\\bheart\\s+(?:skipped|stopped)\\s+a\\s+beat\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:heart|pulse)\\s+(?:was\\s+)?(?:pounding|hammering|thudding|racing|hammered|pounded|thundering)\\s+(?:in|against)\\s+(?:my|his|her|their|its|the)\\s+(?:chest|ribs|throat|ears)\\b|\\bheart\\s+(?:skipped|stopped)\\s+a\\s+beat\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Interior-state telegraphing, and a redundancy: the heart is already in the chest.",
       "suggest": "Cut it, or give the body something specific to do.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "Her heart was pounding in her chest.",
@@ -1610,21 +1980,26 @@
           "The drum pounded through the floor.",
           "She pressed a hand to her chest."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "shiver-down-spine",
       "name": "“Sent a shiver down her spine”",
-      "kind": "regex",
-      "pattern": "\\b(?:sent|felt|ran)\\s+(?:a\\s+)?(?:shiver|chill|shudder|tingle)s?\\s+(?:run\\s+|running\\s+)?(?:down|up|through)\\s+(?:my|his|her|their|the)\\s+spine\\b|\\b(?:shivers?|chills?)\\s+(?:ran\\s+|went\\s+)?(?:down|up)\\s+(?:my|his|her|their|the)\\s+spine\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:sent|felt|ran)\\s+(?:a\\s+)?(?:shiver|chill|shudder|tingle)s?\\s+(?:run\\s+|running\\s+)?(?:down|up|through)\\s+(?:my|his|her|their|the)\\s+spine\\b|\\b(?:shivers?|chills?)\\s+(?:ran\\s+|went\\s+)?(?:down|up)\\s+(?:my|his|her|their|the)\\s+spine\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The stock somatic reaction, present in four separate spellings in the shipped phrase list.",
       "suggest": "Pick a reaction that belongs to this character and this moment.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "The sound sent a shiver down her spine.",
@@ -1635,21 +2010,26 @@
           "She traced a finger along his spine.",
           "The book's spine had cracked."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "sun-dipped-horizon",
       "name": "“The sun dipped below the horizon”",
-      "kind": "regex",
-      "pattern": "\\b(?:sun|moon)\\s+(?:dipped|sank|slipped|dropped|hung|began\\s+to\\s+(?:set|dip|sink))\\s*(?:low\\s+)?(?:below|beneath|behind|toward|towards|in)?\\s*(?:the\\s+)?(?:horizon|sky)?\\b(?=[^.!?\\n]{0,40}(?:cast|casting|paint|painting|bath|bathing|glow))|\\bdipped\\s+below\\s+the\\s+horizon\\b|\\bcasting\\s+long\\s+shadows\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:sun|moon)\\s+(?:dipped|sank|slipped|dropped|hung|began\\s+to\\s+(?:set|dip|sink))\\s*(?:low\\s+)?(?:below|beneath|behind|toward|towards|in)?\\s*(?:the\\s+)?(?:horizon|sky)?\\b(?=[^.!?\\n]{0,40}(?:cast|casting|paint|painting|bath|bathing|glow))|\\bdipped\\s+below\\s+the\\s+horizon\\b|\\bcasting\\s+long\\s+shadows\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The establishing-shot sunset, usually followed by shadows being cast. Four of its fragments make the top-twenty trigrams.",
       "suggest": "Say what time it is, or cut to what happens next.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "The sun dipped below the horizon, casting long shadows.",
@@ -1660,21 +2040,26 @@
           "The sun set at seven.",
           "She dipped the brush in the water."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "felt-like-eternity",
       "name": "“Felt like an eternity”",
-      "kind": "regex",
-      "pattern": "\\b(?:felt|seemed)\\s+like\\s+(?:an\\s+eternity|forever|hours)\\b|\\bfor\\s+what\\s+(?:felt|seemed)\\s+like\\s+(?:an\\s+eternity|forever|hours)\\b|\\btime\\s+(?:seemed\\s+to\\s+)?(?:stood|stand|slowed|stopped)\\s*(?:still)?\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:felt|seemed)\\s+like\\s+(?:an\\s+eternity|forever|hours)\\b|\\bfor\\s+what\\s+(?:felt|seemed)\\s+like\\s+(?:an\\s+eternity|forever|hours)\\b|\\btime\\s+(?:seemed\\s+to\\s+)?(?:stood|stand|slowed|stopped)\\s*(?:still)?\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Duration inflation in place of an actual duration.",
       "suggest": "Give the real interval, or show what filled it.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "The silence felt like an eternity.",
@@ -1685,21 +2070,26 @@
           "The flight felt long.",
           "It took an eternity to load, she joked."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "words-hung-in-air",
       "name": "“The words hung in the air”",
-      "kind": "regex",
-      "pattern": "\\b(?:words?|question|name|silence|accusation|threat)\\s+(?:still\\s+)?hung\\s+(?:heavy\\s+|thick\\s+)?(?:in|between)\\s+(?:the\\s+air|them|us)\\b|\\bair\\s+(?:hung\\s+|was\\s+)(?:thick|heavy)\\s+with\\b|\\bthe\\s+room\\s+fell\\s+silent\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:words?|question|name|silence|accusation|threat)\\s+(?:still\\s+)?hung\\s+(?:heavy\\s+|thick\\s+)?(?:in|between)\\s+(?:the\\s+air|them|us)\\b|\\bair\\s+(?:hung\\s+|was\\s+)(?:thick|heavy)\\s+with\\b|\\bthe\\s+room\\s+fell\\s+silent\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The beat of significance dropped after a line of dialogue, so the reader knows it landed.",
       "suggest": "Trust the line. If it needs help, the line is the problem.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "The words hung in the air between them.",
@@ -1710,21 +2100,26 @@
           "Laundry hung in the yard.",
           "The air smelled of rain."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "little-did-know",
       "name": "“Little did she know”",
-      "kind": "regex",
-      "pattern": "\\blittle\\s+did\\s+(?:he|she|they|I|we|you|him|her|them)\\s+know\\b|\\b(?:he|she|they|I|we)\\s+had\\s+no\\s+way\\s+of\\s+knowing\\b|\\b(?:was|were)\\s+only\\s+just\\s+beginning\\b|\\bhad\\s+only\\s+just\\s+begun\\b|\\bwould\\s+never\\s+be\\s+the\\s+same\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\blittle\\s+did\\s+(?:he|she|they|I|we|you|him|her|them)\\s+know\\b|\\b(?:he|she|they|I|we)\\s+had\\s+no\\s+way\\s+of\\s+knowing\\b|\\b(?:was|were)\\s+only\\s+just\\s+beginning\\b|\\bhad\\s+only\\s+just\\s+begun\\b|\\bwould\\s+never\\s+be\\s+the\\s+same\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Narrator-flagged foreshadowing, including the closer that promises a sequel.",
       "suggest": "Delete it. The reader finds out anyway, and the tease costs the surprise.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "Little did she know what waited upstairs.",
@@ -1735,21 +2130,26 @@
           "She knew little about the protocol.",
           "The meeting was just beginning."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "maybe-just-maybe",
       "name": "“Maybe, just maybe”",
-      "kind": "regex",
-      "pattern": "\\b(?:maybe|perhaps)\\s*,\\s*just\\s+(?:maybe|perhaps)\\b|\\b(?:and\\s+)?(?:for\\s+now\\s*,?\\s*)?(?:maybe\\s+)?that\\s+(?:was|is)\\s+enough\\s*(?=[.!?…]|$)|\\bfor\\s+now\\s*,\\s*that(?:'s|’s)\\s+enough\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:maybe|perhaps)\\s*,\\s*just\\s+(?:maybe|perhaps)\\b|\\b(?:and\\s+)?(?:for\\s+now\\s*,?\\s*)?(?:maybe\\s+)?that\\s+(?:was|is)\\s+enough\\s*(?=[.!?…]|$)|\\bfor\\s+now\\s*,\\s*that(?:'s|’s)\\s+enough\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The wistful closer. Both halves ship as separate entries in the phrase list, which is how often they co-occur.",
       "suggest": "End on the last real thing that happened.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "Maybe, just maybe, they would make it.",
@@ -1760,21 +2160,26 @@
           "Maybe we should leave.",
           "That was enough rope to reach the branch."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "face-it-together",
       "name": "“They would face it together”",
-      "kind": "regex",
-      "pattern": "\\b(?:would|could|will)\\s+face\\s+(?:it|this|them|whatever\\s+(?:came|comes|lay|lies))\\s+(?:together|head[- ]on)\\b|\\bready\\s+(?:to\\s+face|for)\\s+whatever\\s+(?:came|comes|lay|lies|the\\s+\\w+\\s+(?:held|holds))\\b|\\bwhatever\\s+(?:came|comes)\\s+next\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\b(?:would|could|will)\\s+face\\s+(?:it|this|them|whatever\\s+(?:came|comes|lay|lies))\\s+(?:together|head[- ]on)\\b|\\bready\\s+(?:to\\s+face|for)\\s+whatever\\s+(?:came|comes|lay|lies|the\\s+\\w+\\s+(?:held|holds))\\b|\\bwhatever\\s+(?:came|comes)\\s+next\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "The resolve-and-embrace ending, which resolves nothing.",
       "suggest": "Let the last scene stand without a summary of how everyone felt about it.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "Whatever came next, they would face it together.",
@@ -1784,21 +2189,26 @@
           "They faced each other across the table.",
           "He was ready for the interview."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "something-else-entirely",
       "name": "“Something else entirely”",
-      "kind": "regex",
-      "pattern": "\\bsomething\\s+else\\s+entirely\\b|\\bsomething\\s+(?:else\\s+)?(?:darker|deeper|colder|older|far\\s+worse)\\b|\\bunlike\\s+anything\\s+(?:he|she|they|I|we)\\s+had\\s+ever\\s+(?:seen|felt|heard|known)\\b|\\bone\\s+thing\\s+was\\s+certain\\b",
-      "flags": "gi",
+      "match": {
+        "kind": "regex",
+        "pattern": "\\bsomething\\s+else\\s+entirely\\b|\\bsomething\\s+(?:else\\s+)?(?:darker|deeper|colder|older|far\\s+worse)\\b|\\bunlike\\s+anything\\s+(?:he|she|they|I|we)\\s+had\\s+ever\\s+(?:seen|felt|heard|known)\\b|\\bone\\s+thing\\s+was\\s+certain\\b",
+        "flags": "gi"
+      },
+      "notable": {
+        "above": 0
+      },
       "description": "Withholding as a substitute for description: the thing is named only as not-the-other-thing.",
       "suggest": "Name it. If it cannot be named yet, describe what the character can actually perceive.",
+      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it.",
+      "from": "antislop-fiction",
+      "source": "https://github.com/sam-paech/antislop-sampler",
+      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
+      "default": "off",
       "tests": {
         "hit": [
           "This was something else entirely.",
@@ -1809,23 +2219,24 @@
           "We ordered something else.",
           "The room was darker than he remembered."
         ]
-      },
-      "from": "antislop-fiction",
-      "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "Never fired on the audit corpus, on either side. No evidence either way.",
-      "default": "off",
-      "note": "Off by default: this is the creative-writing register. The constructions are real and consistent in fiction and carry no signal in documentation, which is what most people lint. Select the rule or the whole fiction group by id to run it."
+      }
     },
     {
       "id": "colon-appositive",
       "name": "Reaching for the colon",
-      "kind": "density",
-      "pattern": "[a-z,)]: +[a-z]",
-      "flags": "g",
-      "params": {
-        "min": 3.0,
-        "minWords": 250,
-        "minSentences": 5
+      "match": {
+        "kind": "regex",
+        "pattern": "[a-z,)]: +[a-z]",
+        "flags": "g"
+      },
+      "notable": {
+        "above": 3.0,
+        "per": 1000,
+        "unit": "words",
+        "needs": {
+          "words": 250,
+          "sentences": 5
+        }
       },
       "description": "A claim, a colon, then the expansion of the claim, over and over. One is good writing. The tell is the rate: measured over 36 matched documents, no human document exceeded 2.7 of these per 1000 words, while 14 of 18 AI documents were at or above 3.0, running to 9.0. The colon and its continuation must be on the same line, so a heading, a table intro or a colon opening a bulleted list is not counted; only the in-sentence form is.",
       "suggest": "Vary the joins. Some of these want a full stop, some a comma, some the sentence turned around. Replacing every one with a dash or a semicolon swaps one habit for another.",
@@ -1833,6 +2244,12 @@
       "from": "reader report",
       "source": "https://github.com/bheijden/slop/blob/main/research/log.md",
       "evidence": "On the audit corpus: 0 of 18 human documents at or above the threshold, 14 of 18 AI documents.",
+      "reference": {
+        "unit": "per 1000 words",
+        "human": "0 to 2.7 across six registers, 18 documents. Technical writing is lowest at 0.8 to 0.9; academic highest at 2.7.",
+        "ai": "0 to 9.0 across the same six registers. Fourteen of eighteen documents at or above 3.0.",
+        "tune": "Raise it for prose that defines terms as it goes, such as a specification or a glossary. Lower it for chat, release notes and anything short."
+      },
       "tests": {
         "hit": [
           "The bottleneck is not the solver: it is the model that feeds it. What closes the gap is a digital twin: a site-specific process model grounded in physics. The plant is a solver inside a solver: an outer optimizer searches while an inner one settles. Two things follow from this: derivatives come out exact, and scenarios come out nearly free. The second point matters more: thousands of variants compile into one program. Neither alternative reaches this: hand-written code is specialised only by human labour. The niche is narrow and referenceable: most sales in this industry move on references. The code is specialised per question: the framework compiles for the exact question asked. The bottleneck is not the solver: it is the model that feeds it. What closes the gap is a digital twin: a site-specific process model grounded in physics. The plant is a solver inside a solver: an outer optimizer searches while an inner one settles. Two things follow from this: derivatives come out exact, and scenarios come out nearly free. The second point matters more: thousands of variants compile into one program. Neither alternative reaches this: hand-written code is specialised only by human labour. The niche is narrow and referenceable: most sales in this industry move on references. The code is specialised per question: the framework compiles for the exact question asked. Operators do not read the model: they read the number it produces. That number has to survive a hostile question: where did this come from. The answer has to be short: the twin was calibrated last night against live data. "
@@ -1840,12 +2257,6 @@
         "miss": [
           "The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. The bottleneck is not the solver but the model that feeds it, which nobody wants to own. What closes the gap is a digital twin, a site-specific process model grounded in physics and calibrated against a plant that keeps changing. A plant is a solver inside a solver. An outer optimizer searches for the profitable operating point while an inner one settles the physics, and the two argue with each other for most of a working day. Two things follow. Derivatives come out exact, because the physics is stated once and differentiated mechanically. Scenarios come out nearly free, since thousands of plant variants compile into a single program. The second point is the one that matters, and it is the one nobody believes until they watch it happen. Neither alternative reaches this point. Hand-written code is specialised only by human labour, which does not scale past the first engineer who leaves. The niche is narrow and referenceable, and most sales in this industry move on references anyway. "
         ]
-      },
-      "reference": {
-        "unit": "per 1000 words",
-        "human": "0 to 2.7 across six registers, 18 documents. Technical writing is lowest at 0.8 to 0.9; academic highest at 2.7.",
-        "ai": "0 to 9.0 across the same six registers. Fourteen of eighteen documents at or above 3.0.",
-        "tune": "Raise it for prose that defines terms as it goes, such as a specification or a glossary. Lower it for chat, release notes and anything short."
       }
     }
   ]

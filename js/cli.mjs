@@ -189,6 +189,19 @@ function lintSource(name, src, kind, rules, opts) {
              // artefact: reporting it as line:col points the reader at an
              // innocent word. Carry the flag so the reporter can say "document".
              docLevel: m.docLevel || false, measure: m.badgeTitle || null,
+             // Where the rate came from. A document-level finding without its
+             // occurrences is a number nobody can act on.
+             occurrences: (m.spans || []).map((sp) => {
+               const c = lineCol(starts, toSource(runs, sp.start));
+               // A window, not the bare match: patterns like `[a-z,)]: +[a-z]`
+               // match four characters, which tells a reader nothing.
+               const a = Math.max(0, sp.start - 34);
+               const b = Math.min(text.length, sp.end + 34);
+               return { line: c.line, col: c.col,
+                        match: text.slice(sp.start, sp.end),
+                        context: (a > 0 ? '…' : '') + text.slice(a, b).replace(/\s+/g, ' ').trim()
+                                 + (b < text.length ? '…' : '') };
+             }),
              // The rates behind the threshold, so whoever reads the finding can
              // judge the number instead of taking it on trust.
              reference: r.reference || null };
@@ -232,8 +245,14 @@ async function main() {
     const id = o.args[0];
     const r = resolved.available.find((x) => x.id === id);
     if (!r) { process.stderr.write(`slop: no rule "${id}"\n`); return 2; }
-    process.stdout.write(`${C.bold(r.id)}  ${r.name}\n  set:      ${r.set}\n  kind:     ${r.kind}\n  severity: ${r.severity}\n`);
-    if (r.pattern) process.stdout.write(`  pattern:  /${r.pattern}/${r.flags || ''}\n`);
+    const m = r.match || {};
+    const n = r.notable || {};
+    const band = Array.isArray(n.between) ? `between ${n.between[0]} and ${n.between[1]}`
+      : n.above !== undefined ? `above ${n.above}` : `below ${n.below}`;
+    const per = n.per ? ` per ${n.per} ${n.unit || 'words'}` : '';
+    process.stdout.write(`${C.bold(r.id)}  ${r.name}\n  set:      ${r.set}\n`
+      + `  matches:  ${m.kind}\n  notable:  ${band}${per}\n  severity: ${r.severity}\n`);
+    if (m.pattern) process.stdout.write(`  pattern:  /${m.pattern}/${m.flags || ''}\n`);
     process.stdout.write(`\n  ${r.description}\n`);
     if (r.suggest) process.stdout.write(`\n  ${C.cyan('fix:')} ${r.suggest}\n`);
     if (r.from) {
@@ -476,8 +495,16 @@ async function main() {
       for (const f of r.findings) {
         const badge = f.count ? C.dim(` ×${f.count}`) : '';
         if (f.docLevel) {
-          // No line:col and no excerpt: there is no offending span to show.
+          // The rate, then the occurrences behind it. There is no single
+          // offending span, so the rule name takes the line:col column.
           process.stdout.write(`  ${C.cyan('document '.padEnd(9))} ${C.yellow(f.rule.padEnd(21))} ${oneLine(f.measure || f.name, 88)}\n`);
+          const show = o.context ? f.occurrences : f.occurrences.slice(0, 5);
+          for (const oc of show) {
+            process.stdout.write(`  ${C.dim(`${oc.line}:${oc.col}`.padStart(9))} ${C.dim(oneLine(oc.context || oc.match, 96))}\n`);
+          }
+          if (f.occurrences.length > show.length) {
+            process.stdout.write(`  ${' '.repeat(9)} ${C.dim(`… ${f.occurrences.length - show.length} more (--context for all)`)}\n`);
+          }
         } else {
           process.stdout.write(`  ${C.cyan(`${f.line}:${f.col}`.padEnd(9))} ${C.yellow(f.rule.padEnd(21))}${badge} ${oneLine(f.match, 88)}\n`);
           if (o.context && f.sentence.trim() !== f.match.trim()) {

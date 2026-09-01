@@ -144,20 +144,23 @@ export function testRules(rules, extract) {
       out.failures.push({ rule: rule.id, kind: 'no examples', detail: 'every rule needs a tests.hit example' });
     }
     for (const ex of t.miss || []) {
-      if (rule.find(ex).length === 0) out.conform.ok++;
+      if (!rule.fires(ex)) out.conform.ok++;
       else { out.conform.fail++; out.failures.push({ rule: rule.id, kind: 'false positive', detail: ex }); }
     }
     for (const ex of t.hit || []) {
-      const hits = rule.find(ex);
-      if (!hits.length) {
+      if (!rule.fires(ex)) {
         out.conform.fail++;
         out.failures.push({ rule: rule.id, kind: 'example does not match', detail: ex });
         continue;
       }
       out.conform.ok++;
-      for (const v of variants(ex, hits[0].start, hits[0].end)) {
+      // A metric rule (rhythm) counts nothing, so there is no span to preserve;
+      // the variants still have to leave the whole passage judged the same way.
+      const hits = rule.find(ex);
+      const [s0, e0] = hits.length ? [hits[0].start, hits[0].end] : [0, Math.min(ex.length, 1)];
+      for (const v of variants(ex, s0, e0)) {
         const { text } = extract[v.format](v.source, {});
-        if (rule.find(text).length) { if (v.lossless) out.fudge.ok++; }
+        if (rule.fires(text)) { if (v.lossless) out.fudge.ok++; }
         else if (!v.lossless) out.fudge.lossy++;
         else {
           out.fudge.fail++;

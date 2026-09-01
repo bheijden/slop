@@ -16,8 +16,8 @@ const compiled = compileRuleSet(set, set.name).rules;
 const load = (k) => readdirSync(join(D, k)).filter((f) => f.endsWith('.txt'))
   .map((f) => readFileSync(join(D, k, f), 'utf8'));
 const H = load('human'), A = load('ai');
-const docs = (r, s) => s.filter((t) => { try { return r.find(t).length; } catch { return false; } }).length;
-const hits = (r, s) => s.reduce((a, t) => { try { return a + r.find(t).length; } catch { return a; } }, 0);
+const docs = (r, s) => s.filter((t) => { try { return r.fires(t); } catch { return false; } }).length;
+const hits = (r, s) => s.reduce((a, t) => { try { return a + (r.fires(t) ? Math.max(1, r.find(t).length) : 0); } catch { return a; } }, 0);
 
 const tally = { proven: 0, even: 0, noisy: 0, untested: 0 };
 set.rules.forEach((def, i) => {

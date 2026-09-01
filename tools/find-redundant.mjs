@@ -7,7 +7,10 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { compileRuleSet } from '../js/engine.mjs';
 
-const SPAN = new Set(['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'frame']);
+// A rule that judges a rate fires on any long document, so coverage between two
+// of them says the fixture is long rather than that the rules overlap. The
+// distinction is the verdict now, not the kind: a bare count is span-like.
+const spanLike = (r) => !(r.notable || {}).per && (r.match || {}).kind !== 'rhythm';
 const all = [];
 for (const dir of ['rules', 'candidates']) {
   for (const f of readdirSync(new URL(`../${dir}`, import.meta.url).pathname)) {
@@ -16,7 +19,7 @@ for (const dir of ['rules', 'candidates']) {
     if (!j.rules) continue;
     const compiled = compileRuleSet(j, j.name).rules;
     compiled.forEach((r, i) => {
-      if (SPAN.has(r.kind)) all.push({ r, def: j.rules[i], set: j.name });
+      if (spanLike(r)) all.push({ r, def: j.rules[i], set: j.name });
     });
   }
 }
@@ -27,7 +30,7 @@ for (const a of all) {
   if (!hits.length) continue;
   const by = all
     .filter((b) => !(b.set === a.set && b.r.id === a.r.id))
-    .filter((b) => hits.every((x) => { try { return b.r.find(x).length > 0; } catch { return false; } }));
+    .filter((b) => hits.every((x) => { try { return b.r.fires(x); } catch { return false; } }));
   if (by.length) {
     found += 1;
     console.log(`  ${(a.set + '/' + a.r.id).padEnd(32)} covered by ${by.map((b) => b.set + '/' + b.r.id).join(', ')}`);
