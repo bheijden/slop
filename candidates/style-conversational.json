@@ -114,7 +114,7 @@
         "flags": "gi"
       },
       "notable": {
-        "below": 6,
+        "<=": 6,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -148,7 +148,7 @@
         "flags": "gi"
       },
       "notable": {
-        "below": 6,
+        "<=": 6,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -182,7 +182,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 2,
+        "<=": 2,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -216,7 +216,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 0,
+        "<=": 0,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -248,7 +248,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 55,
+        ">=": 55,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -281,7 +281,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 12,
+        ">=": 12,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -314,7 +314,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 35,
+        ">=": 35,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -345,10 +345,8 @@
         "kind": "rhythm"
       },
       "notable": {
-        "between": [
-          0.45,
-          1.85
-        ],
+        "<=": 0.45,
+        ">=": 1.85,
         "needs": {
           "words": 250,
           "sentences": 8

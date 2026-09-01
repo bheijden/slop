@@ -30,62 +30,32 @@
   ],
   "rules": [
     {
-      "id": "style-economist-sentence-length-long",
-      "name": "Longer sentences than this register keeps",
+      "id": "style-economist-sentence-length",
+      "name": "Sentence length outside the range this register keeps",
       "match": {
         "kind": "regex",
         "pattern": "[.!?](?=\\s|$)",
         "flags": "g"
       },
       "notable": {
-        "below": 30,
+        "<=": 30,
+        ">=": 80,
         "per": 1000,
         "unit": "words",
         "needs": {
-          "words": 250,
-          "sentences": 5
+          "sentences": 5,
+          "words": 250
         }
       },
-      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down. This register runs 30 to 80 endings per 1000 words - sentences of roughly 12 to 33 words - and the register sample measured 44.9, or 22.3 words a sentence. At or below 30 endings the document is averaging 33 words a sentence or more, so the reader goes a long way between full stops. It is a measurement of fit, not a defect: a great deal of excellent prose lives above 33 words a sentence. Read the document before you read the number - a page of headings, list items and table rows carries few full stops and will land here without having a long sentence in it.",
-      "suggest": "Below the economist band (30 to 80 sentence endings per 1000 words, or about 12 to 33 words a sentence). Break the longest sentences in two; the guide's entry for full stops reads in full 'Use plenty. They keep sentences short. This helps the reader.'",
+      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down. This register runs 30 to 80 endings per 1000 words - sentences of roughly 12 to 33 words - and the register sample measured 44.9, or 22.3 words a sentence. At or below 30 endings the document is averaging 33 words a sentence or more, so the reader goes a long way between full stops. At or above 80 it is averaging under 13 words a sentence, a staccato this register uses for a paragraph but not for a page. It is a measurement of fit, not a defect: a great deal of excellent prose lives above 33 words a sentence, and plenty of good reporting is written entirely in short ones. Read the document before you read the number - a page of headings, list items and table rows carries few full stops and will land below the band without having a long sentence in it.",
+      "suggest": "Outside the economist band (30 to 80 sentence endings per 1000 words, or about 12 to 33 words a sentence). Below it, break the longest sentences in two; the guide's entry for full stops reads in full 'Use plenty. They keep sentences short. This helps the reader.' Above it, let some of these clauses join up; a short sentence works here because it lands after a long one.",
       "note": "This rule counts full stops, not sentences, so a document made mostly of headings, list items and table cells reads as one very long sentence. The engine's prose gate stops the extreme cases - a document averaging more than 60 words between full stops is not measured at all - but a mixed document, prose paragraphs above a table, can still land here on the strength of its fragments. Where the badge disagrees with the page, the page is right. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 30-80 endings /1000. Register sample (3,251 words of the guide's own prose) 44.9. Local human technical corpus, 16 documents / 19,555 words that clear the engine's default prose gate, ran 17.3 min / 20.1 p10 / 31.4 p25 / 45.5 median / 66.8 p90 / 75.0 max. The low edge is set from the register sample at about two-thirds of it, which places it just below the local p25; it reports 4 of the 16. An earlier draft measured 18 documents / 24,527 words with the prose gate widened to 200 words a sentence, and 2 of the 6 documents it reported were a Python source file and a README of headings and list items, neither of which has sentences to be long. The gate is back at the engine default, which is what excludes them.",
+      "measured": "band 30-80 endings /1000. Register sample (3,251 words of the guide's own prose) 44.9. Local human technical corpus, 16 documents / 19,555 words that clear the engine's default prose gate, ran 17.3 min / 20.1 p10 / 31.4 p25 / 45.5 median / 66.8 p90 / 75.0 max. The low edge is set from the register sample at about two-thirds of it, which places it just below the local p25; it reports 4 of the 16. An earlier draft measured 18 documents / 24,527 words with the prose gate widened to 200 words a sentence, and 2 of the 6 documents it reported were a Python source file and a README of headings and list items, neither of which has sentences to be long. The gate is back at the engine default, which is what excludes them.  Upper edge: band 30-80 endings /1000. Register sample 44.9. Local corpus of 16 documents ran 17.3 min / 45.5 median / 75.0 max, so no local document reaches this edge and it reports 0 of 16. This edge has no local corpus contact: it is the register sample at roughly 1.8x, set above the local maximum, and no corpus in the target register was reachable to check it. Retune it first. Its hit fixture measures 5.7 words a sentence, which clears the prose gate's four-word floor with little to spare, so prose more clipped than that is not measured at all rather than reported.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
-          "The argument over the new berths at the eastern end of the harbour has been running for three years now, and it has acquired the particular quality of exhaustion that attaches to disputes in which every participant has already said everything he intends to say and none of them is willing to be the first to stop repeating it. On one side stand the terminal operators, who point out that the boxes are stacked six high on a quay designed for four and that a berth which is not begun this spring cannot be finished before the end of the decade, by which time the traffic will either have found another port or have been turned away for so long that it will not come back at all. On the other stand the provincial authorities, who observe that the same operators made the same argument in the boom before the last one and then spent the following six years asking to be released from the lease payments on the cranes they had insisted were indispensable. Between them sit the unions, whose position has the merit of being consistent, which is that nothing whatever should be built, agreed, leased or dredged until the wage round has been settled on terms that the men on the night shift are prepared to accept without another ballot. The provincial authorities have commissioned two studies, the first of which concluded that demand would hold and the second of which concluded that it would not, and both of which cost rather more than the berths would have cost had anybody simply built them in the year the first study was ordered. It is worth saying that the studies were not badly done, and that the disagreement between them reflects a genuine disagreement about how long shipping lines will keep sailing around the Cape rather than any failure of arithmetic on the part of the consultants who produced them. What has changed in the past six months is that the Egyptians have begun offering discounts steep enough to tempt the smaller lines back through the canal, which suggests that the rerouting may unwind faster than either study assumed and that the pessimists on the provincial side may turn out to have been right for reasons they never actually advanced. None of this has altered anybody's position by so much as a metre of quay, because the positions were never really about the forecasts in the first place and were always about who would carry the loss if the forecasts turned out to be wrong. That question has an answer, and everybody in the room knows what it is, which is why nobody in the room will say it aloud. The operators will carry the loss on the cranes, the province will carry the loss on the land, and the unions will carry the loss in jobs that are never created and therefore never appear in any statistic that anybody has to explain to a committee. Somebody will eventually decide, and the decision will be taken in a fortnight by people who have not read either study, on the basis of a summary written by an official who has read only the second one. That is not a scandal and it is not even unusual, but it is worth remembering the next time somebody proposes commissioning a third."
-        ],
-        "miss": [
-          "The port has never been busier. Traffic through Rotterdam rose by a tenth last year, and the terminal operators, who spent most of the previous decade grumbling that Europe had built far too much capacity, now find themselves turning ships away at the mouth of the Maas. That is a pleasant problem. It is also a temporary one, for the surge owes less to any revival of European industry than to the rerouting of Asian cargo away from the Red Sea, and a rerouting can be undone as fast as it was made. Ask the Egyptians. Canal revenues in Cairo have roughly halved since the shipping lines began the long haul around the Cape, and the finance ministry has quietly stopped citing them in its budget documents (the canal authority disputes the figure, though it has yet to publish a better one). Dockers (who have watched three such booms) know this. They have seen the cycle before; the men who load the boxes at midnight are markedly less excited by the annual figures than the consultants who write them up. Rotterdam is not alone. Antwerp, Hamburg and Piraeus all report the same swell, and all three have begun the same argument about whether to pour concrete for berths that may stand idle by the end of the decade, an argument that turns, as such arguments always do, on how long a rerouting lasts. Nobody knows. The Dutch government, which owns much of the land, would rather wait; the operators, who own the cranes, would rather build; and the unions, who own the labour, would rather neither side moved at all until the wage round is settled. Something will give. What gives first will probably be the argument itself, because the ships are already coming and the boxes are already stacked six high on the quay, and a berth that is not built this year is a berth that is not available for the next five. The concrete will be poured. It usually is."
-        ]
-      }
-    },
-    {
-      "id": "style-economist-sentence-length-short",
-      "name": "Shorter sentences than this register keeps",
-      "match": {
-        "kind": "regex",
-        "pattern": "[.!?](?=\\s|$)",
-        "flags": "g"
-      },
-      "notable": {
-        "above": 80,
-        "per": 1000,
-        "unit": "words",
-        "needs": {
-          "words": 250,
-          "sentences": 5
-        }
-      },
-      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down. This register runs 30 to 80 endings per 1000 words - sentences of roughly 12 to 33 words - and the register sample measured 44.9, or 22.3 words a sentence. At or above 80 endings the document is averaging under 13 words a sentence, a staccato that this register uses for a paragraph but not for a page. This is a measurement of fit and not a defect: plenty of good reporting is written entirely this way.",
-      "suggest": "Above the economist band (30 to 80 sentence endings per 1000 words, or about 12 to 33 words a sentence). Let some of these clauses join up; a short sentence works here because it lands after a long one.",
-      "note": "Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 30-80 endings /1000. Register sample 44.9. Local corpus of 16 documents ran 17.3 min / 45.5 median / 75.0 max, so no local document reaches this edge and it reports 0 of 16. This edge has no local corpus contact: it is the register sample at roughly 1.8x, set above the local maximum, and no corpus in the target register was reachable to check it. Retune it first. Its hit fixture measures 5.7 words a sentence, which clears the prose gate's four-word floor with little to spare, so prose more clipped than that is not measured at all rather than reported.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The argument over the new berths at the eastern end of the harbour has been running for three years now, and it has acquired the particular quality of exhaustion that attaches to disputes in which every participant has already said everything he intends to say and none of them is willing to be the first to stop repeating it. On one side stand the terminal operators, who point out that the boxes are stacked six high on a quay designed for four and that a berth which is not begun this spring cannot be finished before the end of the decade, by which time the traffic will either have found another port or have been turned away for so long that it will not come back at all. On the other stand the provincial authorities, who observe that the same operators made the same argument in the boom before the last one and then spent the following six years asking to be released from the lease payments on the cranes they had insisted were indispensable. Between them sit the unions, whose position has the merit of being consistent, which is that nothing whatever should be built, agreed, leased or dredged until the wage round has been settled on terms that the men on the night shift are prepared to accept without another ballot. The provincial authorities have commissioned two studies, the first of which concluded that demand would hold and the second of which concluded that it would not, and both of which cost rather more than the berths would have cost had anybody simply built them in the year the first study was ordered. It is worth saying that the studies were not badly done, and that the disagreement between them reflects a genuine disagreement about how long shipping lines will keep sailing around the Cape rather than any failure of arithmetic on the part of the consultants who produced them. What has changed in the past six months is that the Egyptians have begun offering discounts steep enough to tempt the smaller lines back through the canal, which suggests that the rerouting may unwind faster than either study assumed and that the pessimists on the provincial side may turn out to have been right for reasons they never actually advanced. None of this has altered anybody's position by so much as a metre of quay, because the positions were never really about the forecasts in the first place and were always about who would carry the loss if the forecasts turned out to be wrong. That question has an answer, and everybody in the room knows what it is, which is why nobody in the room will say it aloud. The operators will carry the loss on the cranes, the province will carry the loss on the land, and the unions will carry the loss in jobs that are never created and therefore never appear in any statistic that anybody has to explain to a committee. Somebody will eventually decide, and the decision will be taken in a fortnight by people who have not read either study, on the basis of a summary written by an official who has read only the second one. That is not a scandal and it is not even unusual, but it is worth remembering the next time somebody proposes commissioning a third.",
           "The port is busy. Traffic rose a tenth last year. The operators are turning ships away. This is new. For a decade they complained about spare capacity. Now they complain about the lack of it. The mood on the quay has changed. Dockers work double shifts. The cranes run past midnight. Boxes stack six high. The yard was built for four. Something has to give. The surge is not about European industry. It is about the Red Sea. Ships now sail around the Cape. That adds ten days to a voyage from Shanghai. Cargo has moved north as a result. Rotterdam has taken most of it. Antwerp has taken some. Hamburg has taken the rest. None of the three trusts the boom. All three are drawing up plans anyway. The plans involve concrete. The concrete involves money. The money involves the province. The province wants to wait. The operators want to build. The unions want a wage round first. Nobody has moved. Cairo has moved. The canal authority has cut its tolls. Smaller lines are already going back. The big lines are watching. If they follow the boom ends. If they do not it continues. Nobody knows which. The studies disagree. The consultants disagree. The ministers have not read either study. A decision is due in a fortnight. It will be made on a summary. The summary runs to two pages. One of them is a chart. The chart shows two lines. They cross in 2029. That is the whole argument. It will be settled by a chart. Somebody drew that chart in an afternoon. Nobody will ever check it. The berths will be built or they will not. The quay will be full or it will be empty. Either way the dockers will work nights."
         ],
         "miss": [
@@ -94,54 +64,28 @@
       }
     },
     {
-      "id": "style-economist-rhythm-even",
-      "name": "Sentences closer to one length than this register keeps them",
+      "id": "style-economist-rhythm",
+      "name": "Sentence-length variation outside the range this register keeps",
       "match": {
         "kind": "rhythm"
       },
       "notable": {
-        "below": 0.6,
+        "<=": 0.6,
+        ">=": 1.45,
         "needs": {
-          "words": 250,
-          "sentences": 8
+          "sentences": 8,
+          "words": 250
         }
       },
-      "description": "Sentence-length variation, as the coefficient of variation - standard deviation over mean. This register runs 0.60 to 1.45; the register sample measured 1.16 and the local corpus median is 0.82. At or below 0.60 the sentences are close to a single length, which is correct, readable prose that simply runs flatter than this register's rhythm. It is a measurement of fit, not a defect.",
-      "suggest": "Below the economist band (variation 0.60 to 1.45). Cut one long sentence in half and let a short one land after it - the guide quotes Mark Twain on the writer who 'at times may indulge himself with a long one'.",
+      "description": "Sentence-length variation, as the coefficient of variation - standard deviation over mean. This register runs 0.60 to 1.45; the register sample measured 1.16 and the local corpus median is 0.82. At or below 0.60 the sentences are close to a single length, which is correct, readable prose that simply runs flatter than this register's rhythm. At or above 1.45 the rhythm is swinging hard between the very short and the very long, usually because a run of clipped sentences sits next to one that goes on for a hundred words. Some registers want exactly that; this one does not, and that is a judgement about fit rather than about quality.",
+      "suggest": "Outside the economist band (variation 0.60 to 1.45). Below it, cut one long sentence in half and let a short one land after it - the guide quotes Mark Twain on the writer who 'at times may indulge himself with a long one'. Above it, even out the extremes - the guide's image is a torch-light procession rather than a sea-serpent with half its arches under the water.",
       "note": "Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band cv 0.60-1.45. Register sample 1.16. Local corpus of 16 documents ran 0.49 min / 0.70 p10 / 0.82 median / 1.30 p90 / 1.54 max; the low edge is the local p10 rounded down and reports 1 of 16. humanizer-de reports the same measurement at or below 0.40, so this edge sits outside it by design.",
+      "measured": "band cv 0.60-1.45. Register sample 1.16. Local corpus of 16 documents ran 0.49 min / 0.70 p10 / 0.82 median / 1.30 p90 / 1.54 max; the low edge is the local p10 rounded down and reports 1 of 16. humanizer-de reports the same measurement at or below 0.40, so this edge sits outside it by design.  Upper edge: band cv 0.60-1.45. Register sample 1.16. Local corpus of 16 documents ran 0.49 min / 0.82 median / 1.30 p90 / 1.54 max; the high edge sits between the local p90 and the local maximum and reports 1 of 16. An earlier draft put the local maximum at 1.98 and the p90 at 1.48, but that maximum was a Python source file admitted by a widened prose gate; with the gate at its default the file is not measured and the edge is unchanged.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
-          "The harbour authority published its annual traffic figures on Tuesday morning. Container volumes rose by nine per cent over the course of the year. The eastern terminal handled rather more than half of that additional traffic. Three of the four berths there now run for twenty hours a day. The fourth berth has been closed for dredging since the middle of February. Operators say the closure has cost them roughly forty thousand box movements. The authority disputes that figure and puts the number nearer thirty thousand. Neither side has published the calculation on which its estimate rests. The provincial government has asked for a reconciliation before the summer recess. That request has been made twice before and has been ignored on both occasions. Traffic through the western terminal fell by two per cent over the same period. Managers there blame the loss on a scheduling change made by a single line. The line moved its weekly Asian service to Antwerp in the autumn. It has since moved a second service, though not the first, back again. Nobody at either terminal will say what was offered to secure the return. Wage talks for the night shift opened in March and remain unresolved. The union is asking for a rise of six per cent across three years. The employers have offered four per cent and a review clause after eighteen months. A ballot on that offer is expected before the end of next month. Most people on the quay expect the offer to be rejected the first time. Dredging at the fourth berth is now scheduled to resume in the autumn. The contractor has warned that its vessel may not be available in October. A second contractor has been approached but has not yet quoted a price. The authority expects to award the work before the end of the year. Nobody on the quay believes that the work will begin before the spring."
-        ],
-        "miss": [
-          "The port has never been busier. Traffic through Rotterdam rose by a tenth last year, and the terminal operators, who spent most of the previous decade grumbling that Europe had built far too much capacity, now find themselves turning ships away at the mouth of the Maas. That is a pleasant problem. It is also a temporary one, for the surge owes less to any revival of European industry than to the rerouting of Asian cargo away from the Red Sea, and a rerouting can be undone as fast as it was made. Ask the Egyptians. Canal revenues in Cairo have roughly halved since the shipping lines began the long haul around the Cape, and the finance ministry has quietly stopped citing them in its budget documents (the canal authority disputes the figure, though it has yet to publish a better one). Dockers (who have watched three such booms) know this. They have seen the cycle before; the men who load the boxes at midnight are markedly less excited by the annual figures than the consultants who write them up. Rotterdam is not alone. Antwerp, Hamburg and Piraeus all report the same swell, and all three have begun the same argument about whether to pour concrete for berths that may stand idle by the end of the decade, an argument that turns, as such arguments always do, on how long a rerouting lasts. Nobody knows. The Dutch government, which owns much of the land, would rather wait; the operators, who own the cranes, would rather build; and the unions, who own the labour, would rather neither side moved at all until the wage round is settled. Something will give. What gives first will probably be the argument itself, because the ships are already coming and the boxes are already stacked six high on the quay, and a berth that is not built this year is a berth that is not available for the next five. The concrete will be poured. It usually is."
-        ]
-      }
-    },
-    {
-      "id": "style-economist-rhythm-lurching",
-      "name": "Sentence length swinging further than this register swings it",
-      "match": {
-        "kind": "rhythm"
-      },
-      "notable": {
-        "above": 1.45,
-        "needs": {
-          "words": 250,
-          "sentences": 8
-        }
-      },
-      "description": "Sentence-length variation, as the coefficient of variation - standard deviation over mean. This register runs 0.60 to 1.45; the register sample measured 1.16. At or above 1.45 the rhythm is swinging hard between the very short and the very long, usually because a run of clipped sentences sits next to one that goes on for a hundred words. Some registers want exactly that; this one does not, and that is a judgement about fit rather than about quality.",
-      "suggest": "Above the economist band (variation 0.60 to 1.45). Even out the extremes - the guide's image is a torch-light procession rather than a sea-serpent with half its arches under the water.",
-      "note": "Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band cv 0.60-1.45. Register sample 1.16. Local corpus of 16 documents ran 0.49 min / 0.82 median / 1.30 p90 / 1.54 max; the high edge sits between the local p90 and the local maximum and reports 1 of 16. An earlier draft put the local maximum at 1.98 and the p90 at 1.48, but that maximum was a Python source file admitted by a widened prose gate; with the gate at its default the file is not measured and the edge is unchanged.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The harbour authority published its annual traffic figures on Tuesday morning. Container volumes rose by nine per cent over the course of the year. The eastern terminal handled rather more than half of that additional traffic. Three of the four berths there now run for twenty hours a day. The fourth berth has been closed for dredging since the middle of February. Operators say the closure has cost them roughly forty thousand box movements. The authority disputes that figure and puts the number nearer thirty thousand. Neither side has published the calculation on which its estimate rests. The provincial government has asked for a reconciliation before the summer recess. That request has been made twice before and has been ignored on both occasions. Traffic through the western terminal fell by two per cent over the same period. Managers there blame the loss on a scheduling change made by a single line. The line moved its weekly Asian service to Antwerp in the autumn. It has since moved a second service, though not the first, back again. Nobody at either terminal will say what was offered to secure the return. Wage talks for the night shift opened in March and remain unresolved. The union is asking for a rise of six per cent across three years. The employers have offered four per cent and a review clause after eighteen months. A ballot on that offer is expected before the end of next month. Most people on the quay expect the offer to be rejected the first time. Dredging at the fourth berth is now scheduled to resume in the autumn. The contractor has warned that its vessel may not be available in October. A second contractor has been approached but has not yet quoted a price. The authority expects to award the work before the end of the year. Nobody on the quay believes that the work will begin before the spring.",
           "The berth is closed. Nobody says why. The dredger left in March. It has not come back. The crane sits idle. Traffic is down. Managers blame the schedule. The union blames the province. The province blames the weather. Nothing moves. Not the dredger. Not the talks. Not the boxes. What is actually happening, and it has taken three months and two leaked memoranda for anybody outside the harbour authority to work it out, is that the survey commissioned before the dredging began found a layer of contaminated silt across the whole eastern approach, and that the disposal licence required to move that silt anywhere at all was never applied for, because the official responsible for applying for it retired in January and nobody was appointed to replace him until the middle of April, by which time the dredger's charter had expired and the vessel had been contracted to a project in the Baltic that will not release her until the autumn. That is the story. Nobody will confirm it. Everybody repeats it. The consequence, which is rather more serious than the silt and considerably harder to fix, is that the province has now missed the window in which it could have applied for the European grant that was meant to cover two-thirds of the cost of the whole works, and the next window does not open for another two years, so that a dredging job which was budgeted at eleven million euros and was supposed to be finished by June will now cost something closer to thirty and will not be finished before the end of the decade. Somebody will be blamed. It will not be the official who retired. The dredger is still in the Baltic. The grant window is still shut. The silt is still there."
         ],
         "miss": [
@@ -150,62 +94,32 @@
       }
     },
     {
-      "id": "style-economist-comma-low",
-      "name": "Fewer commas than this register uses",
+      "id": "style-economist-comma",
+      "name": "Commas outside the rate this register uses",
       "match": {
         "kind": "regex",
         "pattern": ",",
         "flags": "g"
       },
       "notable": {
-        "below": 30,
+        "<=": 30,
+        ">=": 85,
         "per": 1000,
         "unit": "words",
         "needs": {
-          "words": 250,
-          "sentences": 5
+          "sentences": 5,
+          "words": 250
         }
       },
-      "description": "Commas per 1000 words. This register runs 30 to 85; the register sample measured 61.2 and the local corpus median is 41.5. At or below 30 the prose is mostly bare declaratives carrying little subordination, so the sentences arrive at one weight. It is a measurement of fit, not a defect: plenty of good writing sits below it deliberately.",
-      "suggest": "Below the economist band (30 to 85 commas per 1000 words). Subordinate a clause or two; the guide's instruction is 'Use commas as an aid to understanding.'",
+      "description": "Commas per 1000 words. This register runs 30 to 85; the register sample measured 61.2 and the local corpus median is 41.5. At or below 30 the prose is mostly bare declaratives carrying little subordination, so the sentences arrive at one weight. At or above 85 the sentences are carrying more subordinate material than this register normally asks a reader to hold at once. It is a measurement of fit, not a defect: plenty of good writing sits below the band deliberately, and above it the subordination may be doing real work.",
+      "suggest": "Outside the economist band (30 to 85 commas per 1000 words). Below it, subordinate a clause or two. Above it, split some of the longer sentences. The guide's instruction runs 'Use commas as an aid to understanding. Too many in one sentence can be confusing.'",
       "note": "Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 30-85 /1000. Register sample 61.2. Local corpus of 16 documents ran 21.6 min / 22.6 p10 / 34.7 p25 / 41.5 median / 79.1 max; the low edge sits just below the local p25 and reports 4 of 16. candidates/economist.json reports comma scarcity at or below 20, so this edge sits inside that one by 10 per 1000.",
+      "measured": "band 30-85 /1000. Register sample 61.2. Local corpus of 16 documents ran 21.6 min / 22.6 p10 / 34.7 p25 / 41.5 median / 79.1 max; the low edge sits just below the local p25 and reports 4 of 16. candidates/economist.json reports comma scarcity at or below 20, so this edge sits inside that one by 10 per 1000.  Upper edge: ceiling 85 /1000, and one of the four edges in this profile with no local corpus contact. Register sample 61.2. Local corpus of 16 documents ran 41.5 median / 69.6 p90 / 79.1 max, so the edge sits above the local maximum and reports 0 of 16. An earlier draft reported 1 of 18 here, but that document was a Python source file whose commas were argument separators, admitted by a widened prose gate; it is the reason the gate is back at the engine default. The edge is the register sample at about 1.4x and the local corpus cannot check it.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
-          "The port is busy. Traffic rose a tenth last year. The operators are turning ships away. This is new. For a decade they complained about spare capacity. Now they complain about the lack of it. The mood on the quay has changed. Dockers work double shifts. The cranes run past midnight. Boxes stack six high. The yard was built for four. Something has to give. The surge is not about European industry. It is about the Red Sea. Ships now sail around the Cape. That adds ten days to a voyage from Shanghai. Cargo has moved north as a result. Rotterdam has taken most of it. Antwerp has taken some. Hamburg has taken the rest. None of the three trusts the boom. All three are drawing up plans anyway. The plans involve concrete. The concrete involves money. The money involves the province. The province wants to wait. The operators want to build. The unions want a wage round first. Nobody has moved. Cairo has moved. The canal authority has cut its tolls. Smaller lines are already going back. The big lines are watching. If they follow the boom ends. If they do not it continues. Nobody knows which. The studies disagree. The consultants disagree. The ministers have not read either study. A decision is due in a fortnight. It will be made on a summary. The summary runs to two pages. One of them is a chart. The chart shows two lines. They cross in 2029. That is the whole argument. It will be settled by a chart. Somebody drew that chart in an afternoon. Nobody will ever check it. The berths will be built or they will not. The quay will be full or it will be empty. Either way the dockers will work nights."
-        ],
-        "miss": [
-          "The port has never been busier. Traffic through Rotterdam rose by a tenth last year, and the terminal operators, who spent most of the previous decade grumbling that Europe had built far too much capacity, now find themselves turning ships away at the mouth of the Maas. That is a pleasant problem. It is also a temporary one, for the surge owes less to any revival of European industry than to the rerouting of Asian cargo away from the Red Sea, and a rerouting can be undone as fast as it was made. Ask the Egyptians. Canal revenues in Cairo have roughly halved since the shipping lines began the long haul around the Cape, and the finance ministry has quietly stopped citing them in its budget documents (the canal authority disputes the figure, though it has yet to publish a better one). Dockers (who have watched three such booms) know this. They have seen the cycle before; the men who load the boxes at midnight are markedly less excited by the annual figures than the consultants who write them up. Rotterdam is not alone. Antwerp, Hamburg and Piraeus all report the same swell, and all three have begun the same argument about whether to pour concrete for berths that may stand idle by the end of the decade, an argument that turns, as such arguments always do, on how long a rerouting lasts. Nobody knows. The Dutch government, which owns much of the land, would rather wait; the operators, who own the cranes, would rather build; and the unions, who own the labour, would rather neither side moved at all until the wage round is settled. Something will give. What gives first will probably be the argument itself, because the ships are already coming and the boxes are already stacked six high on the quay, and a berth that is not built this year is a berth that is not available for the next five. The concrete will be poured. It usually is."
-        ]
-      }
-    },
-    {
-      "id": "style-economist-comma-high",
-      "name": "More commas than this register uses",
-      "match": {
-        "kind": "regex",
-        "pattern": ",",
-        "flags": "g"
-      },
-      "notable": {
-        "above": 85,
-        "per": 1000,
-        "unit": "words",
-        "needs": {
-          "words": 250,
-          "sentences": 5
-        }
-      },
-      "description": "Commas per 1000 words. This register runs 30 to 85; the register sample measured 61.2. At or above 85 the sentences are carrying more subordinate material than this register normally asks a reader to hold at once. This is a measurement of fit and not a defect: the subordination may be doing real work.",
-      "suggest": "Above the economist band (30 to 85 commas per 1000 words). Split some of the longer sentences; the guide's instruction continues 'Too many in one sentence can be confusing.'",
-      "note": "Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "ceiling 85 /1000, and one of the four edges in this profile with no local corpus contact. Register sample 61.2. Local corpus of 16 documents ran 41.5 median / 69.6 p90 / 79.1 max, so the edge sits above the local maximum and reports 0 of 16. An earlier draft reported 1 of 18 here, but that document was a Python source file whose commas were argument separators, admitted by a widened prose gate; it is the reason the gate is back at the engine default. The edge is the register sample at about 1.4x and the local corpus cannot check it.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The port is busy. Traffic rose a tenth last year. The operators are turning ships away. This is new. For a decade they complained about spare capacity. Now they complain about the lack of it. The mood on the quay has changed. Dockers work double shifts. The cranes run past midnight. Boxes stack six high. The yard was built for four. Something has to give. The surge is not about European industry. It is about the Red Sea. Ships now sail around the Cape. That adds ten days to a voyage from Shanghai. Cargo has moved north as a result. Rotterdam has taken most of it. Antwerp has taken some. Hamburg has taken the rest. None of the three trusts the boom. All three are drawing up plans anyway. The plans involve concrete. The concrete involves money. The money involves the province. The province wants to wait. The operators want to build. The unions want a wage round first. Nobody has moved. Cairo has moved. The canal authority has cut its tolls. Smaller lines are already going back. The big lines are watching. If they follow the boom ends. If they do not it continues. Nobody knows which. The studies disagree. The consultants disagree. The ministers have not read either study. A decision is due in a fortnight. It will be made on a summary. The summary runs to two pages. One of them is a chart. The chart shows two lines. They cross in 2029. That is the whole argument. It will be settled by a chart. Somebody drew that chart in an afternoon. Nobody will ever check it. The berths will be built or they will not. The quay will be full or it will be empty. Either way the dockers will work nights.",
           "The provincial government, which owns the land under the eastern terminal, and which has, for reasons that nobody in the harbour authority has ever fully understood, retained the right to approve any structure taller than the old grain silo, has asked the operators, not for the first time, to resubmit the drawings. The operators, who had assumed, on the basis of a letter sent in February, that the drawings were settled, and who have already ordered the steel, are, understandably, annoyed. Their annoyance, however justified, will not move the province, which has, in matters of this kind, an almost geological patience. The drawings, all four hundred pages of them, went back on Monday, unaltered except for a revised title block, a new date, and, at the insistence of the province's own engineers, a note recording that the crane rails, which are of a standard gauge, are indeed of a standard gauge. The unions, meanwhile, watching all this from the night shift, have concluded, reasonably enough, that nothing will be built this year, and have adjusted their wage claim accordingly, upwards. The employers, who had hoped, rather optimistically, that the ballot would be settled before the steel arrived, now find themselves negotiating with a workforce that knows, as they do, that the steel will sit on the quay, in the rain, for at least another winter. The steel, it should be said, is not the problem. The problem, as it has been since the first study was commissioned, is that nobody, on either side of the table, or in the province, or in the ministry, is willing to be the person who says, out loud, in a minuted meeting, that the traffic may not last, and that the berths, if they are built, may stand empty, and that the loss, when it comes, will have to be carried by somebody.  Everybody knows this. Nobody says it. The drawings, therefore, will go round again, with a new date, a new title block, and, in all likelihood, a further note about the gauge of the rails. The steel will wait. The winter will come. The ballot, which was supposed to be settled in June, will be held in November, in the rain, on the quay, by men who have long since stopped believing anything they are told about berths."
         ],
         "miss": [
@@ -222,7 +136,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 15,
+        "<=": 15,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -254,7 +168,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 25,
+        ">=": 25,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -286,7 +200,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 28,
+        ">=": 28,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -318,7 +232,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 55,
+        ">=": 55,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -350,7 +264,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 6,
+        ">=": 6,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -382,7 +296,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 4,
+        ">=": 4,
         "per": 1000,
         "unit": "words",
         "needs": {

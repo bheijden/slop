@@ -1,7 +1,7 @@
 // A project can move a threshold without forking the rule, and only params move.
 import { resolveRules } from '../js/config.mjs';
 const base = resolveRules({});
-const tuned = resolveRules({ tune: { 'colon-appositive': { above: 500 } } });
+const tuned = resolveRules({ tune: { 'colon-appositive': { '>=': 500 } } });
 const find = (rs) => rs.rules.find((r) => r.id === 'colon-appositive');
 const DOC = ('The bottleneck is not the solver: it is the model. '
   + 'The plant is a solver inside a solver: an outer optimizer searches. '

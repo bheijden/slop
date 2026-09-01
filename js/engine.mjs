@@ -321,18 +321,23 @@ const MATCHERS = {
 // ---- the verdict ----------------------------------------------------------
 
 // `notable` says when a count is worth reporting:
-//   { above: 0 }                       any occurrence at all
-//   { above: 3, per: 1000 }            a habit: 3 or more per 1000 words
-//   { below: 1, per: 1000 }            an absence, which is also a tell
-//   { between: [30, 85], per: 1000 }   outside a band, either side
+//   { '>': 0 }                         any occurrence at all
+//   { '>=': 3, per: 1000 }             a habit: 3 or more per 1000 words
+//   { '<': 1, per: 1000 }              an absence, which is also a tell
+//   { '<=': 30, '>=': 85, per: 1000 }  a band: notable on either side
+// The operator is written out because the comparison is the rule's meaning,
+// not a detail of it: `> 0` and `>= 3` differ, and a name like `above` hides
+// which one a rule meant.
 // `needs` refuses to judge a document too short for the rate to mean anything.
 // A prose gate keeps rates off config dumps and diffs, where they are noise.
 function verdictOf(rule) {
   const n = rule.notable;
   if (!n) throw new Error(`rule "${rule.id}": needs a "notable" saying when it reports`);
-  const band = Array.isArray(n.between) ? n.between : null;
-  if (band === null && n.above === undefined && n.below === undefined) {
-    throw new Error(`rule "${rule.id}": "notable" needs above, below or between`);
+  const OPS = { '>': (v, t) => v > t, '>=': (v, t) => v >= t,
+                '<': (v, t) => v < t, '<=': (v, t) => v <= t };
+  const bounds = Object.keys(OPS).filter((k) => n[k] !== undefined).map((k) => [k, n[k]]);
+  if (!bounds.length) {
+    throw new Error(`rule "${rule.id}": "notable" needs one of >, >=, < or <=`);
   }
   const per = n.per || null;
   const needs = n.needs || {};
@@ -361,28 +366,23 @@ function verdictOf(rule) {
       if (minFunctionWords && functionWordRatio(text) < minFunctionWords) return { fires: false };
     }
     if (minMatches && count < minMatches) return { fires: false };
-    const lo = band ? band[0] : n.below;
-    const hi = band ? band[1] : n.above;
-    // A count of occurrences is discrete and a rate is continuous, so they
-    // compare differently: `above: 0` on a count means at least one, while
-    // `above: 3` on a rate means 3.0 or more.
-    const discrete = !per && metric === undefined;
-    const under = lo !== undefined && (discrete ? value < lo : value <= lo);
-    const over = hi !== undefined && (discrete ? value > hi : value >= hi);
-    if (!under && !over) return { fires: false };
+
+    // Any bound crossing is notable. Two bounds is a band: notable outside it.
+    const hit = bounds.find(([op, t]) => OPS[op](value, t));
+    if (!hit) return { fires: false };
 
     const shown = per || metric !== undefined
       ? (value >= 10 ? Math.round(value) : Math.round(value * 100) / 100) : value;
     const unit = n.unit || 'words';
-    const where = under ? `at or below ${lo}` : `at or above ${hi}`;
+    const where = `${hit[0]} ${hit[1]}`;
     return {
       fires: true, value, count, words,
-      // A bare count with no `per` is the old span behaviour: report each
-      // occurrence and say nothing about the document.
+      // A bare count with no `per` is span behaviour: report each occurrence
+      // and say nothing about the document as a whole.
       docLevel: Boolean(per) || metric !== undefined,
       measure: metric !== undefined
-        ? `${detail || ''}, variation ${shown}, ${where}`.replace(/^, /, '')
-        : per ? `${count} in ${words} ${unit}, ${shown} per ${per}, ${where}`
+        ? `${detail || ''}, variation ${shown} ${where}`.replace(/^, /, '')
+        : per ? `${count} in ${words} ${unit}, ${shown} per ${per} ${where}`
               : `${count}`,
     };
   };

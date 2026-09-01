@@ -289,7 +289,7 @@ async function main() {
     const dup = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');
       t.value=JSON.stringify({name:'dup',rules:[1,2,3].map(()=>({id:'a',kind:'regex',
-        match:{kind:'regex',pattern:'foo',flags:'gi'},notable:{above:0},
+        match:{kind:'regex',pattern:'foo',flags:'gi'},notable:{'>':0},
         description:'d',suggest:'s',tests:{hit:['a foo b'],miss:['bar']}}))});
       t.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,1200));
@@ -306,7 +306,7 @@ async function main() {
     const own = await evaluate(`(async()=>{
       const t=document.getElementById('rules-src');
       t.value=JSON.stringify({name:'t',rules:[{id:'x',name:'x',
-        match:{kind:'regex',pattern:'\\\\bfoo\\\\b',flags:'gi'}, notable:{above:0},
+        match:{kind:'regex',pattern:'\\\\bfoo\\\\b',flags:'gi'}, notable:{'>':0},
         description:'d',suggest:'s',tests:{hit:['a foo b'],miss:['football']}}]});
       t.dispatchEvent(new Event('input'));
       await new Promise(r=>setTimeout(r,3000));

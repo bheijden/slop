@@ -96,7 +96,7 @@ exists because the owner does not want them. Keeping ninety-nine of them because
 the research is equivocal is the wrong reading. If a project should keep its em
 dashes, say so and add `--ignore em-dash` once, instead of defending each hit.
 
-**A rate is not an occurrence.** `rather-than` and the other `density` rules fire
+**A rate is not an occurrence.** `rather-than` and the other rate rules fire
 on the whole document, not on a phrase, and the badge shows the rate. Fix them by
 <!-- slop-ignore-start -->
 varying, not by replacing every instance with the same thing: swapping every

@@ -18,7 +18,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -43,7 +43,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -72,7 +72,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -99,7 +99,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -124,7 +124,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -148,7 +148,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -173,7 +173,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -198,7 +198,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -226,7 +226,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -251,7 +251,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -277,7 +277,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [

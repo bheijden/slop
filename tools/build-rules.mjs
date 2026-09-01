@@ -196,7 +196,7 @@ for (const p of api.patterns) {
   }
   // Every one of these upstream rules reports each occurrence, which is what a
   // bare count above zero means.
-  rule.notable = { above: 0 };
+  rule.notable = { '>': 0 };
   rule.tests = casesFor(p.id);
   if (OVERRIDES[p.id]) {
     const o = { ...OVERRIDES[p.id] };

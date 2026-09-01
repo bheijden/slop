@@ -4,8 +4,9 @@ A style profile measures a document against a register. It answers a different
 question from the rest of slop: not "is there a worn phrase here" but "does this
 sound like the writing I am aiming at".
 
-Five ship as candidates. They are `density` and `rhythm` rules only, every rule
-off by default, and none of them can change what the slop detector reports.
+Five ship as candidates. Every rule reports a rate or a variation rather than a
+span, every rule is off by default, and none of them can change what the slop
+detector reports.
 
 ## A band, not a ceiling
 
@@ -19,7 +20,7 @@ statement about fit and carries no verdict at all.
 | | slop rule | style rule |
 |---|---|---|
 | shape | ceiling on a tell | band on a register |
-| kinds | any of the eight | `density` and `rhythm` only |
+| kinds | any of the seven | rates and `rhythm` only |
 | a finding means | this is probably worn | this is off target for that register |
 | on good prose | should be silent | fires routinely |
 | what to do about it | usually rewrite | rewrite, or change the band |
@@ -112,10 +113,10 @@ target behind it.
 A style profile cannot weaken, silence, shadow or override a slop rule. There is
 no field in the schema for it.
 
-The guarantee is structural rather than a matter of policy. `density` and
-`rhythm` are the only kinds that report at document level, and a document-level
-match takes an early return in `analyze()` without ever entering the
-span-overlap loop, so it can never swallow a neighbouring span. Any other kind
+The guarantee is structural rather than a matter of policy. A rule with `per` set
+and a `rhythm` rule report at document level, and a document-level match takes an
+early return in `analyze()` without ever entering the span-overlap loop, so it
+can never swallow a neighbouring span. Any other kind
 could: a single greedy `regex` rule matching a whole sentence will collapse a
 slop finding inside it and say nothing about having done so.
 
@@ -172,13 +173,13 @@ one. It reports `document` in place of a line and column, and the measurement in
 place of a quoted phrase:
 
 ```
-  document  style-academic-citation-low 0 in 1168 words, 0 per 1000, at or below 2
+  document  style-academic-citation-low 0 in 1168 words, 0 per 1000 <= 2
             fix: Below the academic floor (2 attributed sources per 1000 words) …
 ```
 
 Read it as a rate against a band, not as an accusation aimed at a sentence. The
-number before `per 1000` is what your document does; the number after `at or
-below` (or `at or above`) is the edge it crossed. Both are visible so you can
+number before `per 1000` is what your document does; the comparison after it is
+the edge it crossed, written out. Both are visible so you can
 tell how far off you are, and decide whether to move the prose or move the band.
 
 `--format json` carries the same information: a doc-level finding has
@@ -205,33 +206,36 @@ all work on one, and `slop fudge candidates/style-<name>.json` has to pass.
 }
 ```
 
-Rules are `density` or `rhythm`, `"default": "off"`, `"severity": "info"`, and
-ids namespaced with the full set name. Ids are global across every loaded set
-and the last duplicate loaded wins silently, so `style-house-comma-low` rather
-than `comma-low`.
+Rules are `regex` or `rhythm`, `"default": "off"`, `"severity": "info"`, and ids
+namespaced with the full set name. Ids are global across every loaded set and a
+duplicate is refused with the name of the set it collides with, so
+`style-house-comma` rather than `comma`.
 
-**The parameters are inverted from what the words suggest.** `params.min` is the
-ceiling that reports on pile-up, and `params.max` is the floor that reports on
-scarcity. A band is a pair of one-sided rules with `max` below `min`, one rule
-per edge so each edge carries its own wording. Setting both on a single rule
-also works and gives an out-of-band check that is silent between the two values,
-at the cost of one `suggest` string having to serve both edges. Getting the pair
-the wrong way round produces a profile that reports on every document in range
-and looks like it hates all prose, so check that `max` is below `min` every
-time.
+**`notable` carries the comparison, so write the operator you mean.** A one-sided
+edge is one bound. A band is two bounds on the same rule, and it is silent
+between them:
 
-Name an edge for what a reader perceives. For sentence length the rate and the
-perception run opposite: few endings per 1000 words means long sentences, so the
-`-long` edge is `params.max`.
+```jsonc
+"notable": { "<=": 30, ">=": 85, "per": 1000, "unit": "words" }
+```
 
-| metric | kind | pattern | low edge | high edge |
+That reports a document at 30 commas per 1000 words or fewer, or at 85 or more,
+and says nothing in between. The finding names the bound that was crossed, so one
+rule covers both edges, which means its `suggest` has to serve both. Write what
+to do below the band and what to do above it, in that order.
+
+Name a metric for what a reader perceives, not for the direction of the number.
+For sentence length the two run opposite. Few endings per 1000 words means long
+sentences, so the *lower* bound is the *long*-sentence edge.
+
+| metric | kind | pattern | lower bound reports | upper bound reports |
 |---|---|---|---|---|
-| `sentence-length` | density | `[.!?](?=\s\|$)` | `-long` is `max` | `-short` is `min` |
-| `rhythm` | rhythm | none | `-even` is `maxCV` | `-lurching` is `minCV` |
-| `comma` | density | `,` | `-low` is `max` | `-high` is `min` |
-| `second-person` | density | `\b(?:you\|your\|yours)\b` | `-low` is `max` | `-high` is `min` |
-| `nominalisation` | density | `\b\w{4,}(?:tion\|ment\|ity\|ness)s?\b` | `-low` is `max` | `-high` is `min` |
-| `passive` | density | `\b(?:is\|are\|was\|were\|be\|been)\s+\w+(?:ed\|en)\b` | `-low` is `max` | `-high` is `min` |
+| `sentence-length` | regex | `[.!?](?=\s\|$)` | long sentences | short ones |
+| `rhythm` | rhythm | none | even pacing | lurching pacing |
+| `comma` | regex | `,` | little subordination | heavy subordination |
+| `second-person` | regex | `\b(?:you\|your\|yours)\b` | the reader is absent | the reader is addressed |
+| `nominalisation` | regex | `\b\w{4,}(?:tion\|ment\|ity\|ness)s?\b` | plain nouns | abstract ones |
+| `passive` | regex | `\b(?:is\|are\|was\|were\|be\|been)\s+\w+(?:ed\|en)\b` | the actor in front | the actor suppressed |
 
 ### The prose gate will eat your sentence-length rules
 
@@ -269,11 +273,12 @@ length up, and a thousands separator inside a figure counts as a comma.
 `tests.hit` is off band and `tests.miss` is in band, and both are required.
 
 - 280 words minimum, not 250. Fudge variants perturb the extracted word count
-  and a fixture at exactly 250 can drop under `minWords` in a variant.
-- 12 sentences minimum, above the `minSentences` default of 5 for `density` and
-  8 for `rhythm`. Watch for a rule that raises it: a `minSentences` of 15 on a
-  long-sentence rule needs well over a thousand words of fixture, because
-  long-winded prose has few sentences by construction.
+  and a fixture at exactly 250 can drop under `needs.words` in a variant.
+- 12 sentences minimum, above the `needs.sentences` default of 5 for a rate and
+  8 for `rhythm`. Watch for a rule that raises it: `needs.sentences` of 15 on a
+  band whose lower bound is the long-sentence edge needs well over a thousand
+  words of fixture, because long-winded prose has few sentences by
+  construction.
 - Every fixture at least 20% clear of every edge that cites it. A fixture at a
   variation of 0.48 against a ceiling of 0.55 is a coin flip once markup moves
   the numbers.

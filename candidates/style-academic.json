@@ -48,7 +48,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 2,
+        "<=": 2,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -81,7 +81,7 @@
         "flags": "gi"
       },
       "notable": {
-        "below": 1.5,
+        "<=": 1.5,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -106,63 +106,33 @@
       }
     },
     {
-      "id": "style-academic-passive-low",
-      "name": "Less of the passive than this register uses",
+      "id": "style-academic-passive",
+      "name": "Passive constructions outside the rate this register uses",
       "match": {
         "kind": "regex",
         "pattern": "\\b(?:is|are|was|were|be|been|being)\\s+\\w+(?:ed|en)\\b",
         "flags": "gi"
       },
       "notable": {
-        "below": 4.5,
+        "<=": 4.5,
+        ">=": 30,
         "per": 1000,
         "unit": "words",
         "needs": {
-          "words": 250,
-          "sentences": 5
+          "sentences": 5,
+          "words": 250
         }
       },
-      "description": "Passive constructions per 1000 words, counted as a form of “be” followed by a participle. The count is a proxy rather than a parse: it misses participles held away from the auxiliary by an adverb and irregular participles ending in neither -ed nor -en, and every number quoted here carries the same undercount, so the edges and the measurement agree with one another. This register runs a band of 4.5 to 30 per 1000, with a reference median of 11.4. At or below 4.5 the document names an actor in nearly every clause, where this register moves the recipient of the action to the front whenever the actor carries no information. It is a measurement of fit, not a defect: most registers put the actor in front, which is why the same rate reads as a virtue elsewhere.",
-      "suggest": "Below the academic band (4.5 to 30 passives per 1000 words). Put the measurement or the sample at the front of the clause where the person who handled it adds nothing.",
+      "description": "Passive constructions per 1000 words, counted as a form of “be” followed by a participle. The count is a proxy rather than a parse: it misses participles held away from the auxiliary by an adverb and irregular participles ending in neither -ed nor -en, and every number quoted here carries the same undercount, so the edges and the measurement agree with one another. This register runs a band of 4.5 to 30 per 1000, with a reference median of 11.4. At or below 4.5 the document names an actor in nearly every clause, where this register moves the recipient of the action to the front whenever the actor carries no information. At or above 30 almost nothing has an actor at the front of the clause, and the reader has to reconstruct who did what. It is a measurement of fit, not a defect: most registers put the actor in front, which is why the low rate reads as a virtue elsewhere, and two of the fourteen reference papers sit above the high edge and both are readable.",
+      "suggest": "Outside the academic band (4.5 to 30 passives per 1000 words). Below it, put the measurement or the sample at the front of the clause where the person who handled it adds nothing. Above it, name the actor in the passages where the actor is the point.",
       "note": "This is the clearest inversion in the profile. APA Style, Publication Manual section 4.13, recommends the active voice “as much as possible” and then states that the passive is “acceptable in expository writing” and where the focus falls on the object or recipient of the action rather than on the actor - which describes most of a methods section. A conversational profile puts a ceiling on the same metric; this one puts a floor under it, and both are correct about their own register. This edge is the lower half of a genuine two-sided band: style-academic-passive-high carries the upper half, and a document between 4.5 and 30 per 1000 hears nothing from either. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 4.5-30 /1000. Reference corpus, 14 documents / 116,073 words: 4.2 (min) / 11.1 (median) / 30.9 (max), with 1 at or below this edge; over the 13 in-register documents: 4.2 / 11.4 / 30.9, with 1 at or below it. Local corpus, 16 documents / 19,555 words: 0.0 / 2.3 / 8.5, with 12 of 16 below it. The floor is the reference p7. A floor of 4.0 was measured first and rejected: it clears the reference minimum of 4.16 by only four per cent.",
+      "measured": "band 4.5-30 /1000. Reference corpus, 14 documents / 116,073 words: 4.2 (min) / 11.1 (median) / 30.9 (max), with 1 at or below this edge; over the 13 in-register documents: 4.2 / 11.4 / 30.9, with 1 at or below it. Local corpus, 16 documents / 19,555 words: 0.0 / 2.3 / 8.5, with 12 of 16 below it. The floor is the reference p7. A floor of 4.0 was measured first and rejected: it clears the reference minimum of 4.16 by only four per cent.  Upper edge: band 4.5-30 /1000. The reference p90 is 28.1 and the maximum 30.9, so this edge is the reference p86 and 2 of the 14 documents sit on or above it - a conference paper at 30.9 and an MSc thesis at 30.8, both of them in register. No document in the 16-document local corpus reaches it, its maximum being 8.5. A ceiling of 35 was measured first and rejected because it reports in neither corpus, which is a rule measuring nothing.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
           "Here's the thing about calibration that nobody tells you when you start. You'll spend a week fighting the camera mount and then you'll find out the real problem was the cable. I've done this on four robots now and it goes the same way every time. You think it's a maths problem. It isn't. It's a hardware problem wearing a maths costume. The first robot I built had a lovely calibration routine and a bracket made of laser-cut acrylic. Guess which one moved. If your bracket flexes by half a millimetre when the arm swings you can throw away everything the solver told you. So buy the aluminium one. It costs forty dollars and it saves you a fortnight. Here's what I do now before I touch any code at all. I grab the camera and I wiggle it. If I can feel any play in it I stop right there and go find a machinist. Then I run the arm through its full range and I watch the mount like a hawk. You can see flex if you look for it. Only then do I open the laptop. The second thing nobody tells you is that your data collection matters far more than your solver. I used to think the clever solver was the interesting part. It really isn't. Grab twice as many poses from twice as many angles and the boring solver will beat the clever one every time. Take the extra twenty minutes. Your future self will thank you when the numbers stop drifting. And when it does go wrong, and it will, start at the bracket and work inwards. That order has never let me down. It's dull advice. It's also the advice I wish somebody had given me on my first day with a robot arm and a webcam. You'll ignore it anyway. Everybody does. Then you'll buy the aluminium bracket.",
-          "The rig holds the camera. A bracket carries the load. The bracket bolts to the frame. Four bolts hold it. Each bolt takes a washer. The frame sits on rubber feet. The feet damp vibration. The compressor next door is loud. Without the feet the images blur. We learned that fast. The camera looks down. It sees a printed target. The target is a checkerboard. It sits on glass. Glass keeps the pattern flat. Paper does not stay flat. A warped target biases every pose. The bias is small at first. It grows with distance. The arm moves the target. It runs a fixed sequence. The sequence covers the volume. It takes eleven minutes. An operator watches the first pass. Then she walks away. The software records each image. It records the joint angles too. Both streams share a clock. One clock is enough. Two clocks need a sync model. The solver reads both streams. It returns a transform. It prints a residual. Under one millimetre passes. Anything else fails. Failures go back to the bracket. We check the bolts. Then we check the feet. Then we check the target. The solver is never the problem. It is the mount. Or the target. Or the clock. The runbook says so. New operators ignore that line. They come back later. Then they read it again. Then they check the bolts. The rig has run for four years. It has never surprised us. That is the whole point of it. Boring hardware makes boring data. Boring data makes good numbers. Good numbers make short meetings. Nobody writes papers about brackets. Somebody probably should. The bracket is the experiment. The solver is arithmetic. We keep forgetting that. Then the mount moves again."
-        ],
-        "miss": [
-          "The relationship between extrinsic calibration and estimation accuracy has drawn steady attention since factor-graph formulations reached inertial navigation (Kaess et al., 2012). Early treatments assumed that the rigid transform between camera and inertial unit had been fixed in advance by a separate procedure, an assumption that proved untenable in the field, where thermal cycling and mechanical shock move the sensors relative to one another [7]. Later work relaxed the assumption by carrying the transform in the estimated state, at the cost of a larger optimisation problem and a longer collection session. The tension between observability and tractability is usually resolved in favour of tractability, though the grounds for that preference are rarely stated in the published descriptions. Our evaluation suggests that the resulting loss of orientation accuracy is smaller than earlier accounts of the problem indicate, provided the mounting assembly is stiff and the thermal environment stays inside the range over which the calibration ran (Furgale, 2013). We gathered the measurements reported here over eleven sessions, under lighting that ranged from overcast daylight to sodium street lamps, and two independent observers labelled each session. A third reader with access to the raw inertial traces settled their disagreements. The distribution of orientation error appears roughly symmetric, which is consistent with the zero-mean noise the derivation assumes. We saw a residual correlation with temperature in three of the eleven sessions, and its magnitude was around four per cent of the total variance [12]. That correlation is likely attributable to expansion of the mounting bracket rather than to any property of the estimator. The competing account, a slow drift in the inertial bias, is hard to rule out on the present evidence, and a dedicated thermal study of the assembly would be needed to separate the two. For practitioners the implication is narrow. The calibration holds across the operating range examined here, so long as the thermal envelope is respected. Beyond that envelope nobody has examined the assumptions behind the derivation, and extending these conclusions to warmer installations is not warranted by what we measured. Comparable limits appear in evaluations of related estimation frameworks (Rehder and Siegwart, 2017). The contribution of this section is therefore a measurement of a known limitation rather than its removal."
-        ]
-      }
-    },
-    {
-      "id": "style-academic-passive-high",
-      "name": "More of the passive than this register uses",
-      "match": {
-        "kind": "regex",
-        "pattern": "\\b(?:is|are|was|were|be|been|being)\\s+\\w+(?:ed|en)\\b",
-        "flags": "gi"
-      },
-      "notable": {
-        "above": 30,
-        "per": 1000,
-        "unit": "words",
-        "needs": {
-          "words": 250,
-          "sentences": 5
-        }
-      },
-      "description": "Passive constructions per 1000 words, the same count as the low edge of this band. This register runs 4.5 to 30 per 1000, with a reference median of 11.4. At or above 30 almost nothing in the document has an actor at the front of the clause, and the reader has to reconstruct who did what. It is a measurement of fit, not a defect: two of the fourteen reference papers sit here, and both are readable.",
-      "suggest": "Above the academic band (4.5 to 30 passives per 1000 words). Name the actor in the passages where the actor is the point.",
-      "note": "The ceiling comes from the first half of APA Style section 4.13, which recommends the active voice “as much as possible ... to create direct, clear, and concise sentences”. The floor and the ceiling are the same measurement read from opposite ends, which is why they ship as a pair and why the same proxy caveat applies: this pattern misses adverb-separated and irregular participles, and both edges are calibrated on that same undercount. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 4.5-30 /1000. The reference p90 is 28.1 and the maximum 30.9, so this edge is the reference p86 and 2 of the 14 documents sit on or above it - a conference paper at 30.9 and an MSc thesis at 30.8, both of them in register. No document in the 16-document local corpus reaches it, its maximum being 8.5. A ceiling of 35 was measured first and rejected because it reports in neither corpus, which is a rule measuring nothing.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The rig holds the camera. A bracket carries the load. The bracket bolts to the frame. Four bolts hold it. Each bolt takes a washer. The frame sits on rubber feet. The feet damp vibration. The compressor next door is loud. Without the feet the images blur. We learned that fast. The camera looks down. It sees a printed target. The target is a checkerboard. It sits on glass. Glass keeps the pattern flat. Paper does not stay flat. A warped target biases every pose. The bias is small at first. It grows with distance. The arm moves the target. It runs a fixed sequence. The sequence covers the volume. It takes eleven minutes. An operator watches the first pass. Then she walks away. The software records each image. It records the joint angles too. Both streams share a clock. One clock is enough. Two clocks need a sync model. The solver reads both streams. It returns a transform. It prints a residual. Under one millimetre passes. Anything else fails. Failures go back to the bracket. We check the bolts. Then we check the feet. Then we check the target. The solver is never the problem. It is the mount. Or the target. Or the clock. The runbook says so. New operators ignore that line. They come back later. Then they read it again. Then they check the bolts. The rig has run for four years. It has never surprised us. That is the whole point of it. Boring hardware makes boring data. Boring data makes good numbers. Good numbers make short meetings. Nobody writes papers about brackets. Somebody probably should. The bracket is the experiment. The solver is arithmetic. We keep forgetting that. Then the mount moves again.",
           "The mounting assembly was designed by the mechanical team and reviewed by two engineers before the drawings went out. The bracket was machined from a single aluminium billet, and the mating faces were ground flat after the initial cut. Dowel pins were pressed into the plate so the camera can come off and go back on without a fresh calibration. The completed assembly then went to the integration bench, where it was fitted to the arm and the loom was routed along the inner face of the second link. That routing was chosen so the cable would not stretch at the extremes of travel. Once the hardware came together the calibration sequence ran three times and the residuals were logged in the shared record. Images were captured at a fixed exposure, and frames in which the target was partly occluded were discarded before the solver ran. Joint angles were read from the controller at the instant each shutter released, and both streams were stamped with one clock, so no synchronisation model was needed. The resulting transform was compared against the value obtained on the previous rig, and the difference fell well inside the tolerance in the specification. A thermal soak then ran for nine hours, during which the ambient temperature climbed from four degrees to thirty-eight degrees in eight steps. At each step the sequence repeated and the residual went into the log. No drift was detected beyond the noise floor of the measurement. The assembly was therefore accepted, the drawings were archived, and the procedure was written into the runbook so the next rig can be built without the questions that held this one up. Three further assemblies have since been produced to the same drawing and none of them has been rejected at the bench."
         ],
         "miss": [
@@ -179,7 +149,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 3,
+        ">=": 3,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -212,7 +182,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 4,
+        ">=": 4,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -245,7 +215,7 @@
         "flags": "gi"
       },
       "notable": {
-        "below": 45,
+        "<=": 45,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -278,7 +248,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 30,
+        "<=": 30,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -303,62 +273,32 @@
       }
     },
     {
-      "id": "style-academic-sentence-length-long",
-      "name": "Sentences run longer than this register keeps them",
+      "id": "style-academic-sentence-length",
+      "name": "Sentence length outside the range this register keeps",
       "match": {
         "kind": "regex",
         "pattern": "[.!?](?=\\s|$)",
         "flags": "g"
       },
       "notable": {
-        "below": 28,
+        "<=": 28,
+        ">=": 62,
         "per": 1000,
         "unit": "words",
         "needs": {
-          "words": 250,
-          "sentences": 5
+          "sentences": 5,
+          "words": 250
         }
       },
-      "description": "Sentence endings per 1000 words, which is mean sentence length upside down: 28 endings is an average sentence of about 36 words. This register runs a band of 28 to 62 endings per 1000, an average sentence of roughly 16 to 36 words, with a reference median of 45. At or below 28 the average sentence is carrying several clauses at once and the reader has to hold all of them. It is a measurement of fit, not a defect: long periodic sentences are a legitimate scholarly manner and older journals are full of them.",
-      "suggest": "Below the academic band (28 to 62 sentence endings per 1000 words, an average sentence of 16 to 36 words). End one of the longest sentences early and let the qualification stand on its own.",
+      "description": "Sentence endings per 1000 words, which is mean sentence length upside down: 28 endings is an average sentence of about 36 words and 62 endings is an average of about 16. This register runs a band of 28 to 62 endings per 1000, with a reference median of 45. At or below 28 the average sentence is carrying several clauses at once and the reader has to hold all of them. At or above 62 the document is delivering one proposition per sentence, with the relations between them left for the reader to infer. It is a measurement of fit, not a defect: long periodic sentences are a legitimate scholarly manner and older journals are full of them, and short sentences are the plainest way to be understood.",
+      "suggest": "Outside the academic band (28 to 62 sentence endings per 1000 words, an average sentence of 16 to 36 words). Below it, end one of the longest sentences early and let the qualification stand on its own. Above it, join the propositions whose relation to each other is part of the claim.",
       "note": "Two things limit what this edge can see. The measurement is sentence endings, so anything that ends a line without a full stop - a heading, a table row, a list item - lengthens the apparent sentence without lengthening any sentence a reader meets, and a document built mostly of those will read as long-winded when it is not built of sentences at all. The prose gate then draws the line: a document whose mean sentence runs over 60 words is not measured, so this edge reports long-winded prose between roughly 36 and 60 words a sentence and goes quiet above that. On the local corpus everything above the 60-word line was a source file or a bullet list rather than prose, so the gate earns its place there, but a genuinely periodic essay at 70 words a sentence would go unreported and that is a real hole. This edge is the lower half of a two-sided band; style-academic-sentence-length-short carries the upper half. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 28-62 /1000. Reference corpus, 14 documents / 116,073 words: 35.3 (min) / 44.7 (median) / 50.3 (max), a narrow range, so none sits outside either edge; over the 13 in-register documents: 35.3 / 45.1 / 50.3. Local corpus, 16 documents / 19,555 words: 17.3 / 45.5 / 75.0, with 4 of 16 at or below this edge. The edges are set outside the reference range on purpose rather than at its p10 and p90 of 39.6 and 50.2, because fourteen documents is a thin basis for a two-sided interval and no fixture could clear an interval that tight by the 20 per cent this profile asks of its own tests. This is the softest pair of numbers in the profile and the two most likely to move on a wider corpus.",
+      "measured": "band 28-62 /1000. Reference corpus, 14 documents / 116,073 words: 35.3 (min) / 44.7 (median) / 50.3 (max), a narrow range, so none sits outside either edge; over the 13 in-register documents: 35.3 / 45.1 / 50.3. Local corpus, 16 documents / 19,555 words: 17.3 / 45.5 / 75.0, with 4 of 16 at or below this edge. The edges are set outside the reference range on purpose rather than at its p10 and p90 of 39.6 and 50.2, because fourteen documents is a thin basis for a two-sided interval and no fixture could clear an interval that tight by the 20 per cent this profile asks of its own tests. This is the softest pair of numbers in the profile and the two most likely to move on a wider corpus.  Upper edge: band 28-62 /1000. The reference maximum is 50.3, so this edge sits above every one of the 14 documents and above all 13 that are in register. Local corpus, 16 documents / 19,555 words: 17.3 / 45.5 / 75.0, with 3 of 16 at or above it.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
-          "The relationship between extrinsic calibration and downstream estimation accuracy has received sustained attention since the introduction of factor-graph formulations for inertial navigation. The early treatments of the problem uniformly assumed that the rigid transformation between the camera and the inertial measurement unit had been determined in advance by some separate procedure whose failure modes were rarely discussed. That assumption proved untenable in field deployments, where thermal cycling and mechanical shock displace the sensors relative to one another by amounts that are small in absolute terms but entirely sufficient to dominate the orientation error budget of any estimator that treats the transformation as a fixed quantity rather than as something to be recovered alongside the trajectory. Subsequent investigations relaxed the requirement by including the transformation in the estimated state vector, at the cost of a substantial increase in the dimensionality of the optimisation problem and a corresponding increase in the number of poses required before the parameters become observable at all, which in practice means a longer and more carefully designed data collection session. The tension between observability and computational tractability is generally resolved in favour of tractability, although the justification for that preference is rarely made explicit in the published descriptions of the resulting systems. A reader attempting to reproduce the reported accuracy figures will often discover that the missing detail was precisely the one that mattered. Our own evaluation suggests that the degradation in orientation accuracy attributable to a fixed-transformation assumption is smaller than the earlier characterisations of the problem indicate, provided that the mounting assembly is stiff and the thermal environment stays within the range over which the calibration was performed, two conditions that are easy to state and surprisingly difficult to guarantee on a mobile platform. The measurements reported here were collected over eleven sessions under illumination conditions that varied from overcast daylight to sodium street lighting, and each session was annotated independently by two observers whose disagreements were resolved by a third annotator with access to the raw inertial traces rather than to the images alone. A residual correlation with ambient temperature was detected in three of those eleven sessions and its magnitude was estimated at approximately four per cent of the total variance, a figure that is small enough to be ignored in most deployments and large enough to matter in the one deployment for which the system was originally commissioned. The most plausible account of that correlation attributes it to thermal expansion of the mounting bracket rather than to any property of the estimator itself. A competing account attributing it to a slow drift in the inertial bias cannot be excluded on the evidence presently available and would require a dedicated thermal characterisation of the assembly to settle one way or the other. The practical implication for anyone reproducing this work is that the calibration retains its validity across the operating range examined here provided the thermal envelope is respected, and that extending the conclusions to warmer installations is not warranted by the measurements that were actually taken. A further consideration, and one that the literature on this problem has treated only in passing, is the degree to which the annotation procedure itself introduces a bias into the reported figures, since the observers were aware of the hypothesis under test and were working from the same images that the estimator consumed rather than from an independent record of the platform's motion. The most defensible response available to us was to require agreement between two observers before a session entered the analysis, and to route the remaining disagreements to a third reader who worked from the inertial traces alone, an arrangement that removes the most obvious route by which an expectation could propagate into the numbers without pretending that the procedure is now free of every such route. Whether a fully blinded protocol would change the reported figures materially is a question this work does not settle, and the honest summary of the position is that the effect reported here is large enough to survive a bias of the size that the annotation procedure could plausibly introduce, but not so large that the question can be set aside altogether in any replication of the work."
-        ],
-        "miss": [
-          "The relationship between extrinsic calibration and estimation accuracy has drawn steady attention since factor-graph formulations reached inertial navigation (Kaess et al., 2012). Early treatments assumed that the rigid transform between camera and inertial unit had been fixed in advance by a separate procedure, an assumption that proved untenable in the field, where thermal cycling and mechanical shock move the sensors relative to one another [7]. Later work relaxed the assumption by carrying the transform in the estimated state, at the cost of a larger optimisation problem and a longer collection session. The tension between observability and tractability is usually resolved in favour of tractability, though the grounds for that preference are rarely stated in the published descriptions. Our evaluation suggests that the resulting loss of orientation accuracy is smaller than earlier accounts of the problem indicate, provided the mounting assembly is stiff and the thermal environment stays inside the range over which the calibration ran (Furgale, 2013). We gathered the measurements reported here over eleven sessions, under lighting that ranged from overcast daylight to sodium street lamps, and two independent observers labelled each session. A third reader with access to the raw inertial traces settled their disagreements. The distribution of orientation error appears roughly symmetric, which is consistent with the zero-mean noise the derivation assumes. We saw a residual correlation with temperature in three of the eleven sessions, and its magnitude was around four per cent of the total variance [12]. That correlation is likely attributable to expansion of the mounting bracket rather than to any property of the estimator. The competing account, a slow drift in the inertial bias, is hard to rule out on the present evidence, and a dedicated thermal study of the assembly would be needed to separate the two. For practitioners the implication is narrow. The calibration holds across the operating range examined here, so long as the thermal envelope is respected. Beyond that envelope nobody has examined the assumptions behind the derivation, and extending these conclusions to warmer installations is not warranted by what we measured. Comparable limits appear in evaluations of related estimation frameworks (Rehder and Siegwart, 2017). The contribution of this section is therefore a measurement of a known limitation rather than its removal."
-        ]
-      }
-    },
-    {
-      "id": "style-academic-sentence-length-short",
-      "name": "Sentences run shorter than this register keeps them",
-      "match": {
-        "kind": "regex",
-        "pattern": "[.!?](?=\\s|$)",
-        "flags": "g"
-      },
-      "notable": {
-        "above": 62,
-        "per": 1000,
-        "unit": "words",
-        "needs": {
-          "words": 250,
-          "sentences": 5
-        }
-      },
-      "description": "Sentence endings per 1000 words, the same count as the long edge of this band: 62 endings is an average sentence of about 16 words. This register runs 28 to 62 endings per 1000, with a reference median of 45. At or above 62 the document is delivering one proposition per sentence, with the relations between them left for the reader to infer. It is a measurement of fit, not a defect: short sentences are the plainest way to be understood and most registers want more of them.",
-      "suggest": "Above the academic band (28 to 62 sentence endings per 1000 words, an average sentence of 16 to 36 words). Join the propositions whose relation to each other is part of the claim.",
-      "note": "This edge and style-academic-sentence-length-long are the two halves of one band, so a document between 28 and 62 endings per 1000 hears nothing from either. Both run on the engine's default prose gate. An earlier draft widened that gate to minSentenceWords 1, on the reasoning that a document averaging under four words a sentence is exactly what this edge exists to report. The widening was measured and withdrawn: what it actually admitted was a Python source file and a code README, whose apparent sentences are file extensions and version numbers rather than prose. A document averaging under four words a sentence is a list of fragments, and the gate is right to leave it alone. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 28-62 /1000. The reference maximum is 50.3, so this edge sits above every one of the 14 documents and above all 13 that are in register. Local corpus, 16 documents / 19,555 words: 17.3 / 45.5 / 75.0, with 3 of 16 at or above it.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The relationship between extrinsic calibration and downstream estimation accuracy has received sustained attention since the introduction of factor-graph formulations for inertial navigation. The early treatments of the problem uniformly assumed that the rigid transformation between the camera and the inertial measurement unit had been determined in advance by some separate procedure whose failure modes were rarely discussed. That assumption proved untenable in field deployments, where thermal cycling and mechanical shock displace the sensors relative to one another by amounts that are small in absolute terms but entirely sufficient to dominate the orientation error budget of any estimator that treats the transformation as a fixed quantity rather than as something to be recovered alongside the trajectory. Subsequent investigations relaxed the requirement by including the transformation in the estimated state vector, at the cost of a substantial increase in the dimensionality of the optimisation problem and a corresponding increase in the number of poses required before the parameters become observable at all, which in practice means a longer and more carefully designed data collection session. The tension between observability and computational tractability is generally resolved in favour of tractability, although the justification for that preference is rarely made explicit in the published descriptions of the resulting systems. A reader attempting to reproduce the reported accuracy figures will often discover that the missing detail was precisely the one that mattered. Our own evaluation suggests that the degradation in orientation accuracy attributable to a fixed-transformation assumption is smaller than the earlier characterisations of the problem indicate, provided that the mounting assembly is stiff and the thermal environment stays within the range over which the calibration was performed, two conditions that are easy to state and surprisingly difficult to guarantee on a mobile platform. The measurements reported here were collected over eleven sessions under illumination conditions that varied from overcast daylight to sodium street lighting, and each session was annotated independently by two observers whose disagreements were resolved by a third annotator with access to the raw inertial traces rather than to the images alone. A residual correlation with ambient temperature was detected in three of those eleven sessions and its magnitude was estimated at approximately four per cent of the total variance, a figure that is small enough to be ignored in most deployments and large enough to matter in the one deployment for which the system was originally commissioned. The most plausible account of that correlation attributes it to thermal expansion of the mounting bracket rather than to any property of the estimator itself. A competing account attributing it to a slow drift in the inertial bias cannot be excluded on the evidence presently available and would require a dedicated thermal characterisation of the assembly to settle one way or the other. The practical implication for anyone reproducing this work is that the calibration retains its validity across the operating range examined here provided the thermal envelope is respected, and that extending the conclusions to warmer installations is not warranted by the measurements that were actually taken. A further consideration, and one that the literature on this problem has treated only in passing, is the degree to which the annotation procedure itself introduces a bias into the reported figures, since the observers were aware of the hypothesis under test and were working from the same images that the estimator consumed rather than from an independent record of the platform's motion. The most defensible response available to us was to require agreement between two observers before a session entered the analysis, and to route the remaining disagreements to a third reader who worked from the inertial traces alone, an arrangement that removes the most obvious route by which an expectation could propagate into the numbers without pretending that the procedure is now free of every such route. Whether a fully blinded protocol would change the reported figures materially is a question this work does not settle, and the honest summary of the position is that the effect reported here is large enough to survive a bias of the size that the annotation procedure could plausibly introduce, but not so large that the question can be set aside altogether in any replication of the work.",
           "The rig holds the camera. A bracket carries the load. The bracket bolts to the frame. Four bolts hold it. Each bolt takes a washer. The frame sits on rubber feet. The feet damp vibration. The compressor next door is loud. Without the feet the images blur. We learned that fast. The camera looks down. It sees a printed target. The target is a checkerboard. It sits on glass. Glass keeps the pattern flat. Paper does not stay flat. A warped target biases every pose. The bias is small at first. It grows with distance. The arm moves the target. It runs a fixed sequence. The sequence covers the volume. It takes eleven minutes. An operator watches the first pass. Then she walks away. The software records each image. It records the joint angles too. Both streams share a clock. One clock is enough. Two clocks need a sync model. The solver reads both streams. It returns a transform. It prints a residual. Under one millimetre passes. Anything else fails. Failures go back to the bracket. We check the bolts. Then we check the feet. Then we check the target. The solver is never the problem. It is the mount. Or the target. Or the clock. The runbook says so. New operators ignore that line. They come back later. Then they read it again. Then they check the bolts. The rig has run for four years. It has never surprised us. That is the whole point of it. Boring hardware makes boring data. Boring data makes good numbers. Good numbers make short meetings. Nobody writes papers about brackets. Somebody probably should. The bracket is the experiment. The solver is arithmetic. We keep forgetting that. Then the mount moves again."
         ],
         "miss": [
@@ -373,7 +313,7 @@
         "kind": "rhythm"
       },
       "notable": {
-        "above": 1.05,
+        ">=": 1.05,
         "needs": {
           "words": 250,
           "sentences": 8

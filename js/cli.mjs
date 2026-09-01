@@ -247,8 +247,8 @@ async function main() {
     if (!r) { process.stderr.write(`slop: no rule "${id}"\n`); return 2; }
     const m = r.match || {};
     const n = r.notable || {};
-    const band = Array.isArray(n.between) ? `between ${n.between[0]} and ${n.between[1]}`
-      : n.above !== undefined ? `above ${n.above}` : `below ${n.below}`;
+    const band = ['<', '<=', '>', '>='].filter((op) => n[op] !== undefined)
+      .map((op) => `${op} ${n[op]}`).join(' or ');
     const per = n.per ? ` per ${n.per} ${n.unit || 'words'}` : '';
     process.stdout.write(`${C.bold(r.id)}  ${r.name}\n  set:      ${r.set}\n`
       + `  matches:  ${m.kind}\n  notable:  ${band}${per}\n  severity: ${r.severity}\n`);

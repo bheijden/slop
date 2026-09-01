@@ -15,7 +15,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "An em dash, or an en dash or double hyphen standing in for one. Every occurrence, no threshold. This is a house-style rule and it is not optional: the owner of a document that carries it does not want em dashes in it.",
       "suggest": "A comma if the aside is light, a colon if what follows explains, brackets if it is a true aside, a full stop if it is really a second sentence.",
@@ -47,7 +47,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: leverage.",
       "suggest": "Write \"use\".",
@@ -72,7 +72,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: navigate complexities.",
       "suggest": "Name the task: handle it, work through it.",
@@ -97,7 +97,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: comprehensive guide.",
       "suggest": "Drop it. A good guide proves itself.",
@@ -122,7 +122,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: transformative.",
       "suggest": "Show the change concretely.",
@@ -147,7 +147,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: cutting edge.",
       "suggest": "Say what is actually new.",
@@ -172,7 +172,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: empower.",
       "suggest": "Say what it lets people do.",
@@ -197,7 +197,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: unlock value.",
       "suggest": "Say what becomes possible.",
@@ -222,7 +222,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: harness.",
       "suggest": "Say what it uses and for what.",
@@ -247,7 +247,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: streamline.",
       "suggest": "Say what was removed.",
@@ -272,7 +272,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: proactive.",
       "suggest": "Say what you do and when.",
@@ -297,7 +297,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: feel free.",
       "suggest": "Delete it. Just say the thing.",
@@ -322,7 +322,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: end of the day.",
       "suggest": "Cut it, or say what actually decides the matter.",
@@ -349,7 +349,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: in conclusion.",
       "suggest": "Delete it and write the conclusion.",
@@ -374,7 +374,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: dive in.",
       "suggest": "Start with the thing itself.",
@@ -399,7 +399,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: when it comes to.",
       "suggest": "Name the subject directly.",
@@ -424,7 +424,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: game changer.",
       "suggest": "Say what changed and for whom.",
@@ -449,7 +449,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: top notch.",
       "suggest": "Say what makes it good.",
@@ -474,7 +474,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: treasure trove.",
       "suggest": "Say what is in it.",
@@ -499,7 +499,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: embark on.",
       "suggest": "Say what you are starting.",
@@ -524,7 +524,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: foster a.",
       "suggest": "Say what people actually do.",
@@ -549,7 +549,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: moreover.",
       "suggest": "Join the sentences, or delete the connective.",
@@ -576,7 +576,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: elevate.",
       "suggest": "Say what improves and by how much.",
@@ -602,7 +602,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: robust.",
       "suggest": "Name the specific strength: what does it survive?",
@@ -628,7 +628,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: crucial.",
       "suggest": "Say why it matters, or drop the intensifier.",
@@ -655,7 +655,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Flagged by slop-gate as an AI-writing tell: realm.",
       "suggest": "Name the field plainly.",
@@ -680,7 +680,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The intensifier models reach for to signal sincerity. Fifty-three times the human rate, and the highest-ratio tell measured. Measured at ×53 vs humans.",
       "suggest": "Delete it. If the claim needs the word, the claim is not carrying itself.",
@@ -706,7 +706,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The pivot connective used to perform balance, at nineteen times the human rate. Measured at ×19 vs humans.",
       "suggest": "Cut it, or make the contrast explicit.",
@@ -731,7 +731,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Reframing as insight: announcing what the real issue is, rather than stating it. Measured at ×30 vs humans.",
       "suggest": "State the issue. Calling it the real one adds nothing.",
@@ -757,7 +757,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The staged reveal, promising a payoff before delivering one. Measured at ×18 vs humans.",
       "suggest": "Deliver the point without announcing it first.",
@@ -782,7 +782,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "False familiarity: filing the topic into a recognisable genre of situations the reader is assumed to share. Measured at ×12 vs humans.",
       "suggest": "Describe this case rather than the genre.",
@@ -808,7 +808,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Hedging with vibes: reporting an impression where a human states an opinion or a fact. Measured at ×12 vs humans.",
       "suggest": "State the opinion, or the fact.",
@@ -834,7 +834,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The engagement-bait closer, soliciting replies rather than ending. Measured at ×10 vs humans.",
       "suggest": "End on the point. If you want replies, ask something specific.",
@@ -859,7 +859,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Emphatic “actual” used to signal that the real thing is finally being named. Measured at ×8.2 vs humans.",
       "suggest": "Name it without the emphasis.",
@@ -884,7 +884,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Announced gratitude. Not observed in the human baseline at all. Measured at only in AI.",
       "suggest": "Say what you did and with whom.",
@@ -909,7 +909,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The lesson-extraction move that converts an anecdote into a moral. Measured at only in AI.",
       "suggest": "Report what happened and let the reader draw the lesson.",
@@ -934,7 +934,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The rhetorical-question header that packages a conclusion. Measured at construct.",
       "suggest": "State the conclusion as a sentence.",
@@ -960,7 +960,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The negation-then-reason couplet, split across two sentences for cadence. Measured at construct.",
       "suggest": "Give the reason once.",
@@ -985,7 +985,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Pre-emptive reassurance addressed to a reader who did not ask for it. Measured at only in AI.",
       "suggest": "Cut it. State the situation.",
@@ -1011,7 +1011,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 1.0,
+        ">=": 1.0,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1050,7 +1050,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The negation flip without a just/only/merely qualifier: “not a tool but a partner”. Slop Score weights this construction at 25% of its entire score, on its own, separate from word lists.",
       "suggest": "Say what it is. The negated half is usually a straw man nobody proposed.",
@@ -1081,7 +1081,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Significance inflation. Seventeen variants of this construction appear in the essay-domain trigram list, making it the single most repeated shape there.",
       "suggest": "Say what it covers. “Far beyond” is doing the work a specific noun should do.",
@@ -1111,7 +1111,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The section-transition tic that stitches paragraphs together without saying how they relate.",
       "suggest": "Name the relationship. If the next point is a consequence, a caveat or a contrast, say which.",
@@ -1139,7 +1139,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Prose that opens by describing itself. Three inflections of “this essay explores” survive into the essay-domain trigram list.",
       "suggest": "Delete the sentence and start with the argument. The reader can see what they are reading.",
@@ -1168,7 +1168,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Claiming the reader learned something instead of telling them what. Both halves recur across the essay trigram list.",
       "suggest": "State the insight. If it will not fit in a sentence it was not one.",
@@ -1196,7 +1196,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The non-answer that concludes a problem statement by declining to pick anything.",
       "suggest": "List the prongs. If there are three, name them; if there is one, say so.",
@@ -1224,7 +1224,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Retrospective grandeur applied to whatever the paragraph just described.",
       "suggest": "Say what changed and when. Let the reader decide whether it was a turning point.",
@@ -1252,7 +1252,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Teasing the finding in a clause before delivering it, which costs a sentence and adds nothing.",
       "suggest": "Report the finding. The reader does not need to be told you looked closely.",
@@ -1280,7 +1280,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "A high-register way of saying “related” that adds a syllable count instead of a claim.",
       "suggest": "Say how they are linked, and in which direction.",
@@ -1307,7 +1307,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The fixed stock of metaphors that essay-shaped generation reaches for: double-edged sword, level playing field, virtuous cycle, driving force behind, one-size-fits-all.",
       "suggest": "Drop the metaphor and state the mechanism, or find one that belongs to this subject.",
@@ -1338,7 +1338,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The uplift that closes a section without committing to anything: challenge the status quo, confront uncomfortable truths, foster a sense of belonging.",
       "suggest": "Cut it, or name who has to do what.",
@@ -1366,7 +1366,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The appositive flourish that turns a list into a cascade of significance. One of only three regexes the antislop sampler ships, alongside not-X-but-Y.",
       "suggest": "End the sentence after the list, or say what each item actually does.",
@@ -1394,7 +1394,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The \"here's the hidden truth people get wrong\" framing, which survives rewording because it is a shape rather than a phrase.",
       "suggest": "State the thing directly instead of teasing it, and stop casting the reader as the one getting it wrong.",
@@ -1421,7 +1421,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The stock reveal that the real work is the unglamorous part.",
       "suggest": "Say what the work actually was.",
@@ -1446,7 +1446,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Gesturing at a neglected detail rather than stating it. Close cousin of the shipped `thats-the-part`.",
       "suggest": "Name the detail.",
@@ -1471,7 +1471,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "\"X isn't A. It's B.\" — the correction split over two sentences, so a within-sentence rule misses it.",
       "suggest": "Say what it is. The denial adds nothing the assertion does not.",
@@ -1500,7 +1500,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Scene-setting opener that delays the subject.",
       "suggest": "Delete it and start with the subject.",
@@ -1525,7 +1525,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The false-inclusive opener that addresses everyone and therefore no one.",
       "suggest": "Address the reader you actually have.",
@@ -1551,7 +1551,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The explanatory analogy reflex, reached for before the plain description.",
       "suggest": "Describe the thing before reaching for a metaphor.",
@@ -1576,7 +1576,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The concession that costs nothing: “It's not perfect, but it works.” A weakness is admitted in a subordinate clause and immediately overridden, so the reader gets the feeling of balance without any of the information.",
       "suggest": "Say what is wrong with it, and how much that matters. If the answer is “not much”, drop the first half.",
@@ -1605,7 +1605,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The self-interview: “Is it perfect? No. Does it work? Yes.” A question nobody asked, answered in one word, twice in a row.",
       "suggest": "State the answer. The question was never in doubt or you would not have written it.",
@@ -1633,7 +1633,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 20,
+        "<=": 20,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1671,7 +1671,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 0,
+        "<=": 0,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1709,7 +1709,7 @@
         "flags": "g"
       },
       "notable": {
-        "below": 20,
+        "<=": 20,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1740,7 +1740,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 70,
+        ">=": 70,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1771,7 +1771,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 8,
+        ">=": 8,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1803,7 +1803,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 35,
+        ">=": 35,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1839,7 +1839,7 @@
         "kind": "rhythm"
       },
       "notable": {
-        "below": 0.4,
+        "<=": 0.4,
         "needs": {
           "words": 250,
           "sentences": 8
@@ -1870,7 +1870,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 6,
+        ">=": 6,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -1903,7 +1903,7 @@
         "anchors": 2
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Three or more consecutive sentences built on the same syntactic frame, with different words in the slots. The paper's own example is a run of “Dr. Smith, a researcher at Oxford University, found that…”. The `echo` detector cannot see this, because every content word differs; what repeats is the shape. Content words are wildcarded and only the closed class is compared, so the badge shows the frame that repeated.",
       "suggest": "Vary the sentence shapes, or collapse the run into one sentence and a list. Three identical frames read as a form someone filled in.",
@@ -1931,7 +1931,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The single most over-represented construction in the creative-writing lists. It heads both the phrase list and the trigram list.",
       "suggest": "Let the line carry the volume, or say how loud they actually were.",
@@ -1961,7 +1961,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Interior-state telegraphing, and a redundancy: the heart is already in the chest.",
       "suggest": "Cut it, or give the body something specific to do.",
@@ -1991,7 +1991,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The stock somatic reaction, present in four separate spellings in the shipped phrase list.",
       "suggest": "Pick a reaction that belongs to this character and this moment.",
@@ -2021,7 +2021,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The establishing-shot sunset, usually followed by shadows being cast. Four of its fragments make the top-twenty trigrams.",
       "suggest": "Say what time it is, or cut to what happens next.",
@@ -2051,7 +2051,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Duration inflation in place of an actual duration.",
       "suggest": "Give the real interval, or show what filled it.",
@@ -2081,7 +2081,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The beat of significance dropped after a line of dialogue, so the reader knows it landed.",
       "suggest": "Trust the line. If it needs help, the line is the problem.",
@@ -2111,7 +2111,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Narrator-flagged foreshadowing, including the closer that promises a sequel.",
       "suggest": "Delete it. The reader finds out anyway, and the tease costs the surprise.",
@@ -2141,7 +2141,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The wistful closer. Both halves ship as separate entries in the phrase list, which is how often they co-occur.",
       "suggest": "End on the last real thing that happened.",
@@ -2171,7 +2171,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "The resolve-and-embrace ending, which resolves nothing.",
       "suggest": "Let the last scene stand without a summary of how everyone felt about it.",
@@ -2200,7 +2200,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "description": "Withholding as a substitute for description: the thing is named only as not-the-other-thing.",
       "suggest": "Name it. If it cannot be named yet, describe what the character can actually perceive.",
@@ -2230,7 +2230,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 3.0,
+        ">=": 3.0,
         "per": 1000,
         "unit": "words",
         "needs": {

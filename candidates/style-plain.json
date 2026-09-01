@@ -65,68 +65,36 @@
   ],
   "rules": [
     {
-      "id": "style-plain-sentence-length-long",
-      "name": "Sentences longer than this register keeps them",
+      "id": "style-plain-sentence-length",
+      "name": "Sentence length outside the range this register keeps",
       "match": {
         "kind": "regex",
         "pattern": "(?<=\\S)(?<!(?:^|\\n)[^\\S\\n]{0,4}\\d{1,3}(?:\\.\\d{1,3}){0,3})[.!?](?=\\s|$)",
         "flags": "g"
       },
       "notable": {
-        "below": 40,
+        "<=": 40,
+        ">=": 100,
         "per": 1000,
         "unit": "words",
         "needs": {
-          "words": 250,
-          "sentences": 8
+          "sentences": 15,
+          "words": 250
         }
       },
-      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down: 40 endings per 1000 words is an average of 25 words a sentence. This register runs 40 to 100 endings per 1000 words, an average of 10 to 25 words a sentence. At or below 40 the average sentence is 25 words or longer, which is the length GOV.UK names as the point to look at a sentence again. It is a measurement of fit, and reference material and analysis sit outside this band and read perfectly well.",
-      "suggest": "Below the plain band (40 to 100 sentence endings per 1000 words, an average of 10 to 25 words a sentence). Split the longest sentences so each carries one idea.",
+      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down: 40 endings per 1000 words is an average of 25 words a sentence and 100 endings is an average of 10. This register runs 40 to 100 endings per 1000 words. At or below 40 the average sentence is 25 words or longer, which is the length GOV.UK names as the point to look at a sentence again. At or above 100 the page reads as a run of separate statements rather than as connected prose. It is a measurement of fit: reference material and analysis sit below the band and read perfectly well, and release notes and staccato incident write-ups sit above it on purpose.",
+      "suggest": "Outside the plain band (40 to 100 sentence endings per 1000 words, an average of 10 to 25 words a sentence). Below it, split the longest sentences so each carries one idea. Above it, join the shortest statements into sentences that each carry one idea.",
       "note": "GOV.UK: \"Do not use long sentences. Check sentences with more than 25 words to see if you can split them to make them clearer.\" The Federal Plain Language Guidelines have a section on short sentences but give no number. Three things about the measurement, all of them departures from the other style profiles. The pattern is not the bare [.!?](?=\\s|$) they share: it also requires a non-space character before the stop and declines a stop that closes a number at the start of a line, because inline code stripped out of HTML leaves a full stop standing on its own and a numbered heading leaves one after the number. The pattern is shared with style-plain-sentence-length-short, and it is at the short edge that the difference showed: those two artefacts supplied 26% and 33% of the counted endings in the only two local documents that reported there, so both reports were markup rather than prose. Away from those two the change is small: it moves the counted rate by at most 7.8% on any other local document, and by nothing at all on six of them. Because this rule and the prose gate read the same quantity, the gate is also this rule's own ceiling: above an average of 60 words between full stops the engine stops treating the text as prose, so this rule reports averages between 25 and 60 words a sentence and says nothing above that. And params.minSentences is 15 rather than the default 5, because an average over five sentences is not an average: the four local documents with the fewest sentences were also the four with the longest apparent sentences, and all four are bulleted lists whose items carry words but no full stops. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 40-100 /1000; this edge is params.max 40. Published number, not a percentile: GOV.UK's 25-word figure. In-register corpus, 20 measurable documents: 25.1 (min) / 51.1 (p25) / 58 (median) / 81.6 (p90) / 120 (max); 1 of the 20 sits at or below the edge, a help-centre page whose text is mostly a table. Local corpus, 16 documents: 17.3 (min) / 30.1 (p25) / 45.5 (median) / 55.3 (p90) / 63.1 (max); 3 of 16 report. An earlier draft ran with the widened gate and minSentences 5 and reported 8 of 18 local documents; five of those eight were a Python file, a bulleted README, a table-shaped README and two copies of a bullet-and-table issue write-up.",
+      "measured": "band 40-100 /1000; this edge is params.max 40. Published number, not a percentile: GOV.UK's 25-word figure. In-register corpus, 20 measurable documents: 25.1 (min) / 51.1 (p25) / 58 (median) / 81.6 (p90) / 120 (max); 1 of the 20 sits at or below the edge, a help-centre page whose text is mostly a table. Local corpus, 16 documents: 17.3 (min) / 30.1 (p25) / 45.5 (median) / 55.3 (p90) / 63.1 (max); 3 of 16 report. An earlier draft ran with the widened gate and minSentences 5 and reported 8 of 18 local documents; five of those eight were a Python file, a bulleted README, a table-shaped README and two copies of a bullet-and-table issue write-up.  Upper edge: band 40-100 /1000; this edge is params.min 100. Corpus-derived, and it replaces a published number that measurement rejected. In-register corpus, 20 measurable documents: 25.1 (min) / 58 (median) / 70.3 (p75) / 81.6 (p90) / 120 (max). The edge sits above p90 and above every in-register document but one, a 275-word page of bulleted principles whose items average 8.3 words. At the published 67 the rule reported 6 of those 20. Local corpus, 16 documents: max 63.1, so nothing reports; at 67 it reported 2 of 18, and both of those were markup artefacts rather than short sentences.",
       "default": "off",
       "severity": "info",
       "tests": {
         "hit": [
-          "The team decided at the end of the review that the migration would run in three stages rather than as a single cutover, mostly because the earlier attempt had shown how quickly a partial failure could leave the two databases disagreeing about the same account. In the first stage, which ran for six weeks over the summer, every write was mirrored to the new cluster while reads carried on being served from the old one, and a background job compared the two copies row by row. That job wrote a report each morning, which the engineer on call read before the daily meeting started, and the report was noisy at first, largely because of timestamp rounding in a column nobody had looked at since the schema was written. It took the better part of a fortnight to work out which of the differences were real and which were an artefact of the comparison itself, and only then did the numbers start to mean anything. Once the report settled to a handful of rows a day, all of them explained by a known race in the ingest path, the team moved on to the second stage and shifted a small share of read traffic to the new cluster. Latency and error rates were watched on a dashboard that had been built for the migration and was thrown away afterwards, which is the fate of most tooling written under that kind of deadline. The third stage was the cutover itself, and it was deliberately dull, with the share raised from ten per cent to fifty over a week and then to a hundred over a quiet weekend in October. The old cluster was left running in a read-only mode for a further month, in case something turned up that nobody on the team had thought of during the planning that preceded the work. Nothing did turn up, which the team took as evidence that the slow approach had been worth the two extra months that it cost the roadmap, although not everybody agreed with that reading of the outcome. One engineer argued afterwards that the same result could have been reached in half the time with a better comparison tool and rather less caution about a race that had already been understood. The argument was never settled. The next migration was planned in much the same way, because the people who had lived through the first one were also the people who ended up writing the second plan. The plan that came out of that review ran to eleven pages, and most of that length was a list of the things that could go wrong at each stage together with the name of the person who would notice them first. Two of those eleven pages covered the rollback, which nobody expected to use and which the team rehearsed twice anyway, once on a Tuesday afternoon with the whole group watching and once at four in the morning with a single engineer on a laptop. The overnight run was the one that found the problem, because the script that flipped the read traffic back assumed a hostname that only existed while the mirroring job was still running on the old cluster. That assumption came into the script from somebody who had since left the team, and it had been right on the day somebody typed it, which is how most of these things start. The fix took an hour and the argument about whether to write it down took the rest of the morning, since the group could not agree on where a note like that belongs once a migration is over and the cluster it describes has gone. In the end the note went into the runbook for the new cluster, where anybody looking for it would have no reason to be, and also into the commit message, where it has stayed readable ever since. The second stage overlapped with a quarter close, which meant the finance team was reading from the same tables at the same moment as the comparison job, and the two workloads did not sit together comfortably. Nobody had thought to ask about the quarter close during planning, and the lesson the team took from that week was less about databases than about who gets invited to the meeting where somebody picks the dates."
-        ],
-        "miss": [
-          "You can claim a travel grant if you work for a public body and your trip supports a project we already fund. Read this page first. It tells you what to send, how long each step takes, and who to ask when something goes wrong along the way. Your trip qualifies if it lasts fewer than 14 days and your manager has signed the request form before you book anything at all. Ask your finance team if you are not sure. They answer most questions the same day, and they will tell you straight away if the trip falls outside the rules, which saves you the trouble of filling in a form that we would only have to send back. Next, gather your papers. You need the signed form, a quote for the travel, and a short note that says why the trip matters to the work you do. Scan all three and send them to the grants inbox as a single file. We reply within 10 working days. If we need more from you, we will say what is missing and give you a date to send it by, so you are never left guessing at the end of a long week, and we will never turn down a claim without telling you why. Once we approve the grant, we pay it into the account you gave us, and the money usually arrives within five working days. Keep your receipts. We may ask to see them for up to two years after you travel, and we cannot pay a second claim while an older one is still open on your record. If we turn your claim down, write to the same inbox within 28 days and tell us what you think we got wrong. A different officer will read the file and decide. You will hear back within 20 working days, and nothing in that review changes your rights under your contract with the department that employs you. We update this page every spring. Tell us if you find anything here that does not match what we do, because the page is only useful to you while it stays true.",
-          "The build failed and nobody knew why. The log came back empty. We checked the runner and it looked healthy. We checked the cache and it was cold. That seemed odd to us. A cold cache is slow, not fatal. So we looked at the step again. It had timed out after sixty seconds. The install takes ninety seconds. It has always taken ninety. The timeout was the new thing. Someone had lowered it last Thursday. They lowered it to catch a hang. The hang was real enough. The fix pointed at the wrong thing. We raised the timeout and the build passed. Then we went looking for the hang. It sat in a post-install script. The script waited on a lock. The cache held that lock. A cold cache made the lock slow. The two bugs turned out to be one bug. We fixed the script for good. We left the timeout where it was. The build has passed every day since. Nobody has touched that config. Quiet is usually a good sign. It is not always a good sign. So we added a metric for it. The metric tracks install time. It alerts above two minutes. Nothing has alerted so far. The graph has stayed flat. Flat graphs are boring to look at. Boring was the point of the work. The runbook is much shorter now. It says one thing only. Check the install step first. That advice is dull to read. It is also correct. Most advice is one or the other. We wrote it down anyway. The next person will thank us. Or they will not thank us. Either way the note is there. It cost ten minutes to write. The bug had cost two days. That trade is an easy one. We should make it more often. We rarely do make it. There is always another ticket waiting. The note gets written later. Later has a way of never coming. This time it came."
-        ]
-      }
-    },
-    {
-      "id": "style-plain-sentence-length-short",
-      "name": "Sentences shorter than this register keeps them",
-      "match": {
-        "kind": "regex",
-        "pattern": "(?<=\\S)(?<!(?:^|\\n)[^\\S\\n]{0,4}\\d{1,3}(?:\\.\\d{1,3}){0,3})[.!?](?=\\s|$)",
-        "flags": "g"
-      },
-      "notable": {
-        "above": 100,
-        "per": 1000,
-        "unit": "words",
-        "needs": {
-          "words": 250,
-          "sentences": 15
-        }
-      },
-      "description": "Sentence endings per 1000 words, which is average sentence length turned upside down: 100 endings per 1000 words is an average of 10 words a sentence. This register runs 40 to 100 endings per 1000 words, an average of 10 to 25 words a sentence. At or above 100 the page reads as a run of separate statements rather than as connected prose. It is a measurement of fit, and release notes and staccato incident write-ups sit here on purpose.",
-      "suggest": "Above the plain band (40 to 100 sentence endings per 1000 words, an average of 10 to 25 words a sentence). Join the shortest statements into sentences that each carry one idea.",
-      "note": "The Plain English Campaign puts clear writing at \"an average sentence length of 15 to 20 words\", and an earlier draft used the 15-word end of that as the edge, at 67 endings per 1000 words. Measurement against writing in the register does not support it. Six of 20 documents of published plain-language writing sit above 67, among them the Mailchimp Content Style Guide's own chapters on grammar and on voice, at 13.1 and 12.6 words a sentence. The guides ask for short sentences and nowhere object to them: the Plain English Campaign's own line is \"Be punchy.\" The 15-word figure is a target average for the long-form documents those guides discuss, not a floor below which a page leaves the register. So this edge is measured rather than published, and the thing the guides do object to at the short end, every sentence the same length, is read by style-plain-rhythm-even instead. Same pattern and same gate as style-plain-sentence-length-long, and 40 < 100, so the two can never both report. Selecting this profile is the statement that you want this register, so the fix is an instruction, not a question. If the band is wrong for this document, move it with `tune` in slop.json or drop the profile; do not leave the finding unaddressed on the grounds that the register is a choice.",
-      "measured": "band 40-100 /1000; this edge is params.min 100. Corpus-derived, and it replaces a published number that measurement rejected. In-register corpus, 20 measurable documents: 25.1 (min) / 58 (median) / 70.3 (p75) / 81.6 (p90) / 120 (max). The edge sits above p90 and above every in-register document but one, a 275-word page of bulleted principles whose items average 8.3 words. At the published 67 the rule reported 6 of those 20. Local corpus, 16 documents: max 63.1, so nothing reports; at 67 it reported 2 of 18, and both of those were markup artefacts rather than short sentences.",
-      "default": "off",
-      "severity": "info",
-      "tests": {
-        "hit": [
+          "The team decided at the end of the review that the migration would run in three stages rather than as a single cutover, mostly because the earlier attempt had shown how quickly a partial failure could leave the two databases disagreeing about the same account. In the first stage, which ran for six weeks over the summer, every write was mirrored to the new cluster while reads carried on being served from the old one, and a background job compared the two copies row by row. That job wrote a report each morning, which the engineer on call read before the daily meeting started, and the report was noisy at first, largely because of timestamp rounding in a column nobody had looked at since the schema was written. It took the better part of a fortnight to work out which of the differences were real and which were an artefact of the comparison itself, and only then did the numbers start to mean anything. Once the report settled to a handful of rows a day, all of them explained by a known race in the ingest path, the team moved on to the second stage and shifted a small share of read traffic to the new cluster. Latency and error rates were watched on a dashboard that had been built for the migration and was thrown away afterwards, which is the fate of most tooling written under that kind of deadline. The third stage was the cutover itself, and it was deliberately dull, with the share raised from ten per cent to fifty over a week and then to a hundred over a quiet weekend in October. The old cluster was left running in a read-only mode for a further month, in case something turned up that nobody on the team had thought of during the planning that preceded the work. Nothing did turn up, which the team took as evidence that the slow approach had been worth the two extra months that it cost the roadmap, although not everybody agreed with that reading of the outcome. One engineer argued afterwards that the same result could have been reached in half the time with a better comparison tool and rather less caution about a race that had already been understood. The argument was never settled. The next migration was planned in much the same way, because the people who had lived through the first one were also the people who ended up writing the second plan. The plan that came out of that review ran to eleven pages, and most of that length was a list of the things that could go wrong at each stage together with the name of the person who would notice them first. Two of those eleven pages covered the rollback, which nobody expected to use and which the team rehearsed twice anyway, once on a Tuesday afternoon with the whole group watching and once at four in the morning with a single engineer on a laptop. The overnight run was the one that found the problem, because the script that flipped the read traffic back assumed a hostname that only existed while the mirroring job was still running on the old cluster. That assumption came into the script from somebody who had since left the team, and it had been right on the day somebody typed it, which is how most of these things start. The fix took an hour and the argument about whether to write it down took the rest of the morning, since the group could not agree on where a note like that belongs once a migration is over and the cluster it describes has gone. In the end the note went into the runbook for the new cluster, where anybody looking for it would have no reason to be, and also into the commit message, where it has stayed readable ever since. The second stage overlapped with a quarter close, which meant the finance team was reading from the same tables at the same moment as the comparison job, and the two workloads did not sit together comfortably. Nobody had thought to ask about the quarter close during planning, and the lesson the team took from that week was less about databases than about who gets invited to the meeting where somebody picks the dates.",
           "The build failed and nobody knew why. The log came back empty. We checked the runner and it looked healthy. We checked the cache and it was cold. That seemed odd to us. A cold cache is slow, not fatal. So we looked at the step again. It had timed out after sixty seconds. The install takes ninety seconds. It has always taken ninety. The timeout was the new thing. Someone had lowered it last Thursday. They lowered it to catch a hang. The hang was real enough. The fix pointed at the wrong thing. We raised the timeout and the build passed. Then we went looking for the hang. It sat in a post-install script. The script waited on a lock. The cache held that lock. A cold cache made the lock slow. The two bugs turned out to be one bug. We fixed the script for good. We left the timeout where it was. The build has passed every day since. Nobody has touched that config. Quiet is usually a good sign. It is not always a good sign. So we added a metric for it. The metric tracks install time. It alerts above two minutes. Nothing has alerted so far. The graph has stayed flat. Flat graphs are boring to look at. Boring was the point of the work. The runbook is much shorter now. It says one thing only. Check the install step first. That advice is dull to read. It is also correct. Most advice is one or the other. We wrote it down anyway. The next person will thank us. Or they will not thank us. Either way the note is there. It cost ten minutes to write. The bug had cost two days. That trade is an easy one. We should make it more often. We rarely do make it. There is always another ticket waiting. The note gets written later. Later has a way of never coming. This time it came."
         ],
         "miss": [
-          "You can claim a travel grant if you work for a public body and your trip supports a project we already fund. Read this page first. It tells you what to send, how long each step takes, and who to ask when something goes wrong along the way. Your trip qualifies if it lasts fewer than 14 days and your manager has signed the request form before you book anything at all. Ask your finance team if you are not sure. They answer most questions the same day, and they will tell you straight away if the trip falls outside the rules, which saves you the trouble of filling in a form that we would only have to send back. Next, gather your papers. You need the signed form, a quote for the travel, and a short note that says why the trip matters to the work you do. Scan all three and send them to the grants inbox as a single file. We reply within 10 working days. If we need more from you, we will say what is missing and give you a date to send it by, so you are never left guessing at the end of a long week, and we will never turn down a claim without telling you why. Once we approve the grant, we pay it into the account you gave us, and the money usually arrives within five working days. Keep your receipts. We may ask to see them for up to two years after you travel, and we cannot pay a second claim while an older one is still open on your record. If we turn your claim down, write to the same inbox within 28 days and tell us what you think we got wrong. A different officer will read the file and decide. You will hear back within 20 working days, and nothing in that review changes your rights under your contract with the department that employs you. We update this page every spring. Tell us if you find anything here that does not match what we do, because the page is only useful to you while it stays true.",
-          "The team decided at the end of the review that the migration would run in three stages rather than as a single cutover, mostly because the earlier attempt had shown how quickly a partial failure could leave the two databases disagreeing about the same account. In the first stage, which ran for six weeks over the summer, every write was mirrored to the new cluster while reads carried on being served from the old one, and a background job compared the two copies row by row. That job wrote a report each morning, which the engineer on call read before the daily meeting started, and the report was noisy at first, largely because of timestamp rounding in a column nobody had looked at since the schema was written. It took the better part of a fortnight to work out which of the differences were real and which were an artefact of the comparison itself, and only then did the numbers start to mean anything. Once the report settled to a handful of rows a day, all of them explained by a known race in the ingest path, the team moved on to the second stage and shifted a small share of read traffic to the new cluster. Latency and error rates were watched on a dashboard that had been built for the migration and was thrown away afterwards, which is the fate of most tooling written under that kind of deadline. The third stage was the cutover itself, and it was deliberately dull, with the share raised from ten per cent to fifty over a week and then to a hundred over a quiet weekend in October. The old cluster was left running in a read-only mode for a further month, in case something turned up that nobody on the team had thought of during the planning that preceded the work. Nothing did turn up, which the team took as evidence that the slow approach had been worth the two extra months that it cost the roadmap, although not everybody agreed with that reading of the outcome. One engineer argued afterwards that the same result could have been reached in half the time with a better comparison tool and rather less caution about a race that had already been understood. The argument was never settled. The next migration was planned in much the same way, because the people who had lived through the first one were also the people who ended up writing the second plan. The plan that came out of that review ran to eleven pages, and most of that length was a list of the things that could go wrong at each stage together with the name of the person who would notice them first. Two of those eleven pages covered the rollback, which nobody expected to use and which the team rehearsed twice anyway, once on a Tuesday afternoon with the whole group watching and once at four in the morning with a single engineer on a laptop. The overnight run was the one that found the problem, because the script that flipped the read traffic back assumed a hostname that only existed while the mirroring job was still running on the old cluster. That assumption came into the script from somebody who had since left the team, and it had been right on the day somebody typed it, which is how most of these things start. The fix took an hour and the argument about whether to write it down took the rest of the morning, since the group could not agree on where a note like that belongs once a migration is over and the cluster it describes has gone. In the end the note went into the runbook for the new cluster, where anybody looking for it would have no reason to be, and also into the commit message, where it has stayed readable ever since. The second stage overlapped with a quarter close, which meant the finance team was reading from the same tables at the same moment as the comparison job, and the two workloads did not sit together comfortably. Nobody had thought to ask about the quarter close during planning, and the lesson the team took from that week was less about databases than about who gets invited to the meeting where somebody picks the dates."
+          "You can claim a travel grant if you work for a public body and your trip supports a project we already fund. Read this page first. It tells you what to send, how long each step takes, and who to ask when something goes wrong along the way. Your trip qualifies if it lasts fewer than 14 days and your manager has signed the request form before you book anything at all. Ask your finance team if you are not sure. They answer most questions the same day, and they will tell you straight away if the trip falls outside the rules, which saves you the trouble of filling in a form that we would only have to send back. Next, gather your papers. You need the signed form, a quote for the travel, and a short note that says why the trip matters to the work you do. Scan all three and send them to the grants inbox as a single file. We reply within 10 working days. If we need more from you, we will say what is missing and give you a date to send it by, so you are never left guessing at the end of a long week, and we will never turn down a claim without telling you why. Once we approve the grant, we pay it into the account you gave us, and the money usually arrives within five working days. Keep your receipts. We may ask to see them for up to two years after you travel, and we cannot pay a second claim while an older one is still open on your record. If we turn your claim down, write to the same inbox within 28 days and tell us what you think we got wrong. A different officer will read the file and decide. You will hear back within 20 working days, and nothing in that review changes your rights under your contract with the department that employs you. We update this page every spring. Tell us if you find anything here that does not match what we do, because the page is only useful to you while it stays true."
         ]
       }
     },
@@ -137,7 +105,7 @@
         "kind": "rhythm"
       },
       "notable": {
-        "below": 0.4,
+        "<=": 0.4,
         "needs": {
           "words": 250,
           "sentences": 8
@@ -167,7 +135,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 12,
+        ">=": 12,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -200,7 +168,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 65,
+        ">=": 65,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -233,7 +201,7 @@
         "flags": "gi"
       },
       "notable": {
-        "below": 2,
+        "<=": 2,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -265,7 +233,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 8,
+        ">=": 8,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -298,7 +266,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 4,
+        ">=": 4,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -331,7 +299,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 2,
+        ">=": 2,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -364,7 +332,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 5,
+        ">=": 5,
         "per": 1000,
         "unit": "words",
         "needs": {
@@ -397,7 +365,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 6,
+        ">=": 6,
         "per": 1000,
         "unit": "words",
         "needs": {

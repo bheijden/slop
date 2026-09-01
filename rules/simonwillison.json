@@ -20,7 +20,7 @@
         "itemLabel": "“no” item"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -55,7 +55,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -82,7 +82,7 @@
         "itemLabel": "“did not” item"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -107,7 +107,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -134,7 +134,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -159,7 +159,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -185,7 +185,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -209,7 +209,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -236,7 +236,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -263,7 +263,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -288,7 +288,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -317,7 +317,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -344,7 +344,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -370,7 +370,7 @@
         "minRun": 2
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -395,7 +395,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -422,7 +422,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -447,7 +447,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -472,7 +472,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -496,7 +496,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -520,7 +520,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -546,7 +546,7 @@
         "minRun": 2
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -570,7 +570,7 @@
         "minRun": 3
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -595,7 +595,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -635,7 +635,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -660,7 +660,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -685,7 +685,7 @@
         "flags": "gi"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [
@@ -710,7 +710,7 @@
         "flags": "g"
       },
       "notable": {
-        "above": 0
+        ">": 0
       },
       "tests": {
         "hit": [

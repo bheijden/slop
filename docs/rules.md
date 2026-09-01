@@ -228,20 +228,22 @@ is a verdict, not a way of matching.
 
 **`notable` says when the count matters.**
 
+The comparison is the key. Write the operator you mean:
+
 | | |
 |---|---|
-| `{ "above": 0 }` | any occurrence at all. Every span rule looks like this. |
-| `{ "above": 3, "per": 1000 }` | a habit: 3 or more per 1000 words |
-| `{ "below": 1, "per": 1000 }` | an absence, which is also a tell |
-| `{ "between": [30, 85], "per": 1000 }` | outside a band, either side |
+| `{ ">": 0 }` | any occurrence at all. Every span rule looks like this. |
+| `{ ">=": 3, "per": 1000 }` | a habit: 3 or more per 1000 words |
+| `{ "<": 1, "per": 1000 }` | an absence, which is also a tell |
+| `{ "<=": 30, ">=": 85, "per": 1000 }` | a band: notable on either side of 30-85 |
+
+Two bounds make a band, and the report names the one that was crossed, so a
+reader sees which edge the document fell off.
 
 `needs` refuses to judge a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
 250 words, 5 sentences and a prose gate, so rates stay off config dumps and diffs.
 
-A count is discrete and a rate is continuous, so they compare differently:
-`above: 0` on a count means at least one, while `above: 3` on a rate means 3.0
-or more.
 
 `tests.hit` and `tests.miss` are required, and they are not decoration. See
 below.
