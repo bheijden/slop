@@ -41,6 +41,21 @@ hold back a set that fails.
 agent acts on. Both appear in `--format json`, so write `suggest` as a
 directive ("Delete the hedge and state the fact"), not a description.
 
+### Write the description for a reader, not for yourself
+
+A `description` is read by someone who has just been given a finding and does
+not know the rule. Open with what it catches and where it came from, in plain
+words. Put the evidence next. Put the mechanics last, or leave them out.
+
+| first | last |
+|---|---|
+| what the rule catches | how the number is computed |
+| where the pattern came from | why the divisor is what it is |
+| what a finding means | correlations, percentiles, thresholds |
+
+A set's own `description` follows the same order: what this set is for, who
+would choose it, then where it came from, then how it works.
+
 ### `suggest` is the imperative; `description` and `note` carry the argument
 
 An agent acts on `suggest`. Anything in it that can be read as permission will be

@@ -15,6 +15,10 @@ on:
       days:
         description: "how many daily snapshots to pool"
         default: "28"
+      force:
+        description: "rewrite even when the list has not moved (to test this workflow)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -33,7 +37,10 @@ jobs:
       # method rather than data. That is a decision to read, not to merge, so
       # the job fails and says so.
       - name: Rebuild the word list
-        run: node tools/load-bearing.mjs --days "${{ github.event.inputs.days || 28 }}"
+        run: |
+          node tools/load-bearing.mjs \
+            --days "${{ github.event.inputs.days || 28 }}" \
+            ${{ github.event.inputs.force == 'true' && '--bootstrap' || '' }}
 
       - name: Did anything change
         id: diff
@@ -72,8 +79,8 @@ jobs:
             by `tools/load-bearing.mjs`. The word list moved by more than the 10% floor, so this is
             a real refresh rather than a refit landing in the same place.
 
-            The threshold is not re-derived here. It was set against an audit corpus that is not in
-            this repository, so if the list has moved a long way the rule may want re-auditing
-            before this is merged: `node tools/load-bearing.mjs --mine <corpus>`.
+            The threshold is not re-derived here and cannot be: it was set once, by hand, and
+            nothing in this repository can check it. That is what the 40% ceiling is for. Below it
+            the list has moved but the measurement it feeds has not changed shape.
           commit-message: "load-bearing: refresh the vocabulary"
           add-paths: rules/load-bearing.json

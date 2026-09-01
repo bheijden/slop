@@ -11,12 +11,9 @@
 //   node tools/load-bearing.mjs --check    report churn, write nothing
 //   node tools/load-bearing.mjs --days 60
 //   node tools/load-bearing.mjs --bootstrap   take the list whatever the churn
-//   node tools/load-bearing.mjs --mine DIR  score each word against a corpus
 //
-// --mine reads DIR/human and DIR/ai and reports the words that separate on
-// their own, which is what a rule in ai-tells needs. It proposes and does not
-// promote: a word that clears the bar here still gets read before it ships,
-// the same as every other rule in that set.
+// This needs nothing but upstream. It reads their word list and writes ours,
+// so it can run unattended forever.
 //
 // Exit 0 wrote or nothing to do, 1 churn over the ceiling, 2 could not fetch.
 
@@ -63,48 +60,28 @@ async function snapshots(days) {
   return out;
 }
 
-// A word earns its own rule by appearing in almost no human document and a
-// good share of AI ones. The bar is stated here rather than chosen per word.
-const MINE_MAX_HUMAN = 0.02;   // at most 2% of human documents
-const MINE_MIN_AI = 0.20;      // at least 20% of AI documents
-// Two independent sources have to agree. Eighteen AI documents against twelve
-// hundred words will hand you a few winners by chance alone, and upstream's
-// lift is measured over 461,000 documents, so a word has to be characteristic
-// there as well. Without this floor the bar also returns absorb, confined and
-// discipline, none of which upstream ranks at all.
-const MINE_MIN_LIFT = 10;
-
-async function mine(dir, pooled, LIFT) {
-  const { readdirSync } = await import('node:fs');
-  const { extractorFor } = await import('../js/extract.mjs');
-  const read = (kind) => readdirSync(join(dir, kind))
-    .filter((f) => /\.(txt|md|html)$/i.test(f))
-    .map((f) => {
-      const t = extractorFor(f)(readFileSync(join(dir, kind, f), 'utf8'), {}).text;
-      return { file: f, text: t, words: (t.match(/[A-Za-z][A-Za-z'\u2019-]*/g) || []).length };
-    }).filter((d) => d.words >= 250);
-  const H = read('human'), A = read('ai');
-  const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const rows = [];
-  for (const w of pooled) {
-    if ((LIFT.get(w) || 0) < MINE_MIN_LIFT) continue;
-    const re = new RegExp(`\\b${esc(w)}\\b`, 'i');
-    const h = H.filter((d) => re.test(d.text)).length;
-    const a = A.filter((d) => re.test(d.text)).length;
-    if (h / H.length <= MINE_MAX_HUMAN && a / A.length >= MINE_MIN_AI) rows.push({ w, h, a, lift: LIFT.get(w) });
-  }
-  rows.sort((x, y) => y.a - x.a || x.h - y.h);
-  console.log(`\n  mined against ${H.length} human and ${A.length} AI documents`);
-  console.log(`  bar: upstream lift >= ${MINE_MIN_LIFT}, at most ${MINE_MAX_HUMAN * 100}% of human documents, at least ${MINE_MIN_AI * 100}% of AI`);
-  for (const r of rows) console.log(`    ${String(r.a).padStart(2)}/${A.length} ai   ${String(r.h).padStart(2)}/${H.length} human   ${r.lift.toFixed(0).padStart(3)}x  ${r.w}`);
-  console.log(`  ${rows.length} candidates. Read them before promoting any into ai-tells.`);
-  if (rows.length) {
-    console.log(`\n  pattern: \\b(?:${rows.map((r) => esc(r.w)).join('|')})\\b`);
-  }
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(readFileSync(new URL(import.meta.url), 'utf8')
+    .split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n'));
+  process.exit(0);
 }
 
 const days = Number(arg('--days', 28));
-const snaps = await snapshots(days);
+const all = await snapshots(days);
+// Pool back only as far as the last break. Upstream changed method on
+// 2026-08-28 and 63% of the list went with it, so a window that spans that
+// would pool two different measurements into one. A day-to-day move that large
+// is never data, so the newest run of comparable snapshots is the window.
+const snaps = [all[0]];
+for (let i = 1; i < all.length; i++) {
+  const a = new Set(all[i - 1].words), b = all[i].words;
+  const moved = b.filter((w) => !a.has(w)).length / b.length;
+  if (moved > CHURN_CEILING) {
+    console.log(`  stopping at ${all[i].generated}: ${(moved * 100).toFixed(0)}% from the day after it, a change of method`);
+    break;
+  }
+  snaps.push(all[i]);
+}
 const seen = new Map();
 for (const s of snaps) for (const w of new Set(s.words)) seen.set(w, (seen.get(w) || 0) + 1);
 // Keep upstream's own order, taken from the newest snapshot that has the word,
@@ -113,14 +90,6 @@ const rank = new Map();
 for (const s of snaps) s.words.forEach((w, i) => { if (!rank.has(w)) rank.set(w, i); });
 const pooled = [...seen].filter(([, n]) => n >= Math.min(MIN_SNAPSHOTS, snaps.length))
   .map(([w]) => w).sort((a, b) => rank.get(a) - rank.get(b));
-
-const mineDir = arg('--mine', null);
-if (mineDir) {
-  const LIFT = new Map();
-  for (const s of snaps) s.words.forEach((w, i) => { if (!LIFT.has(w)) LIFT.set(w, s.lift[i]); });
-  await mine(mineDir, pooled, LIFT);
-  process.exit(0);
-}
 
 const current = (() => {
   try {
