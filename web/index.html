@@ -518,8 +518,8 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
     <details class="ronly">
       <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
       <div class="body">
-        <p><b>Conformance</b> runs every example you wrote: each <code>tests.hit</code>
-        must match, each <code>tests.miss</code> must not. That is what catches the
+        <p><b>Conformance</b> runs every example you wrote. Each <code>tests.hit</code>
+        must match, and each <code>tests.miss</code> must not. That is what catches the
         <code>very</code> rule below, whose pattern has no word boundaries and so
         fires on "E<b>very</b> request".</p>
         <p><b>Fudging</b> then rewrites each hit 27 ways with the markup real files
@@ -529,8 +529,8 @@ It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-wo
 It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
 &lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span></pre>
         <p>A rule that passes a clean sentence but fails a marked-up one will miss
-        things in real files. Soft-wrapped markdown is the usual culprit: a sentence
-        broken across two lines at column 80 stops matching, and nothing tells you.</p>
+        things in real files. Soft-wrapped markdown is the usual culprit (a sentence
+        broken across two lines at column 80 stops matching) and nothing tells you.</p>
       </div>
     </details>
     <details class="ronly">
@@ -619,7 +619,7 @@ D=~/.claude/skills/linting-prose
 R=https://raw.githubusercontent.com/bheijden/slop/main/skill
 curl -sL $R/SKILL.md -o $D/SKILL.md
 for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; done</pre>
-        <p><code>npx</code> needs nothing: it re-resolves the repo on every call, so it is already current.</p>
+        <p><code>npx</code> needs nothing. It re-resolves the repo on every call, so it is already current.</p>
         <p>Your own rule sets need editing. <code>kind</code> and <code>params</code> move inside <code>match</code>, and <code>notable</code> says when a count is worth reporting: <code>{ "&gt;": 0 }</code> for a rule that fires on any occurrence. Loading an old set names the rule and what to change. <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">The rule format</a> has the rest.</p>
       </div>
     </details>

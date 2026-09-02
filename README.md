@@ -84,8 +84,8 @@ the audit measured firing on human prose and not on AI prose do fire, so they si
 in `candidates/unreproduced.json` instead, off. The five `style-` sets are off
 too, and match a register rather than hunting tells.
 
-Rules are data: a set is a JSON file with its own test examples, so adding one
-never means touching the linter.
+Rules are data. A set is a JSON file carrying its own test examples (the fudger
+runs them, rewritten 27 ways), so adding one never means touching the linter.
 
 **A finding means a phrase is worn, not that a machine wrote it.** Human writers
 produce all of these.
