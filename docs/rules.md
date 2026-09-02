@@ -27,7 +27,7 @@ never fires on your own register costs nothing to leave on, and the 10
 creative-writing rules never fire on documentation. The 5 the audit measured
 seen on human prose and not on AI prose were a different case, because those
 do fire, so they moved to `candidates/unreproduced.json` where turning one
-on is an explicit choice. The `em-dash` rule is house style rather than a tell;
+on is an explicit choice. The `em-dash` rule is house style and not a tell;
 `slop explain em-dash` gives the evidence, which points the other way.
 
 ```sh
@@ -229,13 +229,18 @@ is a threshold, not a way of matching.
 
 | `match.kind` | fields | finds |
 |---|---|---|
-| `regex` | `pattern`, `flags` | occurrences of a pattern. Most rules. |
+| `regex` | `pattern`, `flags`, `distinct` | occurrences of a pattern. Most rules. |
 | `chain` | `pattern`, `headTest`, `itemLabel` | `"no X, no Y, no Z"` lists, counting the items |
 | `echo` | `minGram`, `minRun`, `anchored`, `minFuncWords` | consecutive sentences sharing a word skeleton |
 | `question-chain` | `minRun` | runs of consecutive questions |
 | `anaphora` | `minRun` | consecutive sentences opening on the same word |
 | `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
 | `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
+
+`distinct` on a `regex` matcher counts how many different things the pattern
+matched, not how many times it matched, and reports only the first of
+each. Use it for a word list, where one word repeated because it is the
+document's subject should not carry a rate on its own.
 
 **`notable` says when the count is reportable.**
 
@@ -250,6 +255,11 @@ The comparison is the key. Write the operator you mean:
 
 Two bounds make a band, and the report names the bound it passed, so a
 reader can see which edge the document went outside.
+
+`per` is normally a number, giving a rate per that many words. It can also be
+the string `"root"`, which divides by the square root of the length instead. A
+count of distinct things saturates as a document lengthens, so a plain rate falls
+with length; over the root it does not.
 
 `needs` declines to score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
@@ -308,7 +318,7 @@ code) are marked lossy and only reported for information.
 
 That is how you refine a rule. Write the example, run `fudge`, and fix what
 it reports.
-It proved useful at once. The first run found four real bugs, listed in
+It was useful at once. The first run found four real bugs, listed in
 [docs/extraction.md](docs/extraction.md).
 
 ---
@@ -337,7 +347,7 @@ That paper's taxonomy has 11 codes. Measured against it, without flattery:
 | **Not reached** | Factuality, Relevance, Bias, Coherence, Fluency |
 
 The last line is not a to-do list. Those five need human annotation, and the
-paper says so. A linter that asserted them would be making it up.
+paper says so. A linter that stated them would be making it up.
 
 There is a second limit. This engine matches patterns over spans, with no
 <!-- slop-ignore-start -->

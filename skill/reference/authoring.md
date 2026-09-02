@@ -103,13 +103,18 @@ is a verdict, not a way of matching.
 
 | `match.kind` | fields | finds |
 |---|---|---|
-| `regex` | `pattern`, `flags` | occurrences of a pattern. Most rules. |
+| `regex` | `pattern`, `flags`, `distinct` | occurrences of a pattern. Most rules. |
 | `chain` | `pattern`, `headTest`, `itemLabel` | `"no X, no Y, no Z"` lists, counting the items |
 | `echo` | `minGram`, `minRun`, `anchored`, `minFuncWords` | consecutive sentences sharing a word skeleton |
 | `question-chain` | `minRun` | runs of consecutive questions |
 | `anaphora` | `minRun` | consecutive sentences opening on the same word |
 | `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
 | `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
+
+`distinct` on a `regex` matcher counts how many different things the pattern
+matched rather than how many times it matched, and reports only the first of
+each. Use it for a word list, where one word repeated because it is the
+document's subject should not carry a rate on its own.
 
 **`notable` says when the count is reportable.**
 
@@ -124,6 +129,11 @@ The comparison is the key. Write the operator you mean:
 
 Two bounds make a band, and the report names the bound it passed, so a
 reader can see which edge the document went outside.
+
+`per` is normally a number, giving a rate per that many words. It can also be
+the string `"root"`, which divides by the square root of the length instead. A
+count of distinct things saturates as a document grows, so a plain rate falls
+with length; over the root it does not.
 
 `needs` will not score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to

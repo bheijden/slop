@@ -1,6 +1,6 @@
 ---
 name: linting-prose
-description: Lints prose in markdown, HTML and text files for stock language-model phrasing - hedges such as "it is important to note that", "no X, no Y" denial chains, repeated sentence openings, participle tails - and reports each hit as file:line:col with a suggested rewrite. Use when reviewing, editing or proofreading documentation, READMEs, release notes, blog posts or reports; when asked to make writing sound less AI-generated; or when the user mentions slop.
+description: Lints prose in markdown, HTML and text files for stock language-model phrasing - hedges such as "it is important to note that", "no X, no Y" denial chains, repeated sentence openings, participle tails - and for document-level rates such as how far a vocabulary spreads across a known cluster. Reports each hit as file:line:col with a suggested rewrite. Use when reviewing, editing or proofreading documentation, READMEs, release notes, blog posts or reports; when asked to make writing sound less AI-generated; or when the user mentions slop.
 ---
 
 # Linting prose
@@ -50,6 +50,28 @@ Each finding carries everything needed to fix it:
 
 Replace the span in `match`. Use `sentence` for the surrounding context, and
 follow `suggest` for the rewrite.
+
+A rule that measures a rate reports the document instead of a phrase. It sets
+`docLevel`, and carries the numbers in `rate` and the places they came from in
+`occurrences`:
+
+```json
+{ "file": "docs/intro.md", "docLevel": true,
+  "rule": "load-bearing-vocabulary",
+  "measure": "48 in 862 words, 1.63 per root word >= 1.2",
+  "rate": { "value": 1.63, "per": "root", "unit": "words",
+            "op": ">=", "threshold": 1.2, "count": 48, "words": 862 },
+  "occurrences": [ { "line": 3, "col": 5, "match": "carrying", "context": "…" } ] }
+```
+
+There is no single span to replace. Rewrite until the rate falls under
+`rate.threshold`. When the rule is a word list, the run also carries a
+top-level `vocabularies` object naming every word in it, so you can avoid
+swapping one flagged word for another from the same list:
+
+```json
+{ "vocabularies": { "load-bearing-vocabulary": ["plainly", "quietly", "…"] } }
+```
 
 ## Fixing findings
 
@@ -139,8 +161,12 @@ records where it came from and what it measured on a matched human/AI corpus, an
 `explain` prints both. The built-in catalogue is in
 [reference/rules.md](reference/rules.md).
 
-Every rule in those sets runs; none is held back. `load-bearing` is a 4th set, one rule measuring how far a document's vocabulary spreads across a cluster measured over 461,000 pull request descriptions; it is rebuilt from upstream rather than written here. The five patterns the
-audit measured firing on human prose and not on AI prose are in
+Every rule in those sets runs; none is held back. `load-bearing` is the 4th set
+and holds one rule, measuring how far a document's vocabulary spreads across a
+cluster of 461,000 pull request descriptions. It is rebuilt from upstream by CI
+rather than written here, so its version moves on its own.
+
+The five patterns the audit measured on human prose and not on AI prose are in
 `candidates/unreproduced.json`, off, and turning one on means accepting findings
 the measurement says are not evidence of AI authorship.
 

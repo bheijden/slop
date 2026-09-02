@@ -12,6 +12,9 @@ jobs:
       - run: node tests/run.mjs
       - run: node tests/tune.mjs
       - run: node tests/suggest.mjs
+      # The catalogue is generated. It listed 38 of the 117 rules that ship for
+      # a while, because it was built by the tool that ports two vendor sets.
+      - run: node tools/build-catalogue.mjs --check
 
   candidates:
     name: candidate rule sets
