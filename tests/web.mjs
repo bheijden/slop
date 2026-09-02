@@ -144,6 +144,14 @@ async function main() {
     check('shipped sets run, candidate sets do not',
       JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'load-bearing', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
+    // The derived set is the one a reader is most likely to want to try against
+    // their own text after reading the vocabulary page, so it has to be present
+    // and tickable even though it does not ship on.
+    const offered = await evaluate(`JSON.stringify([...document.querySelectorAll('#rules input[data-toggle]')]
+      .map(b => b.dataset.toggle).sort())`);
+    const all = JSON.parse(offered.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
+    check('the derived vocabulary can be switched on from the page',
+      all.includes('ai-vocabulary') && all.includes('load-bearing'), all.join(','));
 
     // Partly on is a third state. Turning one rule off has to leave the set
     // running and show it as neither fully on nor off.
@@ -395,6 +403,82 @@ async function main() {
     const v = JSON.parse(voc);
     check('vocabulary page loads its data', !/have not been published/.test(v.lede) && v.words > 0,
       JSON.stringify(v).slice(0, 160));
+    // The three pieces that carry the argument: which group was taken as the
+    // register, the per-small group evidence for one word, and the dropped list
+    // saying what step three removed. Each reads a different data shape.
+    const arg = await evaluate(`JSON.stringify({
+      groups: document.querySelectorAll('#groups li').length,
+      quiet: document.querySelectorAll('#groups .dot[data-quiet=true]').length,
+      dots: document.querySelectorAll('.dots circle').length,
+      versus: document.querySelectorAll('#flatlist li').length,
+      verdict: (document.querySelector('.verdict') || {}).textContent || null
+    })`);
+    const a = JSON.parse(arg);
+    check('the register chart draws a row per group', a.groups > 1 && a.quiet <= a.groups,
+      `${a.groups} rows, ${a.quiet} not the register`);
+    check('a word shows its lift in each small group', a.dots > 0, `${a.dots} dots`);
+    check('the two rankings are shown side by side', a.versus > 0, `${a.versus} rows`);
+    // The wording of a verdict is free to change; that a published word gets
+    // one, and that it talks about the small groups, is what has to hold.
+    check('a published word says why it was kept',
+      /small group/.test(a.verdict || '') && (a.verdict || '').length > 40,
+      String(a.verdict).slice(0, 90));
+
+    const rej = await evaluate(`(async () => {
+      document.getElementById('tab-rej').click();
+      await new Promise(r => setTimeout(r, 300));
+      return JSON.stringify({
+        pressed: document.getElementById('tab-rej').getAttribute('aria-pressed'),
+        rows: document.querySelectorAll('#list li').length,
+        verdict: (document.querySelector('.verdict') || {}).textContent || ''
+      });
+    })()`);
+    const r2 = JSON.parse(rej);
+    check('the dropped list explains the drop', r2.pressed === 'true' && r2.rows > 0
+      && /small group/.test(r2.verdict) && /#\d/.test(r2.verdict) && r2.verdict !== a.verdict,
+      JSON.stringify(r2).slice(0, 140));
+
+    // Paging between groups is the whole point of the browse view: every group
+    // has to have a list of its own, not just the published one.
+    const paged = await evaluate(`(async () => {
+      document.getElementById('tab-kept').click();
+      const first = [...document.querySelectorAll('#list li')].map(l => l.dataset.w).slice(0, 5);
+      const wasReg = document.getElementById('isreg').textContent;
+      document.getElementById('next').click();
+      await new Promise(r => setTimeout(r, 300));
+      const second = [...document.querySelectorAll('#list li')].map(l => l.dataset.w).slice(0, 5);
+      return JSON.stringify({ first, second, wasReg,
+        nowReg: document.getElementById('isreg').textContent,
+        label: document.getElementById('which').textContent,
+        about: document.getElementById('about').textContent.length,
+        aboutStartsRight: /^group \\d/.test(document.getElementById('about').textContent),
+        rows: document.querySelectorAll('#list li').length });
+    })()`);
+    const P = JSON.parse(paged);
+    check('paging shows a different group with its own words',
+      P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.label)
+      && P.about > 20 && P.aboutStartsRight,
+      JSON.stringify(P).slice(0, 400));
+    check('the register is labelled and the others are not',
+      P.wasReg.length > 0 && P.nowReg.length === 0, `"${P.wasReg}" then "${P.nowReg}"`);
+
+    // The arrival chart and the per-word rate history, both drawn from the whole
+    // archive rather than from the fitting window.
+    const hist = await evaluate(`(async () => {
+      document.getElementById('prev').click();
+      await new Promise(r => setTimeout(r, 400));
+      return JSON.stringify({
+        bands: document.querySelectorAll('#arrive path').length,
+        cap: document.getElementById('acap').textContent,
+        rateLines: document.querySelectorAll('.detail svg path[stroke-width]').length,
+        facts: document.querySelectorAll('.detail .facts').length
+      });
+    })()`);
+    const HH = JSON.parse(hist);
+    check('the arrival chart draws a band per group',
+      HH.bands >= 5 && /signs itself/.test(HH.cap), JSON.stringify(HH).slice(0, 150));
+    check('a word shows its weekly rate, signed against all',
+      HH.rateLines >= 2 && HH.facts >= 2, JSON.stringify(HH).slice(0, 120));
     check('the stack draws a band per signing tool', v.bands > 0 && v.legend === v.bands,
       `${v.bands} bands, ${v.legend} legend entries`);
     // Year rules used to be drawn once per week inside January, so the labels

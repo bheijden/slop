@@ -111,6 +111,66 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .steps b{color:var(--ink);font-weight:600}
 code{background:var(--sunk);border-radius:4px;padding:1px 4px;font-size:12px}
 .colophon{color:var(--muted);font-size:11.5px;margin-top:34px;max-width:78ch}
+/* the topic groups: one row each, dot at its signed share */
+.groups{margin:0;padding:0;list-style:none}
+.groups li{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:center;padding:3px 0}
+.groups .gid{color:var(--muted);font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.groups .track{position:relative;height:26px}
+.groups .rail{position:absolute;left:0;right:0;top:13px;height:1px;background:var(--hair)}
+.groups .dot{position:absolute;top:6px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--flag);opacity:.85}
+.groups .dot[data-quiet=true]{background:var(--muted);opacity:.45}
+.groups .about{position:absolute;top:5px;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(46ch,54%);background:var(--card);padding:0 5px}
+.groups .pc{position:absolute;top:5px;font-variant-numeric:tabular-nums;font-size:11.5px;color:var(--ink);background:var(--card);padding:0 5px}
+
+/* the argument, side by side */
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
+@media (max-width:720px){.versus{grid-template-columns:1fr}}
+.versus .pane header b{font-weight:600}
+.versus ol{list-style:none;margin:0;padding:6px 12px 12px;counter-reset:v}
+.versus li{counter-increment:v;display:grid;grid-template-columns:22px 1fr auto;gap:8px;padding:3px 0;align-items:baseline}
+.versus li::before{content:counter(v);color:var(--muted);font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.versus .x{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.versus .kept .x{color:var(--flag)}
+
+/* the evidence plot for one word */
+.dots{margin:12px 0 2px}
+.dots .lane{stroke:var(--hair);stroke-width:1}
+.dots .one{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3}
+.dots circle{fill:var(--flag)}
+.dots circle.under{fill:var(--muted);opacity:.5}
+.tabs{display:flex;gap:2px}
+.tabs button{background:none;border:0;padding:3px 9px;border-radius:5px;color:var(--muted);cursor:pointer;font-size:11.5px}
+.tabs button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+.verdict{margin:10px 0 0;padding:8px 10px;border-radius:7px;background:var(--sunk);color:var(--muted);font-size:11.5px;max-width:70ch}
+.verdict b{color:var(--ink);font-weight:600}
+
+/* words the small groups removed */
+.drops{list-style:none;margin:0;padding:4px 8px 10px;max-height:340px;overflow:auto;scrollbar-width:thin}
+.drops li{display:grid;grid-template-columns:44px 150px 60px 1fr;gap:10px;align-items:baseline;padding:3px 4px;border-radius:5px}
+.drops li:hover{background:var(--sunk)}
+.drops .n{color:var(--muted);font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.drops .x{color:var(--flag);font-size:11.5px;font-variant-numeric:tabular-nums}
+.drops .why{color:var(--muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.groups .dot[data-register=true]{box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--flag)}
+
+/* paging between groups */
+.pager{display:flex;align-items:center;gap:6px}
+.pager button{background:none;border:1px solid var(--hair);border-radius:6px;width:22px;height:22px;
+  display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:11px;padding:0}
+.pager button:hover{background:var(--sunk);color:var(--ink)}
+.pager .which{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pager .tag{color:var(--flag);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.about-strip{padding:7px 12px;border-bottom:1px solid var(--hair);color:var(--muted);font-size:11.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* the words this page needs before any of it means anything */
+.glossary{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:0 22px;
+  background:var(--card);border:1px solid var(--hair);border-radius:10px;box-shadow:var(--lift);
+  padding:14px 18px;margin-top:14px}
+.glossary dt{font-weight:600;color:var(--ink);margin-top:10px}
+.glossary dt:first-of-type{margin-top:0}
+.glossary dd{margin:2px 0 0;color:var(--muted);max-width:52ch}
+.glossary dd em{font-style:normal;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -129,7 +189,7 @@ code{background:var(--sunk);border-radius:4px;padding:1px 4px;font-size:12px}
 <main>
   <div class="lede">
     <h1>The words that arrive with the <em>machines</em></h1>
-    <p class="sub" id="lede">Reading the daily counts&hellip;</p>
+    <p class="sub" id="lede">Reading the sample&hellip;</p>
   </div>
 
   <figure class="figure">
@@ -139,13 +199,132 @@ code{background:var(--sunk);border-radius:4px;padding:1px 4px;font-size:12px}
     <div class="legend" id="legend"></div>
   </figure>
 
-  <h2>The list, and how each word got there</h2>
-  <p class="note">Ranked by how much more often a word appears in a signed description than in an
-    unsigned one from the same days. Pick any word to see its own history.</p>
+  <h2>The words this page needs</h2>
+  <p class="note">Six terms, all of them ours, none of them standard. Nothing below means anything
+    without them.</p>
+
+  <dl class="glossary">
+    <dt>Signed</dt>
+    <dd>A pull request description ending in a line the tool wrote about itself &mdash;
+      <em>Generated with&hellip;</em>, <em>Co-authored-by&hellip;</em>, or an HTML comment holding a
+      shouted sentinel. The footer is cut off before any word is counted, so nothing here can learn
+      the footer itself. About one description in eight carries one.</dd>
+
+    <dt>Unsigned</dt>
+    <dd>Every other description. <em>Not a human control.</em> Plenty are machine-written with the
+      footer removed or never added, so the two sides are more alike than they look and every number
+      on this page is a floor rather than a ceiling.</dd>
+
+    <dt>Register</dt>
+    <dd>A way of writing, as opposed to a thing written about. Academic, tabloid, legal, chatty are
+      registers; so is the way a machine writes a pull request description. Two authors covering the
+      same lockfile bump in different registers produce different sentences.</dd>
+
+    <dt>Group</dt>
+    <dd>A pile of descriptions that use similar words, found by clustering and nothing else &mdash;
+      the signatures are hidden while it runs. The corpus is cut into five. One of them is the
+      register, and it is the only one published.</dd>
+
+    <dt>Small group</dt>
+    <dd>The same descriptions cut a second time, into ten. These are never published. They exist only
+      to throw words away: the register spreads across several of them, and a word that only ever
+      turns up in one is a word from that corner rather than from the register.</dd>
+
+    <dt>Lift</dt>
+    <dd>How many times more often a group uses a word than the whole rest of the corpus does.
+      <em>Drawn</em> at 7.4&times; means descriptions in that group write it 7.4 times as often as
+      everyone else. This is the number the list is ranked by.</dd>
+  </dl>
+
+  <h2>What the signature does and does not say</h2>
+  <p class="note">A signed description was written by a machine. That is the whole of it. It does not
+    say the unsigned ones were written by people &mdash; plenty are machine-written with the footer
+    stripped &mdash; and it does not say a group holding more signatures is more machine-sounding.
+    Ranking words by how much more the signed half uses them finds the <em>work</em> rather than the
+    writing, and puts a tool's own name at the top.</p>
+
+  <div class="versus">
+    <div class="pane">
+      <header><b>Ranked by the signature alone</b><span class="spacer"></span><span id="flatnote"></span></header>
+      <ol id="flatlist"></ol>
+    </div>
+    <div class="pane kept">
+      <header><b>Ranked against the rest of the corpus</b><span class="spacer"></span><span id="keptnote"></span></header>
+      <ol id="keptlist"></ol>
+    </div>
+  </div>
+
+  <h2>Step one &mdash; which group is the register</h2>
+  <p class="note">Every description clustered by word use alone, coarsely, with the signatures hidden
+    from the fit. The group holding the largest share of signed descriptions is the one published.
+    Coarse on purpose: split any finer and the register falls into two groups, and the wrong half wins
+    the signed share. A second, independent test &mdash; does this group's vocabulary mark machine
+    writing among descriptions that are <em>not</em> in it &mdash; has to agree, and the page says so
+    when it does not.</p>
+
+  <figure class="figure">
+    <figcaption id="gcap"></figcaption>
+    <ul class="groups" id="groups"></ul>
+    <p class="note" id="agree" style="margin:10px 0 4px"></p>
+  </figure>
+
+  <p class="note">The signed share is measured on the last forty days, but the groups can be applied
+    backwards: every description ever sampled is assigned to its nearest one &mdash; assigned, not
+    re-fitted, so the groups do not move underneath the chart. What that shows is a second, entirely
+    independent reason to believe the choice. The group picked for having the most signatures is also
+    the one that <em>arrived</em>.</p>
+
+  <figure class="figure">
+    <figcaption id="acap"></figcaption>
+    <svg id="arrive" viewBox="0 0 1000 280" role="img" aria-labelledby="arrive-t"></svg>
+    <title id="arrive-t">Each group's share of all sampled pull request descriptions, by week</title>
+  </figure>
+
+  <h2>Step three &mdash; what only lives in one corner</h2>
+  <p class="note">The same descriptions are cut a second time, into ten smaller groups. The register
+    does not turn into one of them &mdash; its descriptions scatter, most into one small group and the
+    rest across three or four others. Each word the ranking put forward is then checked inside every
+    small group. A word common enough to be measured in exactly one of them only ever turns up in one
+    corner of the register, so it belongs to that corner rather than to the register, and is dropped
+    however high it ranked. A word too rare to be measured anywhere is kept: this test may remove
+    evidence, never demand it.</p>
+  <p class="note">Neither obvious reading of this is right. It is not a rarity filter &mdash; the words
+    it drops are <em>rarer</em> in ordinary human prose than the ones it keeps. And it is not merely
+    reaching further down the ranking: on the back-testing corpus a filtered list of 1,200 words
+    catches 21 of 24 machine-written documents against 20 for an unfiltered list of the same length,
+    and 21 against 17 when no false alarm is allowed at all.</p>
+
+  <div class="pane" style="margin-top:14px">
+    <header><b id="dropcount">0</b> words dropped, highest-ranked first</header>
+    <ul class="drops" id="drops"></ul>
+  </div>
+
+  <h2>Every group, and the words in it</h2>
+  <p class="note">Page through the groups with the arrows, or the left and right keys. Each list is
+    built exactly the way the published one is &mdash; ranked by contrast, then filtered &mdash; so
+    what you are reading is what would ship if that group had been the register. Pick a word to see
+    how often it has actually been written each week since January 2025, how much of that is signed,
+    and which small groups could measure it.</p>
 
   <div class="panes">
     <div class="pane">
-      <header><b id="count">0</b> words <input id="q" type="search" placeholder="filter" aria-label="Filter the word list"></header>
+      <header>
+        <div class="pager">
+          <button id="prev" aria-label="Previous group">&lsaquo;</button>
+          <span class="which" id="which">01 / 05</span>
+          <button id="next" aria-label="Next group">&rsaquo;</button>
+          <span class="tag" id="isreg"></span>
+        </div>
+        <span class="spacer"></span>
+        <div class="tabs">
+          <button id="tab-kept" aria-pressed="true">kept</button>
+          <button id="tab-rej"  aria-pressed="false">dropped</button>
+        </div>
+      </header>
+      <div class="about-strip" id="about"></div>
+      <header style="border-top:0">
+        <input id="q" type="search" placeholder="search for a word" aria-label="Filter the word list">
+      </header>
       <ul class="list" id="list" role="listbox" aria-label="Derived vocabulary"></ul>
     </div>
     <div class="pane">
@@ -156,89 +335,177 @@ code{background:var(--sunk);border-radius:4px;padding:1px 4px;font-size:12px}
 
   <h2>How this is built</h2>
   <ol class="steps">
-    <li><b>Sample.</b> Ten five-minute windows a day, one from each 2.4 hour block, start times
-      drawn from the date so a run can be repeated. About a thousand public pull request
+    <li><b>Sample.</b> Ten five-minute windows a day, one from each 2.4 hour block, start times drawn
+      from the date so a run can be repeated to the second. About a thousand public pull request
       descriptions a day.</li>
     <li><b>Split off the signature.</b> Tools sign their work, either as a trailing line that reads
-      like attribution or as a shouted HTML comment. That block is cut from the text before a word
-      is counted, so nothing here can learn the signature itself.</li>
-    <li><b>Label.</b> The signature alone decides whether the writing goes in the signed group or
-      the unsigned one. Which tools exist is the only part kept up to date by hand, through a pull
-      request, because it is the only part that goes stale on its own.</li>
-    <li><b>Count, then discard.</b> Each day becomes one small file of word counts and the text is
-      thrown away. Counts are kept per day, so any window can be rebuilt later and a word's history
-      stays readable.</li>
-    <li><b>Divide.</b> A word's score is its rate in signed descriptions over its rate in unsigned
-      ones. Both groups come from the same days, so anything driven by the calendar (a new tool
-      everyone starts naming, say) cancels out, and what is left is the writing.</li>
+      like attribution or as a shouted HTML comment. Both are matched on form rather than on product
+      name, and the block is cut from the text before a word is counted, so nothing here can learn
+      the signature itself.</li>
+    <li><b>Keep the bag, drop the prose.</b> A description becomes a list of words and how often each
+      occurred. Order is gone, the signature is gone, and the account becomes a number that means
+      nothing outside its own day.</li>
+    <li><b>Find the register.</b> Cluster coarsely; take the group with the largest signed share.
+      This is the only place a signature is used, and it is used to pick one group out of five, not
+      to score anything.</li>
+    <li><b>Rank against the rest.</b> A word's score is its rate inside that group over its rate in
+      every other description. The second term is what penalises words everybody uses, and it is the
+      whole reason this ranks <em>amendment</em> over <em>here</em>.</li>
+    <li><b>Drop what only lives in one corner.</b> Cluster again, finely, and remove any word that is
+      common enough to measure inside a single small group and nowhere else. Words too rare to measure
+      anywhere are kept &mdash; demanding evidence rather than merely not-failing costs ten of the
+      twenty-four documents the list catches, because the demand is a frequency floor and the rare
+      words are the signal.</li>
   </ol>
-  <p class="note">The unsigned group is not a human control. Plenty of machine-written descriptions
-    carry no signature, which makes the two groups more alike, so every number here is a floor
-    and not a ceiling. The corpus is pull request prose and carries that shape.</p>
+  <p class="note">The unsigned side is not a human control: plenty of machine-written descriptions
+    carry no signature, which makes the two sides more alike, so every number here is a floor.</p>
 
-  <p class="colophon">Rebuilt daily by
+  <p class="colophon">Sampled every morning and re-derived on Mondays by
     <a href="https://github.com/bheijden/slop/blob/main/.github/workflows/pr-vocabulary.yml">GitHub Actions</a>.
-    The counts behind this page are in
-    <a href="https://github.com/bheijden/slop/tree/main/data/counts">data/counts</a>, one file a day.
-    The idea of measuring pull request prose this way, and the first twenty months of samples, come from
-    <a href="https://github.com/louisabraham/load-bearing">louisabraham/load-bearing</a>, which reaches
-    the same vocabulary by clustering instead of by reading the signatures.</p>
+    The sample is in <a href="https://github.com/bheijden/slop/tree/main/data/docs">data/docs</a>,
+    one file a day; the fit is in
+    <a href="https://github.com/bheijden/slop/blob/main/data/cluster.json">data/cluster.json</a>.
+    Whether any of this carries over to prose that is not about software is measured against
+    <a href="https://github.com/bheijden/slop/tree/main/data/corpus">data/corpus</a>, twenty-four
+    topics each written once by a person and once by a machine.</p>
 </main>
 
 <script>
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString('en');
+const pc = (v) => (v * 100).toFixed(1) + '%';
+const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-/* Theme: three states, and the button says which one is in force. */
+/* theme, same three states as the rest of the site */
 const theme = $('theme');
 const setTheme = (v) => {
   if (v === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', v);
   theme.textContent = v;
-  try { localStorage.setItem('slop-theme', v); } catch {}
+  try { localStorage.setItem('slop-theme', v); } catch (e) { /* private window */ }
 };
-try { setTheme(localStorage.getItem('slop-theme') || 'auto'); } catch { setTheme('auto'); }
+let saved = 'auto';
+try { saved = localStorage.getItem('slop-theme') || 'auto'; } catch (e) { /* ditto */ }
+setTheme(saved);
 theme.onclick = () => setTheme({ auto: 'light', light: 'dark', dark: 'auto' }[theme.textContent] || 'auto');
 
-let DATA = null, sel = null, hidden = new Set();
+let DATA = null, MODE = 'kept', SELECTED = null, GROUP = 0;
+const hidden = new Set();
+const groupAt = () => DATA.browse[GROUP];
 
-fetch('vocabulary-data.json').then((r) => {
-  if (!r.ok) throw new Error(r.status);
-  return r.json();
-}).then((d) => { DATA = d; render(); }).catch(() => {
-  $('lede').textContent = 'The counts have not been published yet. Run tools/pr-page-data.mjs.';
-});
+// The catch belongs to the fetch, not to render(). Chaining it after render()
+// reports every drawing bug as a missing file, which cost an hour once.
+fetch('vocabulary-data.json')
+  .then((r) => r.json())
+  .catch(() => { $('lede').textContent = 'Could not load vocabulary-data.json.'; return null; })
+  .then((d) => { if (d) { DATA = d; render(); } });
 
 function render() {
-  const d = DATA;
-  const signed = d.totals.marked, all = d.totals.descriptions;
-  const recent = d.series.slice(-8);
-  const recentShare = recent.reduce((a, s) => a + s.signed, 0) / Math.max(1, recent.reduce((a, s) => a + s.total, 0));
-  $('lede').innerHTML = `<b>${(recentShare * 100).toFixed(0)}%</b> of public pull request descriptions `
-    + `now sign themselves as written by a tool, against almost none at the start of 2025. `
-    + `These are the words those descriptions reach for that the rest do not.`;
-  $('cap').innerHTML = `<b>${fmt(all)}</b> descriptions over ${d.days} days `
-    + `<span>${d.from} to ${d.to}</span> <span>${fmt(signed)} signed</span> `
-    + `<span>${fmt(d.totals.vocabulary)} distinct words</span> <span>built ${d.built}</span>`;
-  drawStack();
-  drawLegend();
-  fillList('');
-  if (d.words.length) select(d.words[0].w);
+  const d = DATA, s = d.sample, f = d.fit;
+  $('lede').innerHTML =
+    `<b>${fmt(s.descriptions)}</b> public pull request descriptions sampled over ${s.days} days, ` +
+    `<b>${fmt(s.signed)}</b> of them signed by the tool that wrote them. The list below comes from ` +
+    `the most recent ${f.days} days: ${fmt(f.descriptions)} descriptions, ${fmt(f.vocabulary)} words, ` +
+    `cut into ${f.kRegister} groups to find the register and ${f.kSmall} to control for subject.`;
+  $('cap').innerHTML =
+    `<b>${pc(s.signed / Math.max(1, s.descriptions))}</b> signed over the whole sample &middot; ` +
+    `${s.from} to ${s.to} &middot; share of each week's descriptions carrying a signature, by tool`;
+  // open on the register, whichever group that is
+  GROUP = Math.max(0, DATA.browse.findIndex((g) => g.register));
+  drawStack(); drawLegend(); drawVersus(); drawGroups(); drawArrive(); drawDrops();
+  showGroup();
+  addEventListener('resize', () => { drawStack(); drawArrive(); if (SELECTED) select(SELECTED); });
+  $('q').oninput = () => fillList($('q').value);
+  $('tab-kept').onclick = () => setMode('kept');
+  $('tab-rej').onclick = () => setMode('dropped');
+  $('prev').onclick = () => { GROUP = (GROUP - 1 + DATA.browse.length) % DATA.browse.length; showGroup(); };
+  $('next').onclick = () => { GROUP = (GROUP + 1) % DATA.browse.length; showGroup(); };
+  addEventListener('keydown', (e) => {
+    if (document.activeElement === $('q')) return;
+    if (e.key === 'ArrowLeft') $('prev').click();
+    if (e.key === 'ArrowRight') $('next').click();
+  });
 }
 
-/* ---- the stack ------------------------------------------------------- */
-/* Weekly share of descriptions that signed themselves, one band per tool.
-   Bands are stacked in corpus order, so the tool carrying most of it sits at
-   the bottom and the tail does not jitter above it. */
+function showGroup() {
+  const g = groupAt();
+  const pad2 = (n) => String(n).padStart(2, '0');
+  $('which').textContent = `${pad2(GROUP + 1)} / ${pad2(DATA.browse.length)}`;
+  $('isreg').textContent = g.register ? 'register' : '';
+  $('about').textContent = `group ${g.id} \u00b7 ${fmt(g.size)} descriptions, ${pc(g.share)} signed \u00b7 ${g.about.join(' ')}`;
+  $('q').value = '';
+  fillList('');
+  select((rows()[0] || {}).w);
+}
+
+function setMode(m) {
+  MODE = m;
+  $('tab-kept').setAttribute('aria-pressed', String(m === 'kept'));
+  $('tab-rej').setAttribute('aria-pressed', String(m === 'dropped'));
+  $('q').value = '';
+  fillList('');
+  select((rows()[0] || {}).w);
+}
+
+/* ---- every group's share of the corpus, week by week -------------------- */
+/* The fit is on the last forty days; every week ever sampled is then assigned
+   to those groups. So this is one fixed set of groups seen across the whole
+   archive, not a fit repeated per week, and the register rising from about one
+   per cent to about a fifth is a fact about the corpus rather than about the
+   clustering. */
+function drawArrive() {
+  const svg = $('arrive'), H0 = DATA.history;
+  if (!H0 || !H0.weeks.length) { svg.innerHTML = ''; return; }
+  const W = Math.max(320, Math.round(svg.getBoundingClientRect().width) || 1000);
+  const H = W < 560 ? 220 : 280, L = 34, R = 8, T = 10, B = 22;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const S = H0.weeks, order = H0.order;
+  const reg = groupAt().id;
+  const x = (i) => L + (i / Math.max(1, S.length - 1)) * (W - L - R);
+  const y = (v) => T + (1 - v) * (H - T - B);
+  const parts = [];
+  for (const g of [0.25, 0.5, 0.75]) {
+    parts.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}"/>`);
+    parts.push(`<text class="axis" x="${L - 6}" y="${(y(g) + 3).toFixed(1)}" text-anchor="end">${g * 100}%</text>`);
+  }
+  // the selected group drawn last and in colour, the rest stacked beneath in grey
+  const rest = order.filter((c) => c !== reg);
+  const base = new Array(S.length).fill(0);
+  const band = (c, fill, op) => {
+    const upper = S.map((e, i) => base[i] + (e.docs ? e.byGroup[order.indexOf(c)] / e.docs : 0));
+    const d = upper.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')
+      + base.map((v, i) => [i, v]).reverse().map(([i, v]) => `L${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('') + 'Z';
+    parts.push(`<path d="${d}" fill="${fill}" fill-opacity="${op}" stroke="var(--card)" stroke-width="0.8"><title>group ${c}</title></path>`);
+    for (let i = 0; i < S.length; i++) base[i] = upper[i];
+  };
+  band(reg, 'var(--flag)', 0.85);
+  let shade = 0;
+  for (const c of rest) band(c, 'var(--muted)', 0.34 - 0.05 * (shade++ % 4));
+  const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
+  let last = null;
+  for (let i = 0; i < S.length; i += every) {
+    const q = `${S[i].w.slice(0, 4)} Q${Math.floor(+S[i].w.slice(5, 7) / 3.01) + 1}`;
+    if (q === last) continue;
+    last = q;
+    parts.push(`<text class="axis" x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle">${q}</text>`);
+  }
+  svg.innerHTML = parts.join('');
+  const f = S[0], l = S[S.length - 1];
+  const sh = (e) => (e.docs ? e.byGroup[order.indexOf(reg)] / e.docs : 0);
+  const sg = (e) => (e.byGroup[order.indexOf(reg)] ? e.byGroupSigned[order.indexOf(reg)] / e.byGroup[order.indexOf(reg)] : 0);
+  $('acap').innerHTML = `<b>group ${reg}</b>${groupAt().register ? ', the register,' : ''} in colour &middot; ` +
+    `${pc(sh(f))} of all descriptions in ${f.w}, <b>${pc(sh(l))}</b> in ${l.w} &middot; ` +
+    `and ${pc(sg(l))} of it signs itself, against ${pc(sg(f))} at the start`;
+}
+const rows = () => (MODE === 'kept' ? groupAt().words : groupAt().dropped);
+
+/* ---- the corpus signing itself, week by week --------------------------- */
 function activeProducts() {
-  return DATA.products
-    .map((p) => ({ p, n: DATA.series.reduce((a, s) => a + (s.by[p] || 0), 0) }))
-    .filter((x) => x.n > 0).sort((a, b) => b.n - a.n).map((x) => x.p);
+  return DATA.products.filter((p) => DATA.series.some((s) => (s.by[p] || 0) > 0));
 }
 function drawStack() {
   const svg = $('stack'), S = DATA.series;
-  // One viewBox unit per CSS pixel, so 10px type is 10px on a phone as well as
-  // on a desktop. Re-drawn on resize.
+  if (!S.length) { svg.innerHTML = ''; return; }
   const W = Math.max(320, Math.round(svg.getBoundingClientRect().width) || 1000);
   const H = W < 560 ? 200 : 260, L = 34, R = 8, T = 10, B = 22;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -250,131 +517,293 @@ function drawStack() {
     for (const p of shown) t += (s.by[p] || 0) / Math.max(1, s.total);
     peak = Math.max(peak, t);
   }
-  const top = Math.max(0.05, Math.ceil(peak * 20) / 20);
+  // a ceiling whose quarters are whole percents, so the axis reads 0/4/8/12
+  const top = Math.max(0.04, Math.ceil(peak * 25) / 25);
   const y = (v) => T + (1 - v / top) * (H - T - B);
   const parts = [];
   for (let g = 0; g <= 4; g++) {
     const v = (top * g) / 4;
     parts.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`);
-    parts.push(`<text class="axis" x="0" y="${(y(v) + 3.5).toFixed(1)}">${(v * 100).toFixed(0)}%</text>`);
+    parts.push(`<text class="axis" x="${L - 6}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${(v * 100).toFixed(0)}%</text>`);
   }
   const base = new Array(S.length).fill(0);
-  shown.slice().reverse().forEach((p) => {
+  for (const p of shown) {
     const i0 = DATA.products.indexOf(p) % 9;
     const upper = S.map((s, i) => base[i] + (s.by[p] || 0) / Math.max(1, s.total));
     const path = upper.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')
-      + base.map((v, i) => `L${x(base.length - 1 - i).toFixed(1)},${y(base[base.length - 1 - i]).toFixed(1)}`).join('') + 'Z';
-    parts.push(`<path d="${path}" fill="var(--p${i0})" fill-opacity=".85"><title>${p}</title></path>`);
-    upper.forEach((v, i) => { base[i] = v; });
-  });
-  // One rule per quarter, labelled once. Weeks do not line up with months, so
-  // the label is placed on the first week that reaches each quarter rather than
-  // on every week that happens to fall inside it.
-  // Fewer rules when there is less room for them.
-  const step = W < 560 ? 2 : 1;
-  let lastQ = null, drawn = 0;
-  S.forEach((s, i) => {
-    const q = `${s.w.slice(0, 4)}Q${Math.floor(+s.w.slice(5, 7) / 3.01) + 1}`;
-    if (q === lastQ) return;
-    lastQ = q;
-    if (i === 0) return;
-    if (drawn++ % step) return;
-    parts.push(`<line class="hair" x1="${x(i).toFixed(1)}" x2="${x(i).toFixed(1)}" y1="${T}" y2="${H - B}"/>`);
-    parts.push(`<text class="axis" x="${(x(i) + 4).toFixed(1)}" y="${H - B + 13}">${s.w.slice(0, 7)}</text>`);
-  });
+      + base.map((v, i) => [i, v]).reverse().map(([i, v]) => `L${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('') + 'Z';
+    parts.push(`<path d="${path}" fill="var(--p${i0})" fill-opacity=".82"><title>${esc(p)}</title></path>`);
+    for (let i = 0; i < S.length; i++) base[i] = upper[i];
+  }
+  // one label per quarter, and only where the quarter changes, so two weeks in
+  // the same quarter cannot print the same label twice
+  const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
+  let last = null;
+  for (let i = 0; i < S.length; i += every) {
+    const s = S[i];
+    const q = `${s.w.slice(0, 4)} Q${Math.floor(+s.w.slice(5, 7) / 3.01) + 1}`;
+    if (q === last) continue;
+    last = q;
+    parts.push(`<text class="axis" x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle">${q}</text>`);
+  }
   svg.innerHTML = parts.join('');
 }
 function drawLegend() {
   $('legend').innerHTML = activeProducts().map((p) => {
     const i0 = DATA.products.indexOf(p) % 9;
-    return `<button data-p="${p}" aria-pressed="${!hidden.has(p)}"><i style="background:var(--p${i0})"></i>${p}</button>`;
+    return `<button data-p="${esc(p)}" aria-pressed="${!hidden.has(p)}"><i style="background:var(--p${i0})"></i>${esc(p)}</button>`;
   }).join('');
   for (const b of $('legend').querySelectorAll('button')) {
     b.onclick = () => {
       const p = b.dataset.p;
       hidden.has(p) ? hidden.delete(p) : hidden.add(p);
-      drawStack(); drawLegend();
+      drawLegend(); drawStack();
     };
   }
 }
 
-/* ---- the word list --------------------------------------------------- */
-function sparkline(ranks) {
-  const pts = ranks.map((r, i) => [i, r]).filter(([, r]) => r != null);
-  if (pts.length < 2) return '';
-  const xs = ranks.length - 1;
-  const lo = Math.min(...pts.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]));
-  const span = Math.max(1, hi - lo);
-  // rank 1 is best, so a rising line means a word climbing the list
-  const d = pts.map(([i, r], k) => `${k ? 'L' : 'M'}${(i / xs * 52 + 1).toFixed(1)},${(1 + (r - lo) / span * 14).toFixed(1)}`).join('');
-  return `<svg class="spark" viewBox="0 0 54 16" aria-hidden="true"><path d="${d}"/></svg>`;
+/* ---- the argument: the signature alone, against the contrast ----------- */
+function drawVersus() {
+  $('flatlist').innerHTML = DATA.naive.slice(0, 12).map((r) =>
+    `<li><span class="w">${esc(r.w)}</span><span class="x">${r.lift >= 100 ? Math.round(r.lift) : r.lift.toFixed(1)}&times;${r.kept ? '' : ' &middot; dropped'}</span></li>`).join('');
+  $('keptlist').innerHTML = DATA.words.slice(0, 12).map((r) =>
+    `<li><span class="w">${esc(r.w)}</span><span class="x">${r.lift.toFixed(1)}&times;</span></li>`).join('');
+  const survived = DATA.naive.slice(0, 12).filter((r) => r.kept).length;
+  $('flatnote').textContent = `${12 - survived} of these 12 do not survive`;
+  $('keptnote').textContent = `${fmt(DATA.words.length)} words published`;
 }
+
+/* ---- step one: the coarse groups --------------------------------------- */
+function drawGroups() {
+  const G = [...DATA.groups].sort((a, b) => b.share - a.share);
+  const max = Math.max(0.1, ...G.map((g) => g.share));
+  $('gcap').innerHTML =
+    `<b>${DATA.groups.length}</b> groups &middot; ${fmt(DATA.fit.descriptions)} descriptions &middot; ` +
+    `share of each that signs itself`;
+  $('groups').innerHTML = G.map((g) => {
+    const at = (g.share / max) * 88;
+    const flip = at > 52;
+    const side = flip ? `right:calc(${(100 - at).toFixed(1)}% + 12px);text-align:right`
+                      : `left:calc(${at.toFixed(1)}% + 12px)`;
+    const lab = flip ? `right:calc(${(100 - at).toFixed(1)}% + 58px);text-align:right`
+                     : `left:calc(${at.toFixed(1)}% + 58px)`;
+    return `<li>
+      <span class="gid">${g.id}</span>
+      <span class="track">
+        <span class="rail"></span>
+        <span class="dot" data-quiet="${!g.register}" data-register="${g.register}" style="left:${at.toFixed(1)}%"
+              title="${fmt(g.size)} descriptions, ${fmt(g.signed)} signed, ${fmt(g.repos)} repositories"></span>
+        <span class="pc" style="${side}">${pc(g.share)}</span>
+        <span class="about" style="${lab}">${esc(g.about.slice(0, 6).join(' '))}</span>
+      </span></li>`;
+  }).join('');
+  const r = DATA.register;
+  $('agree').innerHTML = r.agreed
+    ? `Group <b>${r.id}</b> is both the most signed and the best at marking machine writing elsewhere `
+      + `(AUC ${r.auc.toFixed(3)}), so the register is one group.`
+    : `<b>The two tests disagree.</b> The register has probably split across groups, and the list below `
+      + `is drawn from only part of it. A coarser clustering would fix it.`;
+}
+
+/* ---- step three: what the small groups removed -------------------------------- */
+function drawDrops() {
+  const by = new Map(DATA.smallGroups.map((s) => [s.id, s]));
+  $('dropcount').textContent = fmt(DATA.dropped.length);
+  let lastWhy = -1;
+  $('drops').innerHTML = DATA.dropped.slice(0, 60).map((r) => {
+    const v = (r.votes || [])[0];
+    const st = v ? by.get(v.c) : null;
+    // the same small group over and over reads as noise; name it once per run
+    const repeat = lastWhy === (v ? v.c : -1);
+    lastWhy = v ? v.c : -1;
+    return `<li>
+      <span class="n">#${r.rank}</span>
+      <span class="w">${esc(r.w)}</span>
+      <span class="x">${r.lift.toFixed(1)}&times;</span>
+      <span class="why">only in small group <b>${v ? v.c : '?'}</b>${repeat ? '' : ' &mdash; ' + esc(st ? st.about.slice(0, 5).join(' ') : '')}</span>
+    </li>`;
+  }).join('');
+}
+
+/* ---- the list ----------------------------------------------------------- */
 function fillList(filter) {
   const q = filter.trim().toLowerCase();
-  const rows = DATA.words.filter((w) => !q || w.w.includes(q));
-  $('count').textContent = fmt(rows.length);
-  $('list').innerHTML = rows.slice(0, 400).map((w) => `<li role="option" data-w="${w.w}"
-      aria-selected="${w.w === sel}"><span class="n">${w.rank}</span><span class="w">${w.w}</span>
-      <span class="x">${w.lift.toFixed(1)}x</span>${sparkline(w.ranks)}</li>`).join('');
+  const R = rows().filter((w) => !q || w.w.includes(q));
+  $('list').innerHTML = R.slice(0, 400).map((w) => `
+    <li data-w="${esc(w.w)}" role="option" aria-selected="false">
+      <span class="n">${w.rank}</span>
+      <span class="w">${esc(w.w)}</span>
+      <span class="x">${w.lift.toFixed(1)}&times;</span>
+      <span class="n">${w.votes ? w.votes.length + '\u00a0sg' : ''}</span>
+    </li>`).join('');
   for (const li of $('list').querySelectorAll('li')) li.onclick = () => select(li.dataset.w);
+  if (SELECTED) for (const li of $('list').querySelectorAll('li'))
+    li.setAttribute('aria-selected', String(li.dataset.w === SELECTED));
 }
-$('q').oninput = () => fillList($('q').value);
 
-let resizeTimer;
-addEventListener('resize', () => {
-  if (!DATA) return;
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { drawStack(); if (sel) select(sel); }, 120);
-});
-
-/* ---- one word -------------------------------------------------------- */
+/* ---- one word's evidence ------------------------------------------------ */
 function select(word) {
-  sel = word;
-  const w = DATA.words.find((x) => x.w === word);
-  for (const li of $('list').querySelectorAll('li')) li.setAttribute('aria-selected', String(li.dataset.w === word));
+  if (!word) return;
+  const w = rows().find((x) => x.w === word);
   if (!w) return;
-  const entered = w.ranks.findIndex((r) => r != null);
-  $('selnote').textContent = `rank ${w.rank} of ${DATA.words.length}`;
+  SELECTED = word;
+  for (const li of $('list').querySelectorAll('li'))
+    li.setAttribute('aria-selected', String(li.dataset.w === word));
+
+  const kept = MODE === 'kept';
+  const votes = w.votes || [];
+  $('selnote').textContent = kept ? `rank ${w.rank} of ${fmt(DATA.words.length)}`
+                                  : `ranked ${w.rank} before the small groups removed it`;
   $('detail').innerHTML = `
-    <div class="big"><span class="word">${w.w}</span>
-      <span class="val">${w.lift.toFixed(1)}x</span>
-      <span class="unit">more often in signed descriptions than unsigned ones</span></div>
-    <div class="facts">
-      <span>in <b>${fmt(w.m)}</b> signed</span>
-      <span>and <b>${fmt(w.u)}</b> unsigned</span>
-      <span>written by <b>${fmt(w.a)}</b> accounts</span>
-      <span>first clears the floor <b>${entered < 0 ? 'not yet' : DATA.months[entered]}</b></span>
+    <div class="big">
+      <span class="word">${esc(w.w)}</span>
+      <span class="val">${w.lift.toFixed(1)}&times;</span>
+      <span class="unit">as often in the register as in everything else</span>
     </div>
-    ${lineChart(w)}`;
+    <div class="facts">
+      <span>rank <b>${w.rank}</b></span>
+      <span>small groups that could measure it <b>${votes.length}</b> of <b>${DATA.smallGroups.filter((s) => s.judged).length}</b></span>
+      <span>${votes.length ? `above 1&times; in <b>${votes.filter((v) => v.lift > 1).length}</b>` : 'too rare to measure in any'}</span>
+    </div>
+    ${rateChart(w)}
+    ${dotPlot(w)}
+    <div class="verdict">${verdict(w, kept, votes)}</div>
+    ${history(w)}`;
 }
-/* A word's score month by month, rebuilt from the counts up to that month.
-   Null before it has enough unsigned appearances for the ratio to mean
-   anything, which is why a line can start late. */
-function lineChart(w) {
+
+/* How often the word has actually been written, per million words, every week
+   since the archive starts — and the same restricted to signed descriptions.
+   Two lines rather than one because that is the confirmation: the ranking never
+   looked at a date or at a signature, so if the grey line climbs and the red one
+   sits well above it, two independent things agree about the word. */
+function rateChart(w) {
+  const H0 = DATA.history;
+  const i = H0 ? H0.words.indexOf(w.w) : -1;
+  if (i < 0) return `<p class="note" style="margin-top:12px">No weekly history kept for this word —
+    only the first 300 of each group are tracked.</p>`;
+  const S = H0.weeks;
+  const all = S.map((e) => (e.words ? 1e6 * e.counts[i] / e.words : 0));
+  const sgn = S.map((e) => (e.wordsSigned ? 1e6 * e.countsSigned[i] / e.wordsSigned : 0));
+  const totW = S.reduce((a, e) => a + e.words, 0), totS = S.reduce((a, e) => a + e.wordsSigned, 0);
+  const tot = S.reduce((a, e) => a + e.counts[i], 0), ts = S.reduce((a, e) => a + e.countsSigned[i], 0);
+  const corpus = totW ? 1e6 * tot / totW : 0;
+  const signedRate = totS ? 1e6 * ts / totS : 0;
+  const unsigned = (totW - totS) ? 1e6 * (tot - ts) / (totW - totS) : 0;
+  const peak = Math.max(...all);
+
   const box = document.querySelector('.detail');
   const W = Math.max(300, Math.round((box && box.getBoundingClientRect().width) || 900) - 32);
-  const H = W < 520 ? 120 : 150, L = 30, R = 8, T = 12, B = 20;
-  const pts = w.hist.map((v, i) => [i, v]).filter(([, v]) => v != null);
-  if (pts.length < 2) return `<p class="note">Not enough months above the floor to draw a history yet.</p>`;
-  const hi = Math.max(2, ...pts.map((p) => p[1]));
-  const x = (i) => L + (i / Math.max(1, w.hist.length - 1)) * (W - L - R);
+  const H = 150, L = 40, R = 8, T = 14, B = 22;
+  const hi = Math.max(1, ...sgn, peak);
+  const x = (k) => L + (k / Math.max(1, S.length - 1)) * (W - L - R);
   const y = (v) => T + (1 - v / hi) * (H - T - B);
   const parts = [];
-  for (let g = 0; g <= 2; g++) {
-    const v = (hi * g) / 2;
-    parts.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`);
-    parts.push(`<text class="axis" x="0" y="${(y(v) + 3.5).toFixed(1)}">${v.toFixed(1)}x</text>`);
+  for (const g of [hi / 2, hi]) {
+    parts.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}"/>`);
+    parts.push(`<text class="axis" x="${L - 6}" y="${(y(g) + 3).toFixed(1)}" text-anchor="end">${Math.round(g)}</text>`);
   }
-  parts.push(`<line class="hair" x1="${L}" x2="${W - R}" y1="${y(1).toFixed(1)}" y2="${y(1).toFixed(1)}"/>`);
-  parts.push(`<text class="axis" x="${W - R - 46}" y="${(y(1) - 5).toFixed(1)}">even</text>`);
-  parts.push(`<path d="${pts.map(([i, v], k) => `${k ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')}"
-    fill="none" stroke="var(--flag)" stroke-width="2"/>`);
-  for (const [i, v] of pts) parts.push(`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2.5" fill="var(--flag)"><title>${DATA.months[i]}: ${v}x</title></circle>`);
-  w.hist.forEach((v, i) => {
-    if (i % 6 !== 0) return;
-    parts.push(`<text class="axis" x="${(x(i) + 3).toFixed(1)}" y="${H - B + 13}">${DATA.months[i]}</text>`);
-  });
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Score for ${w.w} by month">${parts.join('')}</svg>`;
+  const line = (vals, stroke, wd, op) =>
+    `<path d="${vals.map((v, k) => `${k ? 'L' : 'M'}${x(k).toFixed(1)},${y(v).toFixed(1)}`).join('')}"
+      fill="none" stroke="${stroke}" stroke-width="${wd}" stroke-opacity="${op}"/>`;
+  parts.push(line(all, 'var(--muted)', 1.4, 0.85));
+  parts.push(line(sgn, 'var(--flag)', 1.8, 1));
+  let last = null;
+  const every = Math.max(1, Math.round(S.length / 6));
+  for (let k = 0; k < S.length; k += every) {
+    const q = `${S[k].w.slice(0, 4)} Q${Math.floor(+S[k].w.slice(5, 7) / 3.01) + 1}`;
+    if (q === last) continue;
+    last = q;
+    parts.push(`<text class="axis" x="${x(k).toFixed(1)}" y="${H - 6}" text-anchor="middle">${q}</text>`);
+  }
+  parts.push(`<text class="axis" x="${L}" y="${T - 4}">per million words &mdash; <tspan fill="var(--flag)">signed</tspan> against <tspan fill="var(--muted)">all</tspan></text>`);
+  return `<div class="facts" style="margin-top:12px">
+      <span>peak <b>${Math.round(peak)}</b> per million</span>
+      <span>whole corpus <b>${corpus.toFixed(1)}</b></span>
+      <span>signed <b>${signedRate.toFixed(1)}</b> against unsigned <b>${unsigned.toFixed(1)}</b>,
+        <b>${unsigned ? (signedRate / unsigned).toFixed(1) : '&infin;'}&times;</b> higher</span>
+    </div>
+    <svg class="dots" viewBox="0 0 ${W} ${H}" role="img"><title>${esc(w.w)} per million words each week</title>${parts.join('')}</svg>`;
+}
+
+/* Each small group the word was common enough to be measured in, at its
+   signed-against-unsigned lift there. This is the subject test, not the score:
+   a word measured in exactly one small group lives in one subject and is dropped,
+   however high it ranked. A word measured nowhere is too rare to test, and is
+   kept, because absence of evidence is not evidence. */
+function dotPlot(w) {
+  const box = document.querySelector('.detail');
+  const W = Math.max(300, Math.round((box && box.getBoundingClientRect().width) || 900) - 32);
+  const H = 168, L = 34, R = 10, T = 14, B = 30;
+  const votes = w.votes || [];
+  const hi = Math.max(2, ...votes.map((v) => v.lift));
+  const ids = DATA.smallGroups.map((s) => s.id);
+  const by = new Map(DATA.smallGroups.map((s) => [s.id, s]));
+  const x = (i) => L + ((i + 0.5) / ids.length) * (W - L - R);
+  const y = (v) => T + (1 - Math.min(v, hi) / hi) * (H - T - B);
+  const parts = [];
+  const stepv = hi <= 2.5 ? 0.5 : hi <= 8 ? 2 : 5;
+  for (let g = stepv; g <= hi + 1e-9; g += stepv) {
+    if (Math.abs(g - 1) < 1e-9) continue;
+    parts.push(`<line class="lane" x1="${L}" x2="${W - R}" y1="${y(g).toFixed(1)}" y2="${y(g).toFixed(1)}"/>`);
+    parts.push(`<text class="axis" x="${L - 6}" y="${(y(g) + 3).toFixed(1)}" text-anchor="end">${g}&#215;</text>`);
+  }
+  parts.push(`<line class="one" x1="${L}" x2="${W - R}" y1="${y(1).toFixed(1)}" y2="${y(1).toFixed(1)}"/>`);
+  parts.push(`<text class="axis" x="${L - 6}" y="${(y(1) + 3).toFixed(1)}" text-anchor="end">1&#215;</text>`);
+  for (let i = 0; i < ids.length; i++) {
+    const v = votes.find((t) => t.c === ids[i]);
+    const st = by.get(ids[i]);
+    parts.push(`<text class="axis" x="${x(i).toFixed(1)}" y="${H - 15}" text-anchor="middle">${ids[i]}</text>`);
+    if (!v) {
+      parts.push(`<text class="axis" x="${x(i).toFixed(1)}" y="${(y(1) + 4).toFixed(1)}" text-anchor="middle" opacity=".3">&middot;</text>`);
+      continue;
+    }
+    parts.push(`<circle class="${v.lift > 1 ? '' : 'under'}" cx="${x(i).toFixed(1)}" cy="${y(v.lift).toFixed(1)}" r="4">
+      <title>small group ${ids[i]} — ${v.lift}× — ${esc(st ? st.about.slice(0, 4).join(' ') : '')}</title></circle>`);
+  }
+  parts.push(`<text class="axis" x="${L}" y="${H - 1}" opacity=".7">small group &mdash; a dot means the word was common enough there to be measured at all</text>`);
+  return `<svg class="dots" viewBox="0 0 ${W} ${H}" role="img"><title>${esc(w.w)} by small group</title>${parts.join('')}</svg>`;
+}
+
+function verdict(w, kept, votes) {
+  if (!kept) {
+    const v = votes[0];
+    const st = DATA.smallGroups.find((s) => s.id === (v || {}).c);
+    return `Ranked <b>#${w.rank}</b> on the contrast, then found common enough to measure in exactly ` +
+      `one small group` + (st ? ` &mdash; the one about <b>${esc(st.about.slice(0, 4).join(' '))}</b>` : '') +
+      `. A word that only ever appears densely inside one part of the register belongs to that slice ` +
+      `rather than to the register, so it goes.`;
+  }
+  if (!votes.length) return `Too rare to be measured on both sides of any small group, so the subject test ` +
+    `had nothing to say about it and it stands on its contrast alone. Rare words are kept deliberately: ` +
+    `requiring evidence rather than merely not-failing costs ten of the twenty-four documents this list catches.`;
+  return `Measured in <b>${votes.length}</b> small groups, which is more than one, so it is spread across the ` +
+    `register rather than stuck in one part of it. The published score is the contrast above, not these ` +
+    `&mdash; the small groups only ever remove a word, never promote one.`;
+}
+
+/* A word's rank as each build reported it. There is no way to recover what this
+   would have said last month without re-running it on last month's window, so
+   this accumulates from the first build rather than being backdated. */
+function history(w) {
+  if (!w.hist || w.hist.filter((v) => v != null).length < 2) return '';
+  const box = document.querySelector('.detail');
+  const W = Math.max(300, Math.round((box && box.getBoundingClientRect().width) || 900) - 32);
+  const H = 110, L = 36, R = 8, T = 12, B = 20;
+  const pts = w.hist.map((v, i) => [i, v]).filter(([, v]) => v != null);
+  const lo = Math.min(...pts.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]));
+  const span = Math.max(1, hi - lo);
+  const x = (i) => L + (i / Math.max(1, w.hist.length - 1)) * (W - L - R);
+  const y = (v) => T + ((v - lo) / span) * (H - T - B);          // rank 1 at the top
+  const parts = [];
+  for (const v of [lo, hi]) {
+    parts.push(`<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`);
+    parts.push(`<text class="axis" x="${L - 6}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">#${v}</text>`);
+  }
+  parts.push(`<path d="${pts.map(([i, v], k) => `${k ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('')}" fill="none" stroke="var(--flag)" stroke-width="1.6"/>`);
+  for (const [i, v] of pts)
+    parts.push(`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="2.5" fill="var(--flag)"><title>${DATA.builds[i]}: rank ${v}</title></circle>`);
+  return `<p class="note" style="margin-top:14px">Its rank across ${pts.length} builds since ${DATA.builds[0]}.</p>
+    <svg viewBox="0 0 ${W} ${H}" role="img"><title>${esc(w.w)} across builds</title>${parts.join('')}</svg>`;
 }
 </script>
 </body>

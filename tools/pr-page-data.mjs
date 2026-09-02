@@ -1,129 +1,116 @@
 #!/usr/bin/env node
 // Builds the data behind web/vocabulary.html.
 //
-// Three things the page needs, all derived from the daily counts:
+// Four things the page needs:
 //
-//   series   how much of GitHub's pull request prose signs itself, weekly,
-//            split by which tool signed it
-//   words    the current list, with each word's lift and how it got there
-//   ranks    every word's position in the list as it would have stood at the
-//            end of each month, computed by rebuilding the list at each cutoff
+//   series    how much of GitHub's pull request prose signs itself, weekly,
+//             split by which tool signed it. From the daily sample summaries.
+//   groups    the coarse clustering, and which of its groups was taken as the
+//             register
+//   naive     what ranking by the signature alone would have published, and
+//             which of those words survived
+//   words     the published list, each with its lift and the small groups it was
+//             measured in
+//   dropped   words the ranking put high and the small groups removed, each
+//             with the one subject it turned out to live in
 //
-// The last one matters: it means a word's trajectory exists from the first
-// build rather than only accumulating from today, so the page has something
-// to show immediately and stays honest about when a word actually arrived.
+// The last two are the page's argument, so they are data rather than prose.
+//
+// Everything comes from data/docs (the sample) and data/cluster.json plus
+// data/cluster-history.json (the fit). Nothing is recomputed here.
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
-import { listDays, readDay } from './lib/counts.mjs';
+import { availableDays, readSummaries } from '../js/pr-docs.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DIR = join(ROOT, 'data/counts');
-const arg = (n, d) => { const i = process.argv.indexOf(n); return i < 0 ? d : process.argv[i + 1]; };
-const TOP = Number(arg('--top', 1000));
-const MIN_UNMARKED = Number(arg('--min-unmarked', 100));
-const MIN_AUTHORS = Number(arg('--min-authors', 15));
+const DOCS = join(ROOT, 'data/docs');
 
-const days = listDays(DIR);
-if (!days.length) { console.error('no counts'); process.exit(2); }
+const days = availableDays(DOCS);
+if (!days.length) { console.error('no sampled days; run tools/pr-sample.mjs'); process.exit(2); }
+const clusterPath = join(ROOT, 'data/cluster.json');
+if (!existsSync(clusterPath)) { console.error('no data/cluster.json; run tools/pr-cluster.mjs'); process.exit(2); }
+const cluster = JSON.parse(readFileSync(clusterPath, 'utf8'));
+let history = [];
+try { history = JSON.parse(readFileSync(join(ROOT, 'data/cluster-history.json'), 'utf8')); } catch { /* first build */ }
+const seriesPath = join(ROOT, 'data/cluster-series.json');
+if (!existsSync(seriesPath)) { console.error('no data/cluster-series.json; run tools/pr-cluster.mjs'); process.exit(2); }
+const series = JSON.parse(readFileSync(seriesPath, 'utf8'));
 
-// ---- pass one: the final list -------------------------------------------
-const all = new Map();
-const totals = { marked: 0, unmarked: 0 };
+// ---- the sample, week by week -------------------------------------------
+const summaries = readSummaries(DOCS, days);
 const weekly = new Map();
 const products = new Set();
-for (const day of days) {
-  const d = readDay(DIR, day);
-  if (!d) continue;
-  totals.marked += d.marked.docs; totals.unmarked += d.unmarked.docs;
-  // ISO week starting Monday
-  const dt = new Date(day + 'T00:00:00Z');
-  dt.setUTCDate(dt.getUTCDate() - ((dt.getUTCDay() + 6) % 7));
+const totals = { signed: 0, unsigned: 0, scanned: 0 };
+for (const s of summaries) {
+  totals.signed += s.signed.docs;
+  totals.unsigned += s.unsigned.docs;
+  totals.scanned += s.scanned;
+  const dt = new Date(s.date + 'T00:00:00Z');
+  dt.setUTCDate(dt.getUTCDate() - ((dt.getUTCDay() + 6) % 7));   // ISO week, Monday
   const wk = dt.toISOString().slice(0, 10);
-  if (!weekly.has(wk)) weekly.set(wk, { w: wk, total: 0, signed: 0, by: {} });
+  if (!weekly.has(wk)) weekly.set(wk, { w: wk, total: 0, signed: 0, days: 0, by: {} });
   const e = weekly.get(wk);
-  e.total += d.marked.docs + d.unmarked.docs;
-  e.signed += d.marked.docs;
-  for (const [p, n] of Object.entries(d.products || {})) {
-    products.add(p); e.by[p] = (e.by[p] || 0) + n;
-  }
-  for (const [w, [md, ud, ma]] of Object.entries(d.words)) {
-    const a = all.get(w) || [0, 0, 0];
-    a[0] += md; a[1] += ud; a[2] += ma;
-    all.set(w, a);
-  }
+  e.total += s.signed.docs + s.unsigned.docs;
+  e.signed += s.signed.docs;
+  e.days++;
+  for (const [p, n] of Object.entries(s.products || {})) { products.add(p); e.by[p] = (e.by[p] || 0) + n; }
 }
-const lift = (md, ud, M, U) => (md / M) / ((ud + 0.5) / U);
-const ranked = [];
-for (const [w, [md, ud, ma]] of all) {
-  if (ud < MIN_UNMARKED || ma < MIN_AUTHORS) continue;
-  const l = lift(md, ud, totals.marked, totals.unmarked);
-  if (l <= 1) continue;
-  ranked.push({ w, lift: +l.toFixed(3), m: md, u: ud, a: ma });
-}
-ranked.sort((a, b) => b.lift - a.lift);
-const keep = ranked.slice(0, TOP);
-const wanted = new Set(keep.map((r) => r.w));
 
-// ---- pass two: where each of them stood, month by month ------------------
-const months = [...new Set(days.map((d) => d.slice(0, 7)))].sort();
-const run = new Map();                       // word -> [marked, unmarked, authors]
-const runTotals = { marked: 0, unmarked: 0 };
-const rankAt = new Map(keep.map((r) => [r.w, []]));
-const liftAt = new Map(keep.map((r) => [r.w, []]));
-// A word's own line is the score *within* each month, not the running total,
-// so it shows movement rather than a curve settling. Its floor is lower for
-// the same reason: one month holds a fortieth of the corpus.
-const MONTH_FLOOR = Math.max(5, Math.round(MIN_UNMARKED / 12));
-for (const month of months) {
-  const mth = new Map();
-  const mthTotals = { marked: 0, unmarked: 0 };
-  for (const day of days.filter((d) => d.startsWith(month))) {
-    const d = readDay(DIR, day);
-    if (!d) continue;
-    runTotals.marked += d.marked.docs; runTotals.unmarked += d.unmarked.docs;
-    mthTotals.marked += d.marked.docs; mthTotals.unmarked += d.unmarked.docs;
-    for (const [w, [md, ud, ma]] of Object.entries(d.words)) {
-      if (!wanted.has(w)) continue;
-      const a = run.get(w) || [0, 0, 0];
-      a[0] += md; a[1] += ud; a[2] += ma;
-      run.set(w, a);
-      const b = mth.get(w) || [0, 0];
-      b[0] += md; b[1] += ud;
-      mth.set(w, b);
-    }
-  }
-  const snap = [];
-  for (const [w, [md, ud, ma]] of run) {
-    if (ud < MIN_UNMARKED || ma < MIN_AUTHORS || !runTotals.marked) continue;
-    const l = lift(md, ud, runTotals.marked, runTotals.unmarked);
-    if (l > 1) snap.push([w, l]);
-  }
-  snap.sort((a, b) => b[1] - a[1]);
-  const pos = new Map(snap.map(([w], i) => [w, i + 1]));
-  for (const r of keep) {
-    rankAt.get(r.w).push(pos.get(r.w) ?? null);
-    const e = mth.get(r.w);
-    liftAt.get(r.w).push(e && mthTotals.marked && e[1] >= MONTH_FLOOR
-      ? +lift(e[0], e[1], mthTotals.marked, mthTotals.unmarked).toFixed(2) : null);
-  }
-}
+// ---- per-word trajectory across builds ----------------------------------
+// A word's rank as each build reported it. Ranks, not lifts: the lift is a
+// contrast against a corpus that changes underneath it, and rank is what a
+// reader actually wants — is this word climbing or falling.
+const builds = history.map((h) => h.built);
+const trajectory = (w) => history.map((h) => h.words[w] ?? null);
 
 const out = {
-  built: new Date().toISOString().slice(0, 10),
-  days: days.length, from: days[0], to: days[days.length - 1],
-  totals: { ...totals, descriptions: totals.marked + totals.unmarked, vocabulary: all.size },
-  floors: { unmarked: MIN_UNMARKED, authors: MIN_AUTHORS },
+  built: cluster.built,
+  sample: {
+    days: days.length, from: days[0], to: days[days.length - 1],
+    scanned: totals.scanned, descriptions: totals.signed + totals.unsigned,
+    signed: totals.signed, unsigned: totals.unsigned,
+  },
+  fit: {
+    days: cluster.days.length, from: cluster.days[0], to: cluster.days[cluster.days.length - 1],
+    descriptions: cluster.descriptions, signed: cluster.signed,
+    vocabulary: cluster.vocabulary,
+    kRegister: cluster.kRegister, kSmall: cluster.kSmall,
+    constants: cluster.constants,
+  },
+  register: cluster.register,
+  smallGroups: cluster.smallGroups,
+  naive: cluster.naive,
+  // Every group's own list, so a reader can page through all of them and see
+  // what would have shipped had a different one been the register. Plus the
+  // whole archive assigned to those groups, week by week, which is where each
+  // group's share of the corpus and each word's rate over time come from.
+  browse: cluster.groups.map((g) => ({
+    id: g.id, register: g.register, share: g.share, size: g.size, signed: g.signed,
+    about: g.about, words: g.words, dropped: g.dropped,
+  })),
+  history: {
+    from: series.from, to: series.to, order: series.groups, words: series.words,
+    weeks: series.weeks,
+  },
   products: [...products],
   series: [...weekly.values()].sort((a, b) => a.w.localeCompare(b.w)),
-  months,
-  words: keep.map((r, i) => ({ ...r, rank: i + 1, ranks: rankAt.get(r.w), hist: liftAt.get(r.w) })),
+  groups: cluster.groups,
+  builds,
+  words: cluster.words.slice(0, 1000).map((r) => ({
+    w: r.w, rank: r.rank, lift: r.lift, votes: r.votes, hist: trajectory(r.w),
+  })),
+  dropped: cluster.dropped.map((r) => ({ w: r.w, rank: r.rank, lift: r.lift, votes: r.votes })),
 };
+
 const json = JSON.stringify(out);
 writeFileSync(join(ROOT, 'web/vocabulary-data.json'), json + '\n');
-console.log(`${days.length} days, ${totals.marked} signed of ${totals.marked + totals.unmarked}`);
-console.log(`${all.size} words seen, ${ranked.length} clear the floors, ${keep.length} published`);
-console.log(`${out.series.length} weeks, ${months.length} months, products: ${[...products].filter((p) => out.series.some((s) => s.by[p])).join(', ')}`);
+console.log(`sample: ${days.length} days, ${totals.signed} signed of ${totals.signed + totals.unsigned}`);
+console.log(`fit:    ${cluster.descriptions} descriptions, register is group ${cluster.register.id} at ` +
+  `${(cluster.register.share * 100).toFixed(1)}% signed, ${cluster.words.length} words, ${cluster.dropped.length} shown as dropped`);
+console.log(`${out.series.length} weeks of sample, ${series.weeks.length} weeks of assigned archive, ` +
+  `${cluster.groups.length} groups browsable, ${series.words.length} words with a rate history`);
+console.log(`products: ${[...products].filter((p) => out.series.some((s) => s.by[p])).join(', ')}`);
 console.log(`web/vocabulary-data.json  ${(json.length / 1024).toFixed(0)} KB (${(gzipSync(Buffer.from(json)).length / 1024).toFixed(0)} KB gzipped)`);
