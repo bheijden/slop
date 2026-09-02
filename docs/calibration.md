@@ -1,6 +1,6 @@
 # Calibrating a rule against real prose
 
-Every built-in rule is measured over 29k words of real technical writing:
+Every built-in rule is measured over 29k words of real technical writing, drawn from
 internal reports, troubleshooting notes and design documents. That happens before it ships
 enabled. No rule is off by default. One nearly was, and the story is the reason
 this document exists.
@@ -73,6 +73,6 @@ twenty of its hits before you decide. The choice is rarely *keep it or drop it*.
 It is usually *the rule needs a constraint it does not have yet*, and the hits
 themselves tell you which one.
 
-Two rules were nearly disabled on intuition and then kept: `x-is-dead` and
+Two rules were nearly disabled on intuition and then kept. `x-is-dead` and
 `stranded-auxiliary` each produced exactly one finding over 29k words, and both
 were true positives. Guessing would have removed two working rules.

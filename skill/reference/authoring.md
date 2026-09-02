@@ -9,11 +9,11 @@
 
 ## Rule format
 
-A rule set is one JSON file. Each rule carries its own `tests.hit` and
-`tests.miss` examples in that same file, so the examples travel with the rule:
+A rule set is a single JSON file. Each rule brings its own `tests.hit` and
+`tests.miss` examples in that same file, so the examples travel with the rule.
 anyone who installs the set can verify it works without writing tests for
 someone else's rules. `add`, `update` and `restore` run them automatically and
-hold back a set that fails.
+refuse a set that fails.
 
 ```json
 {
@@ -53,14 +53,14 @@ words. Put the evidence next. Put the mechanics last, or leave them out.
 | where the pattern came from | why the divisor is what it is |
 | what a finding means | correlations, percentiles, thresholds |
 
-A set's own `description` follows the same order: what this set is for, who
+A set's own `description` follows the same order. Say what the set is for, who
 would choose it, then where it came from, then how it works.
 
 ### `suggest` is the imperative; `description` and `note` carry the argument
 
 An agent acts on `suggest`. Anything in it that can be read as permission will be
 read that way, and the finding will be closed unaddressed with the rule's own
-words as the reason. This has happened here twice, so it is written down.
+words as the reason. This has come up here more than once, so it is written down.
 
 | goes in `suggest` | goes in `description` or `note` |
 |---|---|
@@ -68,18 +68,18 @@ words as the reason. This has happened here twice, so it is written down.
 | Name the actor in front of the verb. | Two of fourteen reference papers sit above this edge. |
 | Find an aside this document already has and bracket it. | Some good human writing never parenthesises. |
 
-Phrases to keep out of `suggest`: *fine in*, *nothing here is wrong*, *no need*,
-*acceptable*, *leave it*, *optional*, *this is a fit judgement*, and any
-*if you do not…* clause offering the reader a way out.
+Phrases to keep out of `suggest` are *fine in*, *nothing here is wrong*, *no need*,
+*acceptable*, *leave it*, *optional*, *this is a matter of fit*, and any
+*if you do not…* opening that offers the reader a way out.
 
 The caveats are real and must be recorded, which is what `note` is for. A rule
-whose failure mode is written down is a different thing from one that quietly
-misfires; a rule that licenses inaction in its instruction field is a third thing,
-and it is the one to avoid.
+whose failure mode is written down is unlike one that gives no warning when it
+misfires. A rule that licenses inaction in its instruction field is something
+else again, and it is the one to avoid.
 
 **Every `id` in a set must be unique.** An id is how a rule is selected, ignored,
-reported and recorded in the lock file, so two rules answering to one are
-ambiguous, not duplicated. A set with a repeat is refused, naming the id.
+reported and recorded in the lock file, so two rules under one name are
+ambiguous, not duplicated. A set with a repeat is turned away, naming the id.
 
 Optional fields, all printed by `explain <id>`:
 
@@ -97,8 +97,8 @@ directory, or point the web page at it with `#rules=<url>`.
 
 ## The seven matcher kinds
 
-**Seven matcher kinds.** A matcher finds occurrences; `notable` decides whether
-they are worth reporting. `density` used to be an eighth kind and is gone: a rate
+**Seven matcher kinds.** A matcher finds occurrences; `notable` settles whether
+they are worth reporting. `density` used to be an eighth kind and was removed, because a rate
 is a verdict, not a way of matching.
 
 | `match.kind` | fields | finds |
@@ -111,7 +111,7 @@ is a verdict, not a way of matching.
 | `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
 | `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
 
-**`notable` says when the count matters.**
+**`notable` says when the count is reportable.**
 
 The comparison is the key. Write the operator you mean:
 
@@ -122,12 +122,12 @@ The comparison is the key. Write the operator you mean:
 | `{ "<": 1, "per": 1000 }` | an absence, which is also a tell |
 | `{ "<=": 30, ">=": 85, "per": 1000 }` | a band: notable on either side of 30-85 |
 
-Two bounds make a band, and the report names the one that was crossed, so a
-reader sees which edge the document fell off.
+Two bounds make a band, and the report names the bound it passed, so a
+reader can see which edge the document went outside.
 
-`needs` refuses to judge a document too small for the rate to mean anything:
+`needs` will not score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
-250 words, 5 sentences and a prose gate, so rates stay off config dumps and diffs.
+250 words, 5 sentences and a prose filter, so rates keep away from config dumps and diffs.
 
 
 Patterns are JavaScript regular expressions. `flags` only needs `i`; matching is
@@ -148,7 +148,7 @@ Two phases:
 **Conformance.** Every `tests.hit` example must match and every `tests.miss`
 example must not, on plain text.
 
-**Fudging.** Each hit example is rewritten 27 ways with the markup real files
+**Fudging.** Each hit example is remade 27 ways with the markup real files
 carry, and the rule must still fire:
 
 ```
@@ -160,11 +160,11 @@ It is important\nto note that this works.      md:soft-wrap
 <p><span>It</span> <span>is</span> …           html:span-per-word
 ```
 
-A lossless variant that turns a hit into a miss is a bug, either in extraction or in
+A clean variant that turns a hit into a miss is a bug, either in extraction or in
 a rule too tight for real files. Variants that actually delete words (a long
 inline code span) are marked lossy and reported for information only.
 
-Write the example first, run `fudge`, then fix whatever it reports.
+Write the example first, run `fudge`, then fix what it reports.
 
 ## Fixing a noisy rule
 
@@ -178,10 +178,10 @@ node /tmp/slop/js/cli.mjs check --format json -r docs/ \
   | jq -r '.files[].findings[].rule' | sort | uniq -c | sort -rn
 ```
 
-Then read twenty hits of the worst offender. The hits themselves tell you the
-missing constraint. A worked example is in the repo's `docs/calibration.md`:
+Then read 20 hits of the noisiest rule. The hits themselves tell you the
+missing constraint. A worked example is in the repo's `docs/calibration.md`.
 `colon-triple` produced 45% of all findings on technical writing, and 16 of its
 21 hits were docstrings, matrix algebra and hardware lists, not prose.
 Requiring prose characters and a lowercase initial in each item removed every
-false positive without losing a single real hit, and the false positives went
+false positive without losing a single real hit, and the false positives dropped
 into `tests.miss`, so the regression is locked in.

@@ -11,7 +11,7 @@ project can add its own.
 
 ## Run it
 
-Point it at whatever the user is working on. That can be a single file, a directory, or
+Point it at the file the user is working on. That can be a single file, a directory, or
 `.` for the whole project. `docs/` in the examples below is only a placeholder.
 
 For a single check, with no install step:
@@ -22,7 +22,7 @@ npx --yes github:bheijden/slop check <paths> -r
 
 `npx` re-resolves the repository on every call, which costs about 5 seconds each
 time. Fixing findings means running it repeatedly, so clone once instead and the
-per-run cost drops to about 0.2s:
+the cost per run falls to about 0.2s:
 
 ```bash
 git clone --depth 1 https://github.com/bheijden/slop /tmp/slop
@@ -54,17 +54,17 @@ follow `suggest` for the rewrite.
 ## Fixing findings
 
 1. Run with `--format json` over the files in question.
-2. Rewrite each flagged sentence so the span is gone, following `suggest`. The
-   goal is to say the thing plainly, not to paraphrase around the pattern.
-3. Re-run. A finding that survives means the rewrite kept the shape.
+2. Rewrite each flagged sentence so the span is removed, following `suggest`. The
+   goal is to say it in plain words, not to paraphrase around the pattern.
+3. Run it again. A finding that remains means the rewrite kept the same form.
 
-Do not silence a finding by disabling its rule unless it is a genuine false
+Do not mute a finding by disabling its rule unless it is a genuine false
 positive.
 
-## Handing the result to a person
+## Giving the result to a person
 
 `--share` prints a link that opens the document in the web page with every
-finding marked, so a reviewer reads them without installing anything. The file
+finding marked, so a reviewer can see them without installing anything. The file
 is gzipped into the URL fragment, which browsers never send to a server.
 
 ```bash
@@ -73,7 +73,7 @@ is gzipped into the URL fragment, which browsers never send to a server.
 ```
 
 Use it when the person asked for a review and not a rewrite, or when a
-finding is a judgement call that is theirs to make.
+finding is a judgement call for them to make.
 
 ## Keeping a finding
 
@@ -81,7 +81,7 @@ Some findings are the right call to leave. Two things make that decision sound.
 
 **The fix is an instruction, not a question.** `suggest` says what to do. Where a
 rule has a known exception it is recorded in `note`, and `explain` prints it.
-A finding closed on the strength of something the rule itself said should cite
+A finding closed on the strength of something the rule itself claims should cite
 `note`, not a reading of the instruction.
 
 **Read the rule before deciding.** `explain <id>` prints `note` and `measured`
@@ -90,9 +90,9 @@ place a genuine exception is described. `measured` says when and how a tell was
 measured; where it reports that a tell does not indicate authorship, that is a
 statement about detection and not a licence to skip the rule.
 
-**A house-style rule is not a judgement call.** `em-dash` is the example: the
+**A house-style rule is not a judgement call.** `em-dash` is the example, because the
 evidence says em dashes do not indicate a machine wrote something, and the rule
-exists because the owner does not want them. Keeping ninety-nine of them because
+exists because the owner does not want them. Keeping 99 of them because
 the research is equivocal is the wrong reading. If a project should keep its em
 dashes, say so and add `--ignore em-dash` once, instead of defending each hit.
 
@@ -103,10 +103,10 @@ varying, not by replacing every instance with the same thing: swapping every
 "rather than" for "not X" trades one tic for another.
 <!-- slop-ignore-end -->
 
-## Not every finding is a defect
+## Not every finding is a fault
 
-These are style smells, not errors. `ai-vocab` firing once is coincidence;
-several times is a tell. Leave a hit alone when the flagged phrasing is
+These are style smells, not errors. `ai-vocab` firing once means little;
+several times is a tell. Leave a hit as it stands when the flagged phrasing is
 the clearest option. Say why, and leave it.
 
 Findings never fail a run on their own. Set a budget when you want one to:
@@ -129,17 +129,17 @@ use `--format github` for inline pull-request annotations.
 ```
 
 `list` shows every rule and whether it is active. `explain <rule-id>` shows one
-in full, including examples of what it flags and what it deliberately allows.
+in full, including examples of what it flags and what it allows on purpose.
 read this before deciding a finding is wrong.
 
-Four sets ship on: `simonwillison` (27 rules) and `wikipedia-ai` (11), both ports
+Four sets ship on. `simonwillison` (27 rules) and `wikipedia-ai` (11) are both ports
 of published catalogues, and `ai-tells` (78), everything this project gathered
 itself from research papers, style guides and other detectors. Each mined rule
-records where it came from and what it scored on a matched human/AI corpus, and
-`explain` prints both. The shipped catalogue is in
+records where it came from and what it measured on a matched human/AI corpus, and
+`explain` prints both. The built-in catalogue is in
 [reference/rules.md](reference/rules.md).
 
-Every rule in those sets runs; none is held back. `load-bearing` is a fourth, one rule measuring how far a document's vocabulary spreads across a cluster measured over 461,000 pull request descriptions; it is rebuilt from upstream rather than written here. The five patterns the
+Every rule in those sets runs; none is held back. `load-bearing` is a 4th set, one rule measuring how far a document's vocabulary spreads across a cluster measured over 461,000 pull request descriptions; it is rebuilt from upstream rather than written here. The five patterns the
 audit measured firing on human prose and not on AI prose are in
 `candidates/unreproduced.json`, off, and turning one on means accepting findings
 the measurement says are not evidence of AI authorship.
@@ -151,9 +151,9 @@ hunting tells; only one can be selected at a time.
 ... check --rules candidates/style-plain.json --select style-plain docs/ -r
 ```
 
-One rule inside `ai-tells` is on wherever that set is loaded: `em-dash`, which flags
-every em dash. It is house style, not a tell, so say so if a user asks why
-it fired; `explain em-dash` gives the evidence, which points the other way.
+One rule inside `ai-tells` is on wherever that set is loaded. `em-dash` flags
+every em dash. It is house style, not a tell, so say so if a user wants to know why
+it reported; `explain em-dash` gives the evidence, which points the other way.
 
 A project can install more. Rule sets are versioned packages, recorded in
 `.slop/rules.lock.json` with their source and test status:
@@ -168,12 +168,12 @@ A project can install more. Rule sets are versioned packages, recorded in
 Every rule carries its own examples in the same file, so `add`, `update` and
 `restore` run them before installing and hold back a set that fails. `--force`
 installs it anyway. Check `sets` before assuming a finding came from a built-in
-rule, because a project's own set can shadow one of ours.
+rule, because a project's own set can shadow a built-in.
 
 ## Writing or fixing a rule
 
 A rule that fires constantly usually needs a constraint it does not have, not
-deletion. Read twenty of its hits before concluding it is noise.
+deletion. Read 20 of its hits before concluding it is noise.
 [reference/authoring.md](reference/authoring.md) covers the rule format, the
-eight detector kinds, and the markup fudger that checks a rule still fires when
+the detector kinds, and the markup fudger that checks a rule still fires when
 its example is wrapped in bold, italics, inline tags or a soft-wrapped line.

@@ -1,7 +1,7 @@
 # Rule sets
 
-A rule set is a JSON package: a name, a version, and a list of rules that each
-carry their own test examples. This covers choosing, installing, updating,
+A rule set is a JSON package with a name, a version, and a list of rules that each
+bring their own test examples. This covers choosing, installing, updating,
 sharing and writing them.
 
 ## What ships
@@ -14,20 +14,20 @@ sharing and writing them.
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 | `load-bearing` | 1 | One measurement of how far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing). Rebuilt from upstream by `tools/load-bearing.mjs`. |
 
-Off by default, alongside the five style profiles:
+Off by default, alongside the 5 style profiles:
 
 | set | rules | what it is |
 |---|---|---|
 | `unreproduced` | 5 | Patterns published elsewhere that this repo's corpus measured running the other way: they fired on human documents and not on AI ones. Kept because 36 documents is a small corpus and a pattern that fails on technical prose may hold on another register. |
 
-Four sets ship on, and every rule in them runs. Everything this project mined
-itself is in `ai-tells`, whose rules each record their origin in `from` and
-`source` and their score in `evidence`. Nothing there is held back: a rule that
-never fires on your register costs nothing to leave on, and the ten
-creative-writing rules are silent on documentation. The five the audit measured
-firing on human prose and not on AI prose were a different case, because those
-do fire, so they moved out to `candidates/unreproduced.json` where turning one
-on is a deliberate act. The `em-dash` rule is house style rather than a tell;
+All 4 sets ship on, and every rule in them runs. Everything this project mined
+itself is in `ai-tells`. Each rule records where it came from in `from` and
+`source` and their score in `evidence`. Nothing there is kept back, because a rule that
+never fires on your own register costs nothing to leave on, and the 10
+creative-writing rules never fire on documentation. The 5 the audit measured
+seen on human prose and not on AI prose were a different case, because those
+do fire, so they moved to `candidates/unreproduced.json` where turning one
+on is an explicit choice. The `em-dash` rule is house style rather than a tell;
 `slop explain em-dash` gives the evidence, which points the other way.
 
 ```sh
@@ -40,7 +40,7 @@ slop explain note-that       # one rule in full
 
 ```sh
 slop check --select wikipedia-ai docs/ -r        # one set
-slop check --ignore promo,landscape docs/ -r     # drop two rules
+slop check --ignore promo,landscape docs/ -r     # drop 2 rules
 slop check --select colon-triple docs/ -r        # one rule on its own
 slop check --all docs/ -r                        # everything
 ```
@@ -57,10 +57,10 @@ Or in `slop.json`, found by walking up from the working directory:
 }
 ```
 
-Every rule ships enabled. `colon-triple` nearly did not: it produced 45% of all
+Every rule ships enabled. `colon-triple` nearly did not, having produced 45% of all
 findings on a real corpus, and 16 of its 21 hits were docstrings, matrix algebra
-and hardware lists, not prose. Tightening the rule beat disabling it: 5
-hits, all genuine, with full recall on the examples. See
+and hardware lists, not prose. Tightening the rule worked better than disabling it: 5
+hits, all correct, with full recall on the examples. See
 [docs/calibration.md](docs/calibration.md) for the method.
 
 ## Installing rule sets
@@ -85,7 +85,7 @@ slop add ./local-set.json
 ```
 
 A URL can hold one set, an array of sets, or a `{"sets": [...]}` manifest naming
-files beside it, the shape this repo's own `rules/index.json` uses, so
+files beside it, the layout this repo's own `rules/index.json` uses, so
 `slop add <that url>` installs both of ours.
 
 ```sh
@@ -117,31 +117,31 @@ slop update house-style  # just one
 update  house-style 1.0.0 → 1.1.0  tests pass
 ```
 
-**A candidate that fails is held back.** The working version stays:
+**A candidate that fails is refused.** The working version remains in place:
 
 ```
 held back house-style 1.0.0 → 1.2.0  2 failing — --force to install anyway
 ```
 
-Failing *what*, exactly: every rule in a set carries its own `tests.hit` and
+Failing *what*, exactly? Every rule in a set carries its own `tests.hit` and
 `tests.miss` examples in the same JSON file, so the examples travel with the
 rule. Anyone who fetches the set can run them, which is what `add`, `update`
 and `restore` do before installing, and what `slop fudge` does on demand.
 You do not have to write tests for someone else's rules to know whether they
 work on your machine.
 
-So an update from a source you do not control is checked before it can reach
+So an update from a source you do not control is checked before it can get to
 your CI. `add` and `restore` hold back the same way, and `--force` overrides all
-three when you want a work-in-progress set anyway:
+3 when you want a work-in-progress set anyway:
 
 ```sh
 slop add --force ./draft-rules.json
 ```
 
-A forced install is labelled and its failure is recorded in the lock, so
-`sets` goes on showing it as failing, and does not quietly pass it.
+A forced install is marked, and its failure recorded in the lock, so
+`sets` still shows it as failing, and never passes it in silence.
 
-A set built against a newer `slop` than yours is flagged too, since it may
+A set built against a newer `slop` than yours is reported too, since it may
 use a detector kind this engine does not have.
 
 ## Sharing a library
@@ -156,21 +156,21 @@ slop restore shared.lock.json    # from anywhere
 
 Each set is re-fetched from its recorded source and tested; one that fails is
 skipped unless you pass `--force`. If the source now serves something different
-from what the lock recorded, you are told:
+from what the lock recorded, you get:
 
 ```
 restored house-style v1.1.0 2 rules  differs from the lock (1.0.0 → 1.1.0)
 ```
 
-Committing `.slop/rules/` as well pins the exact files; committing only
-the lock keeps them fresh. `slop fudge` tests the built-ins, the library
+Committing `.slop/rules/` as well fixes the exact files; committing only
+the lock brings them up to date. `slop fudge` tests the built-ins, the library
 and anything in `ruleSets` together. Installed rules face the same two phases
 that ours face.
 
 An installed set **shadows** a built-in of the same name, so you can pin or
 customise the rules that ship here by installing your own `simonwillison`.
 
-Turn one off with `--ignore <name>`, or in `slop.json`:
+Switch one off with `--ignore <name>`, or in `slop.json`:
 
 ```json
 { "ignore": ["draft-voice"] }
@@ -223,9 +223,9 @@ Fetching a rule set runs someone else's patterns over your text. The browser
 caps a runaway rule with the worker timeout; **the CLI does not**, so read a
 rule set before pointing production CI at a URL you do not control.
 
-**Seven matcher kinds.** A matcher finds occurrences; `notable` decides whether
-they are worth reporting. `density` used to be an eighth kind and is gone: a rate
-is a verdict, not a way of matching.
+**The 7 matcher kinds.** A matcher finds occurrences; `notable` settles whether
+they are big enough to report. `density` used to be an eighth kind and was removed, because a rate
+is a threshold, not a way of matching.
 
 | `match.kind` | fields | finds |
 |---|---|---|
@@ -237,7 +237,7 @@ is a verdict, not a way of matching.
 | `frame` | `gram`, `minRun`, `anchors` | consecutive sentences sharing a *syntactic* frame |
 | `rhythm` | `maxSentenceWords`, `minSentenceWords` | nothing: it reports sentence-length variation as a metric |
 
-**`notable` says when the count matters.**
+**`notable` says when the count is reportable.**
 
 The comparison is the key. Write the operator you mean:
 
@@ -248,12 +248,12 @@ The comparison is the key. Write the operator you mean:
 | `{ "<": 1, "per": 1000 }` | an absence, which is also a tell |
 | `{ "<=": 30, ">=": 85, "per": 1000 }` | a band: notable on either side of 30-85 |
 
-Two bounds make a band, and the report names the one that was crossed, so a
-reader sees which edge the document fell off.
+Two bounds make a band, and the report names the bound it passed, so a
+reader can see which edge the document went outside.
 
-`needs` refuses to judge a document too small for the rate to mean anything:
+`needs` declines to score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to
-250 words, 5 sentences and a prose gate, so rates stay off config dumps and diffs.
+250 words, 5 sentences and a prose filter, so rates keep away from config dumps and diffs.
 
 
 `tests.hit` and `tests.miss` are required, and they are not decoration. See
@@ -261,7 +261,7 @@ below.
 
 ---
 
-## Fudging: testing a rule set
+## Fudging, or testing a rule set
 
 
 ```sh
@@ -270,7 +270,7 @@ slop fudge                              # every built-in set, plus any
                                               # `ruleSets` in slop.json
 ```
 
-The web page runs the same thing under **test rules**, with failures sorted to
+The web page runs the same checks under **test rules**, with failures sorted to
 the top, which is useful while you are still writing the pattern.
 
 ```
@@ -284,7 +284,7 @@ Two phases:
 **Conformance.** Every `tests.hit` example must match and every `tests.miss`
 example must not, on plain text.
 
-**Fudging.** Each `hit` example is then rewritten 26 ways, injecting the markup
+**Fudging.** Each `hit` example is then remade 26 ways, injecting the markup
 a real document carries, and the rule must still fire:
 
 ```
@@ -306,15 +306,15 @@ being too tight for real files. Variants that genuinely delete words (inline
 <!-- slop-ignore-end -->
 code) are marked lossy and only reported for information.
 
-That is how you refine a rule. Write the example, run `fudge`, and fix whatever
+That is how you refine a rule. Write the example, run `fudge`, and fix what
 it reports.
-It earned its place immediately. The first run found four real bugs, listed in
+It proved useful at once. The first run found four real bugs, listed in
 [docs/extraction.md](docs/extraction.md).
 
 ---
 
 
-See also [calibration.md](calibration.md): how a noisy rule gets fixed instead of disabled.
+See also [calibration.md](calibration.md), on how a noisy rule gets fixed instead of disabled.
 
 ---
 
@@ -322,13 +322,13 @@ See also [calibration.md](calibration.md): how a noisy rule gets fixed instead o
 
 **A finding is not evidence that AI wrote something.** It is evidence that a
 phrase is worn. Human writers produce every pattern here, and current models
-avoid some of them. If you want to know who wrote a document, this is the wrong
-tool, and so is every other one: the paper that defines the field
+avoid some of them. If you want to know who wrote a document, this is the incorrect
+tool, and so is every other one. The paper that defines the field
 ([arXiv 2509.19163](https://arxiv.org/abs/2509.19163)) reports that standard
-metrics fail to match human judgement and that reasoning models fail at
+metrics fail to match what people report, and that reasoning models fail at
 extracting these spans too.
 
-That paper's taxonomy has eleven codes. Measured against it, honestly:
+That paper's taxonomy has 11 codes. Measured against it, without flattery:
 
 | | |
 |---|---|
@@ -336,25 +336,25 @@ That paper's taxonomy has eleven codes. Measured against it, honestly:
 | **Partly reached** | Verbosity, Word Complexity, Tone |
 | **Not reached** | Factuality, Relevance, Bias, Coherence, Fluency |
 
-The last row is not a to-do list. Those five need human annotation, and the
-paper says so. A linter that claimed them would be lying.
+The last line is not a to-do list. Those five need human annotation, and the
+paper says so. A linter that asserted them would be making it up.
 
-There is a second ceiling: this engine matches patterns over spans, with no
+There is a second limit. This engine matches patterns over spans, with no
 <!-- slop-ignore-start -->
 part-of-speech information. That is why `leverage`, `harness` and `foster` are
 <!-- slop-ignore-end -->
-hard. They are slop as verbs and ordinary English as nouns, and a regex cannot
+hard. They are slop as verbs and plain English as nouns, and a regex cannot
 tell the difference. The `frame` detector approximates syntax by wildcarding
 content words, which works, but it is an approximation.
 
 ## Limits
 
 - **English only.** The patterns are hard-coded English. Prose in another
-  language passes almost silently. No findings is not evidence of clean prose.
-- **Heuristics, not proof.** `ai-vocab` firing once is coincidence; several
+  language passes with almost nothing reported. No findings is not evidence of clean prose.
+- **Heuristics, not proof.** `ai-vocab` firing once means little; several
   times is a tell. Set a budget; do not demand zero.
 - **Long inline code spans are removed.** A single short token is kept. Anything
-  with a space in it is treated as a code fragment and dropped.
+  with a space in it is treated as a code fragment and skipped.
 - **Markdown tables can trip `echo-triad`.** Set `"skipTables": true` in
   `slop.json`, which this repo does for exactly that reason.
 - **`.rtf` is not supported.** Convert to `.md` or `.txt` first.
