@@ -1,0 +1,70 @@
+# Proposes agent signatures that data/markers.json does not know about.
+#
+# Which tools exist is the one fact here that goes stale by itself, so it is
+# discovered; but adding one changes what the whole corpus counts as
+# machine-written, so a person decides. The proposals live on one branch that is
+# rewritten every run, so the pull request always shows the current balance:
+# a candidate that turns out to be a fluke disappears from it before it is ever
+# merged, and one that keeps appearing accumulates evidence.
+name: ai-vocabulary markers
+
+on:
+  schedule:
+    - cron: "30 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Look for unrecognised signatures
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/pr-markers.mjs --days 21 --write
+
+      - name: Anything to propose
+        id: any
+        run: |
+          if git diff --quiet -- data/marker-proposals.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "count=$(node -e "console.log(require('./data/marker-proposals.json').proposals.length)")" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Force-pushed to a fixed branch so each run supersedes the last. If the
+      # repository does not allow Actions to open pull requests, the branch is
+      # still pushed and the run says so rather than failing.
+      - name: Update the proposal branch
+        if: steps.any.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B marker-proposals
+          git add data/marker-proposals.json
+          git commit -m "ai-vocabulary: ${{ steps.any.outputs.count }} unrecognised signatures"
+          git push --force origin marker-proposals
+
+      - name: Open or update the pull request
+        if: steps.any.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr view marker-proposals >/dev/null 2>&1 && { echo "pull request already open, branch updated"; exit 0; }
+          gh pr create --base main --head marker-proposals \
+            --title "ai-vocabulary: unrecognised agent signatures" \
+            --body "Footers and sentinel comments seen recently that \`data/markers.json\` does not recognise.
+
+          Move a real agent into \`confirmed\`, anything else into \`rejected\`. Both stop it being proposed again.
+
+          This branch is rewritten every week, so this list is always current: a candidate that stops appearing will vanish from it before you merge." \
+          || echo "Actions cannot open pull requests on this repository. The branch marker-proposals is pushed; open it by hand, or enable Settings -> Actions -> General -> Allow GitHub Actions to create and approve pull requests."

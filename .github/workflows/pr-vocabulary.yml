@@ -1,0 +1,60 @@
+# Counts one more day of pull request descriptions, and rebuilds the word list.
+#
+# The text is fetched, counted and discarded inside the run. What is committed
+# is one small file of counts per day, which is what the list is built from and
+# what keeps a word's history readable.
+name: ai-vocabulary
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "date or range to count, default yesterday"
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-vocabulary
+  cancel-in-progress: false
+
+jobs:
+  count:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Count yesterday
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          DAY="${{ github.event.inputs.days }}"
+          [ -n "$DAY" ] || DAY=$(date -u -d yesterday +%Y-%m-%d)
+          node tools/pr-count.mjs "$DAY"
+
+      - name: Rebuild the list
+        run: node tools/pr-build.mjs --write
+
+      # The rule has to pass its own tests and the repo has to stay clean, or
+      # nothing is committed. A vocabulary that fails its fixtures is a signal,
+      # not something to publish.
+      - name: The rule still has to hold up
+        run: |
+          node js/cli.mjs test-rules candidates/ai-vocabulary.json
+          node tests/run.mjs
+          node js/cli.mjs check -r .
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/counts candidates/ai-vocabulary.json
+          git diff --cached --quiet && { echo "nothing new"; exit 0; }
+          git commit -m "ai-vocabulary: count $(date -u -d yesterday +%Y-%m-%d), rebuild the list"
+          git push origin HEAD:main
