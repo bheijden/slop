@@ -1,8 +1,15 @@
-# Counts one more day of pull request descriptions, and rebuilds the word list.
+# Samples one more day of pull request descriptions, and re-derives the word
+# list from the last forty days of them.
 #
-# The text is fetched, counted and discarded inside the run. What is committed
-# is one small file of counts per day, which is what the list is built from and
-# what keeps a word's history readable.
+# Two things happen on different clocks. The sample runs every morning and is
+# cheap: ten five-minute windows, about a thousand descriptions, kept as bags
+# of words with the prose thrown away. The fit runs on Mondays and is not: it
+# clusters forty days of descriptions into topics and scores the vocabulary
+# inside each one. Splitting them means a missed fit costs a week and a missed
+# sample costs a day, and neither can lose the other's work.
+#
+# Any day the sampler has not reached yet is filled in from the back on every
+# run, so history accumulates without anyone scheduling it.
 name: ai-vocabulary
 
 on:
@@ -11,8 +18,12 @@ on:
   workflow_dispatch:
     inputs:
       days:
-        description: "date or range to count, default yesterday"
+        description: "date or range to sample, default yesterday"
         default: ""
+      fit:
+        description: "re-derive the list even if it is not Monday"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  count:
+  sample:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,24 +41,45 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Count yesterday
+      - name: Sample yesterday
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           DAY="${{ github.event.inputs.days }}"
           [ -n "$DAY" ] || DAY=$(date -u -d yesterday +%Y-%m-%d)
-          node tools/pr-count.mjs "$DAY"
+          node tools/pr-sample.mjs "$DAY"
 
-      - name: Rebuild the list
-        run: node tools/pr-build.mjs --write
+      # Gaps get filled from the back. A day already published as JSONL costs
+      # one request; a day that has to be sampled costs ten searches paced
+      # under the API's thirty-a-minute limit, about fifty seconds. Ten a run
+      # covers either case comfortably.
+      - name: Fill in any gaps
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tools/pr-sample.mjs --backfill 10
+
+      - name: Is this a fit day?
+        id: when
+        run: |
+          if [ "${{ github.event.inputs.fit }}" = "true" ] || [ "$(date -u +%u)" = "1" ]; then
+            echo "fit=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "fit=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Re-derive the list
+        if: steps.when.outputs.fit == 'yes'
+        run: node tools/pr-cluster.mjs --days 40 --write
 
       - name: Rebuild what the page reads
+        if: steps.when.outputs.fit == 'yes'
         run: node tools/pr-page-data.mjs
 
       # The rule has to pass its own tests and the repo has to stay clean, or
       # nothing is committed. A vocabulary that fails its fixtures is a signal,
       # not something to publish.
       - name: The rule still has to hold up
+        if: steps.when.outputs.fit == 'yes'
         run: |
           node js/cli.mjs test-rules candidates/ai-vocabulary.json
           node tests/run.mjs
@@ -57,7 +89,12 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/counts candidates/ai-vocabulary.json web/vocabulary-data.json
+          git add data/docs data/cluster.json data/cluster-history.json \
+                  candidates/ai-vocabulary.json web/vocabulary-data.json
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
-          git commit -m "ai-vocabulary: count $(date -u -d yesterday +%Y-%m-%d), rebuild the list"
+          if [ "${{ steps.when.outputs.fit }}" = "yes" ]; then
+            git commit -m "ai-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"
+          else
+            git commit -m "ai-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d)"
+          fi
           git push origin HEAD:main
