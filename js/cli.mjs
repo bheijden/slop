@@ -212,6 +212,20 @@ function lintSource(name, src, kind, rules, opts) {
   return { file: name, words: countWords(text), findings };
 }
 
+// A rule whose pattern is one flat alternation is a word list wearing a regex.
+// Give the list back, because a reader who has been told their vocabulary is
+// the problem needs to know which words are on it -- both the ones they used
+// and the ones to avoid reaching for instead.
+function vocabularyOf(rule) {
+  const m = rule.match || {};
+  if (m.kind !== 'regex' || !m.pattern) return null;
+  const body = /^\\b\(\?:(.+)\)\\b$/.exec(m.pattern);
+  if (!body) return null;
+  const words = body[1].split('|');
+  if (words.length < 20 || words.some((w) => /[\\[\]()*+?{}^$]/.test(w))) return null;
+  return words;
+}
+
 async function main() {
   let o;
   try { o = parseArgs(process.argv.slice(2)); }
@@ -255,7 +269,18 @@ async function main() {
     const per = n.per ? ` per ${n.per} ${n.unit || 'words'}` : '';
     process.stdout.write(`${C.bold(r.id)}  ${r.name}\n  set:      ${r.set}\n`
       + `  matches:  ${m.kind}\n  notable:  ${band}${per}\n  severity: ${r.severity}\n`);
-    if (m.pattern) process.stdout.write(`  pattern:  /${m.pattern}/${m.flags || ''}\n`);
+    const vocab = vocabularyOf(r);
+    if (vocab) {
+      process.stdout.write(`  words:    ${vocab.length}\n\n`);
+      let line = '   ';
+      for (const w of vocab) {
+        if (line.length + w.length + 2 > 78) { process.stdout.write(line + '\n'); line = '   '; }
+        line += ' ' + w;
+      }
+      if (line.trim()) process.stdout.write(line + '\n');
+    } else if (m.pattern) {
+      process.stdout.write(`  pattern:  /${m.pattern}/${m.flags || ''}\n`);
+    }
     process.stdout.write(`\n  ${r.description}\n`);
     if (r.suggest) process.stdout.write(`\n  ${C.cyan('fix:')} ${r.suggest}\n`);
     if (r.from) {
@@ -450,6 +475,12 @@ async function main() {
   const all = reports.flatMap((r) => r.findings);
   const words = reports.reduce((a, r) => a + r.words, 0);
   const per1000 = words ? +(all.length / words * 1000).toFixed(2) : 0;
+  const vocab = {};
+  for (const r of rules) {
+    if (!all.some((f) => f.rule === r.id)) continue;
+    const w = vocabularyOf(r);
+    if (w) vocab[r.id] = w;
+  }
 
   // --share turns a local file into a link that opens the same text, the same
   // rule sets and the same findings in the web viewer. The document travels in
@@ -489,7 +520,10 @@ async function main() {
   if (o.format === 'json') {
     process.stdout.write(JSON.stringify({
       files: reports, total: all.length, words, per1000,
-      rules: rules.map((r) => r.id), config: cfgPath || null
+      rules: rules.map((r) => r.id), config: cfgPath || null,
+      // Once per run, not once per finding: a thousand words repeated on every
+      // finding would be most of the output.
+      ...(Object.keys(vocab).length ? { vocabularies: vocab } : {})
     }, null, 2) + '\n');
   } else if (o.format === 'tsv') {
     for (const f of all) process.stdout.write([f.file, f.line, f.col, f.rule, oneLine(f.match, 200)].join('\t') + '\n');
