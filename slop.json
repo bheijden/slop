@@ -2,9 +2,11 @@
   "$comment": "Config for this repo. Copy it next to your docs and edit. No select list: every shipped set runs, and each rule's own default decides whether it is part of that.",
   "exclude": [
     "vendor/",
-    "node_modules/"
+    "node_modules/",
+    "data/corpus/"
   ],
   "$comment2": "These docs are table-heavy, and parallel table rows trip echo-triad.",
   "skipTables": true,
-  "maxPer1000": 3.0
+  "maxPer1000": 3.0,
+  "$comment3": "data/corpus is a fixture, not writing: half is machine-written on purpose and the other half is pre-2022 essays. Linting it would be measuring the ruler with itself."
 }

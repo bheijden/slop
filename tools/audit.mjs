@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 // Scores every rule against a matched human/AI corpus. See research/audit.md.
-//   node tools/audit.mjs        (expects audit/human/*.txt and audit/ai/*.txt)
-// AUDIT=/path/to/corpus node tools/audit.mjs
+//   node tools/audit.mjs                      data/corpus, which ships with the repo
+//   AUDIT=/path/to/corpus node tools/audit.mjs   somewhere else, same layout
 
 // Per-rule audit. Every number here is computed from the corpus, not reported by an agent.
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { compileRuleSet, analyze } from '../js/engine.mjs';
 
-const DIR = process.env.AUDIT || new URL('../audit', import.meta.url).pathname;
+const DIR = process.env.AUDIT || new URL('../data/corpus', import.meta.url).pathname;
 const W = /[A-Za-z0-9][A-Za-z0-9'’-]*/g;
 
 // Every rule in the project, slop and style alike.

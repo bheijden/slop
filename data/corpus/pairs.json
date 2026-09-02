@@ -1,0 +1,777 @@
+{
+  "version": 1,
+  "description": "Matched pairs of general prose. Each pair is one topic written twice: once by a person before generative text tools existed, once by a language model given the topic and nothing else. Provenance notes are in provenance.md.",
+  "pairs": [
+    {
+      "id": "academic-1",
+      "register": "academic",
+      "batch": 1,
+      "topic": "The introduction to a comparative study of how skull shape, jaw mechanics and diet are related in a group of deep-channel Amazonian electric fishes.",
+      "audience": "Researchers in evolutionary morphology, ichthyology and comparative biomechanics; an open-access primary research article in Integrative Organismal Biology (Oxford University Press, for the Society for Integrative and Comparative Biology), read via PubMed Central.",
+      "keyPoints": [
+        "Diet is treated as a leading driver of skull diversification in bony fishes, because different prey types impose different demands on the feeding apparatus.",
+        "The braincase and lower jaw are conventional model structures for linking anatomical shape to feeding performance.",
+        "Jaw mechanical advantage tracks diet in a known direction: higher values accompany hard prey, lower values accompany fast or evasive prey.",
+        "Functional redundancy, or many-to-one mapping, means several different anatomies can produce the same performance output, which weakens the expected correlation between morphology and diet; the four-bar linkage behind jaw protrusion is the standard illustration.",
+        "The study group is a clade of weakly electric knifefishes adapted to the deep channels of large lowland Amazonian rivers, whose feeding habits range from probing the substrate for invertebrates to specialising on the scales and tails of other fishes.",
+        "Earlier work on this group has rarely examined form and diet together, and none of it has combined performance estimates with phylogenetic correction.",
+        "The annual flood cycle alternates between high water, when fishes reach floodplain forest and terrestrial food, and low water, when they are confined to channels with rising density, falling oxygen and sharper competition, prompting some species to switch facultatively to scale-eating.",
+        "The paper combines three-dimensional landmark morphometrics, lever-model biomechanics, stable isotope estimates of trophic position, gut contents and phylogenetic comparative model fitting across eleven species, comparing single-optimum, multiple-optimum and neutral-drift models of performance evolution."
+      ],
+      "human": {
+        "file": "human/academic-1.txt",
+        "words": 770,
+        "date": "2019-07-02",
+        "source": "Evans et al., 'Ecomorphology of Neotropical Electric Fishes', Integrative Organismal Biology 1(1)",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7671154/",
+        "sha256": "5aa329fdcfce0c9c"
+      },
+      "ai": {
+        "file": "ai/academic-1.txt",
+        "words": 864,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "4b229c551d1cfcf8"
+      }
+    },
+    {
+      "id": "academic-2",
+      "register": "academic",
+      "batch": 1,
+      "topic": "The opening of the discussion section of an experiment on whether fact-checking politicians' statements changes Australian voters' beliefs and their support for those politicians.",
+      "audience": "Political psychology and cognitive science researchers, plus the general scientific readership of a broad open-access journal; a peer-reviewed empirical article in Royal Society Open Science, read via PubMed Central.",
+      "keyPoints": [
+        "Participants moved their beliefs in the direction of the evidence they received: confirmations raised belief in accurate statements and corrections lowered belief in inaccurate ones.",
+        "No motivated reasoning was detected; corrections were if anything more effective when the statement came from a politician the participant's own party affiliation favoured, an effect carried mainly by left-leaning participants.",
+        "Support for a politician declined only when the set of fact-checks was heavily weighted towards corrections, and did not decline when corrections and confirmations were balanced.",
+        "The absence of an attitude effect is read as consistent with the position that people reject corrections only when accepting them would require abandoning a strongly held and personally important attitude, which the real statements used here may not have engaged.",
+        "A proposed follow-up is to contrast fact-checks on peripheral or obscure issues with fact-checks on issues central to a politician's platform while measuring issue-specific attitudes.",
+        "There was no evidence that right-leaning participants resisted corrections more; traits often linked to conservatism, such as dogmatism, need for closure and threat sensitivity, may simply not be engaged by non-threatening corrections.",
+        "Left-leaning participants did start out believing statements from their preferred politician more strongly, but the authors caution that using real statements from two real politicians sacrifices experimental control, since the two differed in office held and in perceived credibility.",
+        "The ratio effect is explained by expectation and accumulated evidence rather than partisanship: a balanced set of fact-checks changes little, while repeated evidence of falsehood shifts feelings towards the politician and hence voting intention, irrespective of party congruence."
+      ],
+      "human": {
+        "file": "human/academic-2.txt",
+        "words": 733,
+        "date": "2018-12-19",
+        "source": "Aird et al., 'Does truth matter to voters?', Royal Society Open Science 5(12)",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6304148/",
+        "sha256": "f38beb829edfbf77"
+      },
+      "ai": {
+        "file": "ai/academic-2.txt",
+        "words": 824,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "441789022e74122d"
+      }
+    },
+    {
+      "id": "academic-3",
+      "register": "academic",
+      "batch": 1,
+      "topic": "A worked case study, drawn from a critical survey of bias research in natural language processing, that examines how existing work treats African-American English.",
+      "audience": "Natural language processing researchers and practitioners, with an adjacent readership in algorithmic fairness and human-computer interaction; a conference paper accepted at ACL 2020 and posted as a preprint on arXiv.",
+      "keyPoints": [
+        "Prior studies establish that part-of-speech taggers, language identification, dependency parsing and toxicity detection all perform worse on text carrying features of the variety.",
+        "Those studies do not share a single notion of racial bias: most report only a performance gap between text with and without those features, while a minority additionally argue from downstream consequences.",
+        "The consequences named include reinforcing negative perceptions of the variety, disproportionate removal of posts written in it, thereby shrinking the online space in which it can be used, and the extra cost borne by speakers who alter how they write to avoid that.",
+        "None of the surveyed work engages with scholarship on the variety itself, on racial hierarchy, or on raciolinguistic ideology, so the systems are never situated with respect to who actually speaks the variety and how those speakers are regarded.",
+        "The deficit view of the variety as bad English survives decades of evidence that it is rule-governed, and it travels with concrete allocational harms in schooling, in housing searches and in courtrooms where speakers' testimony is misheard or disbelieved.",
+        "Raciolinguistic ideologies cast racialized communities as needing linguistic remediation, so that harm reduction is made conditional on accommodating to dominant language practices.",
+        "Grounding in this literature supplies the normative argument that was missing: performance gaps matter not merely as engineering shortfalls but because they re-stigmatise the variety and reproduce ideologies that license discrimination.",
+        "Because racial hierarchy and language ideology are structural conditions on how systems get built and deployed, measurement and mitigation techniques will stay incomplete unless they also address those conditions, including the power relationship between technologists and affected communities; the section closes by pointing to new research directions and to anti-racist language pedagogy."
+      ],
+      "human": {
+        "file": "human/academic-3.txt",
+        "words": 774,
+        "date": "2020-05-28",
+        "source": "Blodgett et al., 'Language (Technology) is Power', arXiv:2005.14050 (ACL 2020)",
+        "url": "https://arxiv.org/abs/2005.14050",
+        "sha256": "aeccbef93a3bcc79"
+      },
+      "ai": {
+        "file": "ai/academic-3.txt",
+        "words": 862,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "2c7c528f36c145db"
+      }
+    },
+    {
+      "id": "biography-1",
+      "register": "biography",
+      "batch": 2,
+      "topic": "Opening chapter of a revisionist biographical portrait of Florence Nightingale, covering the years before her career began: it sets the sentimental Victorian legend against a harder, stranger reality, then traces her wealthy upbringing, her private conviction of a vocation, and the thwarting of it that brought her to despair in her mid-twenties.",
+      "audience": "Educated general readers of literary non-fiction — the audience for a serious but entertaining trade biography or a long magazine profile. They know the subject only as a national icon and need no specialist background in Victorian history, nursing, or religion; they do expect wit, psychological argument, and prose worth reading for its own sake, and they will enjoy having a piece of received wisdom taken apart.",
+      "keyPoints": [
+        "Open by summoning the received public image in full — the gently bred young woman of fortune renouncing comfort for the sick, the night-time figure with her lamp among dying soldiers in the military hospital of the Crimean war — and then flatly deny it. The real woman was less pliant and less pleasant than the myth, propelled by a compulsion closer to possession than to sweetness, and therefore far more interesting than her legend. This reversal is the chapter's organising move and should be established in the first paragraph.",
+        "Establish the family's wealth and social reach: a network of prosperous connections by marriage, two large country houses in different counties, rented rooms in a fashionable London district for the season, continental travel heavy on Italian opera and introductions to Parisian notables. The expected return on such advantages was a decorous marriage after the requisite quota of dances and dinner parties — exactly what her sister and every young woman she knew were arranging.",
+        "Render her private dissent in the idiom of religious duty rather than rebellion. She did not dispute that a woman should do her duty in the station God appointed; she doubted which station that was. Let her reach for precedents of women called to violent or unwomanly destinies, and let the whole question turn on an inner voice she could not identify but could not silence.",
+        "Assemble the childhood and adolescent symptoms of the vocation as a run of small, faintly unsettling anecdotes: while her sister enjoyed dismembering dolls, she sewed them up again; she visited the sick poor in their cottages, sat up with invalids, splinted an injured dog's paw with unnecessary care; she daydreamed the family house transformed into a hospital with herself running the wards, and even imagined heaven as a place stocked with patients for her to be useful to. She confided the turmoil to a diary.",
+        "Deflate each flight of feeling with the domestic routine that interrupted it — the dinner bell, the dressing for dinner, the china to be looked after, reading aloud to her father in the evening. The comedy and the pathos both come from cutting from visionary intensity straight back to the trivia of a well-run household.",
+        "Show the parents' bafflement from inside their own assumptions, ventriloquising their complacency rather than analysing it: the father proposes a husband as the obvious remedy; the mother cannot imagine what ails a daughter so attractive and so accomplished, who could make a splendid match and instead frets about wanting to be occupied when there is quite enough to occupy anyone at home.",
+        "Bring this to a crisis in her mid-twenties. She asks to spend several months training as a nurse at a provincial hospital, and admits to a further scheme of taking a house nearby to found a kind of unbound Protestant sisterhood for gently reared women. The family dismisses the whole idea as absurd; the mother recovers and returns to her needlework; the daughter, believing her life's purpose destroyed, comes close to despair.",
+        "Explain why the obstacle was so formidable, on two fronts. A woman of independent means simply did not go out and make her own way. And nursing in particular was a disreputable trade: the hospital nurse of the period was popularly a coarse, ignorant, dirty, often violent old woman with a fondness for the bottle, notorious for loose conduct and unfit to be trusted with the simplest medical task — the stock figure familiar from the popular fiction of the day. Add a brief authorial aside noting that this reputation has since been transformed, and chiefly by the subject herself, and let her own retrospective comparison stand: the ambition struck her family as no better than wanting to go into service as a kitchen servant.",
+        "Close on morbid religious self-accusation rather than on resolution. Her unhappiness thickens into melancholy; she judges her surroundings contemptible and herself more contemptible still for deserving them; she frames her frustration as sin, imagines herself arraigned before divine judgement, is convinced no one has offended the Holy Spirit as she has, prays uselessly against her own vanity and hypocrisy, and cannot bring herself to laugh for fear God should hear her doing it before she has repented. Short fragments of her own written self-reproach should carry this passage."
+      ],
+      "human": {
+        "file": "human/biography-1.txt",
+        "words": 1150,
+        "date": "1918",
+        "source": "Eminent Victorians, by Lytton Strachey, Chatto & Windus, 1918 (opening of the \"Florence Nightingale\" chapter); text from Project Gutenberg eBook #2447",
+        "url": null,
+        "sha256": "e53085d50b9d6e4b"
+      },
+      "ai": {
+        "file": "ai/biography-1.txt",
+        "words": 1240,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "64319c4d6e6d422a"
+      }
+    },
+    {
+      "id": "forum-1",
+      "register": "forum",
+      "batch": 1,
+      "topic": "A first-hand account of how a civil asset forfeiture case in early-1990s Northern California stripped a used-car-dealership owner of his property even though prosecutors never charged him with a crime.",
+      "audience": "Readers of a Hacker News discussion thread on the U.S. Supreme Court agreeing to hear a civil forfeiture case (thread item 17395675) - a general technically-literate adult audience following a legal and civil-liberties news story, addressed as fellow commenters rather than as clients or students.",
+      "keyPoints": [
+        "The writer witnessed the case personally, through his then-girlfriend's family: immigrants from Mexico who built up restaurants and other small businesses, one brother running a chain of used car lots.",
+        "The seizure was triggered by an employee, a detailer, being caught with a small quantity of marijuana in his own apartment; police then asserted the dealerships were a front for distribution and money laundering.",
+        "Police took the car lots, the entire vehicle inventory, the owner's house, and froze his bank accounts, amounting to roughly half a million dollars in cash and property.",
+        "The district attorney declined to prosecute, citing the absence of any connection between the employee and the owner, the coerced quality of the employee's taped statement, and the total lack of corroborating evidence, and publicly faulted the police conduct.",
+        "Because forfeiture is a civil action against the property, the decision not to prosecute did not return anything: the owner had to sue, and the department argued that assets are only returned to people acquitted at trial, which a person never charged can never be.",
+        "The writer describes procedural attrition as the department's actual strategy: repeated continuances, demands for appraisals of vehicles that had already been auctioned off within days of the seizure, denial of access to the house where business records were stored, and missed hearings.",
+        "After roughly two years the department offered a take-it-or-leave-it settlement of $50,000 against half a million seized; counsel advised accepting because the city could outlast the plaintiff indefinitely.",
+        "The piece closes by rebutting the common defenses of forfeiture (that targets are all really dealers, that police would not take from the innocent, that recovery is easy) and asserts the practice has grown worse in the intervening decades."
+      ],
+      "human": {
+        "file": "human/forum-1.txt",
+        "words": 739,
+        "date": "2018-06-26",
+        "source": "Hacker News comment 17398314 by jimt1234",
+        "url": "https://news.ycombinator.com/item?id=17398314",
+        "sha256": "42f4c0d0c823dd6f"
+      },
+      "ai": {
+        "file": "ai/forum-1.txt",
+        "words": 840,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "f91004fca92773e0"
+      }
+    },
+    {
+      "id": "forum-2",
+      "register": "forum",
+      "batch": 1,
+      "topic": "An argument that battery research is structurally incompatible with the venture-backed startup model, explaining why breakthroughs tend not to come from small new companies.",
+      "audience": "Participants in an Ask HN thread inviting practitioners to state the most important thing outsiders do not know about their own industry (thread item 13905598) - founders, engineers, and investors who understand venture funding mechanics and are being told why their intuitions do not transfer to hard-science hardware.",
+      "keyPoints": [
+        "Software lets a tiny team build a demonstrable prototype quickly and cheaply, which is what makes the venture funding cycle work; battery development offers nothing comparable to show for years.",
+        "The staff needed are scientists and engineers who expect conventional salaried employment and stable hours rather than equity-driven sprint work.",
+        "Outcomes in the field are close to binary: almost every hypothetical battery venture ends with nothing but patents on processes that never become practical, while a single one captures enormous value.",
+        "There are two shapes a success can take, and both are commercially bad: a simple method is trivially copied and the originator captures only a sliver of the market, while a complicated method usually depends on an expensive or scarce input.",
+        "A scarce-material dependency can require building an entire extractive industry from scratch, at a capital scale far beyond what investors entertain, and that investment could be rendered worthless by a competing chemistry at any moment.",
+        "There is little to disrupt organizationally: a well-funded new entrant would end up structured much like the research arm of an existing consumer-electronics conglomerate.",
+        "Almost all effort goes directly at the breakthrough itself rather than at building better tools that would make the search faster, which the author frames as the real neglected opportunity.",
+        "Ordinary startup risk is survivable because losses are bounded and returns are graded; moonshot battery research has an unbounded, incalculable payoff distribution touching energy, transport, aerospace, and electronics, which makes it unfinanceable by normal means."
+      ],
+      "human": {
+        "file": "human/forum-2.txt",
+        "words": 615,
+        "date": "2017-03-19",
+        "source": "Hacker News comment 13908895 by owenversteeg",
+        "url": "https://news.ycombinator.com/item?id=13908895",
+        "sha256": "dc4c200b87322bb0"
+      },
+      "ai": {
+        "file": "ai/forum-2.txt",
+        "words": 710,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "81c7564c007fb000"
+      }
+    },
+    {
+      "id": "forum-3",
+      "register": "forum",
+      "batch": 1,
+      "topic": "An argument that San Francisco's rapid minimum wage and mandated-benefit increases raised restaurant labour costs without any matching productivity gain, and that restaurants moving to self-service models is the predictable consequence.",
+      "audience": "Commenters on a Hacker News thread about restaurants reducing or eliminating waitstaff (thread item 17394551) - a general professional audience arguing labour policy informally; the writer is a long-standing contributor who is a practising attorney and writes from that vantage without legal citation.",
+      "keyPoints": [
+        "Stacking a large mandated base-wage rise over a few years on top of employer-funded health coverage beyond federal requirements plus paid sick and parental leave can raise the true per-employee cost by something like half.",
+        "The author's benchmark is that sustainable real wage growth follows productivity growth, and he contrasts the restaurant case with software engineers, whom he represented professionally in the early 1990s at salaries that, adjusted for inflation, would still be below six figures today.",
+        "Engineers of comparable individual talent now command far higher pay because the leverage of their work has grown, so employers bid for them voluntarily rather than trying to eliminate the roles.",
+        "Restaurant service work is treated as genuinely hard and worth the money - the author did it himself while working through school - but the job as performed today is not measurably more productive than the same job five years earlier.",
+        "When a cost is raised by decree rather than by rising value, demand for that input falls, and something in the business model has to absorb the difference.",
+        "The article being discussed is criticised for attributing the shift to the city's cost of living and general environment while avoiding the supply-and-demand explanation.",
+        "The observable result is restaurants adopting less labour-dependent formats; the point is not that self-service is new, but that establishments which would previously never have considered it are now adopting it.",
+        "The tradeoff may still be worth making for the workers who keep their jobs at higher pay, but it should be acknowledged that the cost falls on the workers whose positions disappear."
+      ],
+      "human": {
+        "file": "human/forum-3.txt",
+        "words": 679,
+        "date": "2018-06-25",
+        "source": "Hacker News comment 17395290 by grellas",
+        "url": "https://news.ycombinator.com/item?id=17395290",
+        "sha256": "47f18716a146ca6c"
+      },
+      "ai": {
+        "file": "ai/forum-3.txt",
+        "words": 776,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "0acaf589a88c3bf9"
+      }
+    },
+    {
+      "id": "government-1",
+      "register": "government",
+      "batch": 1,
+      "topic": "Official guidance for people in the UK on the practical steps that follow the death of a British national in France, from insurance and registration to repatriation, burial and paperwork.",
+      "audience": "Bereaved relatives, executors and formally appointed representatives in the UK who suddenly have to manage a death abroad; published as consular guidance on the UK government's central public-services website by the Foreign, Commonwealth and Development Office.",
+      "keyPoints": [
+        "The first thing to establish is whether the person who died held travel insurance, because an insurer may cover repatriation and also medical, legal, interpreting and translation costs, and will appoint funeral directors both in the country of death and in the UK; if it is unclear, the bank, credit card provider or employer may know.",
+        "Without insurance, a relative or formally appointed representative must appoint a funeral director and bear all the costs; the foreign ministry meets none of them, although some lawyers and funeral directors occasionally work free or at reduced cost, decided case by case.",
+        "A death has to be registered in the country where it occurred - in France at the local town hall, normally by the next of kin or by a firm of funeral directors; certificates are issued in French, can be requested in a multilingual version, do not state the cause of death, and extra copies are worth obtaining because other organisations need to be notified.",
+        "Re-registration in the UK is unnecessary, since the foreign certificate is generally accepted for UK purposes including probate; an optional consular registration exists and produces a UK-style death certificate, with a record passed to the national register office within a year.",
+        "Post-mortems are ordered by the court where the cause of death is unknown, unnatural, sudden or violent, are performed by court-appointed forensic doctors at a legal medicine institute, may not accommodate cultural or religious sensitivities, and may involve tissue or organs being retained without family consent and without the family being told.",
+        "Bringing a body home requires appointing a UK-based international funeral director who works with the local firm to assemble the necessary documents, including the civil registry death certificate, a certificate of embalming and permission to transfer the remains.",
+        "Carrying ashes home usually needs the death certificate, the cremation certificate, a local authority permit to take them out of the country and a customs form on arrival, and airlines set their own rules; choosing local cremation forecloses a coroner's inquest in the UK, while repatriation leaves the option of requesting a UK post-mortem or a cremation certificate from a coroner.",
+        "Remaining practical tasks include recovering personal effects held by police or retained as evidence during an investigation, finding official translators and English-speaking lawyers, and cancelling the passport with the passport office to prevent identity fraud, timed after repatriation if the document is needed for it."
+      ],
+      "human": {
+        "file": "human/government-1.txt",
+        "words": 1136,
+        "date": "2021-01-28",
+        "source": "GOV.UK guidance 'When someone dies in France', Foreign, Commonwealth & Development Office",
+        "url": "https://www.gov.uk/guidance/what-to-do-after-a-british-person-dies-in-france",
+        "sha256": "4ea0179b3d64ddb7"
+      },
+      "ai": {
+        "file": "ai/government-1.txt",
+        "words": 1000,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "455c17ca5a5f2d9d"
+      }
+    },
+    {
+      "id": "government-2",
+      "register": "government",
+      "batch": 1,
+      "topic": "A public health agency's consumer article explaining what fatty liver disease is, what causes it, how it is detected, how it can progress and what reduces the risk.",
+      "audience": "General adult readers of a free monthly consumer health newsletter produced by the United States National Institutes of Health for the lay public, distributed online and in print.",
+      "keyPoints": [
+        "The liver filters toxins from the blood, helps digest food and helps keep blood sugar steady; a small amount of fat in liver cells is normal, but too much interferes with these functions.",
+        "The condition is increasingly common yet usually silent, so most people who have it do not know; when symptoms appear they tend to be tiredness and discomfort in the upper right abdomen, and specialists urge awareness so people get screened.",
+        "The nonalcoholic form is linked to other health conditions, genetics, diet and the digestive system, affects roughly a third of US adults, and is far more frequent in people with obesity or type 2 diabetes - around three quarters of people carrying excess weight and nine in ten with severe obesity.",
+        "Heavy drinking produces an alcohol-associated form, because alcohol is broken down in the liver and at high volumes behaves as a toxin.",
+        "Chemical pollution is a newer line of research: an early study found high disease rates among workers handling vinyl chloride used to make PVC, many other chemicals have since been implicated, some persist in household products and the environment, and exposures appear to compound dietary risk.",
+        "In a minority of cases the disease advances to inflammation and cell damage, then to permanent scarring and hardening of the liver, which can end in liver failure or cancer; because the liver can repair itself, catching it early matters.",
+        "Detection is often incidental through blood tests done for other reasons, with blood and imaging tests used to gauge severity; biopsy is the only way to confirm the inflammatory stage but risks pain, bleeding, perforation and infection, and often turns out negative, so researchers are developing painless imaging that measures fat and scarring.",
+        "Management rests on lifestyle change: losing about 7 percent of body weight to resolve the inflammatory stage and at least 10 percent to reduce scarring, improving nutrition, exercising more, limiting alcohol and washing produce to cut pesticide exposure; no approved drug exists, though vitamin E and certain weight-reducing diabetes medicines show benefit and further drugs are in trials, and weight loss also lowers heart disease risk, the leading cause of death in this group."
+      ],
+      "human": {
+        "file": "human/government-2.txt",
+        "words": 956,
+        "date": "2021-10",
+        "source": "NIH News in Health, 'Fighting Fatty Liver: Steps Against a Silent Disease'",
+        "url": "https://newsinhealth.nih.gov/2021/10/fighting-fatty-liver",
+        "sha256": "040e46d4a991c466"
+      },
+      "ai": {
+        "file": "ai/government-2.txt",
+        "words": 963,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "f3727ddc79f3c31f"
+      }
+    },
+    {
+      "id": "government-3",
+      "register": "government",
+      "batch": 1,
+      "topic": "A parliamentary research briefing summarising the extent and forms of discrimination in sport across the European Union, drawing on survey evidence about racism, homophobia and other grounds.",
+      "audience": "Members of the European Parliament, their staff and the interested public; issued as a briefing by the European Parliament's in-house research service.",
+      "keyPoints": [
+        "Discrimination is defined as treating people in comparable situations differently on at least one unlawful ground, and survey evidence suggests the feeling of being discriminated against is more widespread than measured discrimination.",
+        "Sport is credited with reaching marginalised groups that other schemes miss and with providing a common framework of rules, and around two thirds of EU citizens regard it as a means of combating discrimination.",
+        "Competitive sport simultaneously ranks and separates people by performance, gender and disability, and women remain scarce in coaching and governance - a small minority of International Olympic Committee members, under a fifth of affiliated bodies' governing structures, about one in seven top decision-making posts in national federations, and roughly a quarter of coaches.",
+        "Discrimination in sport typically attaches to visible characteristics such as skin colour, body shape and gender; deliberate acts should be distinguished from perceived discrimination, and disadvantage is often cumulative, notably for economic migrants despite the belief that sport integrates newcomers easily.",
+        "Two less-discussed grounds are religion - direct harassment by opponents or teammates, and indirect failure to accommodate observance, mixed-gender rules or sponsor logos conflicting with belief - and disability, for which practical remedies include disability-friendly teams, adapted rules, equipment and teaching, and non-playing roles such as coaching or refereeing.",
+        "Recent racism statistics specific to sport are hard to find; a 2017 fundamental rights survey recorded 3 percent of respondents experiencing racist violence and 24 percent racist harassment in a year, with high shares of Jewish respondents fearing antisemitic insult or physical attack, and a 2018 survey found nearly two thirds of victims never reported the incident.",
+        "A 2018 survey of LGBTQI+ experience found nine in ten see homophobia and transphobia as a problem in sport, 82 percent had heard such language within a year, almost one in five had avoided a sport they were drawn to, and trans people faced negative incidents disproportionately often.",
+        "Abuse ranged from verbal insults to shoving and physical violence and online harassment; perpetrators were mostly fellow participants or teammates, with coaches more often responsible for harassment of trans people; most victims did not react and very few reported, many not knowing where to report, and respondents favoured more openly gay sports stars, high-profile campaigns, diversity training and inclusive policies over tougher sanctions."
+      ],
+      "human": {
+        "file": "human/government-3.txt",
+        "words": 987,
+        "date": "2021-07",
+        "source": "European Parliamentary Research Service briefing 'Fighting discrimination in sport', PE 696.163",
+        "url": "https://www.europarl.europa.eu/RegData/etudes/BRIE/2021/696163/EPRS_BRI(2021)696163_EN.pdf",
+        "sha256": "3b4b656ff3b2dcdc"
+      },
+      "ai": {
+        "file": "ai/government-3.txt",
+        "words": 991,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "84eadb7c08e84977"
+      }
+    },
+    {
+      "id": "howto-1",
+      "register": "howto",
+      "batch": 2,
+      "topic": "How to set up and maintain an indoor window garden of flowering and foliage plants through the winter — choosing and building the plant box, siting it at the right window, managing warmth, light and humidity indoors, and the routine care that keeps a small collection thriving.",
+      "audience": "General-interest home gardeners and householders — amateurs with no greenhouse and no professional training, working within an ordinary heated dwelling. They are assumed to be practical and willing to have a small piece of joinery or tinwork made up, and to deal with a commercial florist, but they need to be told the basics of light, warmth, drainage, and humidity from scratch. Written for a domestic readership in an era of stoves, gas lighting, registers, and coal or steam heat.",
+      "keyPoints": [
+        "Scale and ambition: the arrangement can be as modest as a single planter or a handful of pots on a window stand, or as involved as a full fitted display with boxes, shelves, and brackets. Costly fittings and big collections are not the point; a small group of plants kept in good condition beats a crowded one that cannot be properly housed or tended.",
+        "Building the plant box: give dimensions and construction. Recommend making the box roughly eight inches deep rather than six so a metal (zinc) liner tray can be fitted inside, with a slatted false wooden bottom set about two inches above the tray floor so drainage water collects out of sight. A drain tap at tray-bottom level lets the reservoir be emptied every day or two — standing water must never reach the false bottom or the soil stays sodden. The payoff is that the box can be watered freely indoors without soaking the floor covering.",
+        "Finishing the box: since it sits in plain view it can be dressed up with decorative tile held by molding, or a light wooden lattice around the sides — but a plain, sturdy box with molding top and bottom, painted green or another quiet neutral, disappears behind the plants, which is the desired effect. Note that brackets, planters, and stands can simply be bought from a large florist.",
+        "Mounting and mobility: fixing the box to the window frame or to brackets under the sill is common, but a low, lightweight rolling stand of the right height is better — it lets the box be pulled back from the glass, rotated periodically so every side gets light, or turned to show its best face to the room. Add swinging brackets carrying one or two pots on each side of the window, set a third to halfway up; these should pivot on a hinge at the base so they can be swung in or out, and warn that bracket plants dry out fast and are the hardest position to manage well.",
+        "Window choice and exposure: pick a south, southeast, or east window, since winter plants — especially those meant to flower — need every hour of light available. The window should be well sealed against draughts, and shutters plus a curtain help on cold nights.",
+        "Steady temperature: plants suffer badly, sometimes fatally, from being cosy one night and barely above freezing the next. Some survive it, none prosper. With steam, hot-water, or hot-air heating, overheating is as much a danger as chilling. Note the practical difference between masonry rooms, which hold their warmth overnight once closed up except in extreme cold, and lightly built wooden houses exposed on every side, which lose heat quickly.",
+        "Air quality and humidity: rooms lit by gas are hard to grow in, and ordinary living-room air is usually far too dry. Suggest closing off a bay window with glass doors to create a small conservatory, and simpler fixes — a pan of water on the stove or heat register, and damp moss tucked among the pots.",
+        "Cleaning the foliage: dust must be washed off periodically. A bathtub that drains readily is ideal — lay each plant on its side, propped on a small box clear of the tub floor, and syringe it thoroughly without waterlogging the soil. Keep water off the blooms, particularly thick white waxy flowers such as hyacinths. Velvety-leaved begonias should be wiped with dry or barely damp cotton instead, though even they can be syringed if the leaves can be dried quickly outdoors on a mild day or near the stove.",
+        "Pots and planting: plants can go straight into soil in the box, but keeping them potted allows rearranging and moving the needier ones into better light. Use porous clay pots for the bigger specimens on shelves and brackets, and light flexible paper pots for the small plants filling the box, since these can be packed tightly together to save space. Pack damp sphagnum or other moss between spaced pots to steady them, slow soil drying, and release moisture the foliage appreciates.",
+        "Sourcing and temperature classes: florists stock plants bred for window culture and winter bloom, and a knowledgeable one will gladly assemble a suitable collection — order in early autumn, before the trade gets busy, so the request gets proper attention. Explain that most suitable subjects come from the florist's medium house (night temperature about 60°F) or cool house (about 50°F), with daytime running 10 to 15 degrees warmer. Five degrees below those figures does no harm; more is tolerated but checks growth. Allow a higher daytime temperature in bright sun than in dull weather."
+      ],
+      "human": {
+        "file": "human/howto-1.txt",
+        "words": 1115,
+        "date": "1910",
+        "source": "\"Manual of Gardening: A Practical Guide to the Making of Home Grounds and the Growing of Flowers, Fruits, and Vegetables for Home Use\" (Second Edition) by L. H. Bailey, 1910; digitized as Project Gutenberg eBook #9550. Passage is the section \"The inside window-garden, or 'house plants'\" from Chapter VII.",
+        "url": null,
+        "sha256": "11b33b436c07726d"
+      },
+      "ai": {
+        "file": "ai/howto-1.txt",
+        "words": 1171,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "7e561a18e8f4d777"
+      }
+    },
+    {
+      "id": "journalism-1",
+      "register": "journalism",
+      "batch": 1,
+      "topic": "An investigation into how a decade of congressional budget reductions degraded the United States tax-collection agency's capacity to audit and collect, and who benefits from that decline.",
+      "audience": "General readers of a US nonprofit investigative newsroom (ProPublica, co-published with The Atlantic) interested in tax policy, federal budgeting and government accountability; written for a national audience with no specialist tax background.",
+      "keyPoints": [
+        "A long-serving revenue agent discovered around 2008 that large numbers of foreign firms operating in US offshore oil waters owed federal tax and were not being pursued; the enforcement effort he built recovered tens of millions before being wound down after he retired.",
+        "The reductions arrived gradually and were absorbed through attrition rather than mass layoffs, so the institutional decline accumulated over roughly eight years without a single visible triggering event.",
+        "Audit staffing fell by about a third between 2010 and 2017, dropping below ten thousand revenue agents for the first time since the early 1950s, when the economy was a fraction of its later size, with a further wave of retirement eligibility pending.",
+        "Annual audits fell by hundreds of thousands, a drop of roughly two-fifths in the audit rate, and surviving auditors describe narrowing the scope of individual examinations to clear caseloads.",
+        "Basic compliance functions contracted sharply: new investigations of people who never filed returns fell by roughly 85 percent, and the value of tax debts allowed to lapse past the ten-year statutory limit rose from hundreds of millions to billions of dollars per year.",
+        "Enforcement against corporations and wealthy individuals degraded fastest because those cases depend on scarce specialist expertise that departing staff take with them, while most ordinary taxpayers interact with an automated system.",
+        "Audits of a large refundable anti-poverty tax credit were politically protected and grew as a share of the shrinking total, so claimants with very low incomes are examined at rates comparable to people earning half a million dollars or more.",
+        "The publication estimates at least eighteen billion dollars in forgone revenue each year, and former officials warn that if public awareness of weakened enforcement spreads, compliance could fall further and worsen the deficit."
+      ],
+      "human": {
+        "file": "human/journalism-1.txt",
+        "words": 1127,
+        "date": "2018-12-11",
+        "source": "Kiel & Eisinger, 'How the IRS Was Gutted', ProPublica",
+        "url": "https://www.propublica.org/article/how-the-irs-was-gutted",
+        "sha256": "9888558cf6e116f5"
+      },
+      "ai": {
+        "file": "ai/journalism-1.txt",
+        "words": 1001,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "7ac5ce5f5e82b91d"
+      }
+    },
+    {
+      "id": "journalism-2",
+      "register": "journalism",
+      "batch": 1,
+      "topic": "A report on the reopening of Scotland's national portrait gallery in Edinburgh after a multi-year, multi-million-pound refurbishment, based on a press tour of the building.",
+      "audience": "General international readers of a volunteer-written, freely licensed news wiki (Wikinews); an arts-and-culture original report aimed at readers with no specialist knowledge of Scottish art history.",
+      "keyPoints": [
+        "The gallery reopened after a two-and-a-half-year closure and a refurbishment costing £17.6 million, roughly $27.4 million at the time.",
+        "Converting former office and storage areas increased exhibition space by about 60 percent, letting the institution show seventeen exhibitions simultaneously and far more of its collection than before.",
+        "The red sandstone building, designed by Robert Rowand Anderson and opened in 1889, was funded and given to the nation by a newspaper proprietor and philanthropist; it also housed Scotland's antiquarian society until the mid-1950s.",
+        "Accessibility drove much of the work: a large glass lift replaced a cramped two-person one, and sloped entrances were added alongside the original steps, superseding an on-request wooden ramp.",
+        "Visitor numbers were projected to roughly double to around 300,000 a year, admission remained free, and planning was coordinated with another recently refurbished national museum in the city, down to practicalities such as pram access and baby-changing.",
+        "Ground-floor displays pair a rotating photographic gallery of contemporary Scottish public figures, including television actors, with a video installation on missing persons that originated in a theatre production and uses footage from deprived Edinburgh housing areas.",
+        "Upper galleries had false ceilings removed and lost skylights recreated, with adjustable blinds giving control over daylight; new stonework was cut to match the Victorian fabric so closely as to be indistinguishable.",
+        "The first upper-floor themed display covers the eighteenth-century Enlightenment and combines the permanent collection with more than a hundred new loans, shown above restored parquet floors that had been hidden under carpet."
+      ],
+      "human": {
+        "file": "human/journalism-2.txt",
+        "words": 1108,
+        "date": "2011-12-01",
+        "source": "McNeil, 'A portrait of Scotland: Gallery reopens after £17.6 million renovation', Wikinews",
+        "url": "https://en.wikinews.org/wiki/A_portrait_of_Scotland:_Gallery_reopens_after_%C2%A317.6_million_renovation",
+        "sha256": "274a82208c13ba2c"
+      },
+      "ai": {
+        "file": "ai/journalism-2.txt",
+        "words": 1000,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "b08bf2e83019d650"
+      }
+    },
+    {
+      "id": "journalism-3",
+      "register": "journalism",
+      "batch": 1,
+      "topic": "A long-form feature examining the rise of the social-media wellness movement built around eating only 'pure' foods, the harm it caused, and why it took hold.",
+      "audience": "Readers of a British national daily's weekly long-form essay strand (The Guardian's Long Read); an educated general audience interested in food culture, nutrition science, social media and consumer publishing.",
+      "keyPoints": [
+        "A young blogger who sold a commercial raw plant-based cleanse to tens of thousands of followers became physically ill from the regime she was promoting, developing an obsessive disorder centred on dietary purity.",
+        "Her symptoms included hair loss, halted menstruation and skin discolouration caused by relying on a single narrow category of permitted carbohydrate; recovery involved gradually reintroducing excluded foods rather than abandoning plant-based eating altogether.",
+        "Publicly announcing that she was widening her diet cost her thousands of followers and produced refund demands, abuse and threats, including accusations that her illness reflected a lack of discipline.",
+        "Restrictive diets and quack cures are ancient, but this movement differed by defining itself against ordinary eating and by using image-driven social platforms to reach a mass audience with unusually absolute claims.",
+        "Its central proposition — that conventional food is not merely fattening but contaminating — turned a dietary programme into something closer to a moral or quasi-religious framework.",
+        "The commercial effects were fast and measurable: ingredients that publishers resisted a few years earlier because readers had never heard of them became ordinary supermarket stock.",
+        "A backlash came from cookery writers who read it as body-shaming and a route into eating disorders, and from scientists and food writers who disputed specific health claims, including those made for coconut oil.",
+        "At the extreme, a practitioner promoting an acid-alkaline theory of disease charged a terminally ill patient a very large sum for treatment shortly before her death and was later convicted of practising medicine without a licence; as criticism mounted, prominent figures dropped the movement's label while continuing to sell the same products."
+      ],
+      "human": {
+        "file": "human/journalism-3.txt",
+        "words": 1096,
+        "date": "2017-08-11",
+        "source": "Wilson, 'Why we fell for clean eating', The Guardian Long Read",
+        "url": "https://www.theguardian.com/lifeandstyle/2017/aug/11/why-we-fell-for-clean-eating",
+        "sha256": "27b294c1838c7c2b"
+      },
+      "ai": {
+        "file": "ai/journalism-3.txt",
+        "words": 1000,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "88b9cdc5777def2c"
+      }
+    },
+    {
+      "id": "letters-1",
+      "register": "letters",
+      "batch": 2,
+      "topic": "A long, unhurried private letter written over several days by an ailing middle-aged woman novelist of the English gentry to a much younger female relative — mixing a mildly scolding response to news that the girl has been baiting a male acquaintance about the novelist's (anonymously published) books, a frank account of her own declining health, and a run of household, village and family news.",
+      "audience": "One named reader: a young unmarried female relative, roughly in her early twenties, who lives in another county, corresponds frequently, knows every person and household referred to, and is close enough to the writer to be teased about her nerve and her love affairs. The writer assumes total shared context — names abbreviated to initials, places and family situations mentioned without explanation — and no third-party reader. Secondarily, the piece as commissioned should also work for a modern reader who enjoys published private correspondence for its voice and period texture, and who will tolerate unglossed names.",
+      "keyPoints": [
+        "Opens by thanking the young correspondent for relaying, at length, a gentleman acquaintance's opinions on her novels. The writer is entertained rather than wounded, says she bears him no grudge for a mind so unlike her own, but is genuinely amazed that the girl kept pressing him — and sides with the girl's father in calling the trick unfair, since the man will be mortified once he learns whose books he has been criticising to the author's own family.",
+        "Turns the reproach into an affectionate character sketch: the girl is timid about some things and utterly fearless about others, unabashed and impossible to put off. The writer instructs her to stop forcing more of the books on him, to confess, and to apologise.",
+        "Uses the episode to state her own artistic position without solemnity: she and the gentleman would never see eye to eye about fiction or about heroines, and flawless, idealised characters make her feel unwell and ill-natured. She nonetheless grants that much of what he said is sensible, and warmly credits his wish to think well of young women as evidence of a kind and fine-grained temperament — adding that he deserves better than more of her work.",
+        "Mentions, half-apologetically, that an uncle has learned she has a further book ready for publication; she could not deny it when asked directly, but he knows no more. She warns the girl not to expect to enjoy it, though the heroine may please her, being rather too virtuous for the writer's own taste.",
+        "A candid, unsentimental health report: weeks of unwellness, a bad patch about a week earlier, recurrent fever and broken nights; she is somewhat better now and her colour is returning after weeks of looking blotched and wrong. She notes drily that she should not count on ever looking well again, and that illness is a luxury one cannot afford at her age. She thanks the girl for her letters, says her pleasure in them is undiminished, and tosses off a teasing prediction about whom a girl mentioned in them will end up marrying.",
+        "A dated break resumes the letter in the evening, with an apology for having been listless and poor company earlier. She looks forward to coming rain and then mild weather, since a saddle is being finished for her and she believes fresh air and exercise are what she needs. She also admits to household strain over an impending event at a relative's property — an expected death or settlement — which has the family, and especially the grandmother, brooding over troubles that cannot be mended and behaviour nobody can fathom.",
+        "Relays medical news from another branch of the family: a small girl's headaches have eased, the attending physician is pleased with a mercury treatment and thinks a cure possible, and the condition is now held to be treatable if the patient is young enough. She passes this on as fresh information, while wondering whether the girl has already heard as much from a medical acquaintance of her own, and hopes his reputation is holding up against a boy's persistent cough.",
+        "A stretch of village and domestic small talk, delivered deadpan: messages to a young male relative about a servant who remains handsome and obliging and who dined with them, and about a game she plays while thinking of him; neighbours returned from a trip whom she has not seen because she does not risk going to church; a new maid engaged who is to double as housekeeper; and the funeral of an elderly villager, where her polite remark that it had been a handsome affair drew a reply suggesting nobody else thought so — the only handsome thing, she decides, being the servant walking behind in a green coat, with the widow following as chief mourner in short mourning stuff trimmed with crape.",
+        "A third dated section closes the letter: after weighing several plans she settles on having the uncle carry it to London to post, out of curiosity about how the postmark will look. She reflects that he finds London oppressive, expects to miss him once he leaves, and trusts he will arrive in time to visit the sick as conscientiously as he does everything else; she notes his return from a family house, a pleasant day with relatives, and a visit unlikely to be repeated for months. She ends with hopes that the girl's own young man has safely crossed to France, and with an account of her first ride out — a route past the site of some new cottages, with two relatives walking beside her — praising one of them as a tireless nurse, then adding that the girl already knows all this."
+      ],
+      "human": {
+        "file": "human/letters-1.txt",
+        "words": 1014,
+        "date": "1908",
+        "source": "\"The Letters of Jane Austen\", by Jane Austen, selected from the compilation of Edward, Lord Brabourne, by Sarah Chauncey Woolsey; Boston: Little, Brown, and Company, 1908. Project Gutenberg eBook #42078. Passage is Letter LXXIV, Jane Austen to her niece Fanny Knight, Chawton, Sunday 23 March 1817 (continued \"Evening\" and \"Tuesday\"), body text only.",
+        "url": null,
+        "sha256": "ffad57eaf9285417"
+      },
+      "ai": {
+        "file": "ai/letters-1.txt",
+        "words": 1071,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "12f08f64cac5ed48"
+      }
+    },
+    {
+      "id": "literary-1",
+      "register": "literary",
+      "batch": 1,
+      "topic": "A transcendentalist argument that moral and religious authority comes from the individual soul's immediate intuition rather than from tradition, scripture, institutions or the past.",
+      "audience": "Educated nineteenth-century American general readers of a book of essays; originally written for Emerson's lecture-going and book-buying public and issued as part of a collection of philosophical-literary essays, not for an academic or specialist readership.",
+      "keyPoints": [
+        "Genuine religious insight is claimed to be direct and unmediated, so any intermediary help, teacher, text or temple is treated as an intrusion rather than an aid.",
+        "Anyone who can only speak of the divine by referring back to the vocabulary of an ancient people is presented as untrustworthy; the derivative report is worth less than present perception.",
+        "Deference to the past is framed as an actual injury to the mind: history is defensible only as an illustration of the reader's own development, never as an authority over it.",
+        "Human timidity is contrasted with the natural world, which is said to exist wholly in the present and to be complete at every stage of its growth, while people alternate between regret and anticipation.",
+        "Memorised quotation is likened to a childhood stage that ought to be outgrown; once a person genuinely occupies the position from which a saying came, the exact words become dispensable.",
+        "The highest state described is one that cannot be reached by imitation or precedent and is not accompanied by gratitude, hope or joy, since those all imply dependence on something outside the self.",
+        "Value is located in becoming rather than in having become: power exists only in the moment of transition, which is why the doctrine is said to be resented, as it demotes past achievement and reputation.",
+        "The term self-reliance is itself criticised as a weak label, since what is meant is not leaning on the self but the active presence of a principle that commands others without effort."
+      ],
+      "human": {
+        "file": "human/literary-1.txt",
+        "words": 1049,
+        "date": "1841",
+        "source": "Emerson, 'Self-Reliance', Essays: First Series",
+        "url": "https://www.gutenberg.org/cache/epub/2944/pg2944.txt",
+        "sha256": "0d88195fc9d31aeb"
+      },
+      "ai": {
+        "file": "ai/literary-1.txt",
+        "words": 1006,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "380bccb7a09bb5e8"
+      }
+    },
+    {
+      "id": "literary-2",
+      "register": "literary",
+      "batch": 1,
+      "topic": "A personal essay on what walking on foot for days at a time actually feels like, tracking the shifting moods of the day from setting out to the pleasures of the evening halt.",
+      "audience": "General magazine readers of late-Victorian Britain: the piece belongs to the belletristic periodical-essay tradition and was gathered into a collection of light philosophical essays aimed at cultivated but non-specialist readers.",
+      "keyPoints": [
+        "The mood of a walking day is described as moving along a gradient, from an alert exhilaration at the start to a placid, half-dreamlike absorption by late afternoon.",
+        "The later stage is judged less bright but more peaceful, with bodily wellbeing and the pleasure of breathing and movement compensating for the loss of early high spirits.",
+        "Roadside rests are treated as a subject in their own right: stopping to sit and smoke under trees, being looked at by birds, and feeling no obligation to move on.",
+        "Escape from clock time is presented as the central luxury, with a rural place where almost nobody tracks the weekday or the date offered as evidence that unmeasured hours feel far longer.",
+        "The habits of commercial life are argued to be carried inside a person rather than imposed from outside, so that even paradise would not cure a confirmed man of business; a walking tour is offered as the nearest available relief.",
+        "The evening after a long march is claimed to intensify ordinary pleasures, making tobacco and drink taste better and giving reading an unusual vividness, as though the book had been written by the reader.",
+        "Specific pocket reading is recommended for such journeys, with essayists, lyric poetry and a digressive comic novel named as suitable company.",
+        "Loitering outside an inn at sunset is described as producing a kind of egalitarian curiosity, in which pride and narrowness drop away and the traveller will talk to anyone and watch local character as entertainment."
+      ],
+      "human": {
+        "file": "human/literary-2.txt",
+        "words": 1038,
+        "date": "1876",
+        "source": "Stevenson, 'Walking Tours', Cornhill Magazine; collected in Virginibus Puerisque (1881)",
+        "url": "https://www.gutenberg.org/cache/epub/386/pg386.txt",
+        "sha256": "d4e61aa9d433ff26"
+      },
+      "ai": {
+        "file": "ai/literary-2.txt",
+        "words": 1007,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "1162c903ff3867af"
+      }
+    },
+    {
+      "id": "literary-3",
+      "register": "literary",
+      "batch": 1,
+      "topic": "A historical argument that classical education won its authority under conditions that no longer hold, and that natural science now supplies the account of the world an educated person needs.",
+      "audience": "An audience at the opening of a new science-oriented college, and subsequently the readers of a collected volume of essays and addresses on science and education: educated general readers and participants in the Victorian curriculum debate between classical and scientific instruction.",
+      "keyPoints": [
+        "Medieval learning is summarised as a closed system in which theological premises functioned the way axioms function in geometry, and the philosopher's job was to derive approved conclusions from them.",
+        "That system is said to have supplied a complete picture of the world: a beginning and an end, an earth at the centre, matter as a base distraction from the spiritual, and a natural order constantly overridden by spiritual agents.",
+        "Because salvation was the only knowledge held to matter, education was necessarily theological and the route to theology ran through Latin.",
+        "Investigating nature was, on this view, at best irrelevant and at worst suspect, so early researchers risked being taken for sorcerers.",
+        "Contact with Moorish Spain and the Crusades, then Arabic translations and eventually the original texts, reintroduced classical literature to western Europe, and printing spread it.",
+        "The prestige of classical learning is defended as justified at the time, since antiquity then had no rival in literature, sculpture or physical science, and offered the only model of unforced intellectual freedom.",
+        "The recovery of Greek is compared to the contemporary campaign for teaching physical science: a curriculum fight that the reformers won and that changed education for the better.",
+        "Reformers are charged with treating their own victory as final, so that their nineteenth-century successors still defend classics as the sole path to culture despite changed circumstances.",
+        "The decisive modern change is identified as the growing role of natural knowledge in daily life, prosperity and the general conception of the universe, which separates the present from the Renaissance more sharply than the Renaissance was separated from the middle ages.",
+        "Scientific findings are said to contradict the medieval picture directly, and to carry different credentials, since they appeal to nature rather than authority, admit their own partial and symbolic character, and treat claims that outrun evidence as culpable."
+      ],
+      "human": {
+        "file": "human/literary-3.txt",
+        "words": 1103,
+        "date": "1880",
+        "source": "Huxley, 'Science and Culture', address; Collected Essays III",
+        "url": "https://www.gutenberg.org/cache/epub/7150/pg7150.txt",
+        "sha256": "ec8ea5dc85532ea8"
+      },
+      "ai": {
+        "file": "ai/literary-3.txt",
+        "words": 1029,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "0df73042aa549a6f"
+      }
+    },
+    {
+      "id": "policy-1",
+      "register": "policy",
+      "batch": 2,
+      "topic": "A findings section of a regulatory rulemaking document explaining why residential and mobile internet access providers retain both the incentive and the practical ability to interfere with an open internet — building the case through a two-sided-platform / terminating-monopoly analysis, past instances of interference, weak consumer switching, and limited local market choice.",
+      "audience": "Specialist readers of an administrative record: parties and their counsel who filed comments in the proceeding, industry and public-interest advocates, economists and staff at the agency itself, and — most consequentially — the appellate judges who will later review whether the determination was adequately reasoned and supported. Assumes fluency in telecom regulation, two-sided-market economics, and the procedural vocabulary of notice-and-comment rulemaking; explains nothing a lay reader would need explained.",
+      "keyPoints": [
+        "Restate and reaffirm an earlier agency conclusion: last-mile access providers have strong, continuing incentives to restrict openness, and the refreshed evidentiary record built through the current proceeding's notice of proposed rules confirms that the earlier finding still holds. Frame this as a determination reached on the record rather than as argument."
+      ],
+      "human": {
+        "file": "human/policy-1.txt",
+        "words": 973,
+        "date": "2015",
+        "source": "\"Protecting and Promoting the Open Internet\" (Report and Order on Remand, Declaratory Ruling, and Order; FCC 15-24), Federal Communications Commission, published as a Final Rule in the Federal Register, 80 Fed. Reg. 19738, Vol. 80 No. 70, April 13, 2015. Passage is Section III.B.2.a \"Economic Incentives and Ability\", paragraphs 79-81. Retrieved from GPO govinfo: https://www.govinfo.gov/content/pkg/FR-2015-04-13/html/2015-07841.htm",
+        "url": null,
+        "sha256": "3b176099a250abdc"
+      },
+      "ai": {
+        "file": "ai/policy-1.txt",
+        "words": 970,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "b1d93060e1499c07"
+      }
+    },
+    {
+      "id": "review-1",
+      "register": "review",
+      "batch": 2,
+      "topic": "A critical appreciation of the fifteenth-century Florentine painter Sandro Botticelli: why his work produces a pleasure available nowhere else, and how his temperament — visionary rather than merely naturalistic or dramatic — shows itself in his relation to poetry, above all in his drawings for Dante's Commedia.",
+      "audience": "Cultivated general readers of a serious literary and cultural periodical: educated non-specialists who read poetry, know the standard names and episodes of Italian Renaissance art at a layman's level, and can be assumed to have read Dante, but who are not art historians and want an appreciation rather than a scholarly account.",
+      "keyPoints": [
+        "Open by establishing the case for taking him seriously now: he is the single living contemporary named in the painting treatise of the era's greatest master, which may be accident or may be considered judgment; his name, obscure a century ago, is quietly regaining weight as readers discover the charm of his work. Frame the essay's governing question, which is the question any critic owes a comparatively unfamiliar artist: what exactly is the peculiar sensation, the particular quality of pleasure, that this work excites and that cannot be got elsewhere?",
+        "Set his achievement in sequence: by the middle of the century he had already reached the meditative subtlety usually credited to the great imaginative painters of its close. He left behind both the plain devotional art the previous generation's followers had practised for a hundred years and the plain naturalism that grew out of it — a matter of birds and flowers only — and looked instead to what were for him modern books, the vernacular poets, and to his own fresh readings of classical fable; when he did paint sacred incidents he ran an original private sentiment beneath them, so that the undercurrent reaches the viewer as the picture's real matter through the veil of its nominal subject.",
+        "Treat the biography as strikingly uneventful in an age of adventurous artists' lives. Scholarship has thinned out the anecdote earlier chroniclers heaped up, dispelling one famous romance and clearing another painter's reputation, but here there is no legend to dispel. Even his familiar name is not his: it is a nickname attached to the surname of the goldsmith who first taught him, while his family name was another. Two things only happened to him, both shared with other painters — a summons to Rome to paint in the papal chapel, and a late submission to the influence of the reforming friar, after which he seems to drop out of sight into a religious melancholy lasting until his death at the accepted date early in the next century. He is said to have thrown himself into studying the great vernacular poem and even to have written a commentary on it; still, the long inactivity sits oddly, and one half-wishes some document would surface fixing the death earlier and sparing him, in the reader's mind, that dejected old age.",
+        "Establish the central characterisation: he is above all a poetical painter, fusing what belongs to poetry — story, sentiment — with what belongs to painting considered abstractly — line and colour. This is why he becomes the natural illustrator of the great poem.",
+        "Ground that claim in a concrete bibliographical anecdote about the printed edition of 1481, where blanks were left at each canto's head for an illuminator's hand. In a few surviving copies these have been filled, as far as the nineteenth canto of the first canticle, with impressions from engraved plates — evidently a trial, since in one copy in a university library a plate has been pulled upside down and badly out of square in the middle of a sumptuous printed page.",
+        "Argue that the poem had to wait for its illustrator. The earlier tradition, with its almost childlike devotional aim, had not yet learned to load outward things — light, colour, ordinary gesture — with the burden of meaning the poem carries, so before the fifteenth century no painter could have supplied the images.",
+        "Judge the illustrations candidly, praise and fault together. They are crowded with incident and blend, with an unembarrassed disregard for pictorial decorum, three moments of one scene into a single plate. The monstrous figures miscarry, because a poet's words present an image only faintly to the mind and must be pitched lower when turned into visible form — one regrets he did not take the milder imagery of the second canticle instead. Against that, two successes worth describing in detail: in the punishment of those thrust head-downward, an invented touch of flame catching the upturned soles of the feet, proving the design is a painter's own vision and not a transcript of the words; and the centaurs, where he forgets the narrative circumstances altogether and gives himself over with delight to the creatures themselves — small, bright woodland things with arch infant faces and dainty bodies, drawing tiny bows.",
+        "Concede the naturalist inheritance before overturning it: he belonged to a generation of naturalists and might have stayed one, and his work shows plenty of their alertness to outward things — the period's lawns full of delicate small creatures, its hillsides with pools, its pools with flowering reeds. But this did not satisfy him; he is a visionary painter, and in that visionariness he is kin to the poet he illustrated.",
+        "Close on the essay's real distinction, between the dramatic and the visionary painter. The dramatic painters — including the poet's own companion and two celebrated successors — transcribe the outward image with more or less refinement and stand as nearly impassive spectators of the action. The type the subject represents instead commandeers the material before it as the vehicle of its own ideas, moods and visions, playing fast and loose with that material, rejecting, isolating and recombining. For him as for the poet, the scene, the colour, the gesture arrives with sharp and insistent reality, but by some private law of his make it wakes a mood it wakes in nobody else — a mood of which the outward thing is the double or echo, and which he then clothes in sensuous particulars so that everyone may share it."
+      ],
+      "human": {
+        "file": "human/review-1.txt",
+        "words": 999,
+        "date": "1873",
+        "source": "\"Sandro Botticelli\", from The Renaissance: Studies in Art and Poetry by Walter Pater (Sixth Edition; Project Gutenberg eBook #2398). Essay first published 1870; collection first published 1873.",
+        "url": null,
+        "sha256": "9d7f65acd38849b1"
+      },
+      "ai": {
+        "file": "ai/review-1.txt",
+        "words": 1067,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "5743a097d3d7a96d"
+      }
+    },
+    {
+      "id": "techdoc-1",
+      "register": "techdoc",
+      "batch": 1,
+      "topic": "The case for relaxing Python's no-new-features rule for maintenance releases so that modern network security functionality could be backported into the Python 2.7 series.",
+      "audience": "CPython core developers, the python-dev mailing list, and commercial redistributors of Python; published as a Python Enhancement Proposal on the PEP index.",
+      "keyPoints": [
+        "By 2014 the TLS/SSL support in Python 2.7 was about four years old and that in Python 2.6 had been frozen for six years, leaving the standard library well behind current network security practice.",
+        "Software written against such old standard library facilities could not responsibly be recommended for use on the public internet, particularly given evidence that persistent, indiscriminate attacks were more widespread than previously assumed.",
+        "Using the operating system's OpenSSL covers part of the gap on Linux but still leaves applications unable to demand stronger settings explicitly, and pushing users toward third-party crypto or HTTP libraries adds deployment burden and depends on users knowing the libraries exist.",
+        "For the Windows and macOS installers the core team controls which OpenSSL is bundled, but had confined itself to OpenSSL maintenance releases matching the original feature release.",
+        "Specific missing capabilities are named: Server Name Indication, certificate hostname matching, a constant-time comparison primitive, standard password hashing, and hash algorithm availability introspection.",
+        "Python 2.7 was the project's only genuinely long-term maintenance branch, and policies calibrated for shorter support windows stop working; keeping security modules maintained over such a span requires permission to add features while holding existing interfaces stable.",
+        "An enterprise Linux distribution is offered as precedent: support attaches to the whole point-release series rather than the first release, and point releases receive security features under strict backwards-compatibility guarantees.",
+        "The selection rule for backports was that a missing feature must have security consequences beyond the individual Python program and its host machine, which is why network protocols, password storage and operating-system randomness qualified, and the intent was to avoid making users as cautious about maintenance updates as about feature releases."
+      ],
+      "human": {
+        "file": "human/techdoc-1.txt",
+        "words": 1173,
+        "date": "2014-03-23",
+        "source": "Coghlan, PEP 466 'Network Security Enhancements for Python 2.7.x'",
+        "url": "https://peps.python.org/pep-0466/",
+        "sha256": "e50b04a7523ca53d"
+      },
+      "ai": {
+        "file": "ai/techdoc-1.txt",
+        "words": 998,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "452d6b02b17390d1"
+      }
+    },
+    {
+      "id": "techdoc-2",
+      "register": "techdoc",
+      "batch": 1,
+      "topic": "An argument that complexity is the principal barrier to scaling large Internet backbone networks, together with the non-linear behaviours that appear only at large scale.",
+      "audience": "Network architects, backbone operators and protocol designers in the IETF community; published as an Informational Request for Comments.",
+      "keyPoints": [
+        "The document extends an earlier statement of Internet architectural principles by offering philosophical guidance to backbone architects, with the unifying claim that controlling complexity is how cost and reliability are controlled.",
+        "Complexity in most systems is attributed to the demand for robustness against uncertainty in environments and components rather than to basic functionality.",
+        "The Simplicity Principle holds that complexity is what impedes efficient scaling and is therefore the main driver of both capital and operational expenditure, implying designs should be driven toward the simplest workable solution.",
+        "The end-to-end argument is summarised as keeping per-communication state at the endpoints so that state can only be destroyed when the endpoint itself fails, and is linked to the notion of fate-sharing and to the hourglass model with a minimal IP layer at its waist.",
+        "The network core does hold large amounts of coarse-grained state such as routing state, but that state is nearly orthogonal to endpoint state; minimising the interaction between the two is what yields simplicity, which is why address translation, by reducing network-host transparency, deserves scrutiny.",
+        "The largest networks are treated as a qualitatively different engineering problem from medium-sized ones, exhibiting architecture, design and engineering non-linearities and a self-dissimilar structure across scales and levels of abstraction.",
+        "The Amplification Principle states that small perturbations at the input of a process can destabilise the output of a very large system, illustrated by resonance phenomena in bridges, planetary rings and lunar and solar cycles.",
+        "Networking illustrations of amplification include slower and more complex routing convergence as interconnection increases, a routing mesh whose output is far more complex than its input, and cell loss destroying an entire packet in a cell-switched network; a fly-by-wire airliner robust to turbulence yet vulnerable to microscopic faults in a few processors is offered as an engineering parallel, and confining the effect of local changes to the local scope is proposed as the mitigation."
+      ],
+      "human": {
+        "file": "human/techdoc-2.txt",
+        "words": 1078,
+        "date": "2002-12",
+        "source": "Bush & Meyer, RFC 3439 'Some Internet Architectural Guidelines and Philosophy'",
+        "url": "https://www.rfc-editor.org/rfc/rfc3439.txt",
+        "sha256": "44bead05a5f3e4a8"
+      },
+      "ai": {
+        "file": "ai/techdoc-2.txt",
+        "words": 1000,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "76227880ee8a6e3b"
+      }
+    },
+    {
+      "id": "techdoc-3",
+      "register": "techdoc",
+      "batch": 1,
+      "topic": "An explanation of why the Linux kernel deliberately offers neither a stable binary driver interface nor a stable internal source interface, and what driver authors should do instead.",
+      "audience": "Driver developers and hardware vendors, especially those maintaining out-of-tree or binary-only drivers; published as part of the Linux kernel's in-tree development process documentation.",
+      "keyPoints": [
+        "A distinction is drawn at the outset between the kernel's internal interfaces, which change freely, and the system call interface used by applications, which is kept stable across decades.",
+        "The central claim is that a driver author does not actually want a frozen interface but a driver that keeps working, and the way to get that is to have the driver merged into the mainline tree.",
+        "Legal questions about non-GPL and binary-only drivers are explicitly set aside in favour of the technical argument.",
+        "A stable binary interface is impossible because compiler version affects structure alignment and inlining, build configuration changes which fields structures contain and whether some functions exist at all, and the kernel runs on many processor architectures.",
+        "Compiling a module against one exact configuration works for a single distribution release, but the number of distributions, of supported releases, and of hardware-tuned kernels within a single release makes the build matrix unmanageable.",
+        "Kernel development moves continuously, so when developers find a bug or a better design they rename functions, change structures and rework parameters, updating every in-tree caller in the same change.",
+        "The USB subsystem is cited as having been reworked at least three times, including a move from synchronous to asynchronous data handling that raised throughput and a change in packet allocation that resolved documented deadlocks; closed systems that preserved their old USB interfaces left obsolete and error-prone paths available to new developers.",
+        "Freezing interfaces would have required creating parallel new interfaces while maintaining the broken old ones, which is unreasonable to ask of volunteers working in their own time.",
+        "Security fixes frequently require reworking internal interfaces, and the ability to fix every user simultaneously is what stops the flaw from reappearing later; unused interfaces are also deleted to keep the kernel small and avoid code that cannot realistically be tested.",
+        "The practical advice is to get a GPL-compatible driver upstream, after which whoever changes an interface repairs the driver, and the driver ships in every distribution, gains outside bug fixes, tuning and features, and lowers its original author's maintenance cost."
+      ],
+      "human": {
+        "file": "human/techdoc-3.txt",
+        "words": 1171,
+        "date": "2019-02-01",
+        "source": "Kroah-Hartman, 'The Linux Kernel Driver Interface' (Documentation/process/stable-api-nonsense.rst)",
+        "url": "https://raw.githubusercontent.com/torvalds/linux/v5.15/Documentation/process/stable-api-nonsense.rst",
+        "sha256": "9c6d5f4859d3cc6b"
+      },
+      "ai": {
+        "file": "ai/techdoc-3.txt",
+        "words": 999,
+        "model": "claude-opus-5",
+        "generated": "2026-08-29",
+        "sha256": "0fc6ae3d8e53b72c"
+      }
+    },
+    {
+      "id": "travel-1",
+      "register": "travel",
+      "batch": 2,
+      "topic": "A first-person humorous travel sketch about a small Atlantic coral-island colony: how its houses and roads are quarried and built from the island's own soft white stone, the startling glare and charm of the resulting all-white architecture, and the almost comic spotlessness of the whole place.",
+      "audience": "General adult readers of a popular magazine or newspaper travel series - non-specialists reading for pleasure rather than practical trip planning. They have no knowledge of the island, no interest in prices, timetables or logistics, and expect to be entertained by a personable narrator as much as informed. Assume an educated nineteenth-century readership familiar with big grimy cities and with marble as the standard for architectural whiteness, but write so a modern reader of literary travel essays follows it just as easily.",
+      "keyPoints": [
+        "Framing and setup: the narrator and a travelling companion (a clergyman) have just reached the islands' main town and take a long afternoon walk, during which they work out that the strikingly pale town is built from blocks of the island's own coral. Keep the two of them present as a pair of amateur investigators whose conversation drives the piece.",
+        "The geology and the quarrying: the island is coral topped by only a few inches of soil, so practically every householder quarries on his own land. Describe the rectangular pits cut into hillsides with sheer, unblemished walls, and the passing fancy that a house was cast there and lifted out whole - then correct the fancy: what was taken out was the raw material.",
+        "The technique, given in plain workmanlike detail: the stone is soft enough to be cut with a chisel on a twelve-to-fifteen-foot handle, worked with the up-and-down motion of a crowbar drilling a hole or a churn dasher; cuts run ten to twenty feet deep; the extracted blocks are then sawn with an ordinary handsaw into oversized bricks (roughly two feet by one foot by six inches) and left loosely stacked about a month to harden before building starts.",
+        "The completeness of the material: walls, roofs of thin overlapping slabs that step down like shallow terraces, chimneys sawn into ornamental shapes, the veranda floor, the path to the gate, and the boundary fence with its capstones and gateposts - all of it coral, all of it trimmed to graceful lines with a saw.",
+        "The whitewash and the search for a simile: a coat laid on thick over roof, chimneys, house and fence alike, so brilliant in sunlight that an unaccustomed visitor has to look away. Include the mock-earnest deliberation between the two walkers over what the colour actually resembles, resolved in favour of the icing on a cake, faint sheen and all, with marble judged tame and reserved by comparison.",
+        "The aesthetic effect: the hard coating conceals every joint and seam, so a house looks carved from one solid piece with the openings cut out afterwards. Contrast the chilly, sepulchral, conversation-killing effect of a white marble house with the cheerful, nearly giddy effect of these; dwell on a single chimney with one face in sun and one in shadow as something a person could stare at for an hour, and on the involuntary exclamation provoked when such a house appears suddenly through greenery at a bend in a country road.",
+        "Ubiquity and tidiness: the white houses turn up everywhere, town and country, humble smallholding and expensive estate alike, always surrounded by vivid flowers but never covered in climbing vines, which cannot grip the smooth hard surface. The meanest cottage is as spotless as the grandest house; there is no dirt, smell, standing water or disorder anywhere, and the same trimness extends to the roads, the people and their clothes - the neatest place the narrator knows of.",
+        "Two short asides that give the piece its edge: a deadpan question about where, in all this uniform spruceness, the poor are supposed to live, raised, left unanswered, and handed off to future politicians to argue about; and a brief imagining of how one of these dazzling white country houses, with its tinted window ledges, green shutters and banked flowers, would look dropped into a soot-blackened European capital or almost any American city.",
+        "The roads and the closing joke: roadways are made simply by cutting a few inches into the solid coral (many feet where a hill is in the way) and levelling the bed; the coarse, porous surface looks like coarse white sugar. The whiteness throws sunlight back into a walker's eyes hard enough to keep him on the edge of a sneeze. End on an anecdote rather than a conclusion: an old sea captain who joins the walk keeps straying to the verge, and finally explains, in his own rough speech, that he chews tobacco and the road is simply too clean to spit on."
+      ],
+      "human": {
+        "file": "human/travel-1.txt",
+        "words": 1062,
+        "date": "1877",
+        "source": "\"Some Rambling Notes of an Idle Excursion\" by Mark Twain (Samuel L. Clemens), first serialized in The Atlantic Monthly, October 1877 - January 1878; text taken from Project Gutenberg eBook #3182 (https://www.gutenberg.org/cache/epub/3182/pg3182.txt), Chapter III.",
+        "url": null,
+        "sha256": "d522747563dafffc"
+      },
+      "ai": {
+        "file": "ai/travel-1.txt",
+        "words": 1127,
+        "model": "claude-opus-5",
+        "generated": "2026-09-02",
+        "sha256": "645f9903058eb674"
+      }
+    }
+  ]
+}

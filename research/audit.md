@@ -3,6 +3,12 @@
 An audit, not a tuning run. Nothing here changed a rule. The point was to find
 out how the rule sets behave on prose written for other purposes.
 
+> The corpus now lives in the repository, at
+> [`data/corpus/`](../data/corpus/README.md), and has since grown to 24 pairs
+> across 12 registers. Every number in this file is from the 18-pair state it
+> was written against and has been left as it stood; `node tools/audit.mjs`
+> re-runs it against whatever the corpus currently holds.
+
 ## Method
 
 Eighteen human documents and eighteen AI documents, six registers, three pairs
