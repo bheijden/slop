@@ -78,10 +78,18 @@ Three sets ship on:
 | `load-bearing` | 1 | How far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), rebuilt from upstream daily |
 | `ai-tells` | 78 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
+One more set is derived rather than written. `ai-vocabulary` samples public pull
+request descriptions every morning, clusters them into topics, and compares the
+ones that sign themselves machine-written against the ones that do not *inside
+each topic*, so that a word belonging to a subject cannot pass for a word
+belonging to a style. It is off and in `candidates/` until it beats
+`load-bearing` on the corpus; [the page](https://bheijden.github.io/slop/web/vocabulary.html)
+shows what it currently finds and what it throws away.
+
 Every rule in those four runs. A rule that never fires on your register costs
 nothing to leave on, so nothing is held back for being narrow. The five patterns
 the audit measured firing on human prose and not on AI prose do fire, so they sit
-in `candidates/unreproduced.json` instead, off. The five `style-` sets are off
+in `candidates/measured-backwards.json` instead, off. The five `style-` sets are off
 too, and match a register rather than hunting tells.
 
 Rules are data. A set is a JSON file carrying its own test examples (the fudger
@@ -96,7 +104,8 @@ produce all of these.
 |---|---|
 | [Command line](docs/cli.md) | flags, output formats, exit codes, agent usage |
 | [Rules](docs/rules.md) | choosing, installing, and writing your own |
-| [Derived vocabulary](docs/vocabulary.md) | the one rule set that measures itself, daily, from GitHub |
+| [Derived vocabulary](docs/vocabulary.md) | the one rule set that derives itself, daily, from GitHub |
+| [The back-testing corpus](data/corpus/README.md) | 24 topics written twice, once by a person and once by a machine |
 | [Writing styles](docs/styles.md) | matching a register instead of hunting tells |
 | [Agent skill](docs/skill.md) | installing slop so a coding agent picks it up |
 | [The web page](docs/web.md) | what the browser version does |

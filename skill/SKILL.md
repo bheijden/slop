@@ -167,7 +167,7 @@ cluster of 461,000 pull request descriptions. It is rebuilt from upstream by CI
 rather than written here, so its version moves on its own.
 
 The five patterns the audit measured on human prose and not on AI prose are in
-`candidates/unreproduced.json`, off, and turning one on means accepting findings
+`candidates/measured-backwards.json`, off, and turning one on means accepting findings
 the measurement says are not evidence of AI authorship.
 
 The five `style-` sets are off by default. They match a house style instead of

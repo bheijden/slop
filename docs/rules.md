@@ -19,7 +19,7 @@ Off by default, alongside the 5 style profiles:
 
 | set | rules | what it is |
 |---|---|---|
-| `unreproduced` | 5 | Patterns published elsewhere that this repo's corpus measured running the other way: they fired on human documents and not on AI ones. Kept because 36 documents is a small corpus and a pattern that fails on technical prose may hold on another register. |
+| `measured-backwards` | 5 | Patterns published elsewhere that this repo's corpus measured running the other way: they fired on human documents and not on AI ones. Kept because 36 documents is a small corpus and a pattern that fails on technical prose may hold on another register. |
 
 All 4 sets ship on, and every rule in them runs. Everything this project mined
 itself is in `ai-tells`. Each rule records where it came from in `from` and
@@ -27,7 +27,7 @@ itself is in `ai-tells`. Each rule records where it came from in `from` and
 never fires on your own register costs nothing to leave on, and the 10
 creative-writing rules never fire on documentation. The 5 the audit measured
 seen on human prose and not on AI prose were a different case, because those
-do fire, so they moved to `candidates/unreproduced.json` where turning one
+do fire, so they moved to `candidates/measured-backwards.json` where turning one
 on is an explicit choice. The `em-dash` rule is house style and not a tell;
 `slop explain em-dash` gives the evidence, which points the other way.
 

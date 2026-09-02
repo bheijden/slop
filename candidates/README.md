@@ -18,13 +18,13 @@ checked.
 | [`style-economist`](style-economist.json) | 9 | Economist house style |
 | [`style-newsroom`](style-newsroom.json) | 6 | Newsroom wire-service style |
 | [`style-plain`](style-plain.json) | 10 | Plain English |
-| [`unreproduced`](unreproduced.json) | 5 | Tells the audit did not reproduce |
+| [`measured-backwards`](measured-backwards.json) | 5 | Other linters' tells that measured backwards here |
 
 The tells this project mined are not here: they graduated into
 [`../rules/ai-tells.json`](../rules/ai-tells.json) and ship on.
 
 The five `style-` profiles are registers rather than tells, and are described in
-[../docs/styles.md](../docs/styles.md). `unreproduced` holds patterns published
+[../docs/styles.md](../docs/styles.md). `measured-backwards` holds patterns published
 elsewhere that this repo's corpus measured running the other way, firing on human
 documents and not on AI ones; each rule records what was measured. Alternative
 formulations of rules that fire on human prose are recorded as specifications in

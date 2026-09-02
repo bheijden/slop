@@ -1,9 +1,9 @@
 {
-  "name": "unreproduced",
+  "name": "measured-backwards",
   "version": "0.1.0",
   "slop": "0.1.0",
-  "title": "Tells the audit did not reproduce",
-  "description": "Patterns published elsewhere as AI-writing tells that this repo's matched corpus measured running the other way: they fired on human documents and not on AI ones. They are here rather than deleted because the corpus is 36 documents and small, and because a pattern that fails on technical prose may hold on another register. Every rule records what was measured. Off by default: turning one on means accepting findings on your own writing that the measurement says are not evidence of AI authorship.",
+  "title": "Other linters' tells that measured backwards here",
+  "description": "Five patterns that four other public AI-slop linters publish as tells — slop-gate, antislop-sampler, slopster and humanizer-de — and that this repo's matched corpus measured running the other way: they fire on human documents and not on machine-written ones. Each rule names the project it came from and what was measured.\n\nThey are kept rather than deleted for two reasons. A reader who wonders why slop does not flag \"moreover\" gets an answer with a number attached. And 24 pairs is a small corpus: a pattern that fails on these registers may hold on another, so the record is worth keeping where someone can re-run it.\n\nOff by default, and this is not a set to install. Turning one on means accepting findings on your own writing that the measurement says are not evidence of machine authorship.",
   "source": "https://github.com/bheijden/slop/blob/main/research/audit.md",
   "rules": [
     {
@@ -21,7 +21,7 @@
       "suggest": "Join the sentences, or delete the connective.",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 4 hits in 3/18 human documents, 0 in 0/18 AI documents.",
+      "evidence": "On data/corpus, 24 matched pairs: 6 hits in 4 of 24 human documents, 0 in 0 of 24 machine-written ones. Published as a tell by slop-gate.",
       "default": "off",
       "offBecause": "Measured on the audit corpus it fired on 4 of 18 human documents and 0 AI ones. \"Moreover\" and \"Additionally\" are ordinary formal English.",
       "tests": {
@@ -50,7 +50,7 @@
       "note": "single ordinary word; expect false positives",
       "from": "slop-gate",
       "source": "https://github.com/hwajongpark/slop-gate",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "evidence": "On data/corpus, 24 matched pairs: 1 hit in 1 of 24 human documents, 0 in 0 of 24 machine-written ones. Published as a tell by slop-gate.",
       "default": "off",
       "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose. The bare word is too common to carry a tell on its own.",
       "tests": {
@@ -78,7 +78,7 @@
       "suggest": "Drop the metaphor and state the mechanism, or find one that belongs to this subject.",
       "from": "antislop",
       "source": "https://github.com/sam-paech/antislop-sampler",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "evidence": "On data/corpus, 24 matched pairs: 1 hit in 1 of 24 human documents, 0 in 0 of 24 machine-written ones. Published as a tell by antislop.",
       "default": "off",
       "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
       "tests": {
@@ -110,7 +110,7 @@
       "suggest": "Say what it is. The denial adds nothing the assertion does not.",
       "from": "slopster",
       "source": "https://github.com/t0ddharris/slopster",
-      "evidence": "On the audit corpus: 1 hit in 1/18 human documents, 0 in 0/18 AI documents.",
+      "evidence": "On data/corpus, 24 matched pairs: 1 hit in 1 of 24 human documents, 0 in 0 of 24 machine-written ones. Published as a tell by slopster.",
       "default": "off",
       "offBecause": "Measured on the audit corpus it fired on human prose and not on AI prose.",
       "tests": {
@@ -143,7 +143,7 @@
       "note": "Threshold taken from humanizer-de's own German profiles and checked against English: sixteen documents of human technical prose ranged from 0.49 to 1.54, so 0.4 sits below all of them. Nothing about a low score proves authorship; it says the prose is monotone.",
       "from": "humanizer-de",
       "source": "https://github.com/marmbiz/humanizer-de",
-      "evidence": "On the audit corpus: 4 hits in 4/18 human documents, 1 in 1/18 AI documents.",
+      "evidence": "On data/corpus, 24 matched pairs: 4 hits in 4 of 24 human documents, 1 in 1 of 24 machine-written ones. Published as a tell by humanizer-de.",
       "default": "off",
       "offBecause": "The threshold comes from humanizer-de's German profiles. Checked against English, sixteen documents of human technical prose ran 0.49 to 1.54, so the edge sits below all of them and the measurement does not separate the two corpora.",
       "tests": {
@@ -156,5 +156,8 @@
       },
       "severity": "info"
     }
+  ],
+  "aliases": [
+    "unreproduced"
   ]
 }
