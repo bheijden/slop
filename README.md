@@ -96,6 +96,7 @@ produce all of these.
 |---|---|
 | [Command line](docs/cli.md) | flags, output formats, exit codes, agent usage |
 | [Rules](docs/rules.md) | choosing, installing, and writing your own |
+| [Derived vocabulary](docs/vocabulary.md) | the one rule set that measures itself, daily, from GitHub |
 | [Writing styles](docs/styles.md) | matching a register instead of hunting tells |
 | [Agent skill](docs/skill.md) | installing slop so a coding agent picks it up |
 | [The web page](docs/web.md) | what the browser version does |

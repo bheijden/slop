@@ -56,6 +56,8 @@ button,select,textarea,input{font:inherit;color:inherit}
 .wordmark b{color:var(--flag);font-weight:600}
 .modes{display:flex;gap:2px}
 .modes button{background:none;border:0;padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:12px}
+.modes .modelink{padding:3px 9px;border-radius:5px;text-decoration:none;color:var(--muted);display:inline-flex;align-items:center}
+.modes .modelink:hover{background:var(--sunk);color:var(--ink)}
 .modes button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
 .spacer{flex:1}
 .chip{background:none;border:1px solid var(--hair);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:var(--muted)}
@@ -421,6 +423,7 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
   <div class="modes" role="group" aria-label="Mode">
     <button id="m-check" aria-pressed="true">check</button>
     <button id="m-fudge" aria-pressed="false">test rules</button>
+    <a class="modelink" href="vocabulary.html">vocabulary</a>
   </div>
   <span class="spacer"></span>
   <button class="chip" id="btn-theme" title="Light, dark or follow the system">auto</button>

@@ -6,7 +6,11 @@
 // can read the number, argue with it, and change it in one place.
 
 export const TOKENS_MIN = 25;        // shorter than this is a stub, not writing
-export const ENGLISH_MIN = 0.05;     // share of tokens that must be English function words
+// Share of tokens that must be English function words. Over a day of
+// descriptions the median is 0.23, and everything under about 0.06 is a file
+// listing rather than writing. 0.12 is the figure the linter's own prose gate
+// already uses to decide something is prose at all.
+export const ENGLISH_MIN = 0.12;
 
 // Agents sign in two shapes, and both are recognised by form rather than by
 // product name, so one nobody has heard of yet is still caught.
@@ -32,14 +36,29 @@ const URL_RE = /https?:\/\/[^\s<>"'`)\]}]+/g;
 const TAG_RE = /<[a-z/!][^<>]*>/gi;
 const WORD_RE = /[a-z0-9_/-]*[a-z][a-z0-9_/-]*/g;
 
+// Three letters to count as a word. Without it the list fills with 375px, a2,
+// f4 and ss, which are measurements and identifiers rather than writing.
+const LETTERS = /[a-z]/g;
+
 export function tokenize(body) {
   const rest = body.toLowerCase().replace(URL_RE, ' ').replace(TAG_RE, ' ');
   const out = [];
   for (const raw of rest.match(WORD_RE) || []) {
     const w = raw.replace(/^[_/]+/, '').replace(/[_/]+$/, '').replace(/-+$/, '');
-    if (w) out.push(w);
+    if (w && (w.match(LETTERS) || []).length >= 3) out.push(w);
   }
   return out;
+}
+
+// A tool writing about its own configuration is not a style tell, it is the
+// subject: claude/settings and anthropic_api_key say nothing about how a
+// sentence is built. The names come from the marker list, so the two stay in
+// step and neither is a separate thing to remember.
+export function toolWordFilter(markers) {
+  const names = (markers.excludeWords || []).map((w) => w.toLowerCase());
+  if (!names.length) return () => false;
+  const re = new RegExp(`(^|[^a-z])(${names.join('|')})([^a-z]|$)`, 'i');
+  return (word) => re.test(word);
 }
 
 // Split the trailing attribution block off the body. Returns the writing and

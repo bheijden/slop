@@ -21,7 +21,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
-import { prepare, markerRegex, searchPRs, windowsForDay } from './lib/pr-corpus.mjs';
+import { prepare, markerRegex, toolWordFilter, searchPRs, windowsForDay } from './lib/pr-corpus.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = join(ROOT, 'data/counts');
@@ -32,6 +32,10 @@ const FORCE = process.argv.includes('--force');
 
 const markers = JSON.parse(readFileSync(join(ROOT, 'data/markers.json'), 'utf8'));
 const MARK = markerRegex(markers.confirmed);
+// Per product as well as in total, so the page can show which tools are
+// signing and how that mix moves. One description can carry two signatures.
+const isToolWord = toolWordFilter(markers);
+const BY_PRODUCT = markers.confirmed.map((m) => ({ product: m.product, re: new RegExp(m.pattern, 'i') }));
 
 const spec = process.argv.slice(2).find((a) => /^\d{4}-\d{2}-\d{2}/.test(a));
 if (!spec) { console.error('usage: pr-count.mjs YYYY-MM-DD[..YYYY-MM-DD]'); process.exit(2); }
@@ -70,16 +74,19 @@ for (const day of days) {
 
   const W = new Map();   // word -> [markedDocs, unmarkedDocs, markedAuthorSet, unmarkedAuthorSet]
   const totals = { marked: { docs: 0, authors: new Set() }, unmarked: { docs: 0, authors: new Set() } };
+  const products = Object.fromEntries(BY_PRODUCT.map((p) => [p.product, 0]));
   let seen = 0, used = 0;
   for (const rec of recs) {
     seen++;
     const p = prepare(rec, MARK);
     if (!p) continue;
     used++;
+    if (p.marked) for (const bp of BY_PRODUCT) if (bp.re.test(p.footer)) products[bp.product]++;
     const side = p.marked ? 0 : 1;
     const t = p.marked ? totals.marked : totals.unmarked;
     t.docs++; t.authors.add(p.author);
     for (const w of new Set(p.tokens)) {
+      if (isToolWord(w)) continue;
       if (!W.has(w)) W.set(w, [0, 0, new Set(), new Set()]);
       const e = W.get(w);
       e[side]++; e[side + 2].add(p.author);
@@ -92,6 +99,7 @@ for (const day of days) {
     scanned: seen, used,
     marked: { docs: totals.marked.docs, authors: totals.marked.authors.size },
     unmarked: { docs: totals.unmarked.docs, authors: totals.unmarked.authors.size },
+    products,
     schema: 'word -> [markedDocs, unmarkedDocs, markedAuthors, unmarkedAuthors]',
     words }), 'utf8'), { level: 9 }));
   const kb = (readFileSync(out).length / 1024).toFixed(0);

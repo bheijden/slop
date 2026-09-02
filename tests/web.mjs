@@ -380,6 +380,37 @@ async function main() {
     const ow = JSON.parse(own);
     check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
 
+    // The vocabulary page is a separate document with its own data file, so
+    // nothing above touches it. It has broken twice on data shape alone.
+    await send('Page.navigate', { url: base + 'vocabulary.html' });
+    await sleep(2500);
+    const voc = await evaluate(`JSON.stringify({
+      lede: document.getElementById('lede').textContent.slice(0, 24),
+      bands: document.querySelectorAll('#stack path').length,
+      legend: document.querySelectorAll('#legend button').length,
+      words: document.querySelectorAll('#list li').length,
+      axisLabels: [...document.querySelectorAll('#stack text')].map(t => t.textContent),
+      detail: (document.querySelector('.big .word') || {}).textContent || null
+    })`);
+    const v = JSON.parse(voc);
+    check('vocabulary page loads its data', !/have not been published/.test(v.lede) && v.words > 0,
+      JSON.stringify(v).slice(0, 160));
+    check('the stack draws a band per signing tool', v.bands > 0 && v.legend === v.bands,
+      `${v.bands} bands, ${v.legend} legend entries`);
+    // Year rules used to be drawn once per week inside January, so the labels
+    // printed on top of one another and read as 202020251-01.
+    const dates = v.axisLabels.filter((t) => /^\d{4}-\d{2}$/.test(t));
+    check('date labels do not repeat or overlap', new Set(dates).size === dates.length,
+      dates.join(','));
+    check('picking a word fills the detail pane', !!v.detail, String(v.detail));
+
+    const clicked = await evaluate(`(async()=>{
+      const li=[...document.querySelectorAll('#list li')][3];
+      const want=li.dataset.w; li.click(); await new Promise(r=>setTimeout(r,300));
+      return JSON.stringify({want, got:(document.querySelector('.big .word')||{}).textContent})})()`);
+    const cl = JSON.parse(clicked);
+    check('clicking a word selects it', cl.want === cl.got, JSON.stringify(cl));
+
     check('no exception during interaction', errors.length === 0, errors.slice(0, 2).join(' | '));
 
     const bad = checks.filter((c) => !c.ok);

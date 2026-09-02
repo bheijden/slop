@@ -41,6 +41,9 @@ jobs:
       - name: Rebuild the list
         run: node tools/pr-build.mjs --write
 
+      - name: Rebuild what the page reads
+        run: node tools/pr-page-data.mjs
+
       # The rule has to pass its own tests and the repo has to stay clean, or
       # nothing is committed. A vocabulary that fails its fixtures is a signal,
       # not something to publish.
@@ -54,7 +57,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/counts candidates/ai-vocabulary.json
+          git add data/counts candidates/ai-vocabulary.json web/vocabulary-data.json
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
           git commit -m "ai-vocabulary: count $(date -u -d yesterday +%Y-%m-%d), rebuild the list"
           git push origin HEAD:main

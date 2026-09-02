@@ -65,5 +65,27 @@
       "pattern": "release-please|googleapis/release-please",
       "why": "release automation"
     }
+  ],
+  "$comment3": "Words naming the signing tools. A pull request that configures one of them writes claude/settings and anthropic_api_key, which is the subject rather than the style, so they are kept out of the vocabulary. Groomed here beside the markers because the two go stale together.",
+  "excludeWords": [
+    "claude",
+    "anthropic",
+    "sonnet",
+    "opus",
+    "haiku",
+    "codex",
+    "chatgpt",
+    "openai",
+    "copilot",
+    "devin",
+    "gemini",
+    "jules",
+    "cursor",
+    "aider",
+    "openhands",
+    "letta",
+    "kestrel",
+    "windsurf",
+    "codeium"
   ]
 }
