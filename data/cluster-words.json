@@ -1,3609 +1,3971 @@
 {
  "built": "2026-09-02",
- "days": 12,
- "k": 8,
- "descriptions": 9428,
- "leadShare": 0.379,
+ "days": 45,
+ "k": 10,
+ "descriptions": 26818,
+ "clusters": [
+  {
+   "c": 3,
+   "size": 2770,
+   "signed": 1260,
+   "share": 0.455
+  },
+  {
+   "c": 0,
+   "size": 2884,
+   "signed": 1194,
+   "share": 0.414
+  },
+  {
+   "c": 4,
+   "size": 2025,
+   "signed": 803,
+   "share": 0.397
+  },
+  {
+   "c": 6,
+   "size": 2282,
+   "signed": 841,
+   "share": 0.369
+  },
+  {
+   "c": 2,
+   "size": 2042,
+   "signed": 718,
+   "share": 0.352
+  },
+  {
+   "c": 8,
+   "size": 2383,
+   "signed": 731,
+   "share": 0.307
+  },
+  {
+   "c": 5,
+   "size": 2448,
+   "signed": 651,
+   "share": 0.266
+  },
+  {
+   "c": 7,
+   "size": 3164,
+   "signed": 159,
+   "share": 0.05
+  },
+  {
+   "c": 9,
+   "size": 1901,
+   "signed": 56,
+   "share": 0.029
+  },
+  {
+   "c": 1,
+   "size": 4919,
+   "signed": 84,
+   "share": 0.017
+  }
+ ],
+ "note": "Scored within topic clusters and pooled, so vocabulary belonging to a topic cannot win.",
  "words": [
   {
-   "w": "says",
-   "lift": 33.869197134617174,
-   "inside": 654,
-   "outside": 31
+   "w": "configure",
+   "lift": 6.916,
+   "clusters": 8,
+   "agree": 1
   },
   {
-   "w": "half",
-   "lift": 33.20631376562161,
-   "inside": 458,
-   "outside": 22
+   "w": "overview",
+   "lift": 5.584,
+   "clusters": 9,
+   "agree": 1
   },
   {
-   "w": "worth",
-   "lift": 27.46390303013174,
-   "inside": 665,
-   "outside": 39
+   "w": "reviews",
+   "lift": 5.471,
+   "clusters": 9,
+   "agree": 0.89
   },
   {
-   "w": "stated",
-   "lift": 22.122216700816185,
-   "inside": 278,
-   "outside": 20
+   "w": "cursor",
+   "lift": 3.687,
+   "clusters": 10,
+   "agree": 0.9
   },
   {
-   "w": "beside",
-   "lift": 22.04087201910255,
-   "inside": 304,
-   "outside": 22
+   "w": "low",
+   "lift": 3.493,
+   "clusters": 10,
+   "agree": 0.9
   },
   {
-   "w": "carried",
-   "lift": 20.205404664326178,
-   "inside": 353,
-   "outside": 28
+   "w": "repo",
+   "lift": 2.784,
+   "clusters": 10,
+   "agree": 0.8
   },
   {
-   "w": "holds",
-   "lift": 19.656333233410173,
-   "inside": 488,
-   "outside": 40
-  },
-  {
-   "w": "ever",
-   "lift": 18.29271811017696,
-   "inside": 499,
-   "outside": 44
-  },
-  {
-   "w": "goes",
-   "lift": 18.238631424349045,
-   "inside": 341,
-   "outside": 30
-  },
-  {
-   "w": "asserted",
-   "lift": 17.85547915662345,
-   "inside": 301,
-   "outside": 27
-  },
-  {
-   "w": "nothing",
-   "lift": 17.68166459819122,
-   "inside": 1783,
-   "outside": 164
-  },
-  {
-   "w": "way",
-   "lift": 17.22063164354115,
-   "inside": 797,
-   "outside": 75
-  },
-  {
-   "w": "whole",
-   "lift": 17.167122148400257,
-   "inside": 784,
-   "outside": 74
-  },
-  {
-   "w": "something",
-   "lift": 17.164266038903516,
-   "inside": 363,
-   "outside": 34
-  },
-  {
-   "w": "say",
-   "lift": 16.990294840941765,
-   "inside": 276,
-   "outside": 26
-  },
-  {
-   "w": "means",
-   "lift": 16.965671225230253,
-   "inside": 390,
-   "outside": 37
-  },
-  {
-   "w": "answers",
-   "lift": 16.564116876704094,
-   "inside": 330,
-   "outside": 32
-  },
-  {
-   "w": "alone",
-   "lift": 16.13678708013065,
-   "inside": 549,
-   "outside": 55
-  },
-  {
-   "w": "refused",
-   "lift": 15.950631066455795,
-   "inside": 308,
-   "outside": 31
-  },
-  {
-   "w": "carries",
-   "lift": 15.154288084747495,
-   "inside": 850,
-   "outside": 91
-  },
-  {
-   "w": "wrong",
-   "lift": 14.618036444601058,
-   "inside": 802,
-   "outside": 89
-  },
-  {
-   "w": "sits",
-   "lift": 14.47420901732931,
-   "inside": 244,
-   "outside": 27
-  },
-  {
-   "w": "caught",
-   "lift": 14.432335702910805,
-   "inside": 376,
-   "outside": 42
-  },
-  {
-   "w": "meant",
-   "lift": 14.355567959810214,
-   "inside": 198,
-   "outside": 22
-  },
-  {
-   "w": "refusal",
-   "lift": 13.814110367515632,
-   "inside": 199,
-   "outside": 23
-  },
-  {
-   "w": "genuinely",
-   "lift": 13.188373893935763,
-   "inside": 287,
-   "outside": 35
-  },
-  {
-   "w": "anything",
-   "lift": 13.183143525546337,
-   "inside": 497,
-   "outside": 61
-  },
-  {
-   "w": "dropping",
-   "lift": 13.13009264616788,
-   "inside": 165,
-   "outside": 20
-  },
-  {
-   "w": "whatever",
-   "lift": 13.123019195584085,
-   "inside": 181,
-   "outside": 22
-  },
-  {
-   "w": "fact",
-   "lift": 12.891363688964828,
-   "inside": 162,
-   "outside": 20
-  },
-  {
-   "w": "got",
-   "lift": 12.821559900308962,
-   "inside": 224,
-   "outside": 28
-  },
-  {
-   "w": "past",
-   "lift": 12.739789747883524,
-   "inside": 246,
-   "outside": 31
-  },
-  {
-   "w": "would",
-   "lift": 12.54549020387703,
-   "inside": 1565,
-   "outside": 203
-  },
-  {
-   "w": "sentence",
-   "lift": 12.542996247712965,
-   "inside": 173,
-   "outside": 22
-  },
-  {
-   "w": "else",
-   "lift": 12.518828624885003,
-   "inside": 518,
-   "outside": 67
-  },
-  {
-   "w": "answer",
-   "lift": 12.45186878915982,
-   "inside": 416,
-   "outside": 54
-  },
-  {
-   "w": "measured",
-   "lift": 12.320984358504532,
-   "inside": 608,
-   "outside": 80
-  },
-  {
-   "w": "takes",
-   "lift": 12.068840320194429,
-   "inside": 418,
-   "outside": 56
-  },
-  {
-   "w": "taken",
-   "lift": 12.009251726533689,
-   "inside": 173,
-   "outside": 23
-  },
-  {
-   "w": "reaches",
-   "lift": 11.86410575190927,
-   "inside": 360,
-   "outside": 49
-  },
-  {
-   "w": "fires",
-   "lift": 11.745464694390176,
-   "inside": 234,
-   "outside": 32
-  },
-  {
-   "w": "gone",
-   "lift": 11.674708882978187,
-   "inside": 297,
-   "outside": 41
-  },
-  {
-   "w": "looks",
-   "lift": 11.56229955295719,
-   "inside": 202,
-   "outside": 28
-  },
-  {
-   "w": "belongs",
-   "lift": 11.519078186675172,
-   "inside": 173,
-   "outside": 24
-  },
-  {
-   "w": "whose",
-   "lift": 11.514146018751097,
-   "inside": 667,
-   "outside": 94
-  },
-  {
-   "w": "sweep",
-   "lift": 11.486242109810787,
-   "inside": 257,
-   "outside": 36
-  },
-  {
-   "w": "refuses",
-   "lift": 11.401660769643987,
-   "inside": 325,
-   "outside": 46
-  },
-  {
-   "w": "gains",
-   "lift": 11.39801588308426,
-   "inside": 269,
-   "outside": 38
-  },
-  {
-   "w": "asserting",
-   "lift": 11.385909652725172,
-   "inside": 171,
-   "outside": 24
-  },
-  {
-   "w": "down",
-   "lift": 11.348275067043648,
-   "inside": 400,
-   "outside": 57
-  },
-  {
-   "w": "who",
-   "lift": 11.313272270570625,
-   "inside": 267,
-   "outside": 38
-  },
-  {
-   "w": "breaks",
-   "lift": 11.299837307611146,
-   "inside": 142,
-   "outside": 20
-  },
-  {
-   "w": "behaviour",
-   "lift": 11.282221175909138,
-   "inside": 453,
-   "outside": 65
-  },
-  {
-   "w": "reading",
-   "lift": 11.227944219349995,
-   "inside": 499,
-   "outside": 72
-  },
-  {
-   "w": "everything",
-   "lift": 11.144909960753706,
-   "inside": 386,
-   "outside": 56
-  },
-  {
-   "w": "survives",
-   "lift": 11.047147592676918,
-   "inside": 193,
-   "outside": 28
-  },
-  {
-   "w": "given",
-   "lift": 10.875430272583495,
-   "inside": 150,
-   "outside": 22
-  },
-  {
-   "w": "comes",
-   "lift": 10.810502330657624,
-   "inside": 222,
-   "outside": 33
-  },
-  {
-   "w": "ones",
-   "lift": 10.794871529823618,
-   "inside": 268,
-   "outside": 40
-  },
-  {
-   "w": "neither",
-   "lift": 10.700510764702784,
-   "inside": 469,
-   "outside": 71
-  },
-  {
-   "w": "carry",
-   "lift": 10.642921073652401,
-   "inside": 473,
-   "outside": 72
-  },
-  {
-   "w": "doing",
-   "lift": 10.551481285740584,
-   "inside": 152,
-   "outside": 23
-  },
-  {
-   "w": "honest",
-   "lift": 10.461128166961268,
-   "inside": 202,
-   "outside": 31
-  },
-  {
-   "w": "today",
-   "lift": 10.435785219010974,
-   "inside": 451,
-   "outside": 70
-  },
-  {
-   "w": "away",
-   "lift": 10.376230194497698,
-   "inside": 194,
-   "outside": 30
-  },
-  {
-   "w": "question",
-   "lift": 10.249269135677174,
-   "inside": 311,
-   "outside": 49
-  },
-  {
-   "w": "unreachable",
-   "lift": 10.143810417882426,
-   "inside": 171,
-   "outside": 27
-  },
-  {
-   "w": "put",
-   "lift": 10.048897571867151,
-   "inside": 231,
-   "outside": 37
-  },
-  {
-   "w": "enough",
-   "lift": 9.996140165438447,
-   "inside": 144,
-   "outside": 23
-  },
-  {
-   "w": "merely",
-   "lift": 9.947039883460516,
-   "inside": 125,
-   "outside": 20
-  },
-  {
-   "w": "looked",
-   "lift": 9.921055779275148,
-   "inside": 149,
-   "outside": 24
-  },
-  {
-   "w": "lives",
-   "lift": 9.861204752780765,
-   "inside": 269,
-   "outside": 44
-  },
-  {
-   "w": "word",
-   "lift": 9.787887245325146,
-   "inside": 171,
-   "outside": 28
-  },
-  {
-   "w": "hand",
-   "lift": 9.754931396014289,
-   "inside": 296,
-   "outside": 49
-  },
-  {
-   "w": "naming",
-   "lift": 9.701268774127579,
-   "inside": 336,
-   "outside": 56
-  },
-  {
-   "w": "worked",
-   "lift": 9.531994768323182,
-   "inside": 149,
-   "outside": 25
-  },
-  {
-   "w": "reach",
-   "lift": 9.526876918783142,
-   "inside": 365,
-   "outside": 62
-  },
-  {
-   "w": "sees",
-   "lift": 9.43196407276787,
-   "inside": 159,
-   "outside": 27
-  },
-  {
-   "w": "right",
-   "lift": 9.265866592241139,
-   "inside": 497,
-   "outside": 87
-  },
-  {
-   "w": "take",
-   "lift": 9.264255417385941,
-   "inside": 230,
-   "outside": 40
-  },
-  {
-   "w": "deliberate",
-   "lift": 9.198255483558572,
-   "inside": 234,
-   "outside": 41
-  },
-  {
-   "w": "bare",
-   "lift": 9.197017411617853,
-   "inside": 358,
-   "outside": 63
-  },
-  {
-   "w": "asserts",
-   "lift": 9.187563494278537,
-   "inside": 352,
-   "outside": 62
-  },
-  {
-   "w": "gained",
-   "lift": 9.151276692783673,
-   "inside": 115,
-   "outside": 20
-  },
-  {
-   "w": "deliberately",
-   "lift": 9.144090871329402,
-   "inside": 838,
-   "outside": 149
-  },
-  {
-   "w": "place",
-   "lift": 9.047432418255633,
-   "inside": 391,
-   "outside": 70
-  },
-  {
-   "w": "cell",
-   "lift": 9.029136296075137,
-   "inside": 119,
-   "outside": 21
-  },
-  {
-   "w": "actually",
-   "lift": 8.956483695529188,
-   "inside": 711,
-   "outside": 129
-  },
-  {
-   "w": "landed",
-   "lift": 8.934115149159714,
-   "inside": 293,
-   "outside": 53
-  },
-  {
-   "w": "written",
-   "lift": 8.931289648565675,
-   "inside": 709,
-   "outside": 129
-  },
-  {
-   "w": "too",
-   "lift": 8.843981976383937,
-   "inside": 431,
-   "outside": 79
-  },
-  {
-   "w": "argument",
-   "lift": 8.789906585017484,
-   "inside": 229,
-   "outside": 42
-  },
-  {
-   "w": "anywhere",
-   "lift": 8.77050828434153,
-   "inside": 250,
-   "outside": 46
-  },
-  {
-   "w": "catch",
-   "lift": 8.747628697512813,
-   "inside": 185,
-   "outside": 34
-  },
-  {
-   "w": "twice",
-   "lift": 8.740254053929489,
-   "inside": 292,
-   "outside": 54
-  },
-  {
-   "w": "reasoning",
-   "lift": 8.737210083397589,
-   "inside": 158,
-   "outside": 29
-  },
-  {
-   "w": "gets",
-   "lift": 8.726084881433858,
-   "inside": 452,
-   "outside": 84
-  },
-  {
-   "w": "held",
-   "lift": 8.700344218066798,
-   "inside": 264,
-   "outside": 49
-  },
-  {
-   "w": "arm",
-   "lift": 8.679824538307205,
-   "inside": 141,
-   "outside": 26
-  },
-  {
-   "w": "keyed",
-   "lift": 8.636371098816305,
-   "inside": 135,
-   "outside": 25
-  },
-  {
-   "w": "whether",
-   "lift": 8.624292258118661,
-   "inside": 378,
-   "outside": 71
-  },
-  {
-   "w": "lands",
-   "lift": 8.617840953929957,
-   "inside": 383,
-   "outside": 72
-  },
-  {
-   "w": "reason",
-   "lift": 8.469977961061334,
-   "inside": 527,
-   "outside": 101
-  },
-  {
-   "w": "places",
-   "lift": 8.397258456371848,
-   "inside": 157,
-   "outside": 30
-  },
-  {
-   "w": "nine",
-   "lift": 8.299670471182141,
-   "inside": 145,
-   "outside": 28
-  },
-  {
-   "w": "had",
-   "lift": 8.292822451644932,
-   "inside": 1126,
-   "outside": 221
-  },
-  {
-   "w": "printed",
-   "lift": 8.239520901431904,
-   "inside": 149,
-   "outside": 29
-  },
-  {
-   "w": "condition",
-   "lift": 8.183315565763648,
-   "inside": 153,
-   "outside": 30
-  },
-  {
-   "w": "there",
-   "lift": 8.182823743026617,
-   "inside": 1091,
-   "outside": 217
-  },
-  {
-   "w": "look",
-   "lift": 8.139755028758369,
-   "inside": 242,
-   "outside": 48
-  },
-  {
-   "w": "shipped",
-   "lift": 8.105910762174036,
-   "inside": 400,
-   "outside": 80
-  },
-  {
-   "w": "defects",
-   "lift": 8.073624507443341,
-   "inside": 146,
-   "outside": 29
-  },
-  {
-   "w": "numbers",
-   "lift": 8.068867621594206,
-   "inside": 230,
-   "outside": 46
-  },
-  {
-   "w": "own",
-   "lift": 8.065574206238454,
-   "inside": 1817,
-   "outside": 367
-  },
-  {
-   "w": "know",
-   "lift": 8.042760062050121,
-   "inside": 106,
-   "outside": 21
-  },
-  {
-   "w": "prints",
-   "lift": 8.022858397807497,
-   "inside": 150,
-   "outside": 30
-  },
-  {
-   "w": "lost",
-   "lift": 8.015594904607836,
-   "inside": 199,
-   "outside": 40
-  },
-  {
-   "w": "chosen",
-   "lift": 7.983028604343204,
-   "inside": 115,
-   "outside": 23
-  },
-  {
-   "w": "rather",
-   "lift": 7.972015662750736,
-   "inside": 1879,
-   "outside": 384
-  },
-  {
-   "w": "reader",
-   "lift": 7.9608149595311195,
-   "inside": 305,
-   "outside": 62
-  },
-  {
-   "w": "silent",
-   "lift": 7.932079877709981,
-   "inside": 265,
-   "outside": 54
-  },
-  {
-   "w": "cut",
-   "lift": 7.915886952503398,
-   "inside": 148,
-   "outside": 30
-  },
-  {
-   "w": "person",
-   "lift": 7.915886952503398,
-   "inside": 148,
-   "outside": 30
-  },
-  {
-   "w": "dropped",
-   "lift": 7.900853127757956,
-   "inside": 448,
-   "outside": 92
-  },
-  {
-   "w": "regardless",
-   "lift": 7.87174000682234,
-   "inside": 152,
-   "outside": 31
-  },
-  {
-   "w": "hold",
-   "lift": 7.79923713833845,
-   "inside": 251,
-   "outside": 52
-  },
-  {
-   "w": "stayed",
-   "lift": 7.797130517462405,
-   "inside": 141,
-   "outside": 29
-  },
-  {
-   "w": "needs",
-   "lift": 7.660530351879347,
-   "inside": 749,
-   "outside": 159
-  },
-  {
-   "w": "stops",
-   "lift": 7.651921443587525,
-   "inside": 326,
-   "outside": 69
-  },
-  {
-   "w": "raises",
-   "lift": 7.593027681221933,
-   "inside": 128,
-   "outside": 27
-  },
-  {
-   "w": "since",
-   "lift": 7.555106600502964,
-   "inside": 873,
-   "outside": 188
-  },
-  {
-   "w": "well",
-   "lift": 7.532242448048569,
-   "inside": 187,
-   "outside": 40
-  },
-  {
-   "w": "defect",
-   "lift": 7.518232231916417,
-   "inside": 371,
-   "outside": 80
-  },
-  {
-   "w": "existed",
-   "lift": 7.5139336428758705,
-   "inside": 228,
-   "outside": 49
-  },
-  {
-   "w": "either",
-   "lift": 7.505447158074791,
-   "inside": 536,
-   "outside": 116
-  },
-  {
-   "w": "survive",
-   "lift": 7.497105124078836,
-   "inside": 108,
-   "outside": 23
-  },
-  {
-   "w": "cost",
-   "lift": 7.488719100450113,
-   "inside": 342,
-   "outside": 74
-  },
-  {
-   "w": "prose",
-   "lift": 7.478385760473146,
-   "inside": 204,
-   "outside": 44
-  },
-  {
-   "w": "reads",
-   "lift": 7.455294959274479,
-   "inside": 994,
-   "outside": 217
-  },
-  {
-   "w": "declares",
-   "lift": 7.41912914485833,
-   "inside": 166,
-   "outside": 36
-  },
-  {
-   "w": "land",
-   "lift": 7.415066094943294,
-   "inside": 225,
-   "outside": 49
-  },
-  {
-   "w": "rule",
-   "lift": 7.393297093563643,
-   "inside": 741,
-   "outside": 163
-  },
-  {
-   "w": "different",
-   "lift": 7.350587259335089,
-   "inside": 570,
-   "outside": 126
-  },
-  {
-   "w": "re-run",
-   "lift": 7.3082891431761094,
-   "inside": 168,
-   "outside": 37
-  },
-  {
-   "w": "reachable",
-   "lift": 7.3034999628725865,
-   "inside": 244,
-   "outside": 54
-  },
-  {
-   "w": "entire",
-   "lift": 7.2556975102161525,
-   "inside": 149,
-   "outside": 33
-  },
-  {
-   "w": "picks",
-   "lift": 7.250286848388997,
-   "inside": 100,
-   "outside": 22
-  },
-  {
-   "w": "identically",
-   "lift": 7.228962475305499,
-   "inside": 113,
-   "outside": 25
-  },
-  {
-   "w": "absence",
-   "lift": 7.212127443923792,
-   "inside": 126,
-   "outside": 28
-  },
-  {
-   "w": "roughly",
-   "lift": 7.208134017875108,
-   "inside": 95,
-   "outside": 21
-  },
-  {
-   "w": "straight",
-   "lift": 7.1956613995312715,
-   "inside": 161,
-   "outside": 36
-  },
-  {
-   "w": "describes",
-   "lift": 7.177783979905108,
-   "inside": 143,
-   "outside": 32
-  },
-  {
-   "w": "rewritten",
-   "lift": 7.170613366538569,
-   "inside": 200,
-   "outside": 45
-  },
-  {
-   "w": "choice",
-   "lift": 7.140848556337843,
-   "inside": 116,
-   "outside": 26
-  },
-  {
-   "w": "leaves",
-   "lift": 7.130895897292771,
-   "inside": 365,
-   "outside": 83
-  },
-  {
-   "w": "caller",
-   "lift": 7.105725914295351,
-   "inside": 355,
-   "outside": 81
-  },
-  {
-   "w": "reached",
-   "lift": 7.105281111421218,
-   "inside": 294,
-   "outside": 67
-  },
-  {
-   "w": "second",
-   "lift": 7.059294637293329,
-   "inside": 846,
-   "outside": 195
-  },
-  {
-   "w": "than",
-   "lift": 7.035364914006007,
-   "inside": 2055,
-   "outside": 476
-  },
-  {
-   "w": "writing",
-   "lift": 6.962517731210672,
-   "inside": 207,
-   "outside": 48
-  },
-  {
-   "w": "inert",
-   "lift": 6.960275374453437,
-   "inside": 96,
-   "outside": 22
-  },
-  {
-   "w": "last",
-   "lift": 6.938080618795104,
-   "inside": 521,
-   "outside": 122
-  },
-  {
-   "w": "along",
-   "lift": 6.927500105138802,
-   "inside": 155,
-   "outside": 36
-  },
-  {
-   "w": "wins",
-   "lift": 6.924763765400105,
-   "inside": 104,
-   "outside": 24
-  },
-  {
-   "w": "byte-identical",
-   "lift": 6.915658224617197,
-   "inside": 248,
-   "outside": 58
-  },
-  {
-   "w": "tail",
-   "lift": 6.904633638175104,
-   "inside": 91,
-   "outside": 21
-  },
-  {
-   "w": "itself",
-   "lift": 6.8978703985160505,
-   "inside": 759,
-   "outside": 179
-  },
-  {
-   "w": "gives",
-   "lift": 6.840996461786393,
-   "inside": 195,
-   "outside": 46
-  },
-  {
-   "w": "number",
-   "lift": 6.806250141884791,
-   "inside": 436,
-   "outside": 104
-  },
-  {
-   "w": "ships",
-   "lift": 6.7994286746236305,
-   "inside": 248,
-   "outside": 59
-  },
-  {
-   "w": "called",
-   "lift": 6.78215809124892,
-   "inside": 264,
-   "outside": 63
-  },
-  {
-   "w": "left",
-   "lift": 6.781446128400794,
-   "inside": 900,
-   "outside": 216
-  },
-  {
-   "w": "raised",
-   "lift": 6.776229631378947,
-   "inside": 135,
-   "outside": 32
-  },
-  {
-   "w": "five",
-   "lift": 6.775268054873856,
-   "inside": 542,
-   "outside": 130
-  },
-  {
-   "w": "end",
-   "lift": 6.767624895339101,
-   "inside": 363,
-   "outside": 87
-  },
-  {
-   "w": "times",
-   "lift": 6.742766769001768,
-   "inside": 217,
-   "outside": 52
-  },
-  {
-   "w": "drives",
-   "lift": 6.71717752130157,
-   "inside": 105,
-   "outside": 25
-  },
-  {
-   "w": "off",
-   "lift": 6.676198299005882,
-   "inside": 575,
-   "outside": 140
-  },
-  {
-   "w": "produces",
-   "lift": 6.671893178461336,
-   "inside": 182,
-   "outside": 44
-  },
-  {
-   "w": "themselves",
-   "lift": 6.670263900517877,
-   "inside": 92,
-   "outside": 22
-  },
-  {
-   "w": "trip",
-   "lift": 6.670263900517877,
-   "inside": 92,
-   "outside": 22
-  },
-  {
-   "w": "turns",
-   "lift": 6.659799568984121,
-   "inside": 198,
-   "outside": 48
-  },
-  {
-   "w": "floor",
-   "lift": 6.659799568984121,
-   "inside": 198,
-   "outside": 48
-  },
-  {
-   "w": "arithmetic",
-   "lift": 6.643899221069191,
-   "inside": 112,
-   "outside": 27
-  },
-  {
-   "w": "compared",
-   "lift": 6.632229608854198,
-   "inside": 124,
-   "outside": 30
-  },
-  {
-   "w": "three",
-   "lift": 6.618757337839277,
-   "inside": 1345,
-   "outside": 331
-  },
-  {
-   "w": "over",
-   "lift": 6.618068181193589,
-   "inside": 927,
-   "outside": 228
-  },
-  {
-   "w": "offers",
-   "lift": 6.604834482617782,
-   "inside": 83,
-   "outside": 20
-  },
-  {
-   "w": "silently",
-   "lift": 6.59340707387438,
-   "inside": 774,
-   "outside": 191
-  },
-  {
-   "w": "most",
-   "lift": 6.581835546471052,
-   "inside": 349,
-   "outside": 86
-  },
-  {
-   "w": "computed",
-   "lift": 6.568759884640432,
-   "inside": 151,
-   "outside": 37
-  },
-  {
-   "w": "length",
-   "lift": 6.566557265851048,
-   "inside": 159,
-   "outside": 39
-  },
-  {
-   "w": "case",
-   "lift": 6.535359182379123,
-   "inside": 647,
-   "outside": 161
-  },
-  {
-   "w": "slot",
-   "lift": 6.525258163550098,
-   "inside": 154,
-   "outside": 38
-  },
-  {
-   "w": "discarded",
-   "lift": 6.525258163550098,
-   "inside": 94,
-   "outside": 23
-  },
-  {
-   "w": "them",
-   "lift": 6.520037957019258,
-   "inside": 1249,
-   "outside": 312
-  },
-  {
-   "w": "nor",
-   "lift": 6.476562207105693,
-   "inside": 133,
-   "outside": 33
-  },
-  {
-   "w": "deletes",
-   "lift": 6.463699124271323,
-   "inside": 105,
-   "outside": 26
-  },
-  {
-   "w": "shape",
-   "lift": 6.456259965446094,
-   "inside": 655,
-   "outside": 165
-  },
-  {
-   "w": "plain",
-   "lift": 6.455840523512331,
-   "inside": 279,
-   "outside": 70
-  },
-  {
-   "w": "named",
-   "lift": 6.41769896305202,
-   "inside": 537,
-   "outside": 136
-  },
-  {
-   "w": "clock",
-   "lift": 6.410779950154481,
-   "inside": 112,
-   "outside": 28
-  },
-  {
-   "w": "throws",
-   "lift": 6.406617106031005,
-   "inside": 108,
-   "outside": 27
-  },
-  {
-   "w": "being",
-   "lift": 6.331630324869086,
-   "inside": 654,
-   "outside": 168
-  },
-  {
-   "w": "counter",
-   "lift": 6.325505362625095,
-   "inside": 95,
-   "outside": 24
+   "w": "risk",
+   "lift": 2.707,
+   "clusters": 10,
+   "agree": 0.8
   },
   {
    "w": "here",
-   "lift": 6.316042780489999,
-   "inside": 1117,
-   "outside": 288
+   "lift": 2.32,
+   "clusters": 10,
+   "agree": 0.8
   },
   {
-   "w": "which",
-   "lift": 6.308125545316148,
-   "inside": 2237,
-   "outside": 578
+   "w": "automated",
+   "lift": 2.314,
+   "clusters": 10,
+   "agree": 0.9
   },
   {
-   "w": "meaning",
-   "lift": 6.297632878775095,
-   "inside": 83,
-   "outside": 21
+   "w": "note",
+   "lift": 2.293,
+   "clusters": 10,
+   "agree": 0.9
   },
   {
-   "w": "decide",
-   "lift": 6.286529206347045,
-   "inside": 79,
-   "outside": 20
+   "w": "reviewed",
+   "lift": 2.206,
+   "clusters": 10,
+   "agree": 0.8
   },
   {
-   "w": "did",
-   "lift": 6.262848317830924,
-   "inside": 716,
-   "outside": 186
+   "w": "cloud",
+   "lift": 1.927,
+   "clusters": 6,
+   "agree": 1
   },
   {
-   "w": "never",
-   "lift": 6.260445397287398,
-   "inside": 1844,
-   "outside": 480
+   "w": "auth",
+   "lift": 1.842,
+   "clusters": 9,
+   "agree": 1
   },
   {
-   "w": "about",
-   "lift": 6.248479860983063,
-   "inside": 745,
-   "outside": 194
+   "w": "set",
+   "lift": 1.826,
+   "clusters": 10,
+   "agree": 0.7
   },
   {
-   "w": "two",
-   "lift": 6.241418589550959,
-   "inside": 2045,
-   "outside": 534
+   "w": "deploy",
+   "lift": 1.712,
+   "clusters": 8,
+   "agree": 1
   },
   {
-   "w": "exactly",
-   "lift": 6.238709846660764,
-   "inside": 1241,
-   "outside": 324
-  },
-  {
-   "w": "invented",
-   "lift": 6.2217577838500935,
-   "inside": 82,
-   "outside": 21
-  },
-  {
-   "w": "people",
-   "lift": 6.217462967156226,
-   "inside": 101,
-   "outside": 26
-  },
-  {
-   "w": "identical",
-   "lift": 6.1751223596522875,
-   "inside": 388,
-   "outside": 102
-  },
-  {
-   "w": "ten",
-   "lift": 6.153566242841547,
-   "inside": 149,
-   "outside": 39
-  },
-  {
-   "w": "six",
-   "lift": 6.149379237078318,
-   "inside": 409,
-   "outside": 108
-  },
-  {
-   "w": "moved",
-   "lift": 6.146197523343868,
-   "inside": 454,
-   "outside": 120
-  },
-  {
-   "w": "broken",
-   "lift": 6.124935576829232,
-   "inside": 306,
-   "outside": 81
-  },
-  {
-   "w": "entirely",
-   "lift": 6.114002396939798,
-   "inside": 223,
-   "outside": 59
-  },
-  {
-   "w": "verbatim",
-   "lift": 6.09683212250893,
-   "inside": 185,
-   "outside": 49
-  },
-  {
-   "w": "let",
-   "lift": 6.087998595889524,
-   "inside": 181,
-   "outside": 48
-  },
-  {
-   "w": "moves",
-   "lift": 6.068828188379494,
-   "inside": 359,
-   "outside": 96
-  },
-  {
-   "w": "round",
-   "lift": 6.0271468533554335,
-   "inside": 242,
-   "outside": 65
-  },
-  {
-   "w": "closing",
-   "lift": 5.988369833637748,
-   "inside": 145,
-   "outside": 39
-  },
-  {
-   "w": "waiting",
-   "lift": 5.973827896207836,
-   "inside": 130,
-   "outside": 35
-  },
-  {
-   "w": "mechanism",
-   "lift": 5.96679012252554,
-   "inside": 203,
-   "outside": 55
-  },
-  {
-   "w": "column",
-   "lift": 5.9555927683195335,
-   "inside": 345,
-   "outside": 94
-  },
-  {
-   "w": "wall",
-   "lift": 5.945235215678978,
-   "inside": 82,
-   "outside": 22
-  },
-  {
-   "w": "claiming",
-   "lift": 5.945235215678978,
-   "inside": 82,
-   "outside": 22
-  },
-  {
-   "w": "they",
-   "lift": 5.933589677217835,
-   "inside": 1053,
-   "outside": 289
-  },
-  {
-   "w": "side",
-   "lift": 5.932052875954634,
-   "inside": 300,
-   "outside": 82
-  },
-  {
-   "w": "deleted",
-   "lift": 5.929041681601357,
-   "inside": 358,
-   "outside": 98
-  },
-  {
-   "w": "come",
-   "lift": 5.9266106256097215,
-   "inside": 198,
-   "outside": 54
-  },
-  {
-   "w": "four",
-   "lift": 5.912238085554786,
-   "inside": 868,
-   "outside": 239
-  },
-  {
-   "w": "flagged",
-   "lift": 5.886186487738491,
-   "inside": 175,
-   "outside": 48
-  },
-  {
-   "w": "read",
-   "lift": 5.882258271521438,
-   "inside": 1235,
-   "outside": 342
-  },
-  {
-   "w": "pins",
-   "lift": 5.872732347195089,
-   "inside": 351,
-   "outside": 97
-  },
-  {
-   "w": "isn",
-   "lift": 5.852551136379986,
-   "inside": 174,
-   "outside": 48
-  },
-  {
-   "w": "miss",
-   "lift": 5.831081763172428,
-   "inside": 84,
-   "outside": 23
-  },
-  {
-   "w": "otherwise",
-   "lift": 5.827730566756811,
-   "inside": 259,
-   "outside": 72
-  },
-  {
-   "w": "fine",
-   "lift": 5.813411818435542,
-   "inside": 98,
-   "outside": 27
-  },
-  {
-   "w": "fixing",
-   "lift": 5.800229478711198,
-   "inside": 112,
-   "outside": 31
-  },
-  {
-   "w": "eight",
-   "lift": 5.793453509694012,
-   "inside": 190,
-   "outside": 53
-  },
-  {
-   "w": "drops",
-   "lift": 5.790626449772934,
-   "inside": 268,
-   "outside": 75
-  },
-  {
-   "w": "deleting",
-   "lift": 5.740575219832048,
-   "inside": 139,
-   "outside": 39
-  },
-  {
-   "w": "touches",
-   "lift": 5.7333579009833375,
-   "inside": 181,
-   "outside": 51
-  },
-  {
-   "w": "good",
-   "lift": 5.729494972873256,
-   "inside": 72,
-   "outside": 20
-  },
-  {
-   "w": "exists",
-   "lift": 5.703558987399345,
-   "inside": 708,
-   "outside": 202
-  },
-  {
-   "w": "line",
-   "lift": 5.672744081278817,
-   "inside": 885,
-   "outside": 254
-  },
-  {
-   "w": "day",
-   "lift": 5.666671563082979,
-   "inside": 231,
-   "outside": 66
-  },
-  {
-   "w": "reproduces",
-   "lift": 5.666671563082979,
-   "inside": 99,
-   "outside": 28
-  },
-  {
-   "w": "stripped",
-   "lift": 5.622828843059127,
-   "inside": 81,
-   "outside": 23
-  },
-  {
-   "w": "reverted",
-   "lift": 5.611722020653084,
-   "inside": 129,
-   "outside": 37
-  },
-  {
-   "w": "machine",
-   "lift": 5.583694066125084,
-   "inside": 255,
-   "outside": 74
-  },
-  {
-   "w": "genuine",
-   "lift": 5.575378810628248,
-   "inside": 135,
-   "outside": 39
-  },
-  {
-   "w": "moving",
-   "lift": 5.568220299562751,
-   "inside": 128,
-   "outside": 37
-  },
-  {
-   "w": "rest",
-   "lift": 5.556994048958793,
-   "inside": 264,
-   "outside": 77
-  },
-  {
-   "w": "unset",
-   "lift": 5.540313535089706,
-   "inside": 90,
-   "outside": 26
-  },
-  {
-   "w": "front",
-   "lift": 5.521372292234698,
-   "inside": 110,
-   "outside": 32
-  },
-  {
-   "w": "newest",
-   "lift": 5.490766015670204,
-   "inside": 69,
-   "outside": 20
-  },
-  {
-   "w": "flight",
-   "lift": 5.490766015670204,
-   "inside": 69,
-   "outside": 20
-  },
-  {
-   "w": "permanently",
-   "lift": 5.478754495810931,
-   "inside": 89,
-   "outside": 26
-  },
-  {
-   "w": "failing",
-   "lift": 5.460254888152025,
-   "inside": 323,
-   "outside": 96
-  },
-  {
-   "w": "comment",
-   "lift": 5.444846565978688,
-   "inside": 509,
-   "outside": 152
-  },
-  {
-   "w": "measure",
-   "lift": 5.4377151362917475,
-   "inside": 75,
-   "outside": 22
-  },
-  {
-   "w": "inside",
-   "lift": 5.413165632290431,
-   "inside": 735,
-   "outside": 221
-  },
-  {
-   "w": "pointing",
-   "lift": 5.348572265204998,
-   "inside": 100,
-   "outside": 30
-  },
-  {
-   "w": "exist",
-   "lift": 5.34815276934106,
-   "inside": 418,
-   "outside": 127
-  },
-  {
-   "w": "pinning",
-   "lift": 5.334139609886191,
-   "inside": 103,
-   "outside": 31
-  },
-  {
-   "w": "chip",
-   "lift": 5.331613377534836,
-   "inside": 67,
-   "outside": 20
-  },
-  {
-   "w": "instruction",
-   "lift": 5.330492584308531,
-   "inside": 116,
-   "outside": 35
-  },
-  {
-   "w": "where",
-   "lift": 5.329122911513344,
-   "inside": 1096,
-   "outside": 335
-  },
-  {
-   "w": "serves",
-   "lift": 5.3275841968225475,
-   "inside": 129,
-   "outside": 39
-  },
-  {
-   "w": "much",
-   "lift": 5.32674135800008,
-   "inside": 80,
-   "outside": 24
-  },
-  {
-   "w": "scratch",
-   "lift": 5.32674135800008,
-   "inside": 80,
-   "outside": 24
-  },
-  {
-   "w": "falls",
-   "lift": 5.324610661456879,
-   "inside": 204,
-   "outside": 62
-  },
-  {
-   "w": "pushed",
-   "lift": 5.307209973020747,
-   "inside": 122,
-   "outside": 37
-  },
-  {
-   "w": "break",
-   "lift": 5.305891739048311,
-   "inside": 161,
-   "outside": 49
-  },
-  {
-   "w": "grep",
-   "lift": 5.2823518466834125,
-   "inside": 170,
-   "outside": 52
-  },
-  {
-   "w": "smaller",
-   "lift": 5.279527059599625,
-   "inside": 89,
-   "outside": 27
-  },
-  {
-   "w": "exits",
-   "lift": 5.278860536804573,
-   "inside": 144,
-   "outside": 44
-  },
-  {
-   "w": "stopped",
-   "lift": 5.27856249815638,
-   "inside": 199,
-   "outside": 61
-  },
-  {
-   "w": "bad",
-   "lift": 5.265997816198324,
-   "inside": 92,
-   "outside": 28
-  },
-  {
-   "w": "untouched",
-   "lift": 5.251559122616896,
-   "inside": 536,
-   "outside": 166
-  },
-  {
-   "w": "out",
-   "lift": 5.2449859922206485,
-   "inside": 1143,
-   "outside": 355
-  },
-  {
-   "w": "week",
-   "lift": 5.232518338695833,
-   "inside": 85,
-   "outside": 26
-  },
-  {
-   "w": "finding",
-   "lift": 5.220206530840079,
-   "inside": 296,
-   "outside": 92
-  },
-  {
-   "w": "placed",
-   "lift": 5.206323002832525,
-   "inside": 75,
-   "outside": 23
-  },
-  {
-   "w": "few",
-   "lift": 5.206323002832525,
-   "inside": 75,
-   "outside": 23
-  },
-  {
-   "w": "red",
-   "lift": 5.1922774102957,
-   "inside": 409,
-   "outside": 128
-  },
-  {
-   "w": "ask",
-   "lift": 5.192140904330186,
-   "inside": 148,
-   "outside": 46
-  },
-  {
-   "w": "running",
-   "lift": 5.178776320277856,
-   "inside": 500,
-   "outside": 157
-  },
-  {
-   "w": "gap",
-   "lift": 5.162967424142271,
-   "inside": 451,
-   "outside": 142
-  },
-  {
-   "w": "sent",
-   "lift": 5.146208757851366,
-   "inside": 153,
-   "outside": 48
-  },
-  {
-   "w": "pair",
-   "lift": 5.14593529971024,
-   "inside": 194,
-   "outside": 61
-  },
-  {
-   "w": "measurement",
-   "lift": 5.141903432877477,
-   "inside": 197,
-   "outside": 62
-  },
-  {
-   "w": "verdict",
-   "lift": 5.133507296499203,
-   "inside": 225,
-   "outside": 71
-  },
-  {
-   "w": "sites",
-   "lift": 5.123860437150077,
-   "inside": 234,
-   "outside": 74
-  },
-  {
-   "w": "seven",
-   "lift": 5.1067237801696415,
-   "inside": 180,
-   "outside": 57
-  },
-  {
-   "w": "gated",
-   "lift": 5.099571505967724,
-   "inside": 186,
-   "outside": 59
-  },
-  {
-   "w": "noise",
-   "lift": 5.094280496104901,
-   "inside": 89,
-   "outside": 28
-  },
-  {
-   "w": "wide",
-   "lift": 5.083631359975077,
-   "inside": 67,
-   "outside": 21
-  },
-  {
-   "w": "declared",
-   "lift": 5.071057772816076,
-   "inside": 272,
-   "outside": 87
-  },
-  {
-   "w": "row",
-   "lift": 5.056082390418129,
-   "inside": 764,
-   "outside": 246
-  },
-  {
-   "w": "names",
-   "lift": 5.050171963994786,
-   "inside": 695,
-   "outside": 224
-  },
-  {
-   "w": "rounds",
-   "lift": 5.042244944561439,
-   "inside": 85,
-   "outside": 27
-  },
-  {
-   "w": "reasons",
-   "lift": 5.0321906176530415,
-   "inside": 91,
-   "outside": 29
-  },
-  {
-   "w": "trailing",
-   "lift": 5.015683513773582,
-   "inside": 103,
-   "outside": 33
-  },
-  {
-   "w": "purely",
-   "lift": 5.007756265050075,
-   "inside": 66,
-   "outside": 21
-  },
-  {
-   "w": "back",
-   "lift": 5.005602881721653,
-   "inside": 919,
-   "outside": 299
-  },
-  {
-   "w": "always",
-   "lift": 5.004431061686828,
-   "inside": 385,
-   "outside": 125
-  },
-  {
-   "w": "cannot",
-   "lift": 4.9928808938306455,
-   "inside": 1085,
-   "outside": 354
-  },
-  {
-   "w": "class",
-   "lift": 4.988421298775751,
-   "inside": 396,
-   "outside": 129
-  },
-  {
-   "w": "parses",
-   "lift": 4.981648705505989,
-   "inside": 142,
-   "outside": 46
-  },
-  {
-   "w": "literal",
-   "lift": 4.972696738429557,
-   "inside": 221,
-   "outside": 72
-  },
-  {
-   "w": "those",
-   "lift": 4.967934130996565,
-   "inside": 705,
-   "outside": 231
-  },
-  {
-   "w": "clears",
-   "lift": 4.948931753254287,
-   "inside": 135,
-   "outside": 44
-  },
-  {
-   "w": "sending",
-   "lift": 4.930195056904518,
-   "inside": 68,
-   "outside": 22
-  },
-  {
-   "w": "behind",
-   "lift": 4.9270427582747836,
-   "inside": 521,
-   "outside": 172
-  },
-  {
-   "w": "raise",
-   "lift": 4.925930182287819,
-   "inside": 77,
-   "outside": 25
-  },
-  {
-   "w": "round-trip",
-   "lift": 4.922563176011477,
-   "inside": 86,
-   "outside": 28
-  },
-  {
-   "w": "earlier",
-   "lift": 4.920397371974263,
-   "inside": 279,
-   "outside": 92
-  },
-  {
-   "w": "constant",
-   "lift": 4.9131355584377205,
-   "inside": 128,
-   "outside": 42
-  },
-  {
-   "w": "proven",
-   "lift": 4.9111153546719155,
-   "inside": 143,
-   "outside": 47
-  },
-  {
-   "w": "recorded",
-   "lift": 4.898842465127702,
-   "inside": 500,
-   "outside": 166
-  },
-  {
-   "w": "width",
-   "lift": 4.8760170892462265,
-   "inside": 136,
-   "outside": 45
+   "w": "enable",
+   "lift": 1.703,
+   "clusters": 6,
+   "agree": 0.83
   },
   {
    "w": "stays",
-   "lift": 4.872836040802661,
-   "inside": 808,
-   "outside": 270
-  },
-  {
-   "w": "throughout",
-   "lift": 4.8642833582828,
-   "inside": 82,
-   "outside": 27
-  },
-  {
-   "w": "less",
-   "lift": 4.85923480264369,
-   "inside": 70,
-   "outside": 23
-  },
-  {
-   "w": "readers",
-   "lift": 4.8560060752000735,
-   "inside": 64,
-   "outside": 21
-  },
-  {
-   "w": "describing",
-   "lift": 4.8560060752000735,
-   "inside": 64,
-   "outside": 21
-  },
-  {
-   "w": "agree",
-   "lift": 4.833524565592665,
-   "inside": 120,
-   "outside": 40
-  },
-  {
-   "w": "further",
-   "lift": 4.8286910410270725,
-   "inside": 111,
-   "outside": 37
-  },
-  {
-   "w": "pairs",
-   "lift": 4.8137150386844985,
-   "inside": 90,
-   "outside": 30
-  },
-  {
-   "w": "above",
-   "lift": 4.813016791652487,
-   "inside": 565,
-   "outside": 191
-  },
-  {
-   "w": "matched",
-   "lift": 4.8054226785834055,
-   "inside": 190,
-   "outside": 64
-  },
-  {
-   "w": "direction",
-   "lift": 4.797983943786837,
-   "inside": 175,
-   "outside": 59
-  },
-  {
-   "w": "span",
-   "lift": 4.789817162605923,
-   "inside": 69,
-   "outside": 23
-  },
-  {
-   "w": "none",
-   "lift": 4.787763386273444,
-   "inside": 744,
-   "outside": 253
-  },
-  {
-   "w": "point",
-   "lift": 4.778598150074567,
-   "inside": 435,
-   "outside": 148
-  },
-  {
-   "w": "wasn",
-   "lift": 4.774579144061047,
-   "inside": 60,
-   "outside": 20
-  },
-  {
-   "w": "reported",
-   "lift": 4.772926223486941,
-   "inside": 493,
-   "outside": 168
-  },
-  {
-   "w": "dead",
-   "lift": 4.751726457559559,
-   "inside": 284,
-   "outside": 97
-  },
-  {
-   "w": "instance",
-   "lift": 4.735143092133699,
-   "inside": 164,
-   "outside": 56
-  },
-  {
-   "w": "flip",
-   "lift": 4.727482955225072,
-   "inside": 71,
-   "outside": 24
-  },
-  {
-   "w": "missed",
-   "lift": 4.718263595182378,
-   "inside": 94,
-   "outside": 32
-  },
-  {
-   "w": "drop",
-   "lift": 4.716829472509071,
-   "inside": 253,
-   "outside": 87
-  },
-  {
-   "w": "produced",
-   "lift": 4.712686451452848,
-   "inside": 273,
-   "outside": 94
-  },
-  {
-   "w": "already",
-   "lift": 4.698823006299298,
-   "inside": 1770,
-   "outside": 614
-  },
-  {
-   "w": "differs",
-   "lift": 4.695002824993362,
-   "inside": 59,
-   "outside": 20
-  },
-  {
-   "w": "could",
-   "lift": 4.694721138908168,
-   "inside": 813,
-   "outside": 282
-  },
-  {
-   "w": "each",
-   "lift": 4.692320477159621,
-   "inside": 1408,
-   "outside": 489
-  },
-  {
-   "w": "found",
-   "lift": 4.688049554395216,
-   "inside": 740,
-   "outside": 257
-  },
-  {
-   "w": "no-op",
-   "lift": 4.67973060214199,
-   "inside": 142,
-   "outside": 49
-  },
-  {
-   "w": "throw",
-   "lift": 4.6700377052858535,
-   "inside": 73,
-   "outside": 25
-  },
-  {
-   "w": "becomes",
-   "lift": 4.650598359657252,
-   "inside": 258,
-   "outside": 90
-  },
-  {
-   "w": "kept",
-   "lift": 4.635256203557432,
-   "inside": 439,
-   "outside": 154
-  },
-  {
-   "w": "many",
-   "lift": 4.625045621417377,
-   "inside": 129,
-   "outside": 45
-  },
-  {
-   "w": "parameter",
-   "lift": 4.624697533389875,
-   "inside": 146,
-   "outside": 51
-  },
-  {
-   "w": "ahead",
-   "lift": 4.618526881993251,
-   "inside": 109,
-   "outside": 38
-  },
-  {
-   "w": "subject",
-   "lift": 4.618526881993251,
-   "inside": 109,
-   "outside": 38
-  },
-  {
-   "w": "watch",
-   "lift": 4.606064586035362,
-   "inside": 72,
-   "outside": 25
-  },
-  {
-   "w": "leaving",
-   "lift": 4.572119665616736,
-   "inside": 206,
-   "outside": 73
-  },
-  {
-   "w": "property",
-   "lift": 4.5718369298758645,
-   "inside": 220,
-   "outside": 78
-  },
-  {
-   "w": "warn",
-   "lift": 4.567680714485069,
-   "inside": 63,
-   "outside": 22
-  },
-  {
-   "w": "makes",
-   "lift": 4.566100748828035,
-   "inside": 578,
-   "outside": 206
-  },
-  {
-   "w": "assertion",
-   "lift": 4.56446630159662,
-   "inside": 284,
-   "outside": 101
-  },
-  {
-   "w": "derived",
-   "lift": 4.549924909958402,
-   "inside": 205,
-   "outside": 73
-  },
-  {
-   "w": "hosts",
-   "lift": 4.535850186857995,
-   "inside": 57,
-   "outside": 20
-  },
-  {
-   "w": "again",
-   "lift": 4.522872074735369,
-   "inside": 323,
-   "outside": 116
-  },
-  {
-   "w": "once",
-   "lift": 4.520261776803661,
-   "inside": 877,
-   "outside": 316
-  },
-  {
-   "w": "surfaced",
-   "lift": 4.505535398641735,
-   "inside": 145,
-   "outside": 52
-  },
-  {
-   "w": "board",
-   "lift": 4.4989937864476985,
-   "inside": 131,
-   "outside": 47
-  },
-  {
-   "w": "fills",
-   "lift": 4.495177846001178,
-   "inside": 62,
-   "outside": 22
-  },
-  {
-   "w": "call",
-   "lift": 4.489749823761742,
-   "inside": 772,
-   "outside": 280
-  },
-  {
-   "w": "lines",
-   "lift": 4.480434922883284,
-   "inside": 493,
-   "outside": 179
-  },
-  {
-   "w": "filled",
-   "lift": 4.47811834753438,
-   "inside": 70,
-   "outside": 25
-  },
-  {
-   "w": "construction",
-   "lift": 4.477677153608515,
-   "inside": 199,
-   "outside": 72
-  },
-  {
-   "w": "days",
-   "lift": 4.473501730681253,
-   "inside": 133,
-   "outside": 48
-  },
-  {
-   "w": "minutes",
-   "lift": 4.473501730681253,
-   "inside": 133,
-   "outside": 48
-  },
-  {
-   "w": "first",
-   "lift": 4.468448677896519,
-   "inside": 1486,
-   "outside": 542
-  },
-  {
-   "w": "chunk",
-   "lift": 4.461145887325067,
-   "inside": 67,
-   "outside": 24
-  },
-  {
-   "w": "touched",
-   "lift": 4.457583766046569,
-   "inside": 332,
-   "outside": 121
-  },
-  {
-   "w": "just",
-   "lift": 4.457055944636185,
-   "inside": 556,
-   "outside": 203
-  },
-  {
-   "w": "one-line",
-   "lift": 4.449039656965976,
-   "inside": 75,
-   "outside": 27
-  },
-  {
-   "w": "constraint",
-   "lift": 4.449039656965976,
-   "inside": 105,
-   "outside": 38
-  },
-  {
-   "w": "doesn",
-   "lift": 4.449039656965976,
-   "inside": 255,
-   "outside": 93
-  },
-  {
-   "w": "touching",
-   "lift": 4.439314980120149,
-   "inside": 83,
-   "outside": 30
-  },
-  {
-   "w": "wrapped",
-   "lift": 4.432250828071764,
-   "inside": 72,
-   "outside": 26
-  },
-  {
-   "w": "because",
-   "lift": 4.399129029874611,
-   "inside": 1258,
-   "outside": 466
-  },
-  {
-   "w": "hint",
-   "lift": 4.394561620350066,
-   "inside": 66,
-   "outside": 24
-  },
-  {
-   "w": "splits",
-   "lift": 4.394561620350066,
-   "inside": 66,
-   "outside": 24
-  },
-  {
-   "w": "rewrites",
-   "lift": 4.38971912820643,
-   "inside": 74,
-   "outside": 27
-  },
-  {
-   "w": "string",
-   "lift": 4.388065594303724,
-   "inside": 386,
-   "outside": 143
-  },
-  {
-   "w": "sibling",
-   "lift": 4.381925190121233,
-   "inside": 184,
-   "outside": 68
-  },
-  {
-   "w": "onto",
-   "lift": 4.369856145725858,
-   "inside": 296,
-   "outside": 110
-  },
-  {
-   "w": "described",
-   "lift": 4.360336062559178,
-   "inside": 143,
-   "outside": 53
-  },
-  {
-   "w": "copies",
-   "lift": 4.350172109033398,
-   "inside": 156,
-   "outside": 58
-  },
-  {
-   "w": "cells",
-   "lift": 4.350172109033398,
-   "inside": 76,
-   "outside": 28
-  },
-  {
-   "w": "against",
-   "lift": 4.346786761088626,
-   "inside": 1712,
-   "outside": 642
-  },
-  {
-   "w": "fails",
-   "lift": 4.344537171068329,
-   "inside": 771,
-   "outside": 289
-  },
-  {
-   "w": "between",
-   "lift": 4.336786964082526,
-   "inside": 432,
-   "outside": 162
-  },
-  {
-   "w": "decision",
-   "lift": 4.335025270213644,
-   "inside": 477,
-   "outside": 179
-  },
-  {
-   "w": "capped",
-   "lift": 4.330398599446883,
-   "inside": 73,
-   "outside": 27
-  },
-  {
-   "w": "free",
-   "lift": 4.328847735949902,
-   "inside": 203,
-   "outside": 76
-  },
-  {
-   "w": "kind",
-   "lift": 4.327977353375065,
-   "inside": 195,
-   "outside": 73
-  },
-  {
-   "w": "practice",
-   "lift": 4.324880410725065,
-   "inside": 57,
-   "outside": 21
-  },
-  {
-   "w": "fit",
-   "lift": 4.309132749514216,
-   "inside": 70,
-   "outside": 26
-  },
-  {
-   "w": "early",
-   "lift": 4.298993613633005,
-   "inside": 112,
-   "outside": 42
-  },
-  {
-   "w": "derives",
-   "lift": 4.29838434583062,
-   "inside": 83,
-   "outside": 31
-  },
-  {
-   "w": "built",
-   "lift": 4.292519225660667,
-   "inside": 546,
-   "outside": 207
-  },
-  {
-   "w": "ref",
-   "lift": 4.2852441671075265,
-   "inside": 88,
-   "outside": 33
-  },
-  {
-   "w": "ceiling",
-   "lift": 4.280008042758666,
-   "inside": 122,
-   "outside": 46
-  },
-  {
-   "w": "characters",
-   "lift": 4.275169141636271,
-   "inside": 114,
-   "outside": 43
-  },
-  {
-   "w": "heading",
-   "lift": 4.273584571902529,
-   "inside": 93,
-   "outside": 35
-  },
-  {
-   "w": "tier",
-   "lift": 4.268860480827167,
-   "inside": 140,
-   "outside": 53
-  },
-  {
-   "w": "listed",
-   "lift": 4.266514953090448,
-   "inside": 153,
-   "outside": 58
-  },
-  {
-   "w": "join",
-   "lift": 4.263168666852731,
-   "inside": 98,
-   "outside": 37
-  },
-  {
-   "w": "gain",
-   "lift": 4.261393086400064,
-   "inside": 64,
-   "outside": 24
-  },
-  {
-   "w": "hides",
-   "lift": 4.25800744570642,
-   "inside": 77,
-   "outside": 29
-  },
-  {
-   "w": "checked",
-   "lift": 4.2574358819028415,
-   "inside": 505,
-   "outside": 193
-  },
-  {
-   "w": "compares",
-   "lift": 4.2556031501413685,
-   "inside": 90,
-   "outside": 34
-  },
-  {
-   "w": "signal",
-   "lift": 4.253501617721545,
-   "inside": 176,
-   "outside": 67
-  },
-  {
-   "w": "name",
-   "lift": 4.249562401665886,
-   "inside": 887,
-   "outside": 340
-  },
-  {
-   "w": "drive",
-   "lift": 4.247573710235441,
-   "inside": 69,
-   "outside": 26
-  },
-  {
-   "w": "seeded",
-   "lift": 4.245887161214104,
-   "inside": 95,
-   "outside": 36
-  },
-  {
-   "w": "ship",
-   "lift": 4.24458540735783,
-   "inside": 134,
-   "outside": 51
-  },
-  {
-   "w": "guards",
-   "lift": 4.243419419241167,
-   "inside": 212,
-   "outside": 81
-  },
-  {
-   "w": "its",
-   "lift": 4.224853403097183,
-   "inside": 2270,
-   "outside": 876
-  },
-  {
-   "w": "working",
-   "lift": 4.223818562297988,
-   "inside": 312,
-   "outside": 120
-  },
-  {
-   "w": "machinery",
-   "lift": 4.217544910587258,
-   "inside": 53,
-   "outside": 20
-  },
-  {
-   "w": "sets",
-   "lift": 4.207543515294598,
-   "inside": 236,
-   "outside": 91
-  },
-  {
-   "w": "served",
-   "lift": 4.204418919813208,
-   "inside": 125,
-   "outside": 48
-  },
-  {
-   "w": "swap",
-   "lift": 4.2027086477102324,
-   "inside": 76,
-   "outside": 29
-  },
-  {
-   "w": "slow",
-   "lift": 4.2027086477102324,
-   "inside": 76,
-   "outside": 29
-  },
-  {
-   "w": "cleared",
-   "lift": 4.201193612148693,
-   "inside": 94,
-   "outside": 36
-  },
-  {
-   "w": "character",
-   "lift": 4.194808819425063,
-   "inside": 99,
-   "outside": 38
-  },
-  {
-   "w": "part",
-   "lift": 4.190132332446885,
-   "inside": 384,
-   "outside": 149
-  },
-  {
-   "w": "guard",
-   "lift": 4.185748757180084,
-   "inside": 594,
-   "outside": 231
-  },
-  {
-   "w": "corpus",
-   "lift": 4.181233386352489,
-   "inside": 132,
-   "outside": 51
-  },
-  {
-   "w": "one",
-   "lift": 4.173318309856037,
-   "inside": 2580,
-   "outside": 1008
-  },
-  {
-   "w": "marks",
-   "lift": 4.166731116483797,
-   "inside": 106,
-   "outside": 41
-  },
-  {
-   "w": "frame",
-   "lift": 4.16505840226602,
-   "inside": 180,
-   "outside": 70
-  },
-  {
-   "w": "criterion",
-   "lift": 4.158252751281925,
-   "inside": 65,
-   "outside": 25
-  },
-  {
-   "w": "edited",
-   "lift": 4.139156297774315,
-   "inside": 85,
-   "outside": 33
-  },
-  {
-   "w": "assert",
-   "lift": 4.134323874615711,
-   "inside": 166,
-   "outside": 65
-  },
-  {
-   "w": "covers",
-   "lift": 4.133437555558425,
-   "inside": 356,
-   "outside": 140
-  },
-  {
-   "w": "below",
-   "lift": 4.113343254959947,
-   "inside": 440,
-   "outside": 174
-  },
-  {
-   "w": "old",
-   "lift": 4.113038666999623,
-   "inside": 503,
-   "outside": 199
-  },
-  {
-   "w": "several",
-   "lift": 4.110398843181164,
-   "inside": 160,
-   "outside": 63
-  },
-  {
-   "w": "count",
-   "lift": 4.107910708288197,
-   "inside": 520,
-   "outside": 206
-  },
-  {
-   "w": "value",
-   "lift": 4.103306513888866,
-   "inside": 615,
-   "outside": 244
-  },
-  {
-   "w": "toward",
-   "lift": 4.097255125950062,
-   "inside": 54,
-   "outside": 21
-  },
-  {
-   "w": "gating",
-   "lift": 4.0956407622282525,
-   "inside": 59,
-   "outside": 23
-  },
-  {
-   "w": "socket",
-   "lift": 4.094279632031434,
-   "inside": 64,
-   "outside": 25
-  },
-  {
-   "w": "hits",
-   "lift": 4.0912332930195054,
-   "inside": 79,
-   "outside": 31
-  },
-  {
-   "w": "variant",
-   "lift": 4.087661723143452,
-   "inside": 109,
-   "outside": 43
-  },
-  {
-   "w": "what",
-   "lift": 4.085530200091314,
-   "inside": 2115,
-   "outside": 844
-  },
-  {
-   "w": "turn",
-   "lift": 4.084154390135673,
-   "inside": 174,
-   "outside": 69
-  },
-  {
-   "w": "stay",
-   "lift": 4.075745363837367,
-   "inside": 401,
-   "outside": 160
-  },
-  {
-   "w": "invariant",
-   "lift": 4.06951584393447,
-   "inside": 116,
-   "outside": 46
-  },
-  {
-   "w": "didn",
-   "lift": 4.065737778827369,
-   "inside": 81,
-   "outside": 32
-  },
-  {
-   "w": "caps",
-   "lift": 4.060160635097839,
-   "inside": 56,
-   "outside": 22
-  },
-  {
-   "w": "ground",
-   "lift": 4.05839227245189,
-   "inside": 51,
-   "outside": 20
-  },
-  {
-   "w": "both",
-   "lift": 4.054166131185773,
-   "inside": 2059,
-   "outside": 828
-  },
-  {
-   "w": "box",
-   "lift": 4.052310006026334,
-   "inside": 195,
-   "outside": 78
-  },
-  {
-   "w": "deadline",
-   "lift": 4.0303065127809425,
-   "inside": 63,
-   "outside": 25
-  },
-  {
-   "w": "unmodified",
-   "lift": 4.026223122190486,
-   "inside": 58,
-   "outside": 23
-  },
-  {
-   "w": "ratio",
-   "lift": 4.026223122190486,
-   "inside": 58,
-   "outside": 23
-  },
-  {
-   "w": "every",
-   "lift": 4.020705210836733,
-   "inside": 2217,
-   "outside": 899
-  },
-  {
-   "w": "window",
-   "lift": 4.0122946636715815,
-   "inside": 380,
-   "outside": 154
-  },
-  {
-   "w": "find",
-   "lift": 4.010938504200519,
-   "inside": 134,
-   "outside": 54
-  },
-  {
-   "w": "absent",
-   "lift": 3.998203638393423,
-   "inside": 337,
-   "outside": 137
-  },
-  {
-   "w": "kb",
-   "lift": 3.993068428441104,
-   "inside": 82,
-   "outside": 33
-  },
-  {
-   "w": "clearing",
-   "lift": 3.978815953384206,
-   "inside": 50,
-   "outside": 20
-  },
-  {
-   "w": "hard",
-   "lift": 3.9673569634384593,
-   "inside": 152,
-   "outside": 62
-  },
-  {
-   "w": "writes",
-   "lift": 3.963767136597767,
-   "inside": 424,
-   "outside": 174
-  },
-  {
-   "w": "byte-for-byte",
-   "lift": 3.957943476251699,
-   "inside": 74,
-   "outside": 30
-  },
-  {
-   "w": "body",
-   "lift": 3.952575733476582,
-   "inside": 338,
-   "outside": 139
-  },
-  {
-   "w": "mechanical",
-   "lift": 3.949498362148743,
-   "inside": 69,
-   "outside": 28
-  },
-  {
-   "w": "have",
-   "lift": 3.942195226397769,
-   "inside": 1108,
-   "outside": 458
-  },
-  {
-   "w": "step",
-   "lift": 3.9379008960857886,
-   "inside": 554,
-   "outside": 229
-  },
-  {
-   "w": "another",
-   "lift": 3.9362893375261723,
-   "inside": 298,
-   "outside": 123
-  },
-  {
-   "w": "cap",
-   "lift": 3.936204118012478,
-   "inside": 187,
-   "outside": 77
-  },
-  {
-   "w": "compiles",
-   "lift": 3.93587000341117,
-   "inside": 76,
-   "outside": 31
-  },
-  {
-   "w": "columns",
-   "lift": 3.931886329318649,
-   "inside": 141,
-   "outside": 58
-  },
-  {
-   "w": "emitted",
-   "lift": 3.92576507400575,
-   "inside": 148,
-   "outside": 61
-  },
-  {
-   "w": "has",
-   "lift": 3.9234766827347363,
-   "inside": 1603,
-   "outside": 666
-  },
-  {
-   "w": "reports",
-   "lift": 3.9151548981300586,
-   "inside": 570,
-   "outside": 237
-  },
-  {
-   "w": "forced",
-   "lift": 3.9151548981300586,
-   "inside": 90,
-   "outside": 37
-  },
-  {
-   "w": "effect",
-   "lift": 3.9151548981300586,
-   "inside": 186,
-   "outside": 77
-  },
-  {
-   "w": "sentinel",
-   "lift": 3.9151548981300586,
-   "inside": 54,
-   "outside": 22
-  },
-  {
-   "w": "incident",
-   "lift": 3.9151548981300586,
-   "inside": 54,
-   "outside": 22
-  },
-  {
-   "w": "loop",
-   "lift": 3.9106076798976197,
-   "inside": 344,
-   "outside": 143
-  },
-  {
-   "w": "sends",
-   "lift": 3.8932212572441762,
-   "inside": 142,
-   "outside": 59
-  },
-  {
-   "w": "promise",
-   "lift": 3.8922592554509348,
-   "inside": 68,
-   "outside": 28
-  },
-  {
-   "w": "fleet",
-   "lift": 3.8922592554509348,
-   "inside": 68,
-   "outside": 28
-  },
-  {
-   "w": "room",
-   "lift": 3.8858278951478114,
-   "inside": 106,
-   "outside": 44
-  },
-  {
-   "w": "flag",
-   "lift": 3.8816259036137932,
-   "inside": 301,
-   "outside": 126
-  },
-  {
-   "w": "bound",
-   "lift": 3.8778677086240583,
-   "inside": 208,
-   "outside": 87
-  },
-  {
-   "w": "hit",
-   "lift": 3.870572388938102,
-   "inside": 191,
-   "outside": 80
-  },
-  {
-   "w": "expression",
-   "lift": 3.869629841175058,
-   "inside": 51,
-   "outside": 21
-  },
-  {
-   "w": "met",
-   "lift": 3.8618874845500586,
-   "inside": 58,
-   "outside": 24
-  },
-  {
-   "w": "claimed",
-   "lift": 3.8610995050592294,
-   "inside": 200,
-   "outside": 84
-  },
-  {
-   "w": "screen",
-   "lift": 3.8605611047298383,
-   "inside": 297,
-   "outside": 125
-  },
-  {
-   "w": "converted",
-   "lift": 3.842652029646169,
-   "inside": 53,
-   "outside": 22
-  },
-  {
-   "w": "spawn",
-   "lift": 3.842652029646169,
-   "inside": 53,
-   "outside": 22
-  },
-  {
-   "w": "brief",
-   "lift": 3.8408165139883486,
-   "inside": 93,
-   "outside": 39
-  },
-  {
-   "w": "leak",
-   "lift": 3.8350201487531277,
-   "inside": 67,
-   "outside": 28
-  },
-  {
-   "w": "done",
-   "lift": 3.834748873365934,
-   "inside": 248,
-   "outside": 105
-  },
-  {
-   "w": "same",
-   "lift": 3.829627816290666,
-   "inside": 2006,
-   "outside": 854
-  },
-  {
-   "w": "recording",
-   "lift": 3.8288704926616277,
-   "inside": 142,
-   "outside": 60
-  },
-  {
-   "w": "const",
-   "lift": 3.817970202077185,
-   "inside": 55,
-   "outside": 23
-  },
-  {
-   "w": "drift",
-   "lift": 3.816660435284019,
-   "inside": 310,
-   "outside": 132
-  },
-  {
-   "w": "opened",
-   "lift": 3.8156170617369214,
-   "inside": 207,
-   "outside": 88
-  },
-  {
-   "w": "seconds",
-   "lift": 3.8114825721671135,
-   "inside": 125,
-   "outside": 53
-  },
-  {
-   "w": "up",
-   "lift": 3.8006938478848773,
-   "inside": 777,
-   "outside": 333
-  },
-  {
-   "w": "waits",
-   "lift": 3.799517411687398,
-   "inside": 92,
-   "outside": 39
-  },
-  {
-   "w": "convention",
-   "lift": 3.7937547462500567,
-   "inside": 150,
-   "outside": 64
-  },
-  {
-   "w": "doc",
-   "lift": 3.791211446978828,
-   "inside": 208,
-   "outside": 89
-  },
-  {
-   "w": "bugs",
-   "lift": 3.787649853554942,
-   "inside": 101,
-   "outside": 43
-  },
-  {
-   "w": "rows",
-   "lift": 3.7851856903550356,
-   "inside": 565,
-   "outside": 243
-  },
-  {
-   "w": "still",
-   "lift": 3.7849119689446646,
-   "inside": 1732,
-   "outside": 746
-  },
-  {
-   "w": "renders",
-   "lift": 3.77778104205532,
-   "inside": 330,
-   "outside": 142
-  },
-  {
-   "w": "falling",
-   "lift": 3.7777810420553193,
-   "inside": 66,
-   "outside": 28
-  },
-  {
-   "w": "runs",
-   "lift": 3.777578783727766,
-   "inside": 983,
-   "outside": 424
-  },
-  {
-   "w": "symbol",
-   "lift": 3.7744140357789777,
-   "inside": 59,
-   "outside": 25
-  },
-  {
-   "w": "undefined",
-   "lift": 3.7710907568568746,
-   "inside": 89,
-   "outside": 38
-  },
-  {
-   "w": "term",
-   "lift": 3.770149161162279,
-   "inside": 52,
-   "outside": 22
-  },
-  {
-   "w": "also",
-   "lift": 3.769999824666946,
-   "inside": 1122,
-   "outside": 485
-  },
-  {
-   "w": "absolute",
-   "lift": 3.768106826838789,
-   "inside": 82,
-   "outside": 35
-  },
-  {
-   "w": "under",
-   "lift": 3.767918303670467,
-   "inside": 1126,
-   "outside": 487
-  },
-  {
-   "w": "statement",
-   "lift": 3.7645720174327484,
-   "inside": 105,
-   "outside": 45
-  },
-  {
-   "w": "like",
-   "lift": 3.7515533245770736,
-   "inside": 399,
-   "outside": 173
-  },
-  {
-   "w": "declaration",
-   "lift": 3.7501483698563782,
-   "inside": 100,
-   "outside": 43
-  },
-  {
-   "w": "flat",
-   "lift": 3.747177955305997,
-   "inside": 116,
-   "outside": 50
-  },
-  {
-   "w": "write",
-   "lift": 3.743111274340495,
-   "inside": 483,
-   "outside": 210
-  },
-  {
-   "w": "split",
-   "lift": 3.7420835346523855,
-   "inside": 320,
-   "outside": 139
-  },
-  {
-   "w": "omits",
-   "lift": 3.740086996181154,
-   "inside": 47,
-   "outside": 20
-  },
-  {
-   "w": "around",
-   "lift": 3.739621637590114,
-   "inside": 196,
-   "outside": 85
-  },
-  {
-   "w": "true",
-   "lift": 3.7385486139144675,
-   "inside": 652,
-   "outside": 284
-  },
-  {
-   "w": "late",
-   "lift": 3.7287189506000558,
-   "inside": 56,
-   "outside": 24
-  },
-  {
-   "w": "quote",
-   "lift": 3.7287189506000558,
-   "inside": 56,
-   "outside": 24
-  },
-  {
-   "w": "stderr",
-   "lift": 3.7287189506000558,
-   "inside": 56,
-   "outside": 24
-  },
-  {
-   "w": "showed",
-   "lift": 3.7178796513250556,
-   "inside": 147,
-   "outside": 64
-  },
-  {
-   "w": "then",
-   "lift": 3.7162970885108613,
-   "inside": 983,
-   "outside": 431
-  },
-  {
-   "w": "exit",
-   "lift": 3.7133225885667978,
-   "inside": 379,
-   "outside": 166
-  },
-  {
-   "w": "table",
-   "lift": 3.713090690698625,
-   "inside": 577,
-   "outside": 253
-  },
-  {
-   "w": "together",
-   "lift": 3.708454173694621,
-   "inside": 183,
-   "outside": 80
-  },
-  {
-   "w": "become",
-   "lift": 3.6976462926783893,
-   "inside": 119,
-   "outside": 52
-  },
-  {
-   "w": "mirror",
-   "lift": 3.6976462926783884,
-   "inside": 85,
-   "outside": 37
-  },
-  {
-   "w": "vocabulary",
-   "lift": 3.6950257070705375,
-   "inside": 94,
-   "outside": 41
-  },
-  {
-   "w": "dir",
-   "lift": 3.6935423567264705,
-   "inside": 60,
-   "outside": 26
-  },
-  {
-   "w": "union",
-   "lift": 3.6935423567264705,
-   "inside": 60,
-   "outside": 26
-  },
-  {
-   "w": "elsewhere",
-   "lift": 3.6881893967891854,
-   "inside": 78,
-   "outside": 34
-  },
-  {
-   "w": "more",
-   "lift": 3.6878706250176396,
-   "inside": 503,
-   "outside": 222
-  },
-  {
-   "w": "other",
-   "lift": 3.687676055034042,
-   "inside": 937,
-   "outside": 414
-  },
-  {
-   "w": "block",
-   "lift": 3.6865437652539415,
-   "inside": 487,
-   "outside": 215
-  },
-  {
-   "w": "logged",
-   "lift": 3.6825714388352035,
-   "inside": 114,
-   "outside": 50
-  },
-  {
-   "w": "orphaned",
-   "lift": 3.679134922001651,
-   "inside": 53,
-   "outside": 23
-  },
-  {
-   "w": "appears",
-   "lift": 3.6679246198837507,
-   "inside": 181,
-   "outside": 80
-  },
-  {
-   "w": "switched",
-   "lift": 3.6621346836250552,
-   "inside": 55,
-   "outside": 24
-  },
-  {
-   "w": "prefix",
-   "lift": 3.6605106771134697,
-   "inside": 138,
-   "outside": 61
-  },
-  {
-   "w": "satisfy",
-   "lift": 3.6605106771134692,
-   "inside": 46,
-   "outside": 20
-  },
-  {
-   "w": "why",
-   "lift": 3.658201726922904,
-   "inside": 1082,
-   "outside": 482
-  },
-  {
-   "w": "tree",
-   "lift": 3.651668863883727,
-   "inside": 413,
-   "outside": 184
-  },
-  {
-   "w": "edges",
-   "lift": 3.6497206677483596,
-   "inside": 66,
-   "outside": 29
-  },
-  {
-   "w": "restored",
-   "lift": 3.6415150396586027,
-   "inside": 173,
-   "outside": 77
-  },
-  {
-   "w": "parsed",
-   "lift": 3.625143424194499,
-   "inside": 110,
-   "outside": 49
-  },
-  {
-   "w": "dated",
-   "lift": 3.6185522543323274,
-   "inside": 61,
-   "outside": 27
-  },
-  {
-   "w": "literals",
-   "lift": 3.609717281963884,
-   "inside": 52,
-   "outside": 23
-  },
-  {
-   "w": "lesson",
-   "lift": 3.609717281963884,
-   "inside": 52,
-   "outside": 23
-  },
-  {
-   "w": "overwrite",
-   "lift": 3.609717281963884,
-   "inside": 52,
-   "outside": 23
-  },
-  {
-   "w": "covered",
-   "lift": 3.6039082744293425,
-   "inside": 264,
-   "outside": 119
-  },
-  {
-   "w": "callers",
-   "lift": 3.603077333786358,
-   "inside": 127,
-   "outside": 57
-  },
-  {
-   "w": "returns",
-   "lift": 3.595429133832249,
-   "inside": 605,
-   "outside": 274
-  },
-  {
-   "w": "series",
-   "lift": 3.594421869752172,
-   "inside": 65,
-   "outside": 29
+   "lift": 1.658,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "email",
+   "lift": 1.648,
+   "clusters": 5,
+   "agree": 1
   },
   {
    "w": "green",
-   "lift": 3.5925578653253343,
-   "inside": 882,
-   "outside": 400
+   "lift": 1.641,
+   "clusters": 9,
+   "agree": 0.89
   },
   {
-   "w": "how",
-   "lift": 3.591779272325806,
-   "inside": 622,
-   "outside": 282
+   "w": "google",
+   "lift": 1.64,
+   "clusters": 6,
+   "agree": 0.83
   },
   {
-   "w": "anchor",
-   "lift": 3.5853066832692844,
-   "inside": 100,
-   "outside": 45
+   "w": "via",
+   "lift": 1.618,
+   "clusters": 10,
+   "agree": 1
   },
   {
-   "w": "cold",
-   "lift": 3.5835434176873493,
-   "inside": 67,
-   "outside": 30
+   "w": "approved",
+   "lift": 1.617,
+   "clusters": 6,
+   "agree": 0.83
   },
   {
-   "w": "been",
-   "lift": 3.5667187826006845,
-   "inside": 563,
-   "outside": 257
+   "w": "seed",
+   "lift": 1.605,
+   "clusters": 8,
+   "agree": 0.88
   },
   {
-   "w": "offer",
-   "lift": 3.566129461475054,
-   "inside": 47,
-   "outside": 21
+   "w": "honest",
+   "lift": 1.605,
+   "clusters": 7,
+   "agree": 1
   },
   {
-   "w": "better",
-   "lift": 3.5653472440016003,
-   "inside": 106,
-   "outside": 48
+   "w": "download",
+   "lift": 1.602,
+   "clusters": 7,
+   "agree": 0.86
   },
   {
-   "w": "but",
-   "lift": 3.55598509772824,
-   "inside": 1394,
-   "outside": 639
+   "w": "buttons",
+   "lift": 1.594,
+   "clusters": 4,
+   "agree": 0.75
   },
   {
-   "w": "cluster",
-   "lift": 3.5445846814346207,
-   "inside": 88,
-   "outside": 40
+   "w": "idempotent",
+   "lift": 1.571,
+   "clusters": 6,
+   "agree": 1
   },
   {
-   "w": "stop",
-   "lift": 3.53554862473722,
-   "inside": 285,
-   "outside": 131
+   "w": "artifacts",
+   "lift": 1.551,
+   "clusters": 9,
+   "agree": 1
   },
   {
-   "w": "unaffected",
-   "lift": 3.5289661496750533,
-   "inside": 159,
-   "outside": 73
+   "w": "clean",
+   "lift": 1.538,
+   "clusters": 10,
+   "agree": 1
   },
   {
-   "w": "move",
-   "lift": 3.5215678977889415,
-   "inside": 340,
-   "outside": 157
+   "w": "commit",
+   "lift": 1.535,
+   "clusters": 10,
+   "agree": 0.8
   },
   {
-   "w": "probe",
-   "lift": 3.5197821128509146,
-   "inside": 219,
-   "outside": 101
+   "w": "offline",
+   "lift": 1.516,
+   "clusters": 7,
+   "agree": 0.86
   },
   {
-   "w": "time",
-   "lift": 3.5184192017862124,
-   "inside": 674,
-   "outside": 312
+   "w": "supabase",
+   "lift": 1.514,
+   "clusters": 3,
+   "agree": 1
   },
   {
-   "w": "element",
-   "lift": 3.5112103451483856,
-   "inside": 113,
-   "outside": 52
+   "w": "enforced",
+   "lift": 1.512,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "eslint",
+   "lift": 1.499,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "plan",
+   "lift": 1.495,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "frozen",
+   "lift": 1.485,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "tsc",
+   "lift": 1.484,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "end-to-end",
+   "lift": 1.48,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "toggle",
+   "lift": 1.466,
+   "clusters": 5,
+   "agree": 1
+  },
+  {
+   "w": "rule",
+   "lift": 1.462,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "net",
+   "lift": 1.46,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "docs",
+   "lift": 1.449,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "isn",
+   "lift": 1.448,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "installs",
+   "lift": 1.447,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "python3",
+   "lift": 1.441,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "dev",
+   "lift": 1.439,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "merges",
+   "lift": 1.435,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "feed",
+   "lift": 1.422,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "--noemit",
+   "lift": 1.418,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "live",
+   "lift": 1.417,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "board",
+   "lift": 1.417,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "smoke",
+   "lift": 1.411,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "still",
+   "lift": 1.408,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "click",
+   "lift": 1.407,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "items",
+   "lift": 1.406,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "sit",
+   "lift": 1.405,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "gates",
+   "lift": 1.404,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "chrome",
+   "lift": 1.402,
+   "clusters": 3,
+   "agree": 1
+  },
+  {
+   "w": "wired",
+   "lift": 1.402,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "phase",
+   "lift": 1.4,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "tick",
+   "lift": 1.397,
+   "clusters": 5,
+   "agree": 1
+  },
+  {
+   "w": "roadmap",
+   "lift": 1.396,
+   "clusters": 6,
+   "agree": 1
+  },
+  {
+   "w": "panel",
+   "lift": 1.391,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "tier",
+   "lift": 1.391,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "words",
+   "lift": 1.391,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "documents",
+   "lift": 1.389,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "badge",
+   "lift": 1.388,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "env",
+   "lift": 1.385,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "timing",
+   "lift": 1.385,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "stay",
+   "lift": 1.381,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "handoff",
+   "lift": 1.38,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "deployed",
+   "lift": 1.378,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "cap",
+   "lift": 1.375,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "fail-closed",
+   "lift": 1.363,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "rows",
+   "lift": 1.362,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "blocked",
+   "lift": 1.358,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "policy",
+   "lift": 1.355,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "sections",
+   "lift": 1.353,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "item",
+   "lift": 1.352,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "audit",
+   "lift": 1.349,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "untouched",
+   "lift": 1.338,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "deliberate",
+   "lift": 1.332,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "plus",
+   "lift": 1.331,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "validator",
+   "lift": 1.328,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "login",
+   "lift": 1.326,
+   "clusters": 5,
+   "agree": 1
+  },
+  {
+   "w": "now",
+   "lift": 1.325,
+   "clusters": 10,
+   "agree": 1
+  },
+  {
+   "w": "right",
+   "lift": 1.322,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "deferred",
+   "lift": 1.32,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "banner",
+   "lift": 1.317,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "console",
+   "lift": 1.317,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "seeded",
+   "lift": 1.317,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "suites",
+   "lift": 1.317,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "authenticated",
+   "lift": 1.317,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "yet",
+   "lift": 1.315,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "bad",
+   "lift": 1.312,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "didn",
+   "lift": 1.31,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "flat",
+   "lift": 1.308,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "touched",
+   "lift": 1.306,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "design",
+   "lift": 1.304,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "round-trip",
+   "lift": 1.304,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "passes",
+   "lift": 1.303,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "app",
+   "lift": 1.302,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "phone",
+   "lift": 1.301,
+   "clusters": 4,
+   "agree": 1
+  },
+  {
+   "w": "bash",
+   "lift": 1.301,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "origin/main",
+   "lift": 1.298,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "pick",
+   "lift": 1.297,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "sent",
+   "lift": 1.297,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "copy",
+   "lift": 1.294,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "html",
+   "lift": 1.294,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "blank",
+   "lift": 1.294,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "follow-up",
+   "lift": 1.293,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "delivery",
+   "lift": 1.293,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "scripts",
+   "lift": 1.291,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "succeeded",
+   "lift": 1.291,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "catches",
+   "lift": 1.288,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "logic",
+   "lift": 1.286,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "durable",
+   "lift": 1.286,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "pre-existing",
+   "lift": 1.283,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "trap",
+   "lift": 1.281,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "pure",
+   "lift": 1.28,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "structural",
+   "lift": 1.279,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "never",
+   "lift": 1.278,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "inventory",
+   "lift": 1.278,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "gate",
+   "lift": 1.276,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "json",
+   "lift": 1.274,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "bumped",
+   "lift": 1.274,
+   "clusters": 6,
+   "agree": 1
+  },
+  {
+   "w": "mjs",
+   "lift": 1.271,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "desktop",
+   "lift": 1.27,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "relative",
+   "lift": 1.268,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "race",
+   "lift": 1.268,
+   "clusters": 6,
+   "agree": 1
+  },
+  {
+   "w": "findings",
+   "lift": 1.267,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "product",
+   "lift": 1.266,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "healthy",
+   "lift": 1.263,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "saved",
+   "lift": 1.262,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "snapshot",
+   "lift": 1.262,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "web",
+   "lift": 1.262,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "unused",
+   "lift": 1.26,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "session",
+   "lift": 1.259,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "pool",
+   "lift": 1.257,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "npm",
+   "lift": 1.255,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "until",
+   "lift": 1.255,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "halves",
+   "lift": 1.255,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "card",
+   "lift": 1.254,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "tab",
+   "lift": 1.254,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "real",
+   "lift": 1.252,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "detail",
+   "lift": 1.251,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "synthetic",
+   "lift": 1.251,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "codebase",
+   "lift": 1.25,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "logged",
+   "lift": 1.249,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "migration",
+   "lift": 1.249,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "rebuilt",
+   "lift": 1.249,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "health",
+   "lift": 1.249,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "paid",
+   "lift": 1.248,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "ruff",
+   "lift": 1.248,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "lost",
+   "lift": 1.247,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "doesn",
+   "lift": 1.247,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "gains",
+   "lift": 1.245,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "png",
+   "lift": 1.245,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "wiring",
+   "lift": 1.244,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "projects",
+   "lift": 1.244,
+   "clusters": 6,
+   "agree": 1
+  },
+  {
+   "w": "screen",
+   "lift": 1.241,
+   "clusters": 5,
+   "agree": 1
+  },
+  {
+   "w": "harness",
+   "lift": 1.241,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "merge",
+   "lift": 1.24,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "sample",
+   "lift": 1.239,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "index",
+   "lift": 1.238,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "out",
+   "lift": 1.237,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "post",
+   "lift": 1.237,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "parity",
+   "lift": 1.237,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "home",
+   "lift": 1.236,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "shows",
+   "lift": 1.236,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "verification",
+   "lift": 1.236,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "full",
+   "lift": 1.236,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "kept",
+   "lift": 1.235,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "pages",
+   "lift": 1.234,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "retired",
+   "lift": 1.234,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "records",
+   "lift": 1.234,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "route",
+   "lift": 1.234,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "prompt",
+   "lift": 1.233,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "mypy",
+   "lift": 1.233,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "inline",
+   "lift": 1.232,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "numbers",
+   "lift": 1.232,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "ownership",
+   "lift": 1.231,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "reads",
+   "lift": 1.23,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "per",
+   "lift": 1.229,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "step",
+   "lift": 1.228,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "field",
+   "lift": 1.228,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "sweep",
+   "lift": 1.228,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "questions",
+   "lift": 1.228,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "opt-in",
+   "lift": 1.226,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "bar",
+   "lift": 1.225,
+   "clusters": 6,
+   "agree": 1
+  },
+  {
+   "w": "flagged",
+   "lift": 1.225,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "chart",
+   "lift": 1.224,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "server-side",
+   "lift": 1.224,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "fixed",
+   "lift": 1.222,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "two",
+   "lift": 1.221,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "under",
+   "lift": 1.221,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "scheduled",
+   "lift": 1.221,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "three",
+   "lift": 1.22,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "clears",
+   "lift": 1.22,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "first",
+   "lift": 1.219,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "same",
+   "lift": 1.218,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "button",
+   "lift": 1.218,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "verified",
+   "lift": 1.217,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "suite",
+   "lift": 1.217,
+   "clusters": 8,
+   "agree": 1
+  },
+  {
+   "w": "origin",
+   "lift": 1.215,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "old",
+   "lift": 1.213,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "launch",
+   "lift": 1.213,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "skips",
+   "lift": 1.212,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "sha",
+   "lift": 1.212,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "front",
+   "lift": 1.211,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "restart",
+   "lift": 1.211,
+   "clusters": 5,
+   "agree": 1
+  },
+  {
+   "w": "only",
+   "lift": 1.21,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "pass",
+   "lift": 1.21,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "truth",
+   "lift": 1.209,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "person",
+   "lift": 1.208,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "owner",
+   "lift": 1.208,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "secrets",
+   "lift": 1.208,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "read-only",
+   "lift": 1.207,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "postgres",
+   "lift": 1.207,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "next",
+   "lift": 1.206,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "deliberately",
+   "lift": 1.206,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "typecheck",
+   "lift": 1.206,
+   "clusters": 9,
+   "agree": 1
+  },
+  {
+   "w": "then",
+   "lift": 1.205,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "tags",
+   "lift": 1.203,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "join",
+   "lift": 1.203,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "days",
+   "lift": 1.202,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "correction",
+   "lift": 1.202,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "zero",
+   "lift": 1.201,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "max",
+   "lift": 1.201,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "parser",
+   "lift": 1.201,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "remaining",
+   "lift": 1.2,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "invisible",
+   "lift": 1.2,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "floor",
+   "lift": 1.2,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "seam",
+   "lift": 1.2,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "landing",
+   "lift": 1.198,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "prior",
+   "lift": 1.198,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "ship",
+   "lift": 1.198,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "manifest",
+   "lift": 1.198,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "account",
+   "lift": 1.197,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "list",
+   "lift": 1.197,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "clippy",
+   "lift": 1.196,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "don",
+   "lift": 1.195,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "server",
+   "lift": 1.194,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "cell",
+   "lift": 1.194,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "path",
+   "lift": 1.193,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "future",
+   "lift": 1.193,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "lint",
+   "lift": 1.192,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "day",
+   "lift": 1.192,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "stacked",
+   "lift": 1.191,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "ids",
+   "lift": 1.191,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "bridge",
+   "lift": 1.191,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "quality",
+   "lift": 1.191,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "preview",
+   "lift": 1.189,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "worked",
+   "lift": 1.189,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "upload",
+   "lift": 1.189,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "outcome",
+   "lift": 1.189,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "bugs",
+   "lift": 1.188,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "hours",
+   "lift": 1.187,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "pinning",
+   "lift": 1.187,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "shipped",
+   "lift": 1.186,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "--all-targets",
+   "lift": 1.186,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "cards",
+   "lift": 1.185,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "half",
+   "lift": 1.185,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "build",
+   "lift": 1.184,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "everything",
+   "lift": 1.184,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "production",
+   "lift": 1.184,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "capture",
+   "lift": 1.183,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "cycle",
+   "lift": 1.182,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "http",
+   "lift": 1.182,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "authoritative",
+   "lift": 1.182,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "already",
+   "lift": 1.18,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "core",
+   "lift": 1.178,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "documented",
+   "lift": 1.178,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "worse",
+   "lift": 1.178,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "sat",
+   "lift": 1.177,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "exposed",
+   "lift": 1.176,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "high",
+   "lift": 1.174,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "main",
+   "lift": 1.174,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "merged",
+   "lift": 1.173,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "working",
+   "lift": 1.173,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "runs",
+   "lift": 1.171,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "game",
+   "lift": 1.171,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "drift",
+   "lift": 1.17,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "safety",
+   "lift": 1.17,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "edits",
+   "lift": 1.169,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "done",
+   "lift": 1.169,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "our",
+   "lift": 1.169,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "people",
+   "lift": 1.168,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "looked",
+   "lift": 1.168,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "both",
+   "lift": 1.166,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "caught",
+   "lift": 1.166,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "showed",
+   "lift": 1.165,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "skipped",
+   "lift": 1.164,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "channel",
+   "lift": 1.164,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "entirely",
+   "lift": 1.164,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "passing",
+   "lift": 1.164,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "title",
+   "lift": 1.163,
+   "clusters": 9,
+   "agree": 0.78
   },
   {
    "w": "points",
-   "lift": 3.5048329874090043,
-   "inside": 246,
-   "outside": 114
+   "lift": 1.163,
+   "clusters": 7,
+   "agree": 0.71
   },
   {
-   "w": "long",
-   "lift": 3.502822633807568,
-   "inside": 175,
-   "outside": 81
+   "w": "ledger",
+   "lift": 1.163,
+   "clusters": 5,
+   "agree": 0.8
   },
   {
-   "w": "grid",
-   "lift": 3.502088096951199,
-   "inside": 117,
-   "outside": 54
+   "w": "ways",
+   "lift": 1.16,
+   "clusters": 7,
+   "agree": 0.71
   },
   {
-   "w": "disk",
-   "lift": 3.502088096951199,
-   "inside": 117,
-   "outside": 54
+   "w": "confirmed",
+   "lift": 1.159,
+   "clusters": 7,
+   "agree": 0.86
   },
   {
-   "w": "pixels",
-   "lift": 3.501358038978101,
-   "inside": 44,
-   "outside": 20
+   "w": "ships",
+   "lift": 1.159,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "failures",
+   "lift": 1.159,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "mismatch",
+   "lift": 1.158,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "manual",
+   "lift": 1.158,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "works",
+   "lift": 1.157,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "notes",
+   "lift": 1.157,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "proven",
+   "lift": 1.157,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "tables",
+   "lift": 1.156,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "cached",
+   "lift": 1.156,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "model",
+   "lift": 1.155,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "header",
+   "lift": 1.153,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "agent",
+   "lift": 1.152,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "dashboard",
+   "lift": 1.152,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "top",
+   "lift": 1.151,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "genuinely",
+   "lift": 1.151,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "layer",
+   "lift": 1.151,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "bundle",
+   "lift": 1.151,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "view",
+   "lift": 1.15,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "otherwise",
+   "lift": 1.15,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "second",
+   "lift": 1.149,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "inert",
+   "lift": 1.149,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "empty",
+   "lift": 1.148,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "exists",
+   "lift": 1.148,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "react",
+   "lift": 1.148,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "precisely",
+   "lift": 1.148,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "human",
+   "lift": 1.147,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "deterministic",
+   "lift": 1.147,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "historical",
+   "lift": 1.147,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "but",
+   "lift": 1.146,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "deps",
+   "lift": 1.146,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "branches",
+   "lift": 1.145,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "asserted",
+   "lift": 1.145,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "stub",
+   "lift": 1.145,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "nobody",
+   "lift": 1.144,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "most",
+   "lift": 1.143,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "strip",
+   "lift": 1.142,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "link",
+   "lift": 1.142,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "guide",
+   "lift": 1.142,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "workflow",
+   "lift": 1.142,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "unique",
+   "lift": 1.141,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "yml",
+   "lift": 1.141,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "fired",
+   "lift": 1.141,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "from",
+   "lift": 1.14,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "uses",
+   "lift": 1.14,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "landed",
+   "lift": 1.14,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "asset",
+   "lift": 1.14,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "allow",
+   "lift": 1.14,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "flow",
+   "lift": 1.139,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "broken",
+   "lift": 1.139,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "into",
+   "lift": 1.138,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "exact",
+   "lift": 1.138,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "say",
+   "lift": 1.138,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "page",
+   "lift": 1.137,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "can",
+   "lift": 1.137,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "provenance",
+   "lift": 1.137,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "serves",
+   "lift": 1.135,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "classes",
+   "lift": 1.135,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "requirements",
+   "lift": 1.135,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "demo",
+   "lift": 1.132,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "gated",
+   "lift": 1.131,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "against",
+   "lift": 1.131,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "shared",
+   "lift": 1.131,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "skills",
+   "lift": 1.131,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "record",
+   "lift": 1.13,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "pytest",
+   "lift": 1.13,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "confirmation",
+   "lift": 1.13,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "filters",
+   "lift": 1.13,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "exactly",
+   "lift": 1.129,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "adds",
+   "lift": 1.129,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "open",
+   "lift": 1.129,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "deleted",
+   "lift": 1.128,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "detection",
+   "lift": 1.128,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "fire",
+   "lift": 1.128,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "bump",
+   "lift": 1.128,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "head",
+   "lift": 1.128,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "them",
+   "lift": 1.127,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "node",
+   "lift": 1.127,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "pipeline",
+   "lift": 1.126,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "render",
+   "lift": 1.126,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "sql",
+   "lift": 1.126,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "security",
+   "lift": 1.126,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "minutes",
+   "lift": 1.126,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "map",
+   "lift": 1.125,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "defaults",
+   "lift": 1.124,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "captured",
+   "lift": 1.124,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "read",
+   "lift": 1.123,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "backend",
+   "lift": 1.122,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "dead",
+   "lift": 1.121,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "digest",
+   "lift": 1.121,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "native",
+   "lift": 1.12,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "question",
+   "lift": 1.12,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "label",
+   "lift": 1.119,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "extracted",
+   "lift": 1.119,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "history",
+   "lift": 1.118,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "assets",
+   "lift": 1.118,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "worth",
+   "lift": 1.117,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "category",
+   "lift": 1.116,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "stale",
+   "lift": 1.116,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "over",
+   "lift": 1.116,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "fresh",
+   "lift": 1.115,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "after",
+   "lift": 1.115,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "row",
+   "lift": 1.115,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "table",
+   "lift": 1.115,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "rendered",
+   "lift": 1.115,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "compiled",
+   "lift": 1.115,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "groups",
+   "lift": 1.115,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "lands",
+   "lift": 1.114,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "frontend",
+   "lift": 1.114,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "needs",
+   "lift": 1.113,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "workspace",
+   "lift": 1.113,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "renders",
+   "lift": 1.113,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "metrics",
+   "lift": 1.113,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "prints",
+   "lift": 1.113,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "api",
+   "lift": 1.112,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "reuses",
+   "lift": 1.112,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "committed",
+   "lift": 1.112,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "that",
+   "lift": 1.111,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "data",
+   "lift": 1.111,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "new",
+   "lift": 1.11,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "layout",
+   "lift": 1.11,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "side",
+   "lift": 1.11,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "replay",
+   "lift": 1.11,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "mean",
+   "lift": 1.109,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "failure",
+   "lift": 1.109,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "unavailable",
+   "lift": 1.109,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "unchanged",
+   "lift": 1.107,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "known",
+   "lift": 1.107,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "along",
+   "lift": 1.107,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "npx",
+   "lift": 1.107,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "actual",
+   "lift": 1.107,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "guards",
+   "lift": 1.107,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "decision",
+   "lift": 1.106,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "diagnostics",
+   "lift": 1.106,
+   "clusters": 4,
+   "agree": 1
+  },
+  {
+   "w": "onto",
+   "lift": 1.105,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "not",
+   "lift": 1.104,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "public",
+   "lift": 1.104,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "contents",
+   "lift": 1.104,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "track",
+   "lift": 1.103,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "gap",
+   "lift": 1.103,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "one",
+   "lift": 1.102,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "land",
+   "lift": 1.102,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "docker",
+   "lift": 1.102,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "whole",
+   "lift": 1.101,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "comes",
+   "lift": 1.101,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "baseline",
+   "lift": 1.101,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "hit",
+   "lift": 1.1,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "twice",
+   "lift": 1.1,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "identically",
+   "lift": 1.1,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "nothing",
+   "lift": 1.099,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "survive",
+   "lift": 1.099,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "exits",
+   "lift": 1.099,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "with",
+   "lift": 1.098,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "performance",
+   "lift": 1.098,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "pnpm",
+   "lift": 1.098,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "canonical",
+   "lift": 1.097,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "off",
+   "lift": 1.096,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "silently",
+   "lift": 1.096,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "strings",
+   "lift": 1.096,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "nowhere",
+   "lift": 1.096,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "are",
+   "lift": 1.095,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "what",
+   "lift": 1.095,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "count",
+   "lift": 1.095,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "becomes",
+   "lift": 1.095,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "got",
+   "lift": 1.095,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "routes",
+   "lift": 1.094,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "block",
+   "lift": 1.094,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "catch",
+   "lift": 1.094,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "system",
+   "lift": 1.093,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "script",
+   "lift": 1.093,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "feedback",
+   "lift": 1.093,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "picker",
+   "lift": 1.092,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "name",
+   "lift": 1.092,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "like",
+   "lift": 1.091,
+   "clusters": 7,
+   "agree": 1
+  },
+  {
+   "w": "ten",
+   "lift": 1.09,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "forever",
+   "lift": 1.09,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "tsx",
+   "lift": 1.089,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "version",
+   "lift": 1.089,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "fixtures",
+   "lift": 1.088,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "rust",
+   "lift": 1.088,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "separate",
+   "lift": 1.087,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "mode",
+   "lift": 1.087,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "down",
+   "lift": 1.087,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "language",
+   "lift": 1.086,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "ask",
+   "lift": 1.085,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "took",
+   "lift": 1.085,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "extraction",
+   "lift": 1.084,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "location",
+   "lift": 1.083,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "blocking",
+   "lift": 1.082,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "stored",
+   "lift": 1.081,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "look",
+   "lift": 1.081,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "found",
+   "lift": 1.08,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "pinned",
+   "lift": 1.08,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "let",
+   "lift": 1.08,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "instruction",
+   "lift": 1.08,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "present",
+   "lift": 1.078,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "branch",
+   "lift": 1.077,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "had",
+   "lift": 1.077,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "unreachable",
+   "lift": 1.076,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "player",
+   "lift": 1.076,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "cleanup",
+   "lift": 1.075,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "every",
+   "lift": 1.074,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "tests",
+   "lift": 1.074,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "isolation",
+   "lift": 1.074,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "hook",
+   "lift": 1.074,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "short",
+   "lift": 1.073,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "cleanly",
+   "lift": 1.073,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "last",
+   "lift": 1.072,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "scale",
+   "lift": 1.072,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "validates",
+   "lift": 1.072,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "failed",
+   "lift": 1.071,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "readme",
+   "lift": 1.071,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "this",
+   "lift": 1.07,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "line",
+   "lift": 1.07,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "fallback",
+   "lift": 1.07,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "rewritten",
+   "lift": 1.07,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "ceiling",
+   "lift": 1.07,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "local",
+   "lift": 1.069,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "own",
+   "lift": 1.069,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "final",
+   "lift": 1.069,
+   "clusters": 8,
+   "agree": 0.88
+  },
+  {
+   "w": "draft",
+   "lift": 1.068,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "separately",
+   "lift": 1.068,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "independent",
+   "lift": 1.068,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "waiting",
+   "lift": 1.067,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "start",
+   "lift": 1.067,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "pushed",
+   "lift": 1.066,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "image",
+   "lift": 1.065,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "run",
+   "lift": 1.064,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "ref",
+   "lift": 1.063,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "diagnostic",
+   "lift": 1.063,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "raw",
+   "lift": 1.062,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "member",
+   "lift": 1.061,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "persistence",
+   "lift": 1.061,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "explicit",
+   "lift": 1.06,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "pointer",
+   "lift": 1.06,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "driver",
+   "lift": 1.059,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "for",
+   "lift": 1.057,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "browser",
+   "lift": 1.056,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "shape",
+   "lift": 1.055,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "eight",
+   "lift": 1.054,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "regressions",
+   "lift": 1.053,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "prove",
+   "lift": 1.051,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "warning",
+   "lift": 1.05,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "mark",
+   "lift": 1.05,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "sees",
+   "lift": 1.048,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "environment",
+   "lift": 1.048,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "switch",
+   "lift": 1.048,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "all",
+   "lift": 1.047,
+   "clusters": 10,
+   "agree": 0.8
+  },
+  {
+   "w": "architecture",
+   "lift": 1.047,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "distinct",
+   "lift": 1.047,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "fires",
+   "lift": 1.046,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "its",
+   "lift": 1.046,
+   "clusters": 9,
+   "agree": 0.89
+  },
+  {
+   "w": "style",
+   "lift": 1.046,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "signature",
+   "lift": 1.046,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "mcp",
+   "lift": 1.046,
+   "clusters": 6,
+   "agree": 0.83
+  },
+  {
+   "w": "approval",
+   "lift": 1.046,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "plain",
+   "lift": 1.045,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "test",
+   "lift": 1.045,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "slice",
+   "lift": 1.045,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "drops",
+   "lift": 1.044,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "pending",
+   "lift": 1.044,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "restore",
+   "lift": 1.043,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "back",
+   "lift": 1.041,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "correct",
+   "lift": 1.041,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "guard",
+   "lift": 1.04,
+   "clusters": 7,
+   "agree": 0.86
+  },
+  {
+   "w": "machine",
+   "lift": 1.04,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "search",
+   "lift": 1.039,
+   "clusters": 8,
+   "agree": 0.75
+  },
+  {
+   "w": "anyone",
+   "lift": 1.039,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "built",
+   "lift": 1.039,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "generate",
+   "lift": 1.039,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "and",
+   "lift": 1.037,
+   "clusters": 10,
+   "agree": 1
+  },
+  {
+   "w": "true",
+   "lift": 1.037,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "refresh",
+   "lift": 1.035,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "maps",
+   "lift": 1.035,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "artifact",
+   "lift": 1.035,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "exported",
+   "lift": 1.033,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "profile",
+   "lift": 1.032,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "across",
+   "lift": 1.032,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "service",
+   "lift": 1.032,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "sessions",
+   "lift": 1.032,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "just",
+   "lift": 1.031,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "change",
+   "lift": 1.03,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "slot",
+   "lift": 1.029,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "were",
+   "lift": 1.028,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "mobile",
+   "lift": 1.025,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "services",
+   "lift": 1.025,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "connect",
+   "lift": 1.024,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "codex",
+   "lift": 1.024,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "analysis",
+   "lift": 1.023,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "walk",
+   "lift": 1.023,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "toml",
+   "lift": 1.023,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "sdk",
+   "lift": 1.022,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "import",
+   "lift": 1.019,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "display",
+   "lift": 1.018,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "playwright",
+   "lift": 1.018,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "observed",
+   "lift": 1.016,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "repair",
+   "lift": 1.015,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "fast",
+   "lift": 1.014,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "standalone",
+   "lift": 1.014,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "position",
+   "lift": 1.013,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "the",
+   "lift": 1.011,
+   "clusters": 10,
+   "agree": 0.9
+  },
+  {
+   "w": "templates",
+   "lift": 1.011,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "driven",
+   "lift": 1.01,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "builder",
+   "lift": 1.009,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "integration",
+   "lift": 1.007,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "agree",
+   "lift": 1.007,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "dark",
+   "lift": 1.002,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "passed",
+   "lift": 1.001,
+   "clusters": 9,
+   "agree": 0.78
+  },
+  {
+   "w": "etc",
+   "lift": 1,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "limits",
+   "lift": 1,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "frame",
+   "lift": 0.999,
+   "clusters": 5,
+   "agree": 0.8
+  },
+  {
+   "w": "updates",
+   "lift": 0.998,
+   "clusters": 10,
+   "agree": 0.7
+  },
+  {
+   "w": "stated",
+   "lift": 0.998,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "contracts",
+   "lift": 0.997,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "official",
+   "lift": 0.996,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "marks",
+   "lift": 0.996,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "parse",
+   "lift": 0.993,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "measured",
+   "lift": 0.991,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "asserting",
+   "lift": 0.99,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "covered",
+   "lift": 0.988,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "your",
+   "lift": 0.987,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "standard",
+   "lift": 0.986,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "figure",
+   "lift": 0.984,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "was",
+   "lift": 0.983,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "secret",
+   "lift": 0.982,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "forward",
+   "lift": 0.98,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "project",
+   "lift": 0.977,
+   "clusters": 8,
+   "agree": 0.63
+  },
+  {
+   "w": "recovery",
+   "lift": 0.975,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "testing",
+   "lift": 0.973,
+   "clusters": 9,
+   "agree": 0.67
+  },
+  {
+   "w": "send",
+   "lift": 0.973,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "continue",
+   "lift": 0.973,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "cleared",
+   "lift": 0.972,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "creates",
+   "lift": 0.972,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "retries",
+   "lift": 0.97,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "renderer",
+   "lift": 0.968,
+   "clusters": 4,
+   "agree": 0.75
+  },
+  {
+   "w": "anything",
+   "lift": 0.964,
+   "clusters": 7,
+   "agree": 0.71
+  },
+  {
+   "w": "rejection",
+   "lift": 0.964,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "examples",
+   "lift": 0.96,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "release",
+   "lift": 0.959,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "fix",
+   "lift": 0.958,
+   "clusters": 10,
+   "agree": 0.6
+  },
+  {
+   "w": "executable",
+   "lift": 0.95,
+   "clusters": 3,
+   "agree": 0.67
+  },
+  {
+   "w": "raises",
+   "lift": 0.948,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "merely",
+   "lift": 0.935,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "clock",
+   "lift": 0.926,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "queries",
+   "lift": 0.92,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "appear",
+   "lift": 0.907,
+   "clusters": 6,
+   "agree": 0.67
+  },
+  {
+   "w": "nodes",
+   "lift": 0.887,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "resource",
+   "lift": 0.881,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "inputs",
+   "lift": 0.862,
+   "clusters": 5,
+   "agree": 0.6
+  },
+  {
+   "w": "reuse",
+   "lift": 0.861,
+   "clusters": 5,
+   "agree": 0.6
   }
  ]
 }

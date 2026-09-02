@@ -31,7 +31,7 @@
       "note": "Each word counts once however often it appears, so a document that genuinely needs one pays for it once and only breadth accumulates. The total is divided by the square root of the length rather than by the length, because a count of distinct things saturates as a document grows: dividing by length made the score fall with length, -0.52 against log length over 80 human documents where the root gives -0.00. Wire copy and forum writing sit highest among the human documents, because the list carries ordinary reporting verbs. Weighting the words by how characteristic each is was tried four ways, including upstream's own per-word log-odds, and every one selected the same documents.",
       "from": "louisabraham/load-bearing",
       "source": "https://github.com/louisabraham/load-bearing",
-      "evidence": "At 1.2 distinct words per root word: 1 of 80 human documents, 17 of 18 AI documents.",
+      "evidence": "At 1.2 distinct words per root word: 1 of 80 human documents, 17 of 18 AI documents. Independently corroborated: every one of the 1,198 words carries a higher rate in pull request descriptions that identify themselves as machine-written than in those that do not, median 3.19 times, measured over 96,170 signed and 370,641 unsigned descriptions. The group upstream picks without ever reading a signature comes out 46 per cent signed, against under 5 per cent for most of the other nine.",
       "reference": {
         "unit": "distinct list words per square root of length",
         "human": "median 0.70, p75 0.86, p90 0.97, p95 1.11, max 1.41 over 80 documents. Research papers and reference material lowest, wire copy and forum writing highest.",

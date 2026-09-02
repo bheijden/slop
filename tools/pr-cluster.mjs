@@ -73,9 +73,16 @@ function centreFrom(members) {
   return logW;
 }
 
-// Two centres seeded from the labels, the rest from spread-out documents.
+// Two centres seeded from the labels, the rest from random slices of the
+// corpus. Seeding the rest from single documents made them so peaked that
+// nothing ever joined them: k=10 collapsed to k=2 with eight singletons.
+// Every centre has to be built from a comparable number of documents to start.
 const centres = [centreFrom(X.filter((x) => x.marked)), centreFrom(X.filter((x) => !x.marked))];
-for (let c = 2; c < K; c++) centres.push(centreFrom([X[Math.floor((c / K) * X.length)]]));
+let seed = 12345;
+const rnd = () => ((seed = (seed * 1103515245 + 12345) >>> 0) / 4294967296);
+const slices = Array.from({ length: K - 2 }, () => []);
+for (const x of X) slices[Math.floor(rnd() * (K - 2))].push(x);
+for (const sl of slices) centres.push(centreFrom(sl.length ? sl : X));
 
 let assign = new Int32Array(X.length).fill(-1);
 for (let iter = 0; iter < 25; iter++) {
@@ -105,26 +112,75 @@ const stats = groups.map((g, c) => ({
   c, size: g.length, marked: g.filter((x) => x.marked).length,
   share: g.length ? g.filter((x) => x.marked).length / g.length : 0,
 }));
+// A cluster of three documents can be 100% signed and mean nothing. Only
+// clusters holding a real share of the corpus are eligible to be the answer.
+const MIN_SHARE = 0.03;
 stats.sort((a, b) => b.share - a.share);
+const eligible = stats.filter((s) => s.size >= MIN_SHARE * X.length);
+if (!eligible.length) { console.error('no cluster is large enough to report'); process.exit(2); }
 console.log(`${X.length} descriptions, ${V} words in vocabulary, k=${K}`);
 console.log('cluster   size   signed   share');
 for (const s of stats) console.log(`  ${String(s.c).padStart(4)} ${String(s.size).padStart(7)} ${String(s.marked).padStart(8)}  ${(s.share * 100).toFixed(1)}%`);
 
-const lead = stats[0].c;
-const inside = groups[lead], outside = X.filter((x, i) => assign[i] !== lead);
-const cnt = (set) => { const m = new Map(); for (const x of set) for (const j of x.idx) m.set(j, (m.get(j) || 0) + 1); return m; };
-const A = cnt(inside), B = cnt(outside);
+// What each cluster is made of. If pull request boilerplate gathers in clusters
+// of its own, it is already in the denominator when the signed cluster is
+// scored against the rest, and no hand-kept ignore list is needed.
+const words4 = (members, others) => {
+  const cnt = (set) => { const m = new Map(); for (const x of set) for (const j of x.idx) m.set(j, (m.get(j) || 0) + 1); return m; };
+  const A = cnt(members), B = cnt(others);
+  const r = [];
+  for (const [j, n] of A) { const o = B.get(j) || 0; if (n < 8) continue;
+    r.push([vocab[j], (n / members.length) / ((o + 0.5) / Math.max(1, others.length))]); }
+  return r.sort((a, b) => b[1] - a[1]).slice(0, 12).map((x) => x[0]);
+};
+console.log('\nwhat each cluster is made of:');
+for (const st of stats) {
+  if (!st.size) continue;
+  const mine = groups[st.c], rest = X.filter((x, i) => assign[i] !== st.c);
+  console.log(`  ${String(st.c).padStart(2)}  ${(st.share * 100).toFixed(1).padStart(5)}% signed  n=${String(st.size).padStart(5)}  ${words4(mine, rest).join(' ')}`);
+}
+
+// Clusters are topic, not style: the most-signed one here writes about canvas
+// drawing, and the least-signed two are dependency bots. That is what makes
+// them useful as STRATA rather than as an answer.
+//
+// Score every word inside each cluster, signed against unsigned, then keep only
+// what holds across clusters. A word that is really about pull requests cannot
+// win: inside the cluster where it belongs, both groups use it, so its lift
+// there is about one. A word that is about how a sentence is built lifts
+// wherever it appears. This is what replaces a hand-kept ignore list.
+const MIN_IN = Number(arg('--min-in', 8));
+const per = new Map();          // word -> [lifts, one per cluster it appears in]
+for (const st of eligible) {
+  const mine = groups[st.c];
+  const sg = mine.filter((x) => x.marked), un = mine.filter((x) => !x.marked);
+  if (sg.length < 40 || un.length < 40) continue;
+  const cnt = (set) => { const m = new Map(); for (const x of set) for (const j of x.idx) m.set(j, (m.get(j) || 0) + 1); return m; };
+  const A = cnt(sg), B = cnt(un);
+  for (const [j, n] of A) {
+    if (n < MIN_IN) continue;
+    const o = B.get(j) || 0;
+    if (o < MIN_IN) continue;
+    const l = (n / sg.length) / ((o + 0.5) / un.length);
+    if (!per.has(j)) per.set(j, []);
+    per.get(j).push(l);
+  }
+}
 const rows = [];
-for (const [j, n] of A) {
-  const o = B.get(j) || 0;
-  if (o < 20) continue;
-  rows.push({ w: vocab[j], lift: (n / inside.length) / ((o + 0.5) / outside.length), inside: n, outside: o });
+for (const [j, lifts] of per) {
+  if (lifts.length < 3) continue;                       // must appear in three topics
+  const up = lifts.filter((l) => l > 1).length / lifts.length;
+  if (up < 0.6) continue;                               // and lift in most of them
+  // the pooled score is the geometric mean, so one loud cluster cannot carry it
+  const geo = Math.exp(lifts.reduce((a, l) => a + Math.log(l), 0) / lifts.length);
+  rows.push({ w: vocab[j], lift: +geo.toFixed(3), clusters: lifts.length, agree: +up.toFixed(2) });
 }
 rows.sort((a, b) => b.lift - a.lift);
-console.log(`\nmost-signed cluster is ${lead} at ${(stats[0].share * 100).toFixed(1)}% signed; its characteristic words:`);
+console.log(`\n${rows.length} words lift in at least three topics and in most of the ones they appear in:`);
 console.log('  ' + rows.slice(0, 40).map((r) => r.w).join(' '));
 writeFileSync(join(ROOT, 'data/cluster-words.json'), JSON.stringify({
   built: new Date().toISOString().slice(0, 10), days: DAYS, k: K,
-  descriptions: X.length, leadShare: +stats[0].share.toFixed(3),
-  words: rows.slice(0, 600) }, null, 1) + '\n');
+  descriptions: X.length, clusters: stats.filter((s) => s.size).map((s) => ({ c: s.c, size: s.size, signed: s.marked, share: +s.share.toFixed(3) })),
+  note: 'Scored within topic clusters and pooled, so vocabulary belonging to a topic cannot win.',
+  words: rows.slice(0, 2000) }, null, 1) + '\n');
 console.log('\nwrote data/cluster-words.json');
