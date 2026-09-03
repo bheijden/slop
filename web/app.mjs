@@ -73,11 +73,14 @@ function renderSay() {
   const rules = S.sets.reduce((a, x) => a + x.rules.length, 0);
   const built = (S.sets.find((x) => x.corpus?.built) || {}).corpus?.built;
   if (PAGE === 'check') {
-    $('say1').innerHTML = `Paste anything you have written. <b>${rules} rules</b> in `
-      + `<b>${sets}</b> ${term('ruleSet', 'rule sets')} read it in your browser.`;
-    $('say2').innerHTML = `Every ${term('finding', 'finding')} names the line and the fix. `
-      + 'Nothing you paste leaves the page.';
-    $('say3').innerHTML = 'Turn rules off on the left; the findings redraw as you read.';
+    // Open with the tells themselves. Anyone who has read a generated draft
+    // recognises these two on sight, and recognition is the whole argument.
+    $('say1').innerHTML = '<b>It is important to note that&hellip;</b> &middot; '
+      + '<b>No X, no Y, no Z.</b>';
+    $('say2').innerHTML = `You know the feeling. <b>${rules} patterns</b> in <b>${sets}</b> `
+      + `${term('ruleSet', 'rule sets')} catch it.`;
+    $('say3').innerHTML = `Each ${term('finding', 'finding')} names the line and the fix. `
+      + 'Paste a draft and watch it light up.';
   } else {
     const n = S.fudge && S.fudge.length ? S.fudge.length : 0;
     const ex = S.fudge ? S.fudge.reduce((a, r) => a + r.conform.ok + r.conform.fail, 0) : 0;
@@ -86,7 +89,8 @@ function renderSay() {
       + (ex ? `, <b>${ex}</b> ${ex === 1 ? 'example' : 'examples'}` : '') + '.';
     $('say2').innerHTML = `Each runs as written, then again through <b>22</b> `
       + `${term('variants', 'markup variants')}.`;
-    $('say3').innerHTML = `Open any of the <b>${sets}</b> sets on the left to read the format.`;
+    $('say3').innerHTML = `Open any of the <b>${sets}</b> on the left. Every one is a single `
+      + 'JSON file you can fork.';
   }
   $('stamp').innerHTML = built
     ? `${term('derived', 'two are derived')} &middot; rebuilt <b>${esc(built)}</b>`

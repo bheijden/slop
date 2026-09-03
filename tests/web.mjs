@@ -602,6 +602,32 @@ async function main() {
       sizes.every((x) => x.ctaWhole),
       sizes.filter((x) => !x.ctaWhole).map((x) => `${x.where}@${x.h}`).join(' '));
 
+    // A definition that cannot be seen is not a definition. This broke on two
+    // pages at once because the tooltip element took a class name those pages
+    // had already given a tooltip of their own, which hides itself at
+    // opacity 0 until a class is added that this one never adds.
+    for (const [where, url] of [['check', base], ['rules', base + 'rules.html'],
+                                ['vocabulary', base + 'vocabulary.html']]) {
+      await send('Page.navigate', { url });
+      await sleep(2200);
+      const seen = await evaluate(`(async () => {
+        const t = document.querySelector('.say .term');
+        if (!t) return JSON.stringify({err: 'no defined term in the panel'});
+        t.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
+        await new Promise(r => setTimeout(r, 250));
+        const tip = document.getElementById('deftip'), c = getComputedStyle(tip);
+        return JSON.stringify({ term: t.textContent, opacity: c.opacity, display: c.display,
+          width: Math.round(tip.getBoundingClientRect().width),
+          text: tip.textContent.length,
+          // Only one element may answer to this id, or the wrong one gets styled.
+          copies: document.querySelectorAll('#deftip').length });
+      })()`);
+      const V = JSON.parse(seen);
+      check(`a defined term can actually be read on ${where}`,
+        V.opacity === '1' && V.display !== 'none' && V.width > 60 && V.text > 40 && V.copies === 1,
+        JSON.stringify(V));
+    }
+
     // The lower-left panel belongs to the page it is on. On check it asks which
     // sets to run; on test rules that question is meaningless -- the page tests
     // what is in the editor -- so it offers a set to open instead.
@@ -674,7 +700,7 @@ async function main() {
       const sig = all.find(e => e.textContent.trim() === 'signed');
       sig.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
       await new Promise(r => setTimeout(r, 200));
-      const tip = document.getElementById('tip');
+      const tip = document.getElementById('deftip');
       return JSON.stringify({
         marked: all.length,
         undefined_: all.filter(e => !e.dataset.tip || e.dataset.tip.length < 40).length,
@@ -683,7 +709,10 @@ async function main() {
         // definition was not cut there.
         whole: /Generated with Claude Code/.test(sig.dataset.tip)
                && /recognising the line itself/.test(sig.dataset.tip),
-        hovered: !tip.hidden && tip.textContent === sig.dataset.tip,
+        hovered: (() => { const c = getComputedStyle(tip);
+          return !tip.hidden && tip.textContent === sig.dataset.tip
+                 && c.opacity === '1' && c.visibility !== 'hidden' && c.display !== 'none'
+                 && tip.getBoundingClientRect().width > 60; })(),
         signedFigures: [...new Set([...document.body.innerText.matchAll(/([\\d.]+)% signed/g)].map(m => m[1]))]
       });
     })()`);

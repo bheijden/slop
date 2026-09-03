@@ -11,7 +11,7 @@
  * Opt in with data-tip. Shared by all three pages.
  */
 const tip = document.createElement('div');
-tip.className = 'tip';
+tip.className = 'deftip';
 tip.setAttribute('role', 'tooltip');
 tip.hidden = true;
 document.body.append(tip);
@@ -38,14 +38,14 @@ function show(el) {
   tip.style.left = '0px';
   tip.style.top = '0px';
   place(el);
-  el.setAttribute('aria-describedby', 'tip');
+  el.setAttribute('aria-describedby', 'deftip');
 }
 function hide() {
   if (anchor) anchor.removeAttribute('aria-describedby');
   anchor = null;
   tip.hidden = true;
 }
-tip.id = 'tip';
+tip.id = 'deftip';
 
 const of = (e) => e.target.closest?.('[data-tip]');
 
