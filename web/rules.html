@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>slop</title>
-<meta name="description" content="Lint prose for stock language-model phrasing. Nothing leaves your browser.">
+<meta name="description" content="Write a rule set and watch it pass or fail its own examples.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='25' font-size='26' font-family='Georgia,serif' fill='%23C2403C'%3E%C2%B6%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -268,7 +268,7 @@ body.resizing{cursor:col-resize;user-select:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
-<body data-page="check">
+<body data-page="rules">
 
 <div class="dash">
 
@@ -283,8 +283,8 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="cell pad mast">
     <h1>slop<em>.</em></h1>
     <nav class="modes">
-      <a href="./" aria-current="page">check</a>
-      <a href="rules.html">test rules</a>
+      <a href="./">check</a>
+      <a href="rules.html" aria-current="page">test rules</a>
       <a href="vocabulary.html">vocabulary</a>
     </nav>
   </div>
@@ -292,36 +292,21 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="cell tally" id="tally"></div>
 
   <div class="cell pad say">
-    <p>A linter for prose. It flags stock language-model phrasing &mdash;
-      <b>it is important to note that</b>, <b>no X, no Y, no Z</b> &mdash; at the line it came
-      from, with a fix. Nothing leaves your browser.</p>
-    <p class="dim" id="loaded" hidden></p>
-    <aside class="tree" id="tree" hidden></aside>
-    <div class="more" id="doc-tools">
-      <button id="b-example">Load an example</button>
-      <button id="b-file">Choose a file</button>
-      <a href="https://github.com/bheijden/slop">Source and rule format</a>
+    <p>Write a rule set and watch it hold or fail. Every example you wrote is run
+      as written, then again through twenty-two ways of marking the same text up, so a
+      pattern that only works on clean input says so.</p>
+    <div class="more" id="rule-tools">
+      <button id="b-rreset">Reset to template</button>
+      <button id="b-rfile">Choose a file</button>
+      <span class="dim" id="rmeta"></span>
     </div>
   </div>
 
-  <div class="cell big" id="pane-doc" data-edit="on">
-    <header>
-      <div class="seg" id="views">
-        <button id="v-source" aria-pressed="true">your text</button>
-        <button id="v-prose" aria-pressed="false">what it reads</button>
-      </div>
-      <span class="spacer"></span>
-      <select id="kind" class="chip" aria-label="How to parse the input">
-        <option value="md">markdown</option>
-        <option value="html">html</option>
-        <option value="txt">plain text</option>
-      </select>
-    </header>
-    <div class="surface">
-      <textarea id="input" spellcheck="false"
-        placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
-      <div id="doc" class="source"></div>
-    </div>
+  <div class="cell big" id="pane-doc">
+    <header><span class="title">rule set</span><span class="spacer"></span><span class="dim" id="score"></span></header>
+    <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
+      placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
+    <p class="rerr" id="rerr" hidden></p>
   </div>
 
   <div class="cell quiet" id="pane-rules">
@@ -330,18 +315,8 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
 
   <div class="cell" id="pane-list">
-    <header>
-      <span class="title" id="list-head">findings</span>
-      <span class="spacer"></span>
-      <span class="nav" id="nav" hidden>
-        <button class="chip" id="n-prev" title="Previous finding (k or up)" aria-label="Previous finding">&uarr;</button>
-        <span class="dim" id="n-count">&middot;</span>
-        <button class="chip" id="n-next" title="Next finding (j or down)" aria-label="Next finding">&darr;</button>
-      </span>
-      <button class="chip" id="b-copy" hidden title="Copy the findings as JSON">copy JSON</button>
-    </header>
+    <header><span class="title" id="list-head">results</span><span class="spacer"></span></header>
     <ol class="list" id="list"></ol>
-    <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
   </div>
 
 </div>

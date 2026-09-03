@@ -286,16 +286,21 @@ async function main() {
     const mn = JSON.parse(many);
     check('dropping several files builds a tree', mn.files === 2 && mn.tree, JSON.stringify(mn));
 
-    // The page prefills its own rule set, one rule of which fails on purpose,
-    // so the mode demonstrates what a failure looks like without being loaded.
-    const fudge = await evaluate(`(async()=>{document.getElementById('m-fudge').click();
-      await new Promise(r=>setTimeout(r,4000));
-      return JSON.stringify({rows: document.querySelectorAll('#list li[data-rule]').length,
-        score: document.getElementById('score').textContent,
-        prefilled: document.getElementById('rules-src').value.length,
-        why: document.querySelectorAll('#list .why').length})})()`);
+    // Testing rules is its own page now, not a mode of this one. It prefills a
+    // rule set with one rule that fails on purpose, so it shows what a failure
+    // looks like without anything being loaded.
+    await send('Page.navigate', { url: base + 'rules.html' });
+    await sleep(4500);
+    const fudge = await evaluate(`JSON.stringify({
+      rows: document.querySelectorAll('#list li[data-rule]').length,
+      score: document.getElementById('score').textContent,
+      prefilled: document.getElementById('rules-src').value.length,
+      why: document.querySelectorAll('#list .why').length,
+      page: document.body.dataset.page,
+      noInput: !document.getElementById('input')})`);
     const fg = JSON.parse(fudge);
-    check('test-rules mode tests the template', fg.rows >= 2 && fg.prefilled > 200, JSON.stringify(fg));
+    check('the rules page is its own page and tests the template',
+      fg.rows >= 2 && fg.prefilled > 200 && fg.page === 'rules' && fg.noInput, JSON.stringify(fg));
     check('the template shows a real failure', /1 failing/.test(fg.score) && fg.why >= 1, JSON.stringify(fg));
 
     // A failure says what that kind of failure generally means, the way a
@@ -474,6 +479,27 @@ async function main() {
     check('the rules are a panel of their own, overlapping nothing',
       RP.visible && RP.sets >= 5 && !RP.overlapsText && RP.popoverGone, JSON.stringify(RP));
 
+
+    // The theme is a property of the reader, not of the page. It was stored
+    // correctly and never applied on load, so a choice made anywhere vanished
+    // the moment you moved: the value was in localStorage the whole time.
+    await send('Page.navigate', { url: base + 'vocabulary.html' });
+    await sleep(2500);
+    const themed = await evaluate(`(async () => {
+      document.getElementById('theme').click();
+      await new Promise(r => setTimeout(r, 300));
+      return document.documentElement.dataset.theme || 'auto';
+    })()`);
+    const picked = themed.replace(/^"|"$/g, '');
+    for (const [where, url] of [['check', base], ['rules', base + 'rules.html']]) {
+      await send('Page.navigate', { url });
+      await sleep(2500);
+      const got = (await evaluate(`document.documentElement.dataset.theme || 'auto'`))
+        .replace(/^"|"$/g, '');
+      check(`the theme chosen on one page holds on ${where}`, got === picked,
+        `picked ${picked}, ${where} showed ${got}`);
+    }
+
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data
     // shape alone, and once on a stale cached data file paired with a fresh page.
@@ -495,9 +521,21 @@ async function main() {
       !/Could not load/.test(v.say) && v.words > 0 && v.counts === 3,
       JSON.stringify(v).slice(0, 170));
     check('the arrival chart draws a band per cluster',
-      v.bands >= 5 && /of pull requests/.test(v.cap), `${v.bands} bands, "${v.cap}"`);
+      v.bands >= 5 && /share of all pull requests/.test(v.cap), `${v.bands} bands, "${v.cap}"`);
     check('a word opens with its rates and its trajectory',
       !!v.word && v.facts >= 3 && v.rateLines >= 2, JSON.stringify(v).slice(0, 140));
+
+    // Every term the page invents has to define itself where it is used. The
+    // page quoted three different percentages, two of them called "signed",
+    // and explained none of them.
+    const terms = await evaluate(`JSON.stringify({
+      marked: document.querySelectorAll('.term').length,
+      undefined_: [...document.querySelectorAll('.term')].filter(e => !e.title || e.title.length < 40).length,
+      signedFigures: [...new Set([...document.body.innerText.matchAll(/([\\d.]+)% signed/g)].map(m => m[1]))]
+    })`);
+    const TM = JSON.parse(terms);
+    check('the words the page invents define themselves',
+      TM.marked >= 4 && TM.undefined_ === 0, JSON.stringify(TM));
 
     // Paging is the whole point of the browse view: every cluster has to carry a
     // list of its own, not just the one that gets published.

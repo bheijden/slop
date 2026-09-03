@@ -155,3 +155,8 @@ select.chip{padding:2px 4px}
 .themer .s{display:none}
 :root:not([data-theme]) .themer .a{display:block}
 :root:not([data-theme]) .themer .s,:root:not([data-theme]) .themer .m{display:none}
+
+/* A term the page defines. Dotted underline, definition on hover or focus, so
+   a word like "signed" can be used in a sentence without a glossary. */
+.term{border-bottom:1px dotted currentColor;cursor:help}
+.term:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
