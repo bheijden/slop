@@ -5,12 +5,12 @@
 // 2026 and will be wrong by spring. Everything else is a stated constant: you
 // can read the number, argue with it, and change it in one place.
 
-export const TOKENS_MIN = 25;        // shorter than this is a stub, not writing
+export const TOKENS_MIN = Number(process.env.SLOP_TOKENS_MIN ?? 25);  // shorter than this is a stub, not writing
 // Share of tokens that must be English function words. Over a day of
 // descriptions the median is 0.23, and everything under about 0.06 is a file
 // listing rather than writing. 0.12 is the figure the linter's own prose gate
 // already uses to decide something is prose at all.
-export const ENGLISH_MIN = 0.12;
+export const ENGLISH_MIN = Number(process.env.SLOP_ENGLISH_MIN ?? 0.12);
 
 // Agents sign in two shapes, and both are recognised by form rather than by
 // product name, so one nobody has heard of yet is still caught.

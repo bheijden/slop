@@ -78,21 +78,27 @@ button,select,textarea,input{font:inherit;color:inherit}
 .hero .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
 .hero .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
 
-/* input — one card: the text, what to do with it, and which rules run. */
-.io{margin:22px 0 0}
-.iocard{
-  position:relative;border:1px solid var(--hair);border-radius:10px;background:var(--card);
-  box-shadow:var(--lift);transition:border-color .12s,background .12s;
+/* The text you paste and the findings on it are the same surface, in two
+   layers. The textarea is underneath with a visible caret and transparent
+   text; the highlighted copy is on top and ignores the pointer except on the
+   marks themselves. A click lands where you aimed it, and a hover over a
+   finding still opens the finding. */
+body.dragging #pane-doc{border-color:var(--blue);background:var(--sunk)}
+.surface{position:relative;flex:1 1 auto;min-height:0}
+.surface > #input,.surface > #doc{
+  position:absolute;inset:0;margin:0;width:100%;height:100%;overflow:auto;
+  padding:2px 2px 22px;border:0;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+  white-space:pre-wrap;overflow-wrap:break-word;scrollbar-width:thin;
 }
-.iocard:focus-within{border-style:solid;border-color:var(--blue)}
-body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
-#input{
-  display:block;width:100%;min-height:132px;max-height:52vh;overflow:auto;resize:vertical;
-  border:0;background:none;padding:14px 16px 10px;color:inherit;
-  font-family:var(--mono);font-size:12.5px;line-height:1.7;
-}
-#input:focus{outline:none}
-#input::placeholder{color:var(--muted)}
+.surface > #input{background:none;color:transparent;caret-color:var(--ink);resize:none;z-index:1}
+.surface > #input:focus{outline:none}
+.surface > #input::placeholder{color:var(--muted)}
+.surface > #doc{z-index:2;pointer-events:none;background:none}
+.surface > #doc mark{pointer-events:auto}
+/* Reading mode: the stripped prose, no caret, the whole thing clickable. */
+#pane-doc[data-edit=off] .surface > #input{display:none}
+#pane-doc[data-edit=off] .surface{position:static}
+#pane-doc[data-edit=off] .surface > #doc{position:static;height:auto;pointer-events:auto;overflow:visible}
 .loaded{padding:16px;color:var(--muted);font-size:12.5px}
 .loaded b{color:var(--ink);font-weight:500}
 .tools{
@@ -169,6 +175,12 @@ body.dragging #input-card{border-color:var(--blue);background:var(--sunk)}
 #pane-list{grid-column:3}
 .pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative;
       background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:11px 14px}
+/* The text pane is a column: its header, then a surface taking what is left.
+   The pane itself must not scroll while editing — the surface inside does. */
+#pane-doc{display:flex;flex-direction:column;overflow:hidden}
+#pane-doc[data-edit=off]{overflow:auto}
+.dtools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-left:auto}
+.dtools .n{color:var(--muted);font-size:11.5px}
 .phead{position:sticky;top:0;z-index:2;background:var(--card);padding:0 0 7px;
        display:flex;align-items:center;gap:8px;min-height:26px}
 #pane-list .phead{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-left:2px}
@@ -295,10 +307,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .tip .set{color:var(--muted);font-size:11px;margin-left:auto}
 .tip-name{font-family:var(--serif);font-size:15px;line-height:1.3;margin:3px 0 5px;color:var(--ink)}
 .tip-why{color:var(--muted);line-height:1.5}
-.tip-off{color:var(--ink);line-height:1.5;margin:4px 0 6px;padding-left:8px;border-left:2px solid var(--hair)}
 .offtag{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
   border:1px solid var(--hair);border-radius:3px;padding:0 3px;margin-left:5px}
-.setnote{color:var(--muted);font-size:11px;line-height:1.5;margin:2px 0 4px;padding:0 6px 4px}
 .tip-fix{color:var(--ink);margin-top:6px;padding-top:6px;border-top:1px solid var(--hair)}
 
 /* fudge */
@@ -437,29 +447,7 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
     <p class="sub">Flags stock LLM phrasing: <code>it is important to note that</code>, <code>no X, no Y, no Z</code>, at the line it came from, with the fix. Nothing leaves your browser.</p>
   </div>
 
-  <div class="io" id="io">
-    <div class="card iocard" id="input-card">
-      <textarea id="input" spellcheck="false" placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
-      <div class="loaded" id="loaded" hidden></div>
-      <div class="tools">
-        <button class="chip" id="b-example">Load an example</button>
-        <button class="chip" id="b-file">Choose a file</button>
-        <select id="kind" aria-label="How to parse the input">
-          <option value="md">markdown</option>
-          <option value="html">html</option>
-          <option value="txt">plain text</option>
-        </select>
-        <span class="n" id="meta"></span>
-        <span class="rulewrap">
-          <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
-          <div class="pop" id="rules-pop" hidden>
-            <div class="pop-head">Rules <span id="rule-hint"></span></div>
-            <div class="rulebox" id="rules"></div>
-          </div>
-        </span>
-      </div>
-    </div>
-  </div>
+
 
   <div class="results" id="results" hidden>
     <div class="rhead">
@@ -484,11 +472,28 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
       </div>
     </div>
     <div class="panes" id="panes" data-layout="split">
-      <div class="pane" id="pane-doc">
+      <div class="pane" id="pane-doc" data-edit="on">
         <div class="phead">
           <div class="seg" id="views">
-            <button id="v-prose" aria-pressed="true">prose</button>
-            <button id="v-source" aria-pressed="false">source</button>
+            <button id="v-source" aria-pressed="true">your text</button>
+            <button id="v-prose" aria-pressed="false">what it reads</button>
+          </div>
+          <div class="dtools" id="doc-tools">
+            <button class="chip" id="b-example">Example</button>
+            <button class="chip" id="b-file">File</button>
+            <select id="kind" aria-label="How to parse the input">
+              <option value="md">markdown</option>
+              <option value="html">html</option>
+              <option value="txt">plain text</option>
+            </select>
+            <span class="n" id="meta"></span>
+            <span class="rulewrap">
+              <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
+              <div class="pop" id="rules-pop" hidden>
+                <div class="pop-head">Rules <span id="rule-hint"></span></div>
+                <div class="rulebox" id="rules"></div>
+              </div>
+            </span>
           </div>
           <div class="rtools" id="rule-tools" hidden>
             <button class="chip" id="b-rreset">Reset to template</button>
@@ -496,7 +501,12 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
             <span class="n" id="rmeta"></span>
           </div>
         </div>
-        <div id="doc" class="prose"></div>
+        <div class="loaded" id="loaded" hidden></div>
+        <div class="surface">
+          <textarea id="input" spellcheck="false"
+            placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
+          <div id="doc" class="source"></div>
+        </div>
         <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
           placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
         <p class="rerr" id="rerr" hidden></p>
@@ -640,7 +650,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:0, skipped:0,
             kind:'md', name:'input',
-            view:'prose', mode:'check', sel:-1, fudge:null,
+            view:'source', mode:'check', sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
             setOpen:{}, byId:{},
@@ -884,6 +894,10 @@ function renderResults() {
   const byDoc = results.map(() => []);
   S.flat.forEach((f, gi) => byDoc[f.doc].push([f, gi]));
 
+  // The surface is editable only when it shows what you typed, and only when
+  // there is one document to type into. Several files, or the stripped prose,
+  // and it becomes something to read rather than something to edit.
+  $('pane-doc').dataset.edit = useSrc && !multi ? 'on' : 'off';
   $('doc').className = useSrc ? 'source' : 'prose';
   $('doc').innerHTML = results.map((r, di) => {
     const body = useSrc ? ((srcs[di] || {}).src || '') : r.text;
@@ -1012,7 +1026,6 @@ function showTip(el, info) {
     // echoing sentences for an echo, questions in a row for a run.
     + (info.rate ? rateBlock(info)
        : info.measure ? `<div class="tip-count">${esc(info.measure)}</div>` : '')
-    + (info.off ? `<div class="tip-off"><b>Off by default.</b> ${esc(info.off)}</div>` : '')
     + (info.why ? `<div class="tip-why">${esc(info.why)}</div>` : '')
     + (info.suggest ? `<div class="tip-fix">${esc(info.suggest)}</div>` : '');
   t.classList.add('on');
@@ -1135,9 +1148,6 @@ function renderRules() {
       <div class="rlist">${set.rules.map((r) => `<label data-rule-row="${esc(r.id)}">
         <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id) ? ' checked' : ''}>
         <span class="id">${esc(r.id)}</span>${r.default === 'off' ? '<span class="offtag">off</span>' : ''}<span class="n">${counts[r.id] || ''}</span></label>`).join('')}</div>
-      ${set.rules.some((r) => r.default === 'off')
-        ? `<p class="setnote">${set.rules.filter((r) => r.default === 'off').length} rules ship off.
-           Hover one to see why, or use the box above to run the whole set.</p>` : ''}
     </details>`;
   }).join('') + `<div class="load">
       <input type="url" data-url placeholder="https://…/house-style.json">
@@ -1250,11 +1260,10 @@ function pickFile(accept, cb) {
   i.click();
 }
 
-function grow() {
-  const t = $('input');
-  t.style.height = 'auto';
-  t.style.height = Math.max(132, Math.min(t.scrollHeight + 4, innerHeight * 0.52)) + 'px';
-}
+// The textarea used to size itself to its content. It now fills the surface it
+// shares with the highlighted copy, so there is nothing left to grow. The call
+// sites are left alone because they read as "the text changed".
+function grow() {}
 
 /* run */
 let timer = null;
@@ -1264,12 +1273,13 @@ function run() {
     renderRules();
     // The card stays for a loaded set — the text area gives way to a summary,
     // so the rules control and the file picker never go out of reach.
-    $('io').hidden = S.mode === 'fudge';
+    $('doc-tools').hidden = S.mode === 'fudge';
     document.body.dataset.mode = S.mode;
     $('rule-tools').hidden = S.mode !== 'fudge';
     if (S.mode === 'fudge') $('results').hidden = false;
     const many = S.docs.length > 1;
-    $('input').hidden = $('kind').hidden = many;
+    // Several files have nothing single to type into; data-edit does the hiding.
+    $('kind').hidden = many;
     $('loaded').hidden = !many;
     if (many) {
       $('loaded').innerHTML = `<b>${S.docs.length} files</b> loaded`
@@ -1365,7 +1375,13 @@ for (const pre of document.querySelectorAll('.docs pre, .guide pre')) {
 }
 
 /* wiring */
-$('input').addEventListener('input', () => { $('copy-fallback').hidden = true; grow(); run(); });
+$('input').addEventListener('input', () => { $('copy-fallback').hidden = true; run(); });
+// The highlighted copy sits over the textarea, so the two must scroll together
+// or the marks drift off the words they belong to.
+$('input').addEventListener('scroll', () => {
+  $('doc').scrollTop = $('input').scrollTop;
+  $('doc').scrollLeft = $('input').scrollLeft;
+});
 $('kind').addEventListener('change', () => { S.kind = $('kind').value; run(); });
 $('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
 $('v-source').onclick = () => { S.view = 'source'; renderResults(); };

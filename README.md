@@ -69,24 +69,28 @@ slop check --format json docs/ -r        # for agents and scripts
 
 ## Rules
 
-Three sets ship on:
+Five sets ship on:
 
 | set | rules | |
 |---|---|---|
+| `ai-vocabulary` | 1 | A list of ordinary words derived from public GitHub pull requests and rebuilt weekly. See [vocabulary.md](docs/vocabulary.md) |
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
 | `load-bearing` | 1 | How far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), rebuilt from upstream daily |
 | `ai-tells` | 78 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
-One more set is derived rather than written. `ai-vocabulary` samples public pull
-request descriptions every morning, clusters them into topics, and compares the
-ones that sign themselves machine-written against the ones that do not *inside
-each topic*, so that a word belonging to a subject cannot pass for a word
-belonging to a style. It is off and in `candidates/` until it beats
-`load-bearing` on the corpus; [the page](https://bheijden.github.io/slop/web/vocabulary.html)
-shows what it currently finds and what it throws away.
+`ai-vocabulary` is derived rather than written. It samples public pull request
+descriptions every morning, sorts them into five piles by the words they use,
+and publishes the vocabulary of the pile that AI tools sign. [The page](https://bheijden.github.io/slop/web/vocabulary.html)
+shows all five piles and every word's history; [vocabulary.md](docs/vocabulary.md)
+explains how it is built.
 
-Every rule in those four runs. A rule that never fires on your register costs
+It overlaps `load-bearing` by about a third of its words and, on the 24-pair
+corpus, catches nothing that rule misses. Both ship on because the lists are
+derived differently and may separate on text unlike that corpus; run with
+`--select` to see either alone.
+
+Every rule in those five runs. A rule that never fires on your register costs
 nothing to leave on, so nothing is held back for being narrow. The five patterns
 the audit measured firing on human prose and not on AI prose do fire, so they sit
 in `candidates/measured-backwards.json` instead, off. The five `style-` sets are off

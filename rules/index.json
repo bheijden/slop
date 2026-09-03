@@ -1,5 +1,6 @@
 {
   "sets": [
+    "ai-vocabulary.json",
     "ai-tells.json",
     "load-bearing.json",
     "simonwillison.json",

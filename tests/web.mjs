@@ -142,16 +142,26 @@ async function main() {
     check('every set has a set-level toggle', D.total >= 8, String(D.total));
     // All three shipped sets run whole; candidates are loaded but unchecked.
     check('shipped sets run, candidate sets do not',
-      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'load-bearing', 'simonwillison', 'wikipedia-ai']),
+      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'ai-vocabulary', 'load-bearing',
+                                                'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
-    // The derived set is the one a reader is most likely to want to try against
-    // their own text after reading the vocabulary page, so it has to be present
-    // and tickable even though it does not ship on.
+    // Two vocabulary rules ship on and they overlap by about a third of their
+    // words, so a reader has to be able to see and separate them.
     const offered = await evaluate(`JSON.stringify([...document.querySelectorAll('#rules input[data-toggle]')]
       .map(b => b.dataset.toggle).sort())`);
     const all = JSON.parse(offered.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
-    check('the derived vocabulary can be switched on from the page',
+    check('both vocabulary sets are listed separately',
       all.includes('ai-vocabulary') && all.includes('load-bearing'), all.join(','));
+
+    // The panel says what is on. It must not argue about why.
+    const noArgument = await evaluate(`JSON.stringify({
+      notes: document.querySelectorAll('.setnote').length,
+      tips: document.querySelectorAll('.tip-off').length,
+      offTags: document.querySelectorAll('.offtag').length
+    })`);
+    const NA = JSON.parse(noArgument);
+    check('the rules panel states defaults without justifying them',
+      NA.notes === 0 && NA.tips === 0 && NA.offTags > 0, JSON.stringify(NA));
 
     // Partly on is a third state. Turning one rule off has to leave the set
     // running and show it as neither fully on nor off.
@@ -387,6 +397,37 @@ async function main() {
         rows: document.querySelectorAll('#list li[data-rule]').length})})()`);
     const ow = JSON.parse(own);
     check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
+
+    // The text you paste and the findings on it are one surface now, not two.
+    // The overlay technique is easy to get subtly wrong: the caret has to land
+    // where you click, the marks have to sit on the words they belong to, and
+    // the two layers have to scroll together.
+    // A fresh load: earlier checks leave the page in test-rules mode, where this
+    // surface holds a rule set rather than prose.
+    await send('Page.navigate', { url: base });
+    await sleep(2500);
+    const surface = await evaluate(`(async () => {
+      const t = document.getElementById('input');
+      t.value = 'It is important to note that the results are not just good, but transformative.';
+      t.dispatchEvent(new Event('input'));
+      await new Promise(r => setTimeout(r, 1800));
+      const doc = document.getElementById('doc');
+      const cs = getComputedStyle(doc);
+      return JSON.stringify({
+        edit: document.getElementById('pane-doc').dataset.edit,
+        marks: doc.querySelectorAll('mark').length,
+        onTheText: doc.textContent.startsWith('It is important'),
+        docIgnoresPointer: cs.pointerEvents === 'none',
+        markTakesPointer: !!doc.querySelector('mark')
+          && getComputedStyle(doc.querySelector('mark')).pointerEvents === 'auto',
+        oneCopy: document.querySelectorAll('#input').length === 1
+      });
+    })()`);
+    const SF = JSON.parse(surface);
+    check('the text you paste is the surface the findings are drawn on',
+      SF.edit === 'on' && SF.marks > 0 && SF.onTheText && SF.oneCopy, JSON.stringify(SF));
+    check('the caret reaches the text and the marks stay clickable',
+      SF.docIgnoresPointer && SF.markTakesPointer, JSON.stringify(SF));
 
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data

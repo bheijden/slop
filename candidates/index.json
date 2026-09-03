@@ -1,7 +1,6 @@
 {
   "$comment": "Everything here is opt-in. The web page loads these unchecked; the CLI needs --rules and --select.",
   "sets": [
-    "ai-vocabulary.json",
     "style-academic.json",
     "style-conversational.json",
     "style-economist.json",

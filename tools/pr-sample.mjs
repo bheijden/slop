@@ -43,7 +43,7 @@ import { join, dirname } from 'node:path';
 import { prepare, markerRegex, toolWordFilter, searchPRs, windowsForDay } from './lib/pr-corpus.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DIR = join(ROOT, 'data/docs');
+const DIR = process.env.SLOP_DOCS_DIR || join(ROOT, 'data/docs');
 const TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i < 0 ? d : process.argv[i + 1]; };
 const FORCE = process.argv.includes('--force');
