@@ -347,15 +347,25 @@ function verdictOf(rule) {
   if (!bounds.length) {
     throw new Error(`rule "${rule.id}": "notable" needs one of >, >=, < or <=`);
   }
-  const per = n.per || null;
-  // `power` is the exponent under `per: "root"`, and 0.5 is only the default.
-  // The right value is whatever makes one threshold mean the same thing on a
-  // short document and a long one, and that is a property of the pattern, not
-  // a constant: see research/length.md.
-  const power = n.power ?? 0.5;
-  if (per === 'root' && !(power > 0 && power <= 1)) {
+  // Two ways to normalise a count by length, and a rule picks one.
+  //   per: 1000    a rate -- count / words, scaled to that many words
+  //   power: 0.5   count / words^0.5, for a count that saturates as a document
+  //                lengthens and so does not hold a rate
+  // "root" used to be a third name for power 0.5, which was the same thing said
+  // twice. It is refused rather than quietly accepted, because a rule carrying
+  // it was written against different arithmetic.
+  if (n.per === 'root') {
+    throw new Error(`rule "${rule.id}": per: "root" is now power: 0.5 — a root is a power, `
+      + 'and the exponent is the parameter. See docs/rules.md.');
+  }
+  const power = n.power ?? null;
+  if (power !== null && !(power > 0 && power <= 1)) {
     throw new Error(`rule "${rule.id}": "power" must be above 0 and at most 1`);
   }
+  if (power !== null && n.per) {
+    throw new Error(`rule "${rule.id}": "per" and "power" are two normalisations; pick one`);
+  }
+  const per = n.per || (power !== null ? 'power' : null);
   const needs = n.needs || {};
   const minWords = needs.words ?? (per ? 250 : 0);
   const minSentences = needs.sentences ?? (per ? 5 : 0);
@@ -376,7 +386,7 @@ function verdictOf(rule) {
     // Measured over 80 human documents a distinct-word rate correlated -0.52
     // with log length; over the root it correlates -0.00.
     const value = metric !== undefined && metric !== null ? metric
-                : per === 'root' ? (words ? count / Math.pow(words, power) : 0)
+                : per === 'power' ? (words ? count / Math.pow(words, power) : 0)
                 : per ? (words ? (count / words) * per : 0)
                 : count;
     if (metric === null) return { fires: false };
@@ -410,7 +420,8 @@ function verdictOf(rule) {
               kind: metric !== undefined ? 'variation' : 'rate' },
       measure: metric !== undefined
         ? `${detail || ''}, variation ${shown} ${where}`.replace(/^, /, '')
-        : per === 'root' ? `${count} in ${words} ${unit}, ${shown} per ${power === 0.5 ? 'root' : `${unit.replace(/s$/, '')}^${power}`} ${power === 0.5 ? unit.replace(/s$/, '') : ''} ${where}`.replace(/\s+/g, ' ')
+        : per === 'power' ? `${count} in ${words} ${unit}, ${shown} per `
+          + `${power === 0.5 ? `root ${unit.replace(/s$/, '')}` : `${unit.replace(/s$/, '')}^${power}`} ${where}`
         : per ? `${count} in ${words} ${unit}, ${shown} per ${per} ${where}`
               : `${count}`,
     };

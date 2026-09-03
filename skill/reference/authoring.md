@@ -130,15 +130,18 @@ The comparison is the key. Write the operator you mean:
 Two bounds make a band, and the report names the bound it passed, so a
 reader can see which edge the document went outside.
 
-`per` is normally a number, giving a rate per that many words. It can also be
-the string `"root"`, which divides by a power of the length instead. A count of
-distinct things saturates as a document grows, so a plain rate falls with
-length; dividing by a power of the length flattens that out.
+Two ways to normalise a count by length, and a rule picks one.
 
-`power` sets the exponent and defaults to 0.5, the square root. It is a
-property of the pattern, not a constant. Choose it so one threshold means the
-same thing on a short document and a long one: calibrate on full-length
-documents, then check the false-alarm rate holds as they are truncated.
+`per` is a number, giving a rate per that many words: `count / words × per`.
+
+`power` divides by the length raised to that power: `count / words^power`. Use
+it when the count saturates as a document grows — a count of *distinct* things
+runs out of new ones to find, so a plain rate falls with length. `power: 0.5`
+is the square root, the usual choice. The exponent is a property of the
+pattern, not a constant: choose it so one threshold means the same thing on a
+short document and a long one.
+
+`per: "root"` was an older spelling of `power: 0.5` and is now refused.
 
 `needs` will not score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to

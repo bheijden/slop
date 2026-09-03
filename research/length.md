@@ -51,7 +51,7 @@ not fitted, which is enough, and the margin claim was wrong.
 
 ## The exponent is worth more than the operating point
 
-`per: "root"` divides a distinct-word count by the square root of the length.
+`power` divides a distinct-word count by the length raised to that power, and it ships at 0.5, the square root.
 The exponent that belongs there is whatever makes **one threshold mean the same
 thing on a short document and a long one**. That is directly testable:
 calibrate the threshold on full-length documents, then apply it unchanged as
@@ -99,14 +99,19 @@ than the corpus, and none of it is at full length.
 
 ## The recommendation, and what it costs
 
-`js/engine.mjs` now takes an optional `power` beside `per: "root"`, defaulting
-to 0.5, so nothing changes until a rule asks for it. Switching the derived rule
-is one field plus a recalibrated threshold:
+`js/engine.mjs` takes `power`, the exponent the count is divided by. It
+replaced `per: "root"`, which was the same thing named twice. Switching the
+derived rule is one number plus a recalibrated threshold:
 
 ```json
-"notable": { ">=": 0.095, "per": "root", "power": 0.7, "unit": "words",
+"notable": { ">=": 0.095, "power": 0.7, "unit": "words",
              "needs": { "words": 600, "sentences": 5, "matches": 10 } }
 ```
+
+**The proposed value is 0.7.** Not 0.8, which scores identically on every
+length measured and sits one step from 0.9, where false-alarm control fails at
+300 words. 0.7 is the lowest exponent that gets the full gain, and the only one
+all four folds agree on.
 
 Measured against what ships today:
 

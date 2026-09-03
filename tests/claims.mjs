@@ -13,7 +13,7 @@
 // stale on its own. This makes that a failing test rather than a thing someone
 // notices a month later.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 import { loadCorpus } from '../js/corpus.mjs';
@@ -51,25 +51,35 @@ if (m) {
 // A false-alarm rate above this is not a linter anyone would leave switched on.
 check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.length} human documents flagged`);
 
-// `power` is the exponent under per: "root". 0.5 is a default, not a law, and
-// the engine has to honour another value. See research/length.md.
-// 50 matches in 100 words: over the root that is 50/10 = 5, over the length
-// itself 50/100 = 0.5. One threshold of 4 separates the two exponents.
-const mk = (power, at) => compileRule({
+// `power` is the exponent a distinct count is divided by. It replaced
+// per: "root", which was the same thing named twice -- a root IS a power.
+// 50 matches in 100 words: at 0.5 that is 50/10 = 5, at 1.0 it is 50/100 = 0.5.
+// One threshold of 4 separates the two.
+const mk = (notable) => compileRule({
   id: 'p', name: 'p', match: { kind: 'regex', pattern: '\\bthe\\b', flags: 'gi' },
-  notable: { '>=': at, per: 'root', ...(power === undefined ? {} : { power }),
-             needs: { words: 0, sentences: 0, matches: 0 } },
+  notable: { ...notable, needs: { words: 0, sentences: 0, matches: 0 } },
   description: 'x', suggest: 'x', tests: { hit: [], miss: [] },
 }, 'test');
 const sample = `${'the '.repeat(50)}${'word '.repeat(50)}`;
-check('per root defaults to the square root',
-  mk(undefined, 4).fires(sample) && !mk(undefined, 6).fires(sample));
-check('an explicit 0.5 is the same as the default',
-  mk(0.5, 4).fires(sample) && !mk(0.5, 6).fires(sample));
-check('a higher exponent lowers the value', !mk(1, 4).fires(sample) && mk(1, 0.4).fires(sample));
-let threw = false;
-try { mk(0, 1); } catch { threw = true; }
-check('an exponent outside (0, 1] is refused', threw);
+const refuses = (notable) => { try { mk(notable); return false; } catch { return true; } };
+
+check('power 0.5 is the square root',
+  mk({ '>=': 4, power: 0.5 }).fires(sample) && !mk({ '>=': 6, power: 0.5 }).fires(sample));
+check('a higher exponent lowers the value',
+  !mk({ '>=': 4, power: 1 }).fires(sample) && mk({ '>=': 0.4, power: 1 }).fires(sample));
+check('an exponent outside (0, 1] is refused', refuses({ '>=': 1, power: 0 }));
+check('per: "root" is refused rather than guessed at', refuses({ '>=': 1, per: 'root' }));
+check('per and power together are refused', refuses({ '>=': 1, per: 1000, power: 0.5 }));
+// No rule may carry the old spelling, including any added since.
+const stale = [];
+for (const dir of ['rules', 'candidates']) {
+  for (const f of readdirSync(join(ROOT, dir))) {
+    if (!f.endsWith('.json') || f === 'index.json') continue;
+    const s2 = JSON.parse(readFileSync(join(ROOT, dir, f), 'utf8'));
+    for (const r of s2.rules || []) if (r.notable?.per === 'root') stale.push(`${f}:${r.id}`);
+  }
+}
+check('no shipped rule still says per: "root"', stale.length === 0, stale.join(' '));
 
 console.log(failed ? `\ndocumented claims: ${failed} failed` : '\ndocumented claims: all hold');
 process.exit(failed ? 1 : 0);

@@ -257,19 +257,27 @@ The comparison is the key. Write the operator you mean:
 Two bounds make a band, and the report names the bound it passed, so a
 reader can see which edge the document went outside.
 
-`per` is normally a number, giving a rate per that many words. It can also be
-the string `"root"`, which divides by a power of the length instead. A count of
-distinct things saturates as a document lengthens, so a plain rate falls with
-length; dividing by a power of the length flattens that out.
+There are two ways to normalise a count by length, and a rule picks one.
 
-`power` sets the exponent and defaults to 0.5, the square root. It is a
-property of the pattern rather than a constant: how fast a pattern saturates
-depends on how many distinct things it can match and how common they are.
-Choose it so that ONE threshold means the same thing on a short document and a
-long one — calibrate on full-length documents, then check the false-alarm rate
-holds as they are truncated. `tools/metric-sweep.mjs` does this, and
+`per` is a number, giving a rate per that many words: `count / words × per`.
+
+`power` divides by the length raised to that power: `count / words^power`. Use
+it when the count saturates as a document lengthens — a count of *distinct*
+things runs out of new ones to find, so it does not hold a rate, and a plain
+rate falls with length. `power: 0.5` is the square root, which is the usual
+choice.
+
+The exponent is a property of the pattern, not a constant: how fast a pattern
+saturates depends on how many distinct things it can match and how common they
+are. Choose it so that ONE threshold means the same thing on a short document
+and a long one — calibrate on full-length documents, then check the false-alarm
+rate holds as they are truncated. `tools/metric-sweep.mjs` does this, and
 [research/length.md](../research/length.md) records what it found for the
 derived vocabulary rule.
+
+`per: "root"` was an older spelling of `power: 0.5`. A root is a power, so it
+said the same thing twice; it is now refused with a message rather than
+accepted.
 
 `needs` declines to score a document too small for the rate to mean anything:
 `{ "words": 250, "sentences": 5, "matches": 2 }`. With `per` set it defaults to

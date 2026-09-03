@@ -17,7 +17,7 @@
       },
       "notable": {
         ">=": 0.4,
-        "per": "root",
+        "power": 0.5,
         "unit": "words",
         "needs": {
           "words": 600,
