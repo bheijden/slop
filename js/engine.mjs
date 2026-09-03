@@ -422,8 +422,8 @@ function verdictOf(rule) {
               kind: metric !== undefined ? 'variation' : 'rate' },
       measure: metric !== undefined
         ? `${detail || ''}, variation ${shown} ${where}`.replace(/^, /, '')
-        : per === 'power' ? `${count} in ${words} ${unit}, ${shown} per `
-          + `${power === 0.5 ? `root ${unit.replace(/s$/, '')}` : `${unit.replace(/s$/, '')}^${power}`} ${where}`
+        : per === 'power'
+          ? `${count} different ${unit} in ${words}, ${shown} length-adjusted ${where}`
         : per ? `${count} in ${words} ${unit}, ${shown} per ${per} ${where}`
               : `${count}`,
     };

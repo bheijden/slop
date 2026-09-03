@@ -253,13 +253,19 @@ function rateBlock(f) {
   if (!r) return `<div class="m">${esc(f.measure || f.name)}</div>`;
   // Three shapes: a rate per N words, a count over length^power, and the
   // variation measure, which is neither.
-  const one = r.unit.replace(/s$/, '');
+  // "per word^0.7" is the formula, not the meaning, and it told a reader
+  // nothing. Say what the number is instead, and keep the arithmetic in the
+  // tooltip for anyone who wants it.
   const unit = r.kind === 'variation' ? 'sentence-length variation'
-    : r.power ? (r.power === 0.5 ? `per root ${one}` : `per ${one}^${r.power}`)
-    : `per ${r.per} ${r.unit}`;
+    : r.power ? 'length-adjusted' : `per ${r.per} ${r.unit}`;
+  // `count` is distinct matches when the rule counts distinct things, which is
+  // every rule using an exponent, so "occurrences" was the wrong word for it.
   const sub = r.kind === 'variation' ? (r.detail || '')
+    : r.power ? `${r.count} different ${r.unit} matched, in ${r.words} ${r.unit}`
     : `${r.count} occurrence${r.count === 1 ? '' : 's'} in ${r.words} words`;
   const words = (OP_WORDS[r.op] || ((t, u) => `${r.op} ${t} ${u}`))(r.threshold, unit);
+  // No tooltip on this caption: a findings row already opens its own card on
+  // hover, and two at once is worse than one that says less.
   return `<div class="rate"><b>${esc(String(r.value))}</b><span class="ru">${esc(unit)}</span>`
     + `<span class="rb" title="this rule reports at ${esc(words)}">`
     + `${OP_GLYPH[r.op] || esc(r.op)} ${esc(String(r.threshold))}</span></div>`
@@ -270,8 +276,25 @@ function marked(body, ranges, keepBlank) {
   // [start, end, findingIndex, class, priority]. A real span outranks a rate's
   // occurrence where the two overlap, so a flagged phrase is never hidden by
   // the evidence behind a measurement.
-  const ok = ranges.slice().sort((a,b) => a[0]-b[0] || a[4]-b[4])
-    .filter((r,i,a) => i === 0 || r[0] >= a[i-1][1]);
+  //
+  // This was a filter comparing each range against the PREVIOUS ELEMENT OF THE
+  // INPUT rather than the last one kept, so a range dropped for overlapping
+  // still acted as the boundary for the next one, which could then overlap the
+  // range that was kept. The loop below then ran with a < last and re-emitted
+  // text it had already written: "plainly shown it doesn't." appeared twice on
+  // the page while the textarea underneath had it once, which is what made a
+  // selection look duplicated and offset.
+  //
+  // Claim territory in priority order, then lay the survivors out in reading
+  // order. Sorting by start first would have let an early low-priority
+  // occurrence beat the flagged phrase the comment above promises to keep.
+  const kept = [];
+  for (const r of ranges.slice().sort((a, b) => a[4] - b[4] || a[0] - b[0]
+                                                || (b[1] - b[0]) - (a[1] - a[0]))) {
+    if (kept.some((k) => r[0] < k[1] && k[0] < r[1])) continue;
+    kept.push(r);
+  }
+  const ok = kept.sort((a, b) => a[0] - b[0]);
   const out = [];
   let pos = 0;
   for (const line of body.split('\n')) {
@@ -282,6 +305,8 @@ function marked(body, ranges, keepBlank) {
     for (const [rs, re, i, cls] of ok) {
       if (re <= s || rs >= e) continue;
       const a = Math.max(rs, s), b = Math.min(re, e);
+      // Nothing may be emitted twice, whatever the ranges say.
+      if (a < last || b <= a) continue;
       const c = `${cls || ''}${i === S.sel ? ' on' : ''}`.trim();
       html += esc(body.slice(last, a))
         + `<mark data-i="${i}"${c ? ` class="${c}"` : ''}>${esc(body.slice(a, b))}</mark>`;

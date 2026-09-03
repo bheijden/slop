@@ -854,6 +854,23 @@ async function main() {
     check('the two layers of the editor line up exactly',
       LY.metrics.length === 0 && LY.drift <= 1 && LY.lines > 20, JSON.stringify(LY));
 
+    // And they must say the same thing. The highlighted copy is built by
+    // walking the findings and slicing the source between them; an overlap the
+    // range filter let through made it slice backwards and write a phrase
+    // twice, so the page showed text the textarea underneath did not have.
+    const sameText = await evaluate(`(() => {
+      const norm = (x) => x.replace(/\\s+/g, ' ').trim();
+      const a = norm(document.getElementById('input').value);
+      const b = norm(document.getElementById('doc').innerText);
+      let at = -1;
+      for (let k = 0; k < Math.min(a.length, b.length); k++) if (a[k] !== b[k]) { at = k; break; }
+      return JSON.stringify({ equal: a === b, extra: b.length - a.length,
+        around: at < 0 ? '' : b.slice(Math.max(0, at - 30), at + 40) });
+    })()`);
+    const ST2 = JSON.parse(sameText);
+    check('the highlighted copy says exactly what was typed',
+      ST2.equal && ST2.extra === 0, JSON.stringify(ST2));
+
     // The example is the demonstration, so it has to demonstrate: one piece of
     // writing long enough to be scored, tripping the hand-written patterns and
     // both derived word lists, rather than a paragraph for each bolted on.
