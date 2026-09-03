@@ -863,7 +863,7 @@ async function main() {
       words: (document.querySelector('.tally b') || {}).textContent || '0' })`);
     const EX = JSON.parse(shown);
     check('the example sets off enough to be worth reading',
-      EX.findings >= 25 && EX.sets >= 4 && Number(String(EX.words).replace(/,/g, '')) >= 600,
+      EX.findings >= 15 && EX.sets >= 4 && Number(String(EX.words).replace(/,/g, '')) >= 600,
       JSON.stringify(EX));
 
     // Nothing on this page may use a word invented in the making of it. A reader

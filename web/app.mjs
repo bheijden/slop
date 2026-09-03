@@ -83,9 +83,11 @@ function renderSay() {
     $('say1').innerHTML = '<b>It is important to note that&hellip;</b> &middot; '
       + '<b>No X, no Y, no Z.</b>';
     $('say2').innerHTML = `You know the feeling. <b>${rules} patterns</b> in <b>${sets}</b> `
-      + `${term('ruleSet', 'rule sets')} catch it.`;
-    $('say3').innerHTML = `Each ${term('finding', 'finding')} names the line and the fix. `
-      + 'Paste a draft and watch it light up.';
+      + `${term('ruleSet', 'rule sets')} find AI slop.`;
+    // The difference from a detector: a score tells you something is wrong, a
+    // named tell tells an agent what to change.
+    $('say3').innerHTML = `Each ${term('finding', 'finding')} names the tell and the fix, so an `
+      + 'agent can correct its own draft.';
   } else {
     const n = S.fudge && S.fudge.length ? S.fudge.length : 0;
     const ex = S.fudge ? S.fudge.reduce((a, r) => a + r.conform.ok + r.conform.fail, 0) : 0;
@@ -1080,79 +1082,88 @@ $('b-example').onclick = () => {
   S.name = 'example.md';
   $('input').value = `# Why we deleted the retry loop
 
-Don't call it a rewrite. Call it a deletion.
+Last month a customer asked where three days of events had gone. They had not
+gone anywhere. They had been retried into a socket nobody was reading, and the
+loop doing it had been in the ingest path since the first week of the project.
 
-The loop had been in the ingest path since the first week. Nobody defended it
-and nobody removed it, so it sat there quietly, load-bearing in the way that
-undocumented code becomes load-bearing: not because anyone showed it works, but
-because nothing had plainly shown it doesn't.
+Nobody defended it and nobody removed it, so it sat there quietly, load-bearing
+in the way undocumented code becomes load-bearing: not because anyone showed it
+works, but because nothing had plainly shown it doesn't.
 
-We went looking for the reason. Turns out the loop was never warm. It fired on
-every timeout, it fired on every 500, and it fired on the one error class that
-genuinely needed a person. It did not warn, did not retry, did not stop. No
-flags, no metrics, no alerting. That's the whole point of a retry — it parks a
-hazard behind patience, and patience is indistinguishable from health until
-somebody reads the graph.
+## What it was doing
 
-I won't pretend the migration was painless.
+The loop wrapped a single call to the storage client. On any exception it slept,
+doubled the delay, and tried again, up to ten times. That is a reasonable thing
+to write in an afternoon and a hazard to leave in place for three years.
 
-Here's the twist: the loop had never retried anything. A caller upstream had
-been swallowing the exception for eleven months, so the retry sat one rung
-below a handler that had already decided the request was finished. Half the
-timeouts arrived at a socket that was closed. The other half arrived nowhere.
+The first problem is the ordinary one: it retried errors that were never going
+to succeed. A malformed record came back with the same validation failure ten
+times, eleven seconds apart, and was then dropped without a line in the log.
 
-Sit with that for a moment.
+The second problem is the one that cost us. The caller upstream had a deadline
+of its own — two seconds, set in a config file somebody wrote in 2023 and
+nobody has read since. By the third attempt the loop was writing into a request
+that had already been answered and closed. The write failed, and the failure
+went nowhere: the loop swallowed it, the caller had moved on, and the counter
+everyone watched was counting attempts rather than successes.
 
-## What we found
+Turns out the loop had never helped a single request. It had only ever made the
+graph look calm. Patience is indistinguishable from health until somebody reads
+the numbers underneath it.
+
+## Why nobody caught it
+
+The ingest dashboard had one graph and it stood at green for twelve consecutive
+days while this was happening. It plotted writes attempted per minute, and
+attempts were exactly what the loop manufactured. A record that failed ten times
+arrived on that graph as ten healthy-looking writes. The worse the day, the
+better the line.
+
+Nobody was told, because there was nothing to tell. The loop did not warn, did
+not log, and did not increment anything a human had ever looked at. No flags, no
+alerting, no dead-letter queue. That is the whole point of a retry: it buys time
+against a problem that will pass, and it hides one that will not.
+
+We only found it because a customer counted their own records and we could not
+match the number. Half a day of reading the client library, and the loop was
+plainly the only thing between the write and the socket.
+
+## What we changed
 
 The fix needed three things: a deadline the caller owns, one place that decides,
-and a test that survives a rerun. Determinism is the whole game. You already
-know how this ends.
+and a test that survives a rerun.
 
-The job died; the queue didn't. That asymmetry is what carried the defect for
-so long. A worker would fold, a supervisor would restart it, and the counter
-that everyone watched would tick up by one and settle. Nobody was told. The
-dashboard stood at green for twelve consecutive days while the ceiling on
-throughput quietly walked down a rung a week.
+The deadline moved up the stack. A caller that cannot wait four seconds now says
+so, and the storage client honours the budget it is given instead of inventing
+one. Errors are sorted once, in one function, into the ones worth repeating and
+the ones worth reporting. And the ingest path no longer swallows anything: when
+a write fails, it fails loudly and names the record.
 
-Do I know exactly when it started? Where the first drop landed? Which callers
-depended on the old behaviour? No. The audit trail was deliberate about what it
-kept and silent about the rest, and the answer is nowhere in it.
-
-Maybe the loop mattered once. Maybe it never did. Maybe both, in different
-halves of the year.
-
-## What changed
-
-A queue is a promise about order. A retry is a promise about time. A deadline
-is a promise about both, and it is the only one a caller can genuinely hold.
-
-We deleted the loop outright. The callers that refused to carry their own
-deadline were handed one. Ten of them needed nothing; two of them disagreed
-loudly enough that somebody had to make a judgement call, and that judgement is
-filed in the design note beside the premise it rests on.
-
-That loss is real and it's worth naming: the ingest path no longer hides a slow
-dependency. It fails, and it says so. Whoever is on call arrives at an error
-instead of a mystery.
-
-Manual reconciliation is dead. The new path is small enough to hold in your
-head — one deadline, one decision, one place where a request stops.
+Ten call sites needed no change at all. Two of them disagreed with the new
+deadline strongly enough that somebody had to make a judgement call, and that
+judgement is filed in the design note beside the assumption it rests on.
 
 ## What it cost
 
-The slowdown is real, and it's not subtle. Removing the retry moved about four
-per cent of ingest failures from silent to loud, and every one of those is a
-page. That's not nothing.
+The extra noise is real, and it's not subtle. Moving failures from silent to
+loud turned roughly four per cent of ingest errors into pages, and the on-call
+rota felt every one of them in the first week. That's not nothing.
 
-But a page that fires is worth more than a graph that lies. That's the part a
-dashboard can't reach, and that's why being able to replay the queue from a
-fixed offset mattered.
+But a page that fires is worth more than a graph that lies, and the pages have
+already found two upstream defects that the old path had been hiding for
+months. That's the part a dashboard could never reach.
 
-You don't have to take my word for it. The replay is checked in, the offsets
-are in the fixture, and the whole thing runs in about ten seconds on a laptop.
-Run it twice and compare the output — it is byte-identical, which is precisely
-the property the old path could never assert.
+You don't have to take my word for the reproducibility. The replay harness is
+checked in: point it at a fixed offset, run it twice, and compare the output.
+It is byte-identical, which is precisely the property the old path could never
+assert, because its behaviour depended on how long a socket happened to survive.
+
+## What we left alone
+
+We did not touch the backoff schedule, the queue, or the client library's own
+timeouts. Three things changed and no more, which is what made the rollback plan
+one revert and the review a single afternoon. The temptation to fix the two
+upstream defects in the same change was real, and we filed them instead.
 
 The punchline is that nobody noticed the loop for three years, and everybody
 noticed its absence in a day.`;
