@@ -195,9 +195,18 @@ const clusters = Array.from({ length: K }, (_, c) => ({
 }));
 const publish = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
 
+// Renumber so the index means the position in the stack the page draws. Zero is
+// the published cluster, which sits on the axis because it is what the rule is
+// built from; the rest follow it upward, largest first. k-means hands back
+// arbitrary labels, and leaving them arbitrary meant the chart's bottom band was
+// "cluster 7" and cycling through the list walked the highlight around the stack
+// in no order at all.
+const stackOrder = [publish, ...clusters.filter((x) => x !== publish).sort((a, b) => b.share - a.share)];
+stackOrder.forEach((x, i) => { x.stack = i; });
+
 console.log(`  c    size    start      end   arrived   stamped   most characteristic words`);
-for (const x of [...clusters].sort((a, b) => b.stamped - a.stamped)) {
-  console.log(`  ${x.c === publish.c ? '->' : '  '}${String(x.c).padStart(2)} ` +
+for (const x of stackOrder) {
+  console.log(`  ${x === publish ? '->' : '  '}${String(x.stack).padStart(2)} ` +
     `${(100 * x.share).toFixed(1).padStart(5)}% ${(100 * x.start).toFixed(1).padStart(7)}% ` +
     `${(100 * x.end).toFixed(1).padStart(8)}%   ${x.arrived ? ' YES ' : '  -  '}   ` +
     `${(100 * x.stamped).toFixed(1).padStart(6)}%   ${x.words.slice(0, 6).map((j) => vocab[j]).join(' ')}`);
@@ -206,7 +215,7 @@ for (const x of [...clusters].sort((a, b) => b.stamped - a.stamped)) {
 // is worth knowing rather than hiding: it means the growth signal has gone
 // ambiguous, which is exactly the failure this method was changed to avoid.
 const grew = clusters.filter((x) => x.arrived);
-console.log(`\npublished cluster ${publish.c}, ${(100 * publish.stamped).toFixed(1)}% signed` +
+console.log(`\npublished cluster ${publish.stack} (k-means label ${publish.c}), ${(100 * publish.stamped).toFixed(1)}% signed` +
   ` (runner-up ${(100 * [...clusters].sort((a, b) => b.stamped - a.stamped)[1].stamped).toFixed(1)}%)`);
 console.log(`their growth test would admit ${grew.length ? grew.map((x) => x.c).join(', ') : 'no cluster'}` +
   `${grew.length === 1 && grew[0].c === publish.c ? ' — the same one' : grew.length ? '' : ''}`);
@@ -240,14 +249,14 @@ writeFileSync(join(ROOT, 'data/cluster.json'), JSON.stringify({
   built, days, k: K, iterations: iters, settled,
   descriptions: N, signed: sig.reduce((a, b) => a + b, 0), vocabulary: V,
   constants: { MIN_DF, MIN_WORDS, SMOOTH, MIN_AUTHORS, TOP, SEED },
-  publish: { id: publish.c, size: publish.size, signed: publish.signed,
+  publish: { id: publish.stack, fit: publish.c, size: publish.size, signed: publish.signed,
              stamped: +publish.stamped.toFixed(4), start: +publish.start.toFixed(4),
              end: +publish.end.toFixed(4), arrived: publish.arrived,
-             growthAdmits: grew.map((x) => x.c) },
-  clusters: clusters.map((x) => ({
-    id: x.c, size: x.size, signed: x.signed, share: +x.share.toFixed(4),
+             growthAdmits: grew.map((x) => x.stack) },
+  clusters: stackOrder.map((x) => ({
+    id: x.stack, fit: x.c, size: x.size, signed: x.signed, share: +x.share.toFixed(4),
     stamped: +x.stamped.toFixed(4), start: +x.start.toFixed(4), end: +x.end.toFixed(4),
-    published: x.c === publish.c,
+    published: x === publish,
     about: x.words.slice(0, 10).map((j) => vocab[j]),
     words: x.words.slice(0, x.c === publish.c ? TOP : TRACK)
       .map((j, i) => ({ w: vocab[j], rank: i + 1, lift: +scoreOf(x.c)[j].toFixed(3) })),
@@ -258,14 +267,14 @@ console.log('\nwrote data/cluster.json');
 
 writeFileSync(join(ROOT, 'data/cluster-series.json'), JSON.stringify({
   built, from: weeks[0], to: weeks[weeks.length - 1],
-  clusters: clusters.map((x) => x.c), words: tracked,
+  clusters: stackOrder.map((x) => x.stack), words: tracked,
   schema: 'weeks[].counts[i] is appearances of words[i] that week; countsSigned[i] the same over '
         + 'signed descriptions only. Rate per million = counts[i] / words * 1e6.',
   weeks: weeks.map((w, i) => ({
     w, docs: weekTotal[i], words: weekWords[i], wordsSigned: weekWordsSigned[i],
     signed: clusters.reduce((a, x) => a + perWeekSigned[x.c][i], 0),
-    byGroup: clusters.map((x) => perWeek[x.c][i]),
-    byGroupSigned: clusters.map((x) => perWeekSigned[x.c][i]),
+    byGroup: stackOrder.map((x) => perWeek[x.c][i]),
+    byGroupSigned: stackOrder.map((x) => perWeekSigned[x.c][i]),
     counts: Array.from(counts[i]), countsSigned: Array.from(countsSigned[i]),
   })),
 }) + '\n');
@@ -277,7 +286,7 @@ console.log('wrote data/cluster-series.json');
   try { hist = JSON.parse(readFileSync(path, 'utf8')); } catch { /* first build */ }
   hist = hist.filter((h) => h.built !== built);
   hist.push({ built, from: days[0], to: days[days.length - 1], descriptions: N,
-              published: { id: publish.c, stamped: +publish.stamped.toFixed(4) },
+              published: { id: publish.stack, stamped: +publish.stamped.toFixed(4) },
               words: Object.fromEntries(keep.slice(0, 300).map((j, i) => [vocab[j], i + 1])) });
   hist.sort((a, b) => a.built.localeCompare(b.built));
   writeFileSync(path, JSON.stringify(hist, null, 1) + '\n');

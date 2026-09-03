@@ -530,7 +530,12 @@ async function main() {
       await new Promise(r => setTimeout(r, 400));
       document.getElementById('next').click();
       await new Promise(r => setTimeout(r, 400));
-      return JSON.stringify({ bands: g1.length,
+      // the pager reads "NN / total"; the highlighted band must be NN - 1, so
+      // that cycling walks the highlight straight up the stack
+      const at = () => fills().indexOf('var(--flag)');
+      const shown = () => parseInt(document.getElementById('which').textContent, 10);
+      const lockstep = at() === shown() - 1;
+      return JSON.stringify({ bands: g1.length, lockstep,
         sameOrder: JSON.stringify(g1) === JSON.stringify(geom()),
         sameBottom: b1 === bottom(),
         highlightMoved: JSON.stringify(f1) !== JSON.stringify(fills()),
@@ -541,9 +546,9 @@ async function main() {
         bottomNoLongerColoured: fills()[0] !== 'var(--flag)' });
     })()`);
     const ST = JSON.parse(stack);
-    check('the stack never moves; only the highlight does',
+    check('the stack never moves, and the highlight climbs it in step',
       ST.bands >= 5 && ST.sameOrder && ST.sameBottom && ST.highlightMoved
-      && ST.bottomStartsColoured && ST.bottomNoLongerColoured,
+      && ST.bottomStartsColoured && ST.bottomNoLongerColoured && ST.lockstep,
       JSON.stringify(ST));
 
     // Nothing on this page may use a word invented in the making of it. A reader
