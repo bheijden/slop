@@ -1,8 +1,14 @@
 # Mining log
 
 Sources searched for AI-writing tells, what each yielded, and what was turned down.
-Rules distilled from these live in [../candidates](../candidates), one set per
-source.
+
+This is a record of what each search found at the time, so the file names below
+are the ones that existed then. One set per source is no longer how the rules
+are filed: what survived was folded into `rules/ai-tells.json`, and what
+measured backwards is kept together in `candidates/measured-backwards.json`.
+The paths named in the sections below (`candidates/antislop.json`,
+`candidates/mined.json` and the rest) no longer resolve, and are left as written
+rather than rewritten after the fact.
 
 ## Contents
 

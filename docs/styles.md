@@ -136,7 +136,7 @@ loaded and run like any other set, so read one before selecting it.
 
 Most apparent conflicts are not conflicts. A slop rule sets a ceiling and a
 style band sets an interval, and on the same metric they stack into three zones.
-`candidates/economist.json` reports em dashes at 35 per 1000 and above, on the
+`candidates/style-economist.json` reports em dashes at 35 per 1000 and above, on the
 basis that they have stopped doing any work. A register that wants them might
 put its floor at 3. Between 3 and 35 both are silent, and above 35 both report
 and agree.

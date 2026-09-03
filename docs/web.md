@@ -19,22 +19,26 @@ continuous scroll, the findings pane runs through all of them grouped by file,
 and next/prev crosses file boundaries. A file list on the left shows which file
 you are in as you scroll and jumps you to any of them.
 
-The input is one card, holding the text, the buttons that fill it, and the **rules**
-control that decides what runs over it. The rules button opens a panel of every set the repo carries, each collapsible,
-with a checkbox on the set itself and one per rule. The set box is tri-state: on,
-off, or a dash when you have picked some rules out of it. It carries the count,
-`27 rules`, or `11/27 rules` once you turn some off.
+The rules panel sits under the standing prose and lists every set that is
+loaded, each collapsible, with a checkbox on the set itself and one per rule.
+The set box is tri-state: on, off, or a dash when you have picked some rules out
+of it. It carries the count, `27 rules`, or `11/27 rules` once you turn some
+off.
 
-What ships in `rules/` arrives ticked. Everything in `candidates/`, style
-profiles included, arrives unticked, so you can see what a set would say before
-letting it say it. There is no separate section for style profiles, because they are the
-same kind of artifact and get the same control.
+The five sets in `rules/` are the only ones loaded, and all five arrive ticked.
+`candidates/` is not offered here at all: those sets are work in progress, and a
+visitor has no way to tell them apart from a rule that earned its place. Load
+one with **Add from URL** or **Add a file** if you want to see what it says.
 
-Three columns (files, document, findings) separated by dividers you can drag
-to resize or step left and right to collapse. A theme control in the bar chooses
-light, dark or the system setting, because a browser forced to dark for every
-site should not force it here. The page grows with the window, with a side
-margin that widens to a cap.
+The layout is a fixed six-cell grid, one screen, nothing scrolling but the
+insides of panels. The left column holds what stays put as you move between
+check, rule sets and vocabulary: the masthead, the page's standing prose, and a
+list. The right column holds what the page is for. A file list appears beside
+the text only when more than one document is loaded, and the documents run end
+to end in one scroller, so reading down carries you into the next file and the
+findings follow. A theme control in the top right chooses light, dark or the
+system setting, because a browser forced to dark for every site should not force
+it here.
 
 Two voices carry the design. Everything the linter says is monospace, everything
 you wrote is serif.

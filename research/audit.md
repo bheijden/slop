@@ -437,7 +437,7 @@ a bench is for.
 
 ## Regrouped by evidence
 
-The scores live on the rules themselves. Every rule in `candidates/mined.json`
+The scores live on the rules themselves. Every rule in what was then `candidates/mined.json` (the mined set has since been folded into `rules/ai-tells.json`)
 carries an `evidence` field saying what it did on this corpus, alongside `from`
 and `source` saying where it came from. `slop explain <rule>` prints all three,
 and `tools/group-by-evidence.mjs` recalculates them when the corpus gets bigger.
