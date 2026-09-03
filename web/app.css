@@ -1,23 +1,24 @@
-/* The shell every page shares.
+/* The shell all three pages share.
  *
- * One screen, never the page scrolling. A column down the left carries the
- * identity, the three destinations and whatever that page's standing context
- * is — the counts, the tools, the toggles. Everything else is a work area the
- * page divides into panels. Panels scroll inside themselves.
+ * One screen, six cells, hairlines between, nothing scrolling but the insides
+ * of panels. The left column is narrow and holds what stays put: the masthead,
+ * the page's standing prose, and a list. The right column is wide and holds
+ * what the page is actually for — the text being linted, the chart, the rule
+ * set, the findings.
  *
- * Each page sets --work to its own grid. Nothing else about the shell changes
- * between them, which is the point: moving between check, rules and vocabulary
- * should feel like changing what is on the bench, not changing rooms.
+ * Moving between check, rules and vocabulary swaps what is in the cells. It
+ * never changes where the cells are, which is the whole point.
  */
 
 :root{
   --paper:#EDEDE9; --card:#FDFDFC; --sunk:#E0E0DA; --hair:#D4D4CC;
   --ink:#14161A; --muted:#5C5F66; --blue:#2D5BD6; --flag:#B93B37; --ok:#2E7D4F;
   --lift:0 1px 2px rgba(20,22,26,.05), 0 1px 1px rgba(20,22,26,.04);
+  --gutter:clamp(16px, 4vw, 112px);
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
-  --rail:212px;
-  /* one hue per series, ordered by how much each carries */
+  /* One hue per signing tool. Ordered by how much of the corpus each carries,
+     so the largest band is the most saturated and the tail stays quiet. */
   --p0:#2D5BD6; --p1:#B93B37; --p2:#2E7D4F; --p3:#8A5CD6; --p4:#C07C1E;
   --p5:#0F8B8D; --p6:#9C4A7A; --p7:#5C6470; --p8:#7A8B2E;
   color-scheme:light;
@@ -40,7 +41,6 @@
   --p5:#4FC3C5; --p6:#D68CB4; --p7:#9AA3B0; --p8:#B5C95B;
   color-scheme:dark;
 }
-
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;background:var(--hair);color:var(--ink);font-family:var(--mono);
@@ -50,52 +50,58 @@ button,select,input,textarea{font:inherit;color:inherit}
 a{color:var(--blue)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-/* ---- the shell ---------------------------------------------------------- */
-.app{display:grid;grid-template-columns:var(--rail) 1fr;height:100dvh;gap:1px;background:var(--hair)}
-.work{display:grid;gap:1px;background:var(--hair);min-width:0;min-height:0;
-      grid-template:var(--work, "a" 1fr / 1fr)}
+.dash{display:grid;height:100dvh;
+  grid-template-columns:minmax(280px,25%) 1fr;
+  grid-template-rows:auto minmax(180px,1fr) minmax(240px,1.25fr);
+  background:var(--hair);gap:1px}
+.cell{background:var(--paper);min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.cell.pad{padding:14px 18px}
+.cell.quiet{background:var(--card)}
 
-/* ---- the rail ----------------------------------------------------------- */
-.rail{background:var(--paper);display:flex;flex-direction:column;min-height:0;overflow:hidden}
-.rail > *{padding:0 16px}
-.brand{padding-top:15px;padding-bottom:13px}
-.brand a{display:block;font-family:var(--serif);font-size:23px;line-height:1;letter-spacing:-.02em;
-         color:var(--ink);text-decoration:none;font-weight:500}
-.brand a b{color:var(--flag);font-weight:500}
-.brand p{margin:5px 0 0;color:var(--muted);font-size:11px}
+/* Every working cell has a header that does not scroll and a body that does.
+   The header is a sibling of the body, never laid over it: text passing under
+   a toolbar reads as a mistake even when it is deliberate. */
+.cell > header{display:flex;align-items:center;gap:8px;padding:8px 14px;min-height:34px;flex:none;
+               border-bottom:1px solid var(--hair);color:var(--muted);font-size:11px;position:relative;z-index:20}
+.cell > header .title{color:var(--ink);font-size:11px;letter-spacing:.09em;text-transform:uppercase}
+.cell > header .spacer{flex:1}
+.cell > .body{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+.cell > .body.pad{padding:12px 14px}
 
-.dest{display:flex;flex-direction:column;gap:1px;padding:0;margin:4px 0 0}
-.dest a{display:flex;align-items:baseline;gap:9px;padding:7px 16px;text-decoration:none;
-        color:var(--muted);border-left:2px solid transparent}
-.dest a:hover{background:var(--sunk);color:var(--ink)}
-.dest a[aria-current=page]{color:var(--ink);border-left-color:var(--flag);background:var(--sunk)}
-.dest .k{font-size:10px;color:var(--muted);width:12px;flex:none;text-align:right}
-.dest a[aria-current=page] .k{color:var(--flag)}
+/* masthead */
+.mast{justify-content:center}
+.mast h1{font-family:var(--serif);font-weight:500;font-size:clamp(19px,2.3vw,30px);line-height:1.06;
+         margin:0;letter-spacing:-.015em}
+.mast h1 em{font-style:normal;color:var(--flag)}
+.mast .modes{display:flex;gap:2px;margin-top:9px;flex-wrap:wrap}
+.mast .modes a,.mast .modes button{padding:2px 8px;border-radius:5px;text-decoration:none;color:var(--muted);
+  font-size:11.5px;background:none;border:0;cursor:pointer}
+.mast .modes a[aria-current=page],.mast .modes button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
 
-/* whatever standing context the page has: counts, tools, toggles */
-.context{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;padding-top:14px;
-         border-top:1px solid var(--hair);margin-top:14px}
-.context h2{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
-            margin:0 0 7px;font-weight:400}
-.context h2:not(:first-child){margin-top:18px}
-.figure{margin:0 0 11px}
-.figure b{display:block;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
-.figure span{color:var(--muted);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
-.figure i{display:block;height:2px;width:30px;border-radius:1px;margin-bottom:6px}
-.railfoot{padding-top:10px;padding-bottom:12px;border-top:1px solid var(--hair);
-          display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px}
+/* the three counts */
+.tally{flex-direction:row;align-items:stretch;gap:0}
+.tally div{flex:1;padding:14px 18px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.tally div+div{box-shadow:inset 1px 0 0 var(--hair)}
+.tally b{font-size:clamp(17px,2vw,26px);font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.tally span{color:var(--muted);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase}
+.tally i{display:block;height:3px;border-radius:2px;margin-bottom:9px;width:44px}
 
-/* ---- panels ------------------------------------------------------------- */
-.panel{background:var(--paper);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
-.panel > header{display:flex;align-items:center;gap:8px;padding:8px 14px;min-height:34px;
-                border-bottom:1px solid var(--hair);color:var(--muted);font-size:11px;flex:none}
-.panel > header .title{color:var(--ink);font-size:11px;letter-spacing:.09em;text-transform:uppercase}
-.panel > header .spacer{flex:1}
-.panel > .body{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
-.panel > .body.pad{padding:12px 14px}
-.panel.quiet{background:var(--card)}
+/* the standing prose cell */
+.say{gap:8px;overflow:hidden}
+.say p{margin:0;color:var(--muted);max-width:46ch}
+.say p b{color:var(--ink);font-weight:600}
+.say .more{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:auto;padding-top:10px;flex:none}
+.say .more button,.say .more a{background:none;border:0;padding:0;color:var(--blue);cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;font-size:11.5px}
 
-/* ---- small shared controls ---------------------------------------------- */
+/* charts */
+.plot{flex:1;min-height:0;padding:6px 14px 4px}
+svg{display:block;width:100%;height:100%}
+.axis{fill:var(--muted);font-size:10px}
+.grid{stroke:var(--hair);stroke-width:1}
+.one{stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3}
+
+/* small shared controls */
 .chip{background:none;border:1px solid var(--hair);border-radius:6px;padding:2px 8px;
       color:var(--muted);cursor:pointer;font-size:11px;line-height:1.6}
 .chip:hover{background:var(--sunk);color:var(--ink)}
@@ -104,19 +110,29 @@ a{color:var(--blue)}
             cursor:pointer;font-size:11px}
 .seg button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
 select.chip{padding:2px 4px}
+.pager{display:flex;align-items:center;gap:5px;flex:none}
+.pager button{background:none;border:1px solid var(--hair);border-radius:5px;width:20px;height:20px;
+  display:grid;place-items:center;color:var(--muted);cursor:pointer;font-size:11px;padding:0;line-height:1}
+.pager button:hover{background:var(--sunk);color:var(--ink)}
+.pager .which{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .num{font-variant-numeric:tabular-nums}
 .dim{color:var(--muted)}
-svg{display:block;width:100%;height:100%}
-.axis{fill:var(--muted);font-size:10px}
-.grid{stroke:var(--hair);stroke-width:1}
 
-/* A dashboard stops being one below about this width, so the shell becomes a
-   single column that scrolls and each panel takes a workable height. */
+/* a scrolling list of things to pick from */
+.list{list-style:none;margin:0;padding:3px;overflow:auto;scrollbar-width:thin;flex:1;min-height:0}
+.list li{display:grid;grid-template-columns:28px 1fr auto;gap:7px;align-items:center;
+         padding:3px 7px;border-radius:5px;cursor:pointer}
+.list li:hover{background:var(--sunk)}
+.list li[aria-selected=true]{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
+.list .n{color:var(--muted);font-size:10.5px;text-align:right;font-variant-numeric:tabular-nums}
+.list .w{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list .x{color:var(--flag);font-variant-numeric:tabular-nums;font-size:11px}
+
+/* Under about 900px six cells stop being a dashboard, so it becomes a column
+   that scrolls with each cell given a workable height of its own. */
 @media (max-width:900px){
   body{overflow:auto}
-  .app{grid-template-columns:1fr;height:auto}
-  .rail{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--hair)}
-  .rail .context{display:none}
-  .work{grid-template:none!important;display:flex;flex-direction:column}
-  .panel{min-height:320px}
+  .dash{height:auto;grid-template-columns:1fr;grid-template-rows:none}
+  .cell{min-height:0}
+  .cell.chart,.cell.words,.cell.detail,.cell.big{min-height:320px}
 }
