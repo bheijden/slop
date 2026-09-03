@@ -93,17 +93,20 @@ a{color:var(--blue)}
    links fit a tablet in landscape without moving. */
 .say{gap:7px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
      scrollbar-width:thin;touch-action:pan-y}
-.say p{margin:0;color:var(--muted);max-width:46ch;line-height:1.5}
+/* One size on all three pages, and not a function of the viewport. This used
+   to shrink at two viewport heights, so the same paragraph was 13px on a tall
+   tablet and 11.5px on a short laptop -- the panel scrolls when it has to, and
+   shrinking the type to avoid that made the type the odd one out instead. The
+   measure is the column, since the column is already narrow. */
+.say p{margin:0;color:var(--muted);line-height:1.5}
 @media (max-height:900px){
   .say{gap:5px}
-  .say p{font-size:12px;line-height:1.45}
   .say .more{padding-top:7px}
 }
 @media (max-height:800px){
   .cell.pad{padding:11px 14px}
   .say{gap:4px}
-  .say p{font-size:11.5px;line-height:1.4}
-  .say .more{padding-top:5px;font-size:11px}
+  .say .more{padding-top:5px}
 }
 .say p b{color:var(--ink);font-weight:600}
 .say .more{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:auto;padding-top:10px;flex:none}
@@ -218,3 +221,11 @@ select.chip{padding:2px 4px}
 .libset:hover{background:var(--sunk)}
 .libset .nm{font-size:12.5px}
 .libset .cnt{font-size:11px;color:var(--muted)}
+
+/* ---- definitions on hover ------------------------------------------------ */
+/* Replaces the native title attribute: instant, styleable, and it works on a
+   touch screen, where hover does not exist. */
+.tip{position:fixed;z-index:70;max-width:min(34ch,calc(100vw - 24px));padding:8px 10px;
+  border:1px solid var(--hair);border-radius:8px;background:var(--card);color:var(--ink);
+  box-shadow:0 8px 24px rgba(0,0,0,.22);font-size:12px;line-height:1.5;pointer-events:none}
+.tip[hidden]{display:none}

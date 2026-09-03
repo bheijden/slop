@@ -524,6 +524,33 @@ async function main() {
         H.open && H.blocks >= 5 && H.npx && H.skill && !H.wide, JSON.stringify(H));
     }
 
+    // One type size for the standing prose, on all three pages and at any
+    // viewport. It used to shrink at two viewport heights, so the same
+    // paragraph was 13px on a tall tablet and 11.5px on a short laptop.
+    const sizes = [];
+    for (const [where, url] of [['check', base], ['rules', base + 'rules.html'],
+                                ['vocabulary', base + 'vocabulary.html']]) {
+      for (const h of [900, 800, 760]) {
+        await send('Emulation.setDeviceMetricsOverride',
+          { width: 1400, height: h, deviceScaleFactor: 1, mobile: false });
+        await send('Page.navigate', { url });
+        await sleep(1600);
+        const got = await evaluate(`(() => { const p = document.querySelector('.say p');
+          const c = getComputedStyle(p);
+          return JSON.stringify({ font: c.fontSize,
+            fills: p.getBoundingClientRect().width / document.querySelector('.say').clientWidth });
+        })()`);
+        sizes.push({ where, h, ...JSON.parse(got) });
+      }
+    }
+    await send('Emulation.clearDeviceMetricsOverride');
+    const one = [...new Set(sizes.map((x) => x.font))];
+    check('the standing prose is one size everywhere',
+      one.length === 1 && one[0] === '13px', sizes.map((x) => `${x.where}@${x.h}:${x.font}`).join(' '));
+    // And it uses the column it is given rather than stopping short of it.
+    check('the prose uses the width of its panel',
+      sizes.every((x) => x.fills > 0.85), sizes.map((x) => x.fills.toFixed(2)).join(' '));
+
     // The lower-left panel belongs to the page it is on. On check it asks which
     // sets to run; on test rules that question is meaningless -- the page tests
     // what is in the editor -- so it offers a set to open instead.
@@ -587,14 +614,34 @@ async function main() {
     // Every term the page invents has to define itself where it is used. The
     // page quoted three different percentages, two of them called "signed",
     // and explained none of them.
-    const terms = await evaluate(`JSON.stringify({
-      marked: document.querySelectorAll('.term').length,
-      undefined_: [...document.querySelectorAll('.term')].filter(e => !e.title || e.title.length < 40).length,
-      signedFigures: [...new Set([...document.body.innerText.matchAll(/([\\d.]+)% signed/g)].map(m => m[1]))]
-    })`);
+    // data-tip, not title: the page's escaper left quotes alone, and the
+    // definition of "signed" quotes a footer verbatim, so the attribute ended
+    // at that quote and the tooltip lost the rest of the sentence. A native
+    // tooltip also never fires on a touch screen.
+    const terms = await evaluate(`(async () => {
+      const all = [...document.querySelectorAll('.term')];
+      const sig = all.find(e => e.textContent.trim() === 'signed');
+      sig.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
+      await new Promise(r => setTimeout(r, 200));
+      const tip = document.getElementById('tip');
+      return JSON.stringify({
+        marked: all.length,
+        undefined_: all.filter(e => !e.dataset.tip || e.dataset.tip.length < 40).length,
+        stillUsingTitle: all.filter(e => e.title).length,
+        // The quoted footer is past the first quote, so its presence proves the
+        // definition was not cut there.
+        whole: /Generated with Claude Code/.test(sig.dataset.tip)
+               && /recognising the line itself/.test(sig.dataset.tip),
+        hovered: !tip.hidden && tip.textContent === sig.dataset.tip,
+        signedFigures: [...new Set([...document.body.innerText.matchAll(/([\\d.]+)% signed/g)].map(m => m[1]))]
+      });
+    })()`);
     const TM = JSON.parse(terms);
     check('the words the page invents define themselves',
-      TM.marked >= 4 && TM.undefined_ === 0, JSON.stringify(TM));
+      TM.marked >= 4 && TM.undefined_ === 0 && TM.stillUsingTitle === 0, JSON.stringify(TM));
+    check('a definition survives the quotes inside it',
+      TM.whole === true, JSON.stringify(TM.whole));
+    check('hovering a term shows its definition', TM.hovered === true, JSON.stringify(TM.hovered));
 
     // Paging is the whole point of the browse view: every cluster has to carry a
     // list of its own, not just the one that gets published.

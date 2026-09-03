@@ -115,6 +115,8 @@ const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString('en');
 const pc = (v) => (v * 100).toFixed(1) + '%';
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const attr = (s) => String(s).replace(/[&<>"']/g,
+  (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* theme — three states, the same key and the same order as the other pages, so
    a choice made on one of them holds on all of them. The button shows which
@@ -191,11 +193,11 @@ function render() {
   const inFive = Math.round(ai * 5);
   $('say2').innerHTML = `One of them appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of all
     pull requests this week. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five of those are
-    <span class="term" tabindex="0" title="${esc(DEF.signed)}">signed</span> by the AI that wrote them.`;
+    <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span> by the AI that wrote them.`;
   $('say3').innerHTML = `Its most representative words should look familiar to anyone who uses coding
     agents.`;
 
-  $('t-cluster').title = DEF.cluster;
+  $('t-cluster').dataset.tip = DEF.cluster;
   GROUP = Math.max(0, DATA.browse.findIndex((g) => g.published));
   showGroup();
 
@@ -217,7 +219,7 @@ function showGroup() {
   const pad2 = (n) => String(n).padStart(2, '0');
   $('which').textContent = `${pad2(GROUP + 1)} / ${pad2(DATA.browse.length)}`;
   $('about').innerHTML = `${fmt(g.size)} pull requests &middot; ${pc(g.stamped)} `
-    + `<span class="term" tabindex="0" title="${esc(DEF.signed)}">signed</span>`
+    + `<span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span>`
     + ` &middot; most representative first`;
   $('q').value = '';
   drawArrive();
@@ -281,7 +283,7 @@ function drawArrive() {
   const at = order.indexOf(reg), f = S[0], l = S[S.length - 1];
   const sh = (e) => (e.docs ? e.byGroup[at] / e.docs : 0);
   const sg = (e) => (e.byGroup[at] ? e.byGroupSigned[at] / e.byGroup[at] : 0);
-  $('acap').innerHTML = `<span class="term" tabindex="0" title="${esc(DEF.share)}">share of all `
+  $('acap').innerHTML = `<span class="term" tabindex="0" data-tip="${attr(DEF.share)}">share of all `
     + `pull requests</span>: first week <b>${pc(sh(f))}</b> &rarr; last week <b>${pc(sh(l))}</b>`;
 }
 
@@ -313,12 +315,12 @@ function select(word) {
     <div class="big">
       <span class="w">${esc(w.w)}</span>
       <span class="x">${w.lift.toFixed(1)}&times;</span>
-      <span class="u"><span class="term" tabindex="0" title="${esc(DEF.freq)}">more frequent</span> in this <span class="term" tabindex="0" title="${esc(DEF.cluster)}">cluster</span></span>
+      <span class="u"><span class="term" tabindex="0" data-tip="${attr(DEF.freq)}">more frequent</span> in this <span class="term" tabindex="0" data-tip="${attr(DEF.cluster)}">cluster</span></span>
     </div>
     <div class="facts">
-      ${st ? `<span><b>${Math.round(st.peak)}</b> <span class="term" tabindex="0" title="${esc(DEF.perMillion)}">per million</span>, at the peak</span>
+      ${st ? `<span><b>${Math.round(st.peak)}</b> <span class="term" tabindex="0" data-tip="${attr(DEF.perMillion)}">per million</span>, at the peak</span>
               <span><b>${st.corpus.toFixed(1)}</b> per million across all pull requests</span>
-              <span class="sig"><b>${st.signed.toFixed(1)}</b> per million in <span class="term" tabindex="0" title="${esc(DEF.signed)}">signed</span> ones</span>`
+              <span class="sig"><b>${st.signed.toFixed(1)}</b> per million in <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span> ones</span>`
             : '<span>no weekly history kept for this word</span>'}
     </div>`;
   drawRate();
@@ -380,5 +382,6 @@ function drawRate() {
 
 </script>
 <script type="module" src="install.mjs"></script>
+<script type="module" src="tip.mjs"></script>
 </body>
 </html>
