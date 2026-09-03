@@ -51,9 +51,10 @@ not fitted, which is enough, and the margin claim was wrong.
 
 ## The exponent is worth more than the operating point
 
-`power` divides a distinct-word count by the length raised to that power, and it ships at 0.5, the square root.
-The exponent that belongs there is whatever makes **one threshold mean the same
-thing on a short document and a long one**. That is directly testable:
+`power` divides a distinct-word count by the length raised to that power, and
+it ships at 0.5, the square root. The exponent that belongs there is whatever
+makes **one threshold mean the same thing on a short document and a long
+one**. That is directly testable:
 calibrate the threshold on full-length documents, then apply it unchanged as
 the documents are truncated. Too low an exponent and long documents drift above
 the line; too high and short ones do.
