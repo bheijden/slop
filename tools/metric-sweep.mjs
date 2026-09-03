@@ -23,9 +23,15 @@ import { join, dirname } from 'node:path';
 import { loadCorpus } from '../js/corpus.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const set = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf8'));
-const ALL = set.rules[0].match.pattern.replace(/^\\b\(\?:/, '').replace(/\)\\b$/, '')
+// The exponent is a property of the pattern, so it has to be measurable for
+// any list rule, not just the derived one.
+const file = process.argv.find((a) => a.endsWith('.json')) || 'rules/pr-vocabulary.json';
+const set = JSON.parse(readFileSync(join(ROOT, file), 'utf8'));
+const rule = set.rules.find((r) => r.match?.distinct) || set.rules[0];
+const SHIPS = { power: rule.notable.power ?? 0.5, at: rule.notable['>='] };
+const ALL = rule.match.pattern.replace(/^\\b\(\?:/, '').replace(/\)\\b$/, '')
   .split('|').map((w) => w.replace(/\\/g, ''));
+console.log(`${file}: ${rule.id}, ${ALL.length} words, ships at power ${SHIPS.power} >= ${SHIPS.at}\n`);
 const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const { human, ai } = loadCorpus();
 
@@ -44,7 +50,7 @@ const metric = (d, re, beta) => hits(d, re) / Math.pow(d.words, beta);
 // Two knobs are chosen here, list length and threshold, on 48 documents. The
 // fold picks both on three quarters and is scored on the quarter held out.
 console.log('=== choosing list length and threshold, held out ===\n');
-const LENGTHS = [100, 150, 200, 250];
+const LENGTHS = [100, 150, 200, 250, 500, 700, 1000].filter((n) => n <= ALL.length);
 const FOLDS = 4;
 const idx = human.map((_, i) => i);
 
@@ -70,21 +76,21 @@ for (let f = 0; f < FOLDS; f++) {
   // of 24, near enough, and the budget has to scale with the fold.
   const p = pick(train, 1);
   picks.push(`${p.n}@${p.t.toFixed(2)}`);
-  const reT = reOf(p.n), reS = reOf(250);
+  const reT = reOf(p.n), reS = reOf(ALL.length);
   heldTuned += test.filter((i) => metric(ai[i], reT, 0.5) >= p.t).length;
-  heldShipped += test.filter((i) => metric(ai[i], reS, 0.5) >= 0.40).length;
+  heldShipped += test.filter((i) => metric(ai[i], reS, SHIPS.power) >= SHIPS.at).length;
   heldTotal += test.length;
 }
 console.log(`  each fold chose: ${picks.join('   ')}`);
 console.log(`  tuned per fold, scored held out : ${heldTuned}/${heldTotal}`);
-console.log(`  shipped 250 @ 0.40, same documents: ${heldShipped}/${heldTotal}`);
+console.log(`  shipped ${ALL.length} @ ${SHIPS.at} (power ${SHIPS.power}), same documents: ${heldShipped}/${heldTotal}`);
 
 // How much room each operating point leaves above the human documents.
 console.log('\n=== how close each threshold sits to human writing ===\n');
-for (const [label, n, t] of [['shipped  250 @ 0.40', 250, 0.40], ['tuned    200 @ 0.31', 200, 0.31]]) {
+for (const [label, n, t, b] of [[`shipped  ${ALL.length} @ ${SHIPS.at}`, ALL.length, SHIPS.at, SHIPS.power]]) {
   const re = reOf(n);
-  const h = human.map((d) => metric(d, re, 0.5)).sort((a, b) => b - a);
-  const a = ai.map((d) => metric(d, re, 0.5)).sort((x, y) => y - x);
+  const h = human.map((d) => metric(d, re, b)).sort((x, y) => y - x);
+  const a = ai.map((d) => metric(d, re, b)).sort((x, y) => y - x);
   const mean = h.reduce((s, x) => s + x, 0) / h.length;
   const sd = Math.sqrt(h.reduce((s, x) => s + (x - mean) ** 2, 0) / h.length);
   console.log(`  ${label}   human ${h.filter((x) => x >= t).length}/24  machine ${a.filter((x) => x >= t).length}/24`);
@@ -98,7 +104,7 @@ console.log('\n=== one threshold, applied to shorter documents ===');
 console.log('threshold calibrated on FULL-length human documents at 1 false alarm,');
 console.log('then applied unchanged as documents are truncated.\n');
 const SIZES = [900, 600, 400, 300];
-const re = reOf(250);
+const re = reOf(ALL.length);
 console.log('  beta   thresh   ' + ['full', ...SIZES.map((n) => `${n}w`)].map((s) => s.padStart(11)).join(''));
 for (const beta of [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]) {
   const hFull = human.map((d) => metric(d, re, beta)).sort((a, b) => b - a);

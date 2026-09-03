@@ -28,13 +28,17 @@ const check = (name, ok, detail = '') => {
 };
 
 const { human, ai } = loadCorpus();
-const { rules } = resolveRules({ select: ['pr-vocabulary'] });
-const rule = rules.find((r) => r.id === 'pr-vocabulary');
-const flags = (d) => rule.fires(d.text);
-const H = human.filter(flags).length;
-const A = ai.filter(flags).length;
+const scoreOf = (id, set) => {
+  const { rules } = resolveRules({ select: [set] });
+  const rule = rules.find((r) => r.id === id);
+  const flags = (d) => rule.fires(d.text);
+  return { H: human.filter(flags).length, A: ai.filter(flags).length };
+};
+const { H, A } = scoreOf('pr-vocabulary', 'pr-vocabulary');
+const lb = scoreOf('load-bearing-vocabulary', 'load-bearing');
 
-console.log(`the derived rule as it ships: ${H}/${human.length} human, ${A}/${ai.length} machine`);
+console.log(`pr-vocabulary as it ships: ${H}/${human.length} human, ${A}/${ai.length} machine`);
+console.log(`load-bearing  as it ships: ${lb.H}/${human.length} human, ${lb.A}/${ai.length} machine`);
 
 // The claim, wherever it is written, has to be the shipped configuration's.
 const doc = readFileSync(join(ROOT, 'docs/vocabulary.md'), 'utf8');
@@ -88,6 +92,16 @@ const n = shipped.rules[0].notable;
 check('the derived rule keeps the exponent research/length.md chose',
   n.power === 0.7, `power is ${n.power}`);
 check('and the threshold calibrated for it', n['>='] === 0.095, `threshold is ${n['>=']}`);
+
+// The exponent is a property of the pattern, so the ported list was measured
+// separately rather than given the same number. It landed on 0.7 too, but at a
+// threshold that costs it no false alarms at all -- its two populations happen
+// to leave a gap there and the derived list's do not.
+const lbn = JSON.parse(readFileSync(join(ROOT, 'rules/load-bearing.json'), 'utf8')).rules[0].notable;
+check('the ported rule carries its own measured settings',
+  lbn.power === 0.7 && lbn['>='] === 0.31, JSON.stringify(lbn));
+check('and it costs no false alarms', lb.H === 0, `${lb.H} of ${human.length} human documents flagged`);
+check('while catching what it caught before', lb.A >= 22, `${lb.A} of ${ai.length}`);
 
 console.log(failed ? `\ndocumented claims: ${failed} failed` : '\ndocumented claims: all hold');
 process.exit(failed ? 1 : 0);

@@ -19,8 +19,12 @@ the corpus into by word use alone. **Lead group** is the one they publish,
 chosen as the largest of recent weeks, then checked for having risen from
 under 2 per cent to above 20.
 
-Numbers below come from this repo's audit corpus: 80 human and 18 AI documents of
-general prose, not pull requests. The two numbers are false alarms, then hits.
+Numbers below come from this repo's audit corpus **as it stood when these
+experiments were run**: 80 human and 18 AI documents of general prose, not pull
+requests. The two numbers are false alarms, then hits. `data/corpus` now holds
+24 matched pairs instead, so these figures cannot be compared directly with any
+elsewhere in the repository; they are kept as the record of what each attempt
+cost at the time.
 
 ## The rebuild matches exactly
 

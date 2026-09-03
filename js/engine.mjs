@@ -415,7 +415,9 @@ function verdictOf(rule) {
       docLevel: Boolean(per) || metric !== undefined,
       // The same numbers as `measure`, kept apart so a caller can lay them out
       // itself. `measure` is one line for a terminal; a page wants the parts.
-      rate: { value: shown, per, unit, op: hit[0], threshold: hit[1],
+      // `per` is a number or nothing; the exponent travels as `power`. Emitting
+      // the internal sentinel here made a consumer print "0.27 per power words".
+      rate: { value: shown, per: per === 'power' ? null : per, power, unit, op: hit[0], threshold: hit[1],
               count, words, detail: detail || null,
               kind: metric !== undefined ? 'variation' : 'rate' },
       measure: metric !== undefined

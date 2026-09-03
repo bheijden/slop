@@ -129,6 +129,37 @@ the floor. A real trade rather than a free win, and it was taken deliberately.
 the floor is a separate decision resting on the same truncated evidence, so it
 has not been made.
 
+## The ported list wanted the same exponent and a different threshold
+
+`rules/load-bearing.json` was measured separately, because the exponent is a
+property of the pattern and that list is 1,198 words against this one's 250.
+Run `node tools/metric-sweep.mjs rules/load-bearing.json`.
+
+It lands on 0.7 as well — four folds out of four at 400 words — and the gain is
+larger, because a longer list saturates sooner and so suffers more from being
+divided by too small a power. Held out at 400 words it catches 22 of 24 against
+the square root's 14.
+
+Where the two rules part company is the threshold. Above the highest-scoring
+human document, load-bearing's populations leave a gap: the top human scores
+0.305 and the lowest machine document above it scores 0.318. A threshold of
+0.31 sits in that gap, so it costs **no false alarms at all**:
+
+| | full | 600w | 400w |
+|---|---|---|---|
+| 0.5 @ 1.20 (before) | 1 false alarm, 22/24 | 1 false alarm, 16/24 | 10/24 |
+| **0.7 @ 0.31** | **0 false alarms, 22/24** | **0, 21/24** | **0, 20/24** |
+
+Better on every axis, which is why it was applied without the deliberation the
+derived rule needed. The derived list has no such gap — buying zero false
+alarms there costs four documents — so the two rules carry different thresholds
+for a measured reason rather than an oversight.
+
+Only our layer changed. The 1,198 words are still upstream's, rebuilt from
+upstream by `tools/load-bearing.mjs`, which rewrites the pattern and leaves
+`notable` alone. Their method publishes a word list and no per-document rate;
+the metric that turns a list into a rule has always been ours.
+
 **The caveat that matters.** Every short-document number above comes from
 truncating a long document. A 400-word slice of a 1,000-word essay has an
 introduction and no conclusion, and its vocabulary is not necessarily

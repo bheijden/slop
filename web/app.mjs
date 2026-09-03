@@ -191,7 +191,12 @@ const OP_WORDS = { '>=': (t, u) => `${t} ${u} or more`, '>': (t, u) => `more tha
 function rateBlock(f) {
   const r = f.rate;
   if (!r) return `<div class="m">${esc(f.measure || f.name)}</div>`;
-  const unit = r.kind === 'variation' ? 'sentence-length variation' : `per ${r.per} ${r.unit}`;
+  // Three shapes: a rate per N words, a count over length^power, and the
+  // variation measure, which is neither.
+  const one = r.unit.replace(/s$/, '');
+  const unit = r.kind === 'variation' ? 'sentence-length variation'
+    : r.power ? (r.power === 0.5 ? `per root ${one}` : `per ${one}^${r.power}`)
+    : `per ${r.per} ${r.unit}`;
   const sub = r.kind === 'variation' ? (r.detail || '')
     : `${r.count} occurrence${r.count === 1 ? '' : 's'} in ${r.words} words`;
   const words = (OP_WORDS[r.op] || ((t, u) => `${r.op} ${t} ${u}`))(r.threshold, unit);
