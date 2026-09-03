@@ -50,7 +50,14 @@ const TOP = Number(arg('--top', 250));
 const SEED = Number(arg('--seed', 12345));
 const TRACK = 400;                           // words per cluster given a weekly history for the page
 
-const days = availableDays(DOCS);
+// Slicing the archive by date is how the contrast this method rests on gets
+// tested. The word ranking compares the machine-writing cluster against the
+// REST of the corpus, so it needs a rest that is mostly human. That was true
+// in early 2025 and is not true now, and a slice is the only way to measure
+// what that costs.
+const FROM = arg('--from', ''), TO = arg('--to', '');
+const days = availableDays(DOCS).filter((d) => (!FROM || d >= FROM) && (!TO || d <= TO));
+if (!days.length) { console.error(`no sampled days in ${FROM || 'start'}..${TO || 'end'}`); process.exit(1); }
 if (!days.length) { console.error(`no sampled days in ${DOCS}; run tools/pr-sample.mjs first`); process.exit(2); }
 
 // ---- pass one: how many documents each word appears in -------------------
