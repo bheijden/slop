@@ -139,11 +139,13 @@ async function main() {
       return JSON.stringify({total:boxes.length, on});
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
-    check('every set has a set-level toggle', D.total >= 8, String(D.total));
-    // All three shipped sets run whole; candidates are loaded but unchecked.
-    check('shipped sets run, candidate sets do not',
-      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'ai-vocabulary', 'load-bearing',
-                                                'simonwillison', 'wikipedia-ai']),
+    check('every set has a set-level toggle', D.total >= 5, String(D.total));
+    // Only what ships is offered. candidates/ is repository furniture: style
+    // profiles, and a record of patterns that measured backwards. A visitor has
+    // no way to tell those apart from a rule that earned its place.
+    check('every offered set runs, and nothing else is offered',
+      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'load-bearing', 'simonwillison',
+                                                'slop-vocabulary', 'wikipedia-ai']),
       D.on.join(','));
     // Two vocabulary rules ship on and they overlap by about a third of their
     // words, so a reader has to be able to see and separate them.
@@ -151,7 +153,7 @@ async function main() {
       .map(b => b.dataset.toggle).sort())`);
     const all = JSON.parse(offered.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
     check('both vocabulary sets are listed separately',
-      all.includes('ai-vocabulary') && all.includes('load-bearing'), all.join(','));
+      all.includes('slop-vocabulary') && all.includes('load-bearing'), all.join(','));
 
     // The panel says what is on. It must not argue about why.
     const noArgument = await evaluate(`JSON.stringify({
@@ -161,7 +163,7 @@ async function main() {
     })`);
     const NA = JSON.parse(noArgument);
     check('the rules panel states defaults without justifying them',
-      NA.notes === 0 && NA.tips === 0 && NA.offTags > 0, JSON.stringify(NA));
+      NA.notes === 0 && NA.tips === 0, JSON.stringify(NA));
 
     // Partly on is a third state. Turning one rule off has to leave the set
     // running and show it as neither fully on nor off.

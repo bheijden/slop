@@ -73,13 +73,13 @@ Five sets ship on:
 
 | set | rules | |
 |---|---|---|
-| `ai-vocabulary` | 1 | A list of ordinary words derived from public GitHub pull requests and rebuilt weekly. See [vocabulary.md](docs/vocabulary.md) |
+| `slop-vocabulary` | 1 | A list of ordinary words derived from public GitHub pull requests and rebuilt weekly. See [vocabulary.md](docs/vocabulary.md) |
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
 | `load-bearing` | 1 | How far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), rebuilt from upstream daily |
 | `ai-tells` | 78 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
-`ai-vocabulary` is derived rather than written. It samples public pull request
+`slop-vocabulary` is derived rather than written. It samples public pull request
 descriptions every morning, sorts them into five piles by the words they use,
 and publishes the vocabulary of the pile that AI tools sign. [The page](https://bheijden.github.io/slop/web/vocabulary.html)
 shows all five piles and every word's history; [vocabulary.md](docs/vocabulary.md)

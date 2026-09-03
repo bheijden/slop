@@ -771,13 +771,10 @@ function addSet(set, on = true) {
 async function loadBuiltins() {
   const m = await (await fetch('../rules/index.json')).json();
   for (const f of m.sets) addSet(await (await fetch('../rules/' + f)).json());
-  // Candidate sets, style profiles included, are the same kind of artifact and
-  // get the same panel. They arrive unchecked: tick one to see what it makes of
-  // your text without committing to it.
-  try {
-    const c = await (await fetch('../candidates/index.json')).json();
-    for (const f of c.sets) addSet(await (await fetch('../candidates/' + f)).json(), false);
-  } catch { /* candidates are optional */ }
+  // candidates/ holds work in progress: style profiles nobody asked for, and a
+  // record of patterns that measured backwards. They are worth keeping in the
+  // repository and not worth putting in front of a visitor, who has no way to
+  // tell them apart from the sets that ship.
 }
 
 /* worker — kept alive, so the timeout measures rule execution, not module load */

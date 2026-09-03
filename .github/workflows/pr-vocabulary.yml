@@ -10,7 +10,7 @@
 #
 # Any day the sampler has not reached yet is filled in from the back on every
 # run, so history accumulates without anyone scheduling it.
-name: ai-vocabulary
+name: slop-vocabulary
 
 on:
   schedule:
@@ -29,7 +29,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: ai-vocabulary
+  group: slop-vocabulary
   cancel-in-progress: false
 
 jobs:
@@ -86,7 +86,7 @@ jobs:
       - name: The rule still has to hold up
         if: steps.when.outputs.fit == 'yes'
         run: |
-          node js/cli.mjs test-rules rules/ai-vocabulary.json
+          node js/cli.mjs test-rules rules/slop-vocabulary.json
           node tests/run.mjs
           node js/cli.mjs check -r .
 
@@ -95,12 +95,12 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/docs data/cluster.json data/cluster-series.json \
-                  data/cluster-history.json rules/ai-vocabulary.json \
+                  data/cluster-history.json rules/slop-vocabulary.json \
                   web/vocabulary-data.json web/vocabulary.html
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
           if [ "${{ steps.when.outputs.fit }}" = "yes" ]; then
-            git commit -m "ai-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"
+            git commit -m "slop-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"
           else
-            git commit -m "ai-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d)"
+            git commit -m "slop-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d)"
           fi
           git push origin HEAD:main

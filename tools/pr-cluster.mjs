@@ -281,7 +281,7 @@ console.log('wrote data/cluster-series.json');
 }
 
 if (process.argv.includes('--write')) {
-  const path = join(ROOT, 'rules/ai-vocabulary.json');
+  const path = join(ROOT, 'rules/slop-vocabulary.json');
   const set = JSON.parse(readFileSync(path, 'utf8'));
   const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const [maj, min, patch] = (set.version || '0.1.0').split('.').map(Number);
@@ -291,5 +291,5 @@ if (process.argv.includes('--write')) {
                  stamped: `${(100 * publish.stamped).toFixed(1)}%`, words: keep.length };
   set.rules[0].match.pattern = `\\b(?:${keep.map((j) => esc(vocab[j])).join('|')})\\b`;
   writeFileSync(path, JSON.stringify(set, null, 2) + '\n');
-  console.log(`wrote rules/ai-vocabulary.json v${set.version}`);
+  console.log(`wrote rules/slop-vocabulary.json v${set.version}`);
 }

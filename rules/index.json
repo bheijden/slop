@@ -1,6 +1,6 @@
 {
   "sets": [
-    "ai-vocabulary.json",
+    "slop-vocabulary.json",
     "ai-tells.json",
     "load-bearing.json",
     "simonwillison.json",
