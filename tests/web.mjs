@@ -353,6 +353,29 @@ async function main() {
     const SG = JSON.parse(single);
     check('one file shows no list of files', SG.hidden === true, JSON.stringify(SG));
 
+    // Loading the example replaces whatever is open. It used to write straight
+    // into the textarea, which is only the source of truth while at most one
+    // file is loaded, so with a folder open the button did nothing at all.
+    const replace = await evaluate(`(async () => {
+      const dt = new DataTransfer();
+      const body = (n) => '# File ' + n + '\\n\\nIt is important to note that a. No x, no y, no z.\\n';
+      for (const n of ['p', 'q', 'r']) dt.items.add(new File([body(n)], n + '.md'));
+      dispatchEvent(new DragEvent('drop', {dataTransfer: dt, bubbles: true, cancelable: true}));
+      await new Promise(r => setTimeout(r, 1800));
+      const loaded = document.querySelectorAll('#tree button.f').length;
+      document.getElementById('b-example').click();
+      await new Promise(r => setTimeout(r, 2200));
+      return JSON.stringify({ loaded,
+        listed: document.querySelectorAll('#tree button.f').length,
+        tree: !document.getElementById('tree').hidden,
+        sections: document.querySelectorAll('#doc .filesec').length,
+        shows: document.getElementById('doc').innerText.slice(0, 40) });
+    })()`);
+    const SWAP = JSON.parse(replace);
+    check('the example replaces a whole folder, not just a single file',
+      SWAP.loaded === 3 && SWAP.listed === 0 && SWAP.tree === false
+      && SWAP.sections <= 1 && /retry loop/.test(SWAP.shows), JSON.stringify(SWAP));
+
     // Testing rules is its own page now, not a mode of this one. It prefills a
     // rule set with one rule that fails on purpose, so it shows what a failure
     // looks like without anything being loaded.

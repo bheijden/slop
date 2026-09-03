@@ -570,7 +570,9 @@ function renderTree() {
   // One document needs no list of documents.
   const multi = (S.results || []).length > 1;
   $('tree').hidden = !multi;
-  if (!multi) return;
+  // Emptied, not just hidden: a hidden list still answers selectors, and it
+  // would keep naming files that are no longer loaded.
+  if (!multi) { $('tree').innerHTML = ''; return; }
   let html = `<div class="thead">${S.results.length} files</div>`;
   let dir = null;
   S.results.forEach((r, i) => {
@@ -1068,10 +1070,12 @@ $('b-rfile').onclick = () => pickFile('.json', async (file) => {
 $('rules-src').addEventListener('input', run);
 $('rules-src').value = RULE_TEMPLATE;
 
-$('b-example').onclick = () => {
-  $('kind').value = S.kind = 'md';
-  S.name = 'example.md';
-  $('input').value = `# Why we deleted the retry loop
+// One document, loaded the way every other document is loaded. This used to
+// set the textarea directly, which is only the source of truth while at most
+// one file is open: with a folder loaded, currentDocs() reads S.docs and the
+// example was written into a box nothing was looking at, so the button did
+// nothing at all.
+const EXAMPLE = `# Why we deleted the retry loop
 
 Last month a customer asked where three days of events had gone. They had not
 gone anywhere. They had been retried into a socket nobody was reading, and the
@@ -1158,8 +1162,7 @@ upstream defects in the same change was real, and we filed them instead.
 
 The punchline is that nobody noticed the loop for three years, and everybody
 noticed its absence in a day.`;
-  grow(); run();
-};
+$('b-example').onclick = () => loadDocs([{ name: 'example.md', kind: 'md', src: EXAMPLE }]);
 $('b-file').onclick = () => {
   const i = Object.assign(document.createElement('input'), {
     type: 'file', multiple: true,
