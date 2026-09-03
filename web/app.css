@@ -91,7 +91,8 @@ a{color:var(--blue)}
    bottom of its cell and the last line was simply unreachable. It should rarely
    need to — the type tightens on a short viewport so three sentences and the
    links fit a tablet in landscape without moving. */
-.say{gap:7px;overflow:auto;scrollbar-width:thin}
+.say{gap:7px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+     scrollbar-width:thin;touch-action:pan-y}
 .say p{margin:0;color:var(--muted);max-width:46ch;line-height:1.5}
 @media (max-height:900px){
   .say{gap:5px}
@@ -143,9 +144,12 @@ select.chip{padding:2px 4px}
 .list .w{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .list .x{color:var(--flag);font-variant-numeric:tabular-nums;font-size:11px}
 
-/* Under about 900px six cells stop being a dashboard, so it becomes a column
-   that scrolls with each cell given a workable height of its own. */
-@media (max-width:900px){
+/* Six cells stop being a dashboard on a small screen, so it becomes a column
+   that scrolls, with each cell given a workable height of its own.
+   The height condition matters as much as the width: a tablet in landscape is
+   wide enough for the grid and often not tall enough for what goes in it, and
+   a cell that quietly clips is worse than a page that scrolls. */
+@media (max-width:900px), (max-height:560px){
   body{overflow:auto}
   .dash{height:auto;grid-template-columns:1fr;grid-template-rows:none}
   .cell{min-height:0}

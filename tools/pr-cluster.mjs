@@ -195,14 +195,16 @@ const clusters = Array.from({ length: K }, (_, c) => ({
 }));
 const publish = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
 
-// Renumber so the index means the position in the stack the page draws. Zero is
-// the published cluster, which sits on the axis because it is what the rule is
-// built from; the rest follow it upward, largest first. k-means hands back
-// arbitrary labels, and leaving them arbitrary meant the chart's bottom band was
-// "cluster 7" and cycling through the list walked the highlight around the stack
-// in no order at all.
-const stackOrder = [publish, ...clusters.filter((x) => x !== publish).sort((a, b) => b.share - a.share)];
+// Renumber so the index means the position in the stack the page draws, and so
+// that one metric explains the whole ordering: signed share, descending. Zero is
+// therefore the published cluster -- the selector on the line above is that same
+// metric's maximum -- and walking up the stack walks down the signed share.
+// k-means hands back arbitrary labels, and leaving them arbitrary meant the
+// chart's bottom band was "cluster 7" and cycling through the list walked the
+// highlight around the stack in no order at all.
+const stackOrder = [...clusters].sort((a, b) => b.stamped - a.stamped);
 stackOrder.forEach((x, i) => { x.stack = i; });
+if (stackOrder[0] !== publish) throw new Error('stack 0 must be the published cluster');
 
 console.log(`  c    size    start      end   arrived   stamped   most characteristic words`);
 for (const x of stackOrder) {

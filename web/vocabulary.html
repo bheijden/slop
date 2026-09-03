@@ -206,9 +206,13 @@ function render() {
   const ai = (DATA.browse.find((g) => g.published) || {}).stamped || 0;
   $('say1').innerHTML = `We grouped GitHub pull requests since 2025 into <b>${f.k} clusters</b>
     of vocabulary.`;
-  $('say2').innerHTML = `One cluster has grown from <b>${pc(from)}</b> of all pull requests to
-    <b>${pc(to)}</b>. In <b>${pc(ai)}</b> of them the tool that wrote the text
-    <span class="term" tabindex="0" title="${esc(DEF.signed)}">signed</span> it.`;
+  // One claim, one verb carrying it, round numbers. The earlier version put
+  // three decimals and a note about signatures where the headline should be,
+  // and read like a page of notes rather than a thing worth knowing.
+  const inFive = Math.round(ai * 5);
+  $('say2').innerHTML = `One of them appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of all
+    pull requests today. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five of those are
+    <span class="term" tabindex="0" title="${esc(DEF.signed)}">signed</span> by the AI that wrote them.`;
   $('say3').innerHTML = `Its most representative words should look familiar to anyone who uses coding
     agents.`;
 
@@ -279,10 +283,10 @@ function drawArrive() {
       stroke-opacity=".55"><title>group ${c}: ${pc(share)} of the last week</title></path>`);
     for (let i = 0; i < S.length; i++) base[i] = upper[i];
   };
-  // The clusters arrive numbered by their place in this stack: nought is the one
-  // the slop rule is built from and sits on the axis, and the numbers climb with
-  // the bands. So drawing them in order is the whole of the layout, and cycling
-  // through the list walks the highlight straight up the chart.
+  // The clusters arrive numbered by signed share, descending, so the number means
+  // one thing the whole way up: nought is the most signed group, which is the one
+  // the slop rule is built from, and it sits on the axis. So drawing them in order
+  // is the whole of the layout, and cycling walks the highlight straight up.
   const steps = [0.46, 0.38, 0.31, 0.25, 0.20, 0.16, 0.13, 0.10, 0.08, 0.06];
   order.forEach((c, i) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
                                c === reg ? 0.85 : steps[i % steps.length]));

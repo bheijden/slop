@@ -589,6 +589,21 @@ async function main() {
       && ST.bottomStartsColoured && ST.bottomNoLongerColoured && ST.lockstep,
       JSON.stringify(ST));
 
+    // One metric explains the stack: signed share, descending. Position 0 is
+    // therefore the cluster the rule is built from, because that is the same
+    // metric's maximum. Before this, 0 was the published one and 1..9 were
+    // ordered by size, so the axis carried two meanings at once.
+    const ord = await evaluate(`(async () => {
+      const d = await fetch('vocabulary-data.json').then(r => r.json());
+      const c = d.browse.map(x => x.stamped);
+      return JSON.stringify({stamped: c, sorted: c.every((v,i) => i === 0 || c[i-1] >= v),
+        ids: d.browse.map(x => x.id).join(','),
+        publishedIsZero: d.browse.findIndex(x => x.published) === 0});
+    })()`);
+    const O = JSON.parse(ord);
+    check('the stack is ordered by one number, and the rule comes from the top of it',
+      O.sorted && O.publishedIsZero, JSON.stringify(O));
+
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.
     // Scoped to the copy we wrote, not the whole page: the word list is data, and
