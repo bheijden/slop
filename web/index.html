@@ -292,11 +292,14 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="cell tally" id="tally"></div>
 
   <div class="cell pad say">
+    <div class="prose">
     <p>A linter for prose. It flags stock language-model phrasing &mdash;
       <b>it is important to note that</b>, <b>no X, no Y, no Z</b> &mdash; at the line it came
       from, with a fix. Nothing leaves your browser.</p>
     <p class="dim" id="loaded" hidden></p>
     <aside class="tree" id="tree" hidden></aside>
+    </div>
+    <div id="cta"></div>
     <div class="more" id="doc-tools">
       <button id="b-example">Load an example</button>
       <button id="b-file">Choose a file</button>

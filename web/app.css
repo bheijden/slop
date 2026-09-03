@@ -91,7 +91,12 @@ a{color:var(--blue)}
    bottom of its cell and the last line was simply unreachable. It should rarely
    need to — the type tightens on a short viewport so three sentences and the
    links fit a tablet in landscape without moving. */
-.say{gap:7px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+/* The panel itself no longer scrolls. Its prose does, and the call to action
+   and the links below it stay put, because a narrow window used to push the
+   button off the bottom of the one panel every page shares. */
+.say{gap:7px;overflow:hidden}
+.say .prose{display:flex;flex-direction:column;gap:inherit;min-height:0;flex:1 1 auto;
+     overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
      scrollbar-width:thin;touch-action:pan-y}
 /* One size on all three pages, and not a function of the viewport. This used
    to shrink at two viewport heights, so the same paragraph was 13px on a tall
@@ -189,7 +194,23 @@ select.chip{padding:2px 4px}
 /* ---- the install sheet -------------------------------------------------- */
 /* Sits beside the theme toggle so every page can reach it without spending a
    panel on it. */
-.sheeter{right:44px}
+/* The call to action. It is the widest thing in the panel and the only filled
+   control on the page, because everything else here exists to earn it. */
+/* The auto margin belongs to the slot, not the button: the button is a child of
+   the slot, so putting it on the button pushed it inside a box of its own height
+   and left the panel's slack below the links. */
+#cta{display:flex;flex:none;padding-top:10px}
+.cta{display:grid;grid-template-columns:auto 1fr;gap:1px 9px;width:100%;
+  padding:9px 12px;border:1px solid transparent;border-radius:9px;background:var(--blue);
+  color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:var(--lift)}
+.cta:hover{filter:brightness(1.08)}
+.cta:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.cta svg{grid-row:1 / span 2;align-self:center;width:17px;height:17px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.cta-t{font-size:13px;font-weight:600;letter-spacing:.01em}
+.cta-s{font-size:11px;opacity:.82;line-height:1.35}
+/* The panel's own links follow it, so the button is not the last thing pinned. */
+.say .more{margin-top:8px}
 .sheet{width:min(680px,calc(100vw - 32px));max-height:min(78vh,760px);padding:0;border:1px solid var(--hair);
   border-radius:12px;background:var(--card);color:var(--ink);box-shadow:0 18px 48px rgba(0,0,0,.28);
   overflow-y:auto;overscroll-behavior:contain}

@@ -525,18 +525,27 @@ async function main() {
       const sheet = await evaluate(`(async () => {
         const b = document.getElementById('installer');
         if (!b) return JSON.stringify({err: 'no button'});
+        const r = b.getBoundingClientRect();
+        const panel = document.querySelector('.say').getBoundingClientRect();
+        const inPanel = r.left >= panel.left - 2 && r.right <= panel.right + 2
+                        && r.top >= panel.top - 2;
+        const wide = r.width > panel.width * 0.8;
         b.click();
         await new Promise(r => setTimeout(r, 300));
         const d = document.querySelector('dialog.sheet');
         const cmds = [...d.querySelectorAll('.sheet-c pre')].map(p => p.textContent);
         return JSON.stringify({open: d.open, blocks: cmds.length,
-          wide: d.scrollWidth > d.clientWidth + 2,
+          overflows: d.scrollWidth > d.clientWidth + 2,
+          inPanel, wide,
+          // The skill is the call to action, so it leads.
+          skillFirst: cmds[0].includes('.claude/skills/linting-prose'),
           npx: cmds.some(c => c.includes('npx --yes github:bheijden/slop')),
           skill: cmds.some(c => c.includes('.claude/skills/linting-prose'))});
       })()`);
       const H = JSON.parse(sheet);
-      check(`how to install and run it is reachable from ${where}`,
-        H.open && H.blocks >= 5 && H.npx && H.skill && !H.wide, JSON.stringify(H));
+      check(`installing it is the call to action on ${where}`,
+        H.open && H.blocks >= 5 && H.npx && H.skill && !H.overflows
+        && H.skillFirst && H.inPanel && H.wide, JSON.stringify(H));
     }
 
     // One type size for the standing prose, on all three pages and at any
@@ -545,15 +554,19 @@ async function main() {
     const sizes = [];
     for (const [where, url] of [['check', base], ['rules', base + 'rules.html'],
                                 ['vocabulary', base + 'vocabulary.html']]) {
-      for (const h of [900, 800, 760]) {
+      for (const h of [900, 800, 760, 620]) {
         await send('Emulation.setDeviceMetricsOverride',
-          { width: 1400, height: h, deviceScaleFactor: 1, mobile: false });
+          { width: 1180, height: h, deviceScaleFactor: 1, mobile: false });
         await send('Page.navigate', { url });
         await sleep(1600);
         const got = await evaluate(`(() => { const p = document.querySelector('.say p');
-          const c = getComputedStyle(p);
+          const c = getComputedStyle(p), say = document.querySelector('.say');
+          const panel = say.getBoundingClientRect();
+          const cta = document.getElementById('installer').getBoundingClientRect();
           return JSON.stringify({ font: c.fontSize,
-            fills: p.getBoundingClientRect().width / document.querySelector('.say').clientWidth });
+            fills: p.getBoundingClientRect().width / say.clientWidth,
+            // The button must never be what a short window cuts off.
+            ctaWhole: cta.top >= panel.top - 1 && cta.bottom <= panel.bottom + 1 && cta.height > 30 });
         })()`);
         sizes.push({ where, h, ...JSON.parse(got) });
       }
@@ -565,6 +578,10 @@ async function main() {
     // And it uses the column it is given rather than stopping short of it.
     check('the prose uses the width of its panel',
       sizes.every((x) => x.fills > 0.85), sizes.map((x) => x.fills.toFixed(2)).join(' '));
+    // Only the prose scrolls, so the call to action survives a short window.
+    check('the call to action is never the thing that gets cut off',
+      sizes.every((x) => x.ctaWhole),
+      sizes.filter((x) => !x.ctaWhole).map((x) => `${x.where}@${x.h}`).join(' '));
 
     // The lower-left panel belongs to the page it is on. On check it asks which
     // sets to run; on test rules that question is meaningless -- the page tests

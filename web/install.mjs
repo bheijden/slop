@@ -11,24 +11,10 @@ const REPO = 'https://github.com/bheijden/slop';
 
 const BLOCKS = [
   {
-    h: 'Run it once',
-    p: 'Nothing installed. Needs only Node.',
-    cmd: 'npx --yes github:bheijden/slop check docs/ -r',
-  },
-  {
-    h: 'Run it often',
-    p: 'A clone starts about 25&times; faster. No dependencies.',
-    cmd: 'git clone --depth 1 https://github.com/bheijden/slop\nnode slop/js/cli.mjs check docs/ -r',
-  },
-  {
-    h: 'Fail a build on it',
-    p: 'Findings never fail a run on their own. Set a budget when they should.',
-    cmd: 'slop check --max-per-1000 2 docs/ -r\nslop check --format json docs/ -r',
-  },
-  {
-    h: 'Give it to a coding agent',
-    p: 'The agent then runs it by itself whenever it writes prose for you. '
-     + 'About 100 tokens to have installed; the body loads only when it triggers.',
+    h: 'Give it to your coding agent',
+    p: 'The point of everything else on this page. The agent runs slop on its own prose as it '
+     + 'writes, so the phrasing never reaches you. About 100 tokens to have installed; the body '
+     + 'loads only when it triggers.',
     cmd: 'D=~/.claude/skills/linting-prose\n'
        + 'R=https://raw.githubusercontent.com/bheijden/slop/main/skill\n'
        + 'mkdir -p $D/reference\n'
@@ -49,25 +35,47 @@ const BLOCKS = [
        + '~/.claude/skills/linting-prose/. Migrate any rule sets under .slop/rules/\n'
        + 'and run: slop test-rules <file>',
   },
+  {
+    h: 'Run it once, by hand',
+    p: 'Nothing installed. Needs only Node.',
+    cmd: 'npx --yes github:bheijden/slop check docs/ -r',
+  },
+  {
+    h: 'Run it often',
+    p: 'A clone starts about 25&times; faster. No dependencies.',
+    cmd: 'git clone --depth 1 https://github.com/bheijden/slop\n'
+       + 'node slop/js/cli.mjs check docs/ -r',
+  },
+  {
+    h: 'Fail a build on it',
+    p: 'Findings never fail a run on their own. Set a budget when they should.',
+    cmd: 'slop check --max-per-1000 2 docs/ -r\nslop check --format json docs/ -r',
+  },
 ];
+
+
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+// The call to action, not a 26px icon in a corner. It sits at the foot of the
+// standing prose on every page, which is the one panel that does not change
+// between check, rule sets and vocabulary.
 const btn = document.createElement('button');
-btn.className = 'themer sheeter';
+btn.className = 'cta';
 btn.id = 'installer';
-btn.title = 'How to install and run it';
-btn.setAttribute('aria-label', 'How to install and run it');
 btn.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true">
-  <path d="M4 6.5L7.5 10 4 13.5"/><path d="M10.5 14h5.5"/></svg>`;
+    <path d="M4 6.5L7.5 10 4 13.5"/><path d="M10.5 14h5.5"/></svg>
+  <span class="cta-t">Install the skill</span>
+  <span class="cta-s">so your coding agent lints its own prose</span>`;
 
 const dlg = document.createElement('dialog');
 dlg.className = 'sheet';
 dlg.innerHTML = `
   <form method="dialog" class="sheet-x"><button aria-label="Close">&times;</button></form>
-  <h2>Install and run</h2>
-  <p class="sheet-lead">A prose linter that runs anywhere Node does. The page you are on
-    is the same engine, and nothing you paste into it leaves your browser.</p>
+  <h2>Install the skill</h2>
+  <p class="sheet-lead">The best time to catch this phrasing is before it is written. Installed
+    as a skill, slop runs inside your coding agent on the prose it is about to hand you. It is
+    also a linter you can run yourself, anywhere Node does.</p>
   ${BLOCKS.map((b) => `<section class="sheet-b">
     <h3>${esc(b.h)}</h3>
     <p>${b.p}</p>
@@ -77,7 +85,9 @@ dlg.innerHTML = `
     <a href="${REPO}/blob/main/docs/skill.md">the agent skill</a> &middot;
     <a href="${REPO}/blob/main/docs/rules.md">the rule format</a></p>`;
 
-document.body.append(btn, dlg);
+const slot = document.getElementById('cta');
+(slot || document.body).append(btn);
+document.body.append(dlg);
 btn.onclick = () => dlg.showModal();
 // Clicking the backdrop closes it. The dialog fills its own box, so a click
 // whose target is the dialog itself landed outside the content.
