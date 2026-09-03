@@ -56,9 +56,9 @@ const DEF = {
   ruleSet: 'A single JSON file holding patterns, when each one is worth reporting, and the '
          + 'examples it must catch and must not. Every set here is one file, and you can load '
          + 'your own from a URL or off disk.',
-  derived: 'Two of these sets are not written by hand. They are word lists measured from public '
-         + 'GitHub pull request descriptions and rebuilt every Monday, so they follow how machine '
-         + 'writing actually moves rather than how anyone remembers it.',
+  derived: 'This set is not written by hand. It is a word list measured from public GitHub pull '
+         + 'request descriptions, re-derived every Monday, so it follows how machine writing '
+         + 'actually moves rather than how anyone remembers it. The date is that last rebuild.',
   variants: 'The same example marked up twenty-two different ways — bold in the middle of a word, '
           + 'a link around half of it, an HTML entity for the apostrophe, a line break mid-phrase. '
           + 'A pattern that only matches clean text passes the example and fails these.',
@@ -71,7 +71,9 @@ const term = (k, text) => `<span class="term" tabindex="0" data-tip="${attr(DEF[
 function renderSay() {
   const sets = S.sets.length;
   const rules = S.sets.reduce((a, x) => a + x.rules.length, 0);
-  const built = (S.sets.find((x) => x.corpus?.built) || {}).corpus?.built;
+  // Only the derived set carries a build date, so name it rather than saying
+  // "two are derived", which left the reader asking which two.
+  const measured = S.sets.find((x) => x.corpus?.built);
   if (PAGE === 'check') {
     // Open with the tells themselves. Anyone who has read a generated draft
     // recognises these two on sight, and recognition is the whole argument.
@@ -92,8 +94,9 @@ function renderSay() {
     $('say3').innerHTML = `Open any of the <b>${sets}</b> on the left. Every one is a single `
       + 'JSON file you can fork.';
   }
-  $('stamp').innerHTML = built
-    ? `${term('derived', 'two are derived')} &middot; rebuilt <b>${esc(built)}</b>`
+  $('stamp').innerHTML = measured
+    ? `${term('derived', esc(measured.title || measured.name))} rebuilt `
+      + `<b>${esc(measured.corpus.built)}</b>`
     : `<b>${rules}</b> rules in <b>${sets}</b> sets`;
 }
 const PAGE = document.body.dataset.page === 'rules' ? 'rules' : 'check';

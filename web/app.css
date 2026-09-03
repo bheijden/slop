@@ -104,7 +104,7 @@ a{color:var(--blue)}
    and the links below it stay put, because a narrow window used to push the
    button off the bottom of the one panel every page shares. */
 .say{gap:7px;overflow:hidden}
-.say .prose{display:flex;flex-direction:column;gap:inherit;min-height:0;flex:1 1 auto;
+.say .prose{display:flex;flex-direction:column;gap:inherit;min-height:0;flex:0 1 auto;
      overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
      scrollbar-width:thin;touch-action:pan-y}
 /* One size on all three pages, and not a function of the viewport. This used
@@ -208,7 +208,7 @@ select.chip{padding:2px 4px}
 /* The auto margin belongs to the slot, not the button: the button is a child of
    the slot, so putting it on the button pushed it inside a box of its own height
    and left the panel's slack below the links. */
-#cta{display:flex;flex:none;padding-top:8px}
+#cta{display:flex;flex:none;margin-top:auto;padding-top:12px}
 /* Its own colours per theme, not one formula for both. A solid --blue fill was
    a dark slab on the light page; mixing the accent against --card came out pale
    on both and near enough identical. These are picked separately: a clear blue
