@@ -44,9 +44,10 @@ const $ = (id) => document.getElementById(id)
   || GONE.get(id)
   || (GONE.set(id, Object.assign(document.createElement('div'), { id })), GONE.get(id));
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const PAGE = document.body.dataset.page === 'rules' ? 'rules' : 'check';
 const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:0, skipped:0,
-            kind:'md', name:'input',
-            view:'source', mode:(document.body.dataset.page === 'rules' ? 'fudge' : 'check'),
+            kind:'md', name:'input', setFile:{},
+            view:'source', mode:(PAGE === 'rules' ? 'fudge' : 'check'),
             sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
@@ -134,7 +135,11 @@ function addSet(set, on = true) {
 }
 async function loadBuiltins() {
   const m = await (await fetch('../rules/index.json')).json();
-  for (const f of m.sets) addSet(await (await fetch('../rules/' + f)).json());
+  for (const f of m.sets) {
+    const set = await (await fetch('../rules/' + f)).json();
+    S.setFile[set.name] = '../rules/' + f;
+    addSet(set);
+  }
   // candidates/ holds work in progress: style profiles nobody asked for, and a
   // record of patterns that measured backwards. They are worth keeping in the
   // repository and not worth putting in front of a visitor, who has no way to
@@ -501,7 +506,53 @@ function scrollToDoc(i) {
   if (grp && S.layout !== 'text') grp.scrollIntoView({ block: 'start', behavior });
 }
 
+// On test rules the lower-left holds a library instead of a switchboard. The
+// page tests whatever is in the editor, so which sets are ticked on for
+// checking is meaningless here -- the useful thing is to open a shipped set and
+// read, fork or break it.
+function renderLibrary() {
+  const el = $('rules');
+  el.innerHTML = S.sets.map((set) => {
+    const t = set.rules.reduce((a, r) => a + (r.tests ? (r.tests.hit || []).length + (r.tests.miss || []).length : 0), 0);
+    return `<button class="libset" data-open="${esc(set.name)}">
+      <span class="nm">${esc(set.title || set.name)}</span>
+      <span class="cnt">${set.rules.length} ${set.rules.length === 1 ? 'rule' : 'rules'}${t ? ` &middot; ${t} examples` : ''}</span>
+    </button>`;
+  }).join('') + `<div class="load">
+      <input type="url" data-url placeholder="https://…/house-style.json">
+      <div class="row"><button data-add>Open from URL</button><button data-file>Choose file…</button></div>
+      <div class="err" data-err></div></div>`;
+
+  for (const b of el.querySelectorAll('button[data-open]')) {
+    b.onclick = async () => {
+      const url = S.setFile[b.dataset.open];
+      if (!url) return;
+      // The file, not a re-serialised parse: what you open is what ships.
+      try {
+        $('rules-src').value = await (await fetch(url)).text();
+        run();
+      } catch { el.querySelector('[data-err]').textContent = `Could not open ${url}.`; }
+    };
+  }
+  const q = (sel) => el.querySelector(sel);
+  q('[data-add]').onclick = async () => {
+    const u = q('[data-url]').value.trim(); if (!u) return;
+    try {
+      const res = await fetch(u, { headers: { accept: 'application/json' } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      $('rules-src').value = await res.text();
+      q('[data-err]').textContent = ''; run();
+    } catch (e) { q('[data-err]').textContent = e.message; }
+  };
+  q('[data-file]').onclick = () => pickFile('.json', async (file) => {
+    $('rules-src').value = await file.text();
+    q('[data-err]').textContent = ''; run();
+  });
+  $('rule-hint').textContent = `${S.sets.length} to open`;
+}
+
 function renderRules() {
+  if (PAGE === 'rules') return renderLibrary();
   const counts = {};
   for (const f of S.flat) counts[f.rule] = (counts[f.rule] || 0) + 1;
   const el = $('rules');

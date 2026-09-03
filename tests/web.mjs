@@ -500,6 +500,56 @@ async function main() {
         `picked ${picked}, ${where} showed ${got}`);
     }
 
+    // How to run it has to be reachable from every page, and the sheet is the
+    // only place it lives now. It broke on first build because .sheet was
+    // already the name of a dead overlay on vocabulary.
+    for (const [where, url] of [['check', base], ['rules', base + 'rules.html'],
+                                ['vocabulary', base + 'vocabulary.html']]) {
+      await send('Page.navigate', { url });
+      await sleep(2200);
+      const sheet = await evaluate(`(async () => {
+        const b = document.getElementById('installer');
+        if (!b) return JSON.stringify({err: 'no button'});
+        b.click();
+        await new Promise(r => setTimeout(r, 300));
+        const d = document.querySelector('dialog.sheet');
+        const cmds = [...d.querySelectorAll('.sheet-c pre')].map(p => p.textContent);
+        return JSON.stringify({open: d.open, blocks: cmds.length,
+          wide: d.scrollWidth > d.clientWidth + 2,
+          npx: cmds.some(c => c.includes('npx --yes github:bheijden/slop')),
+          skill: cmds.some(c => c.includes('.claude/skills/linting-prose'))});
+      })()`);
+      const H = JSON.parse(sheet);
+      check(`how to install and run it is reachable from ${where}`,
+        H.open && H.blocks >= 5 && H.npx && H.skill && !H.wide, JSON.stringify(H));
+    }
+
+    // The lower-left panel belongs to the page it is on. On check it asks which
+    // sets to run; on test rules that question is meaningless -- the page tests
+    // what is in the editor -- so it offers a set to open instead.
+    await send('Page.navigate', { url: base + 'rules.html' });
+    await sleep(2500);
+    const lib = await evaluate(`(async () => {
+      const b = [...document.querySelectorAll('.libset')].find(x => /Simon/.test(x.textContent));
+      if (!b) return JSON.stringify({err: 'no library'});
+      b.click();
+      await new Promise(r => setTimeout(r, 1200));
+      return JSON.stringify({sets: document.querySelectorAll('.libset').length,
+        boxes: document.querySelectorAll('#rules input[type=checkbox]').length,
+        head: document.querySelector('#pane-rules .title').textContent,
+        opened: document.getElementById('rules-src').value.includes('"simonwillison"')});
+    })()`);
+    const L = JSON.parse(lib);
+    check('test rules offers a set to open, not a set to tick',
+      L.sets >= 5 && L.boxes === 0 && L.head === 'library' && L.opened, JSON.stringify(L));
+    await send('Page.navigate', { url: base });
+    await sleep(2200);
+    const box = await evaluate(`JSON.stringify({
+      boxes: document.querySelectorAll('#rules input[type=checkbox]').length,
+      sets: document.querySelectorAll('.libset').length})`);
+    const B = JSON.parse(box);
+    check('check still asks which sets to run', B.boxes > 5 && B.sets === 0, JSON.stringify(B));
+
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data
     // shape alone, and once on a stale cached data file paired with a fresh page.
