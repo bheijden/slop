@@ -388,110 +388,62 @@ async function main() {
     const ow = JSON.parse(own);
     check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
 
-    // The vocabulary page is a separate document with its own data file, so
-    // nothing above touches it. It has broken twice on data shape alone.
+    // The vocabulary page is a separate document with its own data file and its
+    // own layout, so nothing above touches it. It has broken three times on data
+    // shape alone, and once on a stale cached data file paired with a fresh page.
     await send('Page.navigate', { url: base + 'vocabulary.html' });
-    await sleep(2500);
+    await sleep(3000);
     const voc = await evaluate(`JSON.stringify({
-      lede: document.getElementById('lede').textContent.slice(0, 24),
-      bands: document.querySelectorAll('#stack path').length,
-      legend: document.querySelectorAll('#legend button').length,
+      say: document.getElementById('say1').textContent.slice(0, 30),
+      counts: document.querySelectorAll('#tally b').length,
+      bands: document.querySelectorAll('#arrive path').length,
       words: document.querySelectorAll('#list li').length,
-      axisLabels: [...document.querySelectorAll('#stack text')].map(t => t.textContent),
-      detail: (document.querySelector('.big .word') || {}).textContent || null
+      which: document.getElementById('which').textContent,
+      cap: document.getElementById('acap').textContent,
+      word: (document.querySelector('.word-head .w') || {}).textContent || null,
+      facts: document.querySelectorAll('.word-head .facts span').length,
+      rateLines: document.querySelectorAll('#rate path[stroke-width]').length
     })`);
     const v = JSON.parse(voc);
-    check('vocabulary page loads its data', !/have not been published/.test(v.lede) && v.words > 0,
-      JSON.stringify(v).slice(0, 160));
-    // The three pieces that carry the argument: which group was taken as the
-    // register, the per-small group evidence for one word, and the dropped list
-    // saying what step three removed. Each reads a different data shape.
-    const arg = await evaluate(`JSON.stringify({
-      groups: document.querySelectorAll('#groups li').length,
-      quiet: document.querySelectorAll('#groups .dot[data-quiet=true]').length,
-      dots: document.querySelectorAll('.dots circle').length,
-      versus: document.querySelectorAll('#flatlist li').length,
-      verdict: (document.querySelector('.verdict') || {}).textContent || null
-    })`);
-    const a = JSON.parse(arg);
-    check('the register chart draws a row per group', a.groups > 1 && a.quiet <= a.groups,
-      `${a.groups} rows, ${a.quiet} not the register`);
-    check('a word shows its lift in each small group', a.dots > 0, `${a.dots} dots`);
-    check('the two rankings are shown side by side', a.versus > 0, `${a.versus} rows`);
-    // The wording of a verdict is free to change; that a published word gets
-    // one, and that it talks about the small groups, is what has to hold.
-    check('a published word says why it was kept',
-      /small group/.test(a.verdict || '') && (a.verdict || '').length > 40,
-      String(a.verdict).slice(0, 90));
+    check('vocabulary page loads its data',
+      !/Could not load/.test(v.say) && v.words > 0 && v.counts === 3,
+      JSON.stringify(v).slice(0, 170));
+    check('the arrival chart draws a band per cluster',
+      v.bands >= 5 && /of pull requests/.test(v.cap), `${v.bands} bands, "${v.cap}"`);
+    check('a word opens with its rates and its trajectory',
+      !!v.word && v.facts >= 3 && v.rateLines >= 2, JSON.stringify(v).slice(0, 140));
 
-    const rej = await evaluate(`(async () => {
-      document.getElementById('tab-rej').click();
-      await new Promise(r => setTimeout(r, 300));
-      return JSON.stringify({
-        pressed: document.getElementById('tab-rej').getAttribute('aria-pressed'),
-        rows: document.querySelectorAll('#list li').length,
-        verdict: (document.querySelector('.verdict') || {}).textContent || ''
-      });
-    })()`);
-    const r2 = JSON.parse(rej);
-    check('the dropped list explains the drop', r2.pressed === 'true' && r2.rows > 0
-      && /small group/.test(r2.verdict) && /#\d/.test(r2.verdict) && r2.verdict !== a.verdict,
-      JSON.stringify(r2).slice(0, 140));
-
-    // Paging between groups is the whole point of the browse view: every group
-    // has to have a list of its own, not just the published one.
+    // Paging is the whole point of the browse view: every cluster has to carry a
+    // list of its own, not just the one that gets published.
     const paged = await evaluate(`(async () => {
-      document.getElementById('tab-kept').click();
       const first = [...document.querySelectorAll('#list li')].map(l => l.dataset.w).slice(0, 5);
-      const wasReg = document.getElementById('isreg').textContent;
       document.getElementById('next').click();
-      await new Promise(r => setTimeout(r, 300));
-      const second = [...document.querySelectorAll('#list li')].map(l => l.dataset.w).slice(0, 5);
-      return JSON.stringify({ first, second, wasReg,
-        nowReg: document.getElementById('isreg').textContent,
-        label: document.getElementById('which').textContent,
-        about: document.getElementById('about').textContent.length,
-        aboutStartsRight: /^group \\d/.test(document.getElementById('about').textContent),
-        rows: document.querySelectorAll('#list li').length });
+      await new Promise(r => setTimeout(r, 400));
+      return JSON.stringify({ first,
+        second: [...document.querySelectorAll('#list li')].map(l => l.dataset.w).slice(0, 5),
+        which: document.getElementById('which').textContent,
+        rows: document.querySelectorAll('#list li').length,
+        about: document.getElementById('about').textContent });
     })()`);
     const P = JSON.parse(paged);
-    check('paging shows a different group with its own words',
-      P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.label)
-      && P.about > 20 && P.aboutStartsRight,
-      JSON.stringify(P).slice(0, 400));
-    check('the register is labelled and the others are not',
-      P.wasReg.length > 0 && P.nowReg.length === 0, `"${P.wasReg}" then "${P.nowReg}"`);
+    check('paging shows a different cluster with its own words',
+      P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.which)
+      && /pull requests/.test(P.about), JSON.stringify(P).slice(0, 200));
 
-    // The arrival chart and the per-word rate history, both drawn from the whole
-    // archive rather than from the fitting window.
-    const hist = await evaluate(`(async () => {
-      document.getElementById('prev').click();
-      await new Promise(r => setTimeout(r, 400));
-      return JSON.stringify({
-        bands: document.querySelectorAll('#arrive path').length,
-        cap: document.getElementById('acap').textContent,
-        rateLines: document.querySelectorAll('.detail svg path[stroke-width]').length,
-        facts: document.querySelectorAll('.detail .facts').length
-      });
+    // Nothing on this page may use a word invented in the making of it. A reader
+    // arrives with no context and the copy has to work anyway.
+    const jargon = await evaluate(`(() => {
+      const t = document.body.innerText.toLowerCase();
+      return JSON.stringify(['register', 'small group', 'unsigned', 'lift', 'stratum', 'strata',
+        'contrast', 'corpus'].filter(w => t.includes(w)));
     })()`);
-    const HH = JSON.parse(hist);
-    check('the arrival chart draws a band per group',
-      HH.bands >= 5 && /signs itself/.test(HH.cap), JSON.stringify(HH).slice(0, 150));
-    check('a word shows its weekly rate, signed against all',
-      HH.rateLines >= 2 && HH.facts >= 2, JSON.stringify(HH).slice(0, 120));
-    check('the stack draws a band per signing tool', v.bands > 0 && v.legend === v.bands,
-      `${v.bands} bands, ${v.legend} legend entries`);
-    // Year rules used to be drawn once per week inside January, so the labels
-    // printed on top of one another and read as 202020251-01.
-    const dates = v.axisLabels.filter((t) => /^\d{4}-\d{2}$/.test(t));
-    check('date labels do not repeat or overlap', new Set(dates).size === dates.length,
-      dates.join(','));
-    check('picking a word fills the detail pane', !!v.detail, String(v.detail));
+    const J = JSON.parse(jargon);
+    check('the page uses no word invented in this project', J.length === 0, J.join(', '));
 
     const clicked = await evaluate(`(async()=>{
       const li=[...document.querySelectorAll('#list li')][3];
       const want=li.dataset.w; li.click(); await new Promise(r=>setTimeout(r,300));
-      return JSON.stringify({want, got:(document.querySelector('.big .word')||{}).textContent})})()`);
+      return JSON.stringify({want, got:(document.querySelector('.word-head .w')||{}).textContent})})()`);
     const cl = JSON.parse(clicked);
     check('clicking a word selects it', cl.want === cl.got, JSON.stringify(cl));
 

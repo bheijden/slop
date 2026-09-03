@@ -107,6 +107,17 @@ const out = {
 
 const json = JSON.stringify(out);
 writeFileSync(join(ROOT, 'web/vocabulary-data.json'), json + '\n');
+
+// Stamp the page with the build it belongs to. The page appends this to its
+// fetch, so a browser that has cached one of the two files cannot pair it with
+// a fresh copy of the other and fail in a way that looks like a drawing bug.
+{
+  const pagePath = join(ROOT, 'web/vocabulary.html');
+  const stamp = `${out.built}-${cluster.register.id}-${out.words.length}`;
+  const page = readFileSync(pagePath, 'utf8');
+  const next = page.replace(/<body(?: data-built="[^"]*")?>/, `<body data-built="${stamp}">`);
+  if (next !== page) { writeFileSync(pagePath, next); console.log(`stamped web/vocabulary.html with ${stamp}`); }
+}
 console.log(`sample: ${days.length} days, ${totals.signed} signed of ${totals.signed + totals.unsigned}`);
 console.log(`fit:    ${cluster.descriptions} descriptions, register is group ${cluster.register.id} at ` +
   `${(cluster.register.share * 100).toFixed(1)}% signed, ${cluster.words.length} words, ${cluster.dropped.length} shown as dropped`);
