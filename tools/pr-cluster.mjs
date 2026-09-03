@@ -247,7 +247,22 @@ for (let i = 0; i < N; i++) {
 }
 
 const built = new Date().toISOString().slice(0, 10);
-writeFileSync(join(ROOT, 'data/cluster.json'), JSON.stringify({
+// --dry fits and reports without touching data/ or rules/, so a sweep over k
+// cannot leave the page reading a fit nobody chose.
+const DRY = process.argv.includes('--dry');
+const OUT = arg('--out', '');
+if (DRY && OUT) {
+  const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  writeFileSync(OUT, JSON.stringify({ name: `k${K}`, version: '0.0.0', slop: '0.1.0',
+    title: `k=${K}`, rules: [{ id: `k${K}`, name: `k${K}`,
+      match: { kind: 'regex', pattern: `\\b(?:${keep.map((j) => esc(vocab[j])).join('|')})\\b`, flags: 'gi', distinct: true },
+      notable: { '>=': 0.40, per: 'root', unit: 'words',
+                 needs: { words: 600, sentences: 5, matches: 10 } },
+      description: 'sweep', suggest: 'sweep',
+      tests: { hit: [], miss: [] } }] }, null, 2) + '\n');
+  console.log(`wrote ${OUT}`);
+}
+if (!DRY) writeFileSync(join(ROOT, 'data/cluster.json'), JSON.stringify({
   built, days, k: K, iterations: iters, settled,
   descriptions: N, signed: sig.reduce((a, b) => a + b, 0), vocabulary: V,
   constants: { MIN_DF, MIN_WORDS, SMOOTH, MIN_AUTHORS, TOP, SEED },
@@ -265,9 +280,9 @@ writeFileSync(join(ROOT, 'data/cluster.json'), JSON.stringify({
   })),
   words: keep.map((j, i) => ({ w: vocab[j], rank: i + 1, lift: +lift[j].toFixed(3) })),
 }, null, 1) + '\n');
-console.log('\nwrote data/cluster.json');
+if (!DRY) console.log('\nwrote data/cluster.json');
 
-writeFileSync(join(ROOT, 'data/cluster-series.json'), JSON.stringify({
+if (!DRY) writeFileSync(join(ROOT, 'data/cluster-series.json'), JSON.stringify({
   built, from: weeks[0], to: weeks[weeks.length - 1],
   clusters: stackOrder.map((x) => x.stack), words: tracked,
   schema: 'weeks[].counts[i] is appearances of words[i] that week; countsSigned[i] the same over '
@@ -280,9 +295,9 @@ writeFileSync(join(ROOT, 'data/cluster-series.json'), JSON.stringify({
     counts: Array.from(counts[i]), countsSigned: Array.from(countsSigned[i]),
   })),
 }) + '\n');
-console.log('wrote data/cluster-series.json');
+if (!DRY) console.log('wrote data/cluster-series.json');
 
-{
+if (!DRY) {
   const path = join(ROOT, 'data/cluster-history.json');
   let hist = [];
   try { hist = JSON.parse(readFileSync(path, 'utf8')); } catch { /* first build */ }
@@ -295,8 +310,8 @@ console.log('wrote data/cluster-series.json');
   console.log(`wrote data/cluster-history.json  (${hist.length} builds)`);
 }
 
-if (process.argv.includes('--write')) {
-  const path = join(ROOT, 'rules/slop-vocabulary.json');
+if (process.argv.includes('--write') && !DRY) {
+  const path = join(ROOT, 'rules/pr-vocabulary.json');
   const set = JSON.parse(readFileSync(path, 'utf8'));
   const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const [maj, min, patch] = (set.version || '0.1.0').split('.').map(Number);
@@ -306,5 +321,5 @@ if (process.argv.includes('--write')) {
                  stamped: `${(100 * publish.stamped).toFixed(1)}%`, words: keep.length };
   set.rules[0].match.pattern = `\\b(?:${keep.map((j) => esc(vocab[j])).join('|')})\\b`;
   writeFileSync(path, JSON.stringify(set, null, 2) + '\n');
-  console.log(`wrote rules/slop-vocabulary.json v${set.version}`);
+  console.log(`wrote rules/pr-vocabulary.json v${set.version}`);
 }

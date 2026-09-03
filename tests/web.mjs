@@ -147,8 +147,8 @@ async function main() {
     // profiles, and a record of patterns that measured backwards. A visitor has
     // no way to tell those apart from a rule that earned its place.
     check('every offered set runs, and nothing else is offered',
-      JSON.stringify(D.on) === JSON.stringify(['ai-tells', 'load-bearing', 'simonwillison',
-                                                'slop-vocabulary', 'wikipedia-ai']),
+      JSON.stringify([...D.on].sort()) === JSON.stringify(['ai-tells', 'load-bearing',
+                                                'pr-vocabulary', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
     // Two vocabulary rules ship on and they overlap by about a third of their
     // words, so a reader has to be able to see and separate them.
@@ -156,7 +156,7 @@ async function main() {
       .map(b => b.dataset.toggle).sort())`);
     const all = JSON.parse(offered.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
     check('both vocabulary sets are listed separately',
-      all.includes('slop-vocabulary') && all.includes('load-bearing'), all.join(','));
+      all.includes('pr-vocabulary') && all.includes('load-bearing'), all.join(','));
 
     // The panel says what is on. It must not argue about why.
     const noArgument = await evaluate(`JSON.stringify({
@@ -537,11 +537,20 @@ async function main() {
       return JSON.stringify({sets: document.querySelectorAll('.libset').length,
         boxes: document.querySelectorAll('#rules input[type=checkbox]').length,
         head: document.querySelector('#pane-rules .title').textContent,
+        order: [...document.querySelectorAll('.libset .nm')].map(n => n.textContent).slice(0, 3),
+        nav: [...document.querySelectorAll('.mast a')].map(a => a.textContent),
         opened: document.getElementById('rules-src').value.includes('"simonwillison"')});
     })()`);
     const L = JSON.parse(lib);
-    check('test rules offers a set to open, not a set to tick',
+    check('rule sets offers a set to open, not a set to tick',
       L.sets >= 5 && L.boxes === 0 && L.head === 'library' && L.opened, JSON.stringify(L));
+    // The hand-written regex sets lead, because this page is where you go to
+    // read one. The two derived sets are a single generated pattern each and
+    // teach nothing about the format, so they follow.
+    check('the sets that best show the format come first',
+      JSON.stringify(L.order) === JSON.stringify(['Simon Willison', 'AI tells',
+        'Signs of AI writing (Wikipedia)']), JSON.stringify(L.order));
+    check('the page is called rule sets', L.nav.includes('rule sets'), L.nav.join(','));
     await send('Page.navigate', { url: base });
     await sleep(2200);
     const box = await evaluate(`JSON.stringify({

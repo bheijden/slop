@@ -1,14 +1,14 @@
 {
-  "name": "slop-vocabulary",
+  "name": "pr-vocabulary",
   "version": "0.1.19",
   "slop": "0.1.0",
-  "title": "The slop list",
+  "title": "PR vocabulary",
   "description": "AI writing draws on a recognisable vocabulary. This set holds one rule that measures how much of it a document uses.\n\nA register is a way of writing rather than a thing written about — academic, tabloid, legal, chatty are registers, and so is the way a machine writes a pull request description. A word list is only about the writing if the subject is held still, and holding it still is what the derivation below spends its effort on.\n\nThe words are derived here rather than taken from anyone. Some public pull request descriptions sign themselves — a trailing attribution line, or a shouted HTML comment. That signature says one thing reliably: this description was written by a machine. It does not say the unsigned ones were written by people, and it does not say a group holding more signatures is more machine-sounding, so it is used in exactly one place.\n\ntools/pr-sample.mjs samples a day of descriptions each morning and keeps each as a bag of words. tools/pr-cluster.mjs then does three things. It clusters coarsely and takes the group with the largest signed share, which is the register — that is the one use of the signature. It ranks that group's vocabulary by how much more the group uses each word than the whole rest of the corpus does. And it clusters again finely, dropping any word common enough to measure inside a single stratum and nowhere else, because such a word belongs to one part of the register rather than to the register.\n\nThe middle step is what makes the list usable. Ranking by how much more the signed half uses a word finds the work rather than the writing — agents get pointed at typecheck failures, so that vocabulary comes back, with a tool's own name at the top — and it has no term for rarity, so ordinary words outrank distinctive ones. Contrasting the register against the whole corpus supplies both. Measured on data/corpus, ranking by the signature alone catches 9 of 24 machine-written documents; ranking by the contrast catches 20.\n\nIt rebuilds itself: the sample runs daily, the derivation weekly. The agent signatures it splits on are groomed by hand through a pull request, because which tools exist is the one part that goes out of date on its own.",
   "source": "https://github.com/bheijden/slop",
   "rules": [
     {
-      "id": "slop-list",
-      "name": "Slop vocabulary",
+      "id": "pr-vocabulary",
+      "name": "Pull request vocabulary",
       "match": {
         "kind": "regex",
         "pattern": "\\b(?:nobody|quietly|nowhere|halves|survived|rung|arms|handed|load-bearing|somebody|refused|precisely|worse|refusal|indistinguishable|plainly|decides|asserted|outright|ruling|rides|genuinely|died|answered|told|hazard|twelve|carries|half|refuses|ladder|loud|carrying|carried|holds|defect|vacuous|byte-identical|opposite|pre-fix|parked|eleven|settles|minted|leg|says|genuine|merely|stands|re-derived|folded|sweep|ceiling|asymmetry|walked|fourth|hole|nothing|disagreed|sat|whoever|disagree|filed|arrived|buys|ten|armed|judgement|premise|deliberate|swept|held|survives|sitting|refusing|asks|gained|precedent|rests|answering|beside|standing|outage|blind|deliberately|legitimately|alone|surviving|worst|trap|offered|honest|judged|apart|cites|settled|re-verified|lever|loses|forever|pays|walk|ours|ruled|whose|asked|exemption|saying|fifth|machinery|nine|sides|measured|symptom|verdict|reproduces|beats|unit-tested|seam|backstop|empirically|owed|refusals|consequence|band|arriving|fired|lie|floor|incl|latent|defects|folds|flagging|stamped|stall|drives|whichever|knob|knowing|hands|dies|remedy|guessed|gains|probed|mutant|restated|drawn|loudly|ever|cheap|identically|twin|inert|counted|fed|carve-out|stayed|contradicted|cited|landed|widened|stamps|widening|fence|argued|reaches|drifted|priced|theirs|lands|census|fold|honestly|scored|structurally|prose|beat|verbatim|legs|refuse|sits|widens|stating|criterion|carry|dedup|proven|forbids|threw|idiom|degrades|agrees|untouched|faithful|drew|mutation-checked|draws|divergence|bit-identical|asserts|predicate|worth|staleness|kills|declined|discards|literally|invented|phantom|verdicts|re-read|vacuously|spellings|promised|straight|shipped|corpus|accident|throwaway|mints|mutants|mattered|flipped|grew|drain|predates|stranded|arrives|settle|said|sit|wrongly|survive|caller|honoured|caught|dial|admits|provably|stamp|bare|nudge|holding|spelled|directions|behavioural|spine|came)\\b",
@@ -52,6 +52,7 @@
     "words": 250
   },
   "aliases": [
+    "slop-vocabulary",
     "ai-vocabulary"
   ]
 }

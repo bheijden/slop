@@ -510,9 +510,21 @@ function scrollToDoc(i) {
 // page tests whatever is in the editor, so which sets are ticked on for
 // checking is meaningless here -- the useful thing is to open a shipped set and
 // read, fork or break it.
+// Which sets read best as worked examples of writing a rule. The two derived
+// sets are each a single generated pattern of a few hundred words, so they
+// teach nothing about the format; these three are hand-written regexes with
+// their own tests. Presentation only -- rules/index.json is generated, and
+// alphabetical there is right for the switchboard on check.
+const SHOWCASE = ['simonwillison', 'ai-tells', 'wikipedia-ai'];
+
 function renderLibrary() {
   const el = $('rules');
-  el.innerHTML = S.sets.map((set) => {
+  const rank = (set) => {
+    const i = SHOWCASE.indexOf(set.name);
+    return i === -1 ? SHOWCASE.length : i;
+  };
+  const shown = [...S.sets].sort((a, b) => rank(a) - rank(b));
+  el.innerHTML = shown.map((set) => {
     const t = set.rules.reduce((a, r) => a + (r.tests ? (r.tests.hit || []).length + (r.tests.miss || []).length : 0), 0);
     return `<button class="libset" data-open="${esc(set.name)}">
       <span class="nm">${esc(set.title || set.name)}</span>

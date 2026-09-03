@@ -1,6 +1,6 @@
 # Reproducing load-bearing, and the one place the signature improves on it
 
-`rules/slop-vocabulary.json` is derived by a method that is
+`rules/pr-vocabulary.json` is derived by a method that is
 [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing) with a
 single deliberate change. This file records what was tried, what was measured,
 and what was wrong along the way.

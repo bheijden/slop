@@ -6,7 +6,7 @@
 # rewritten every run, so the pull request always shows the current balance:
 # a candidate that turns out to be a fluke disappears from it before it is ever
 # merged, and one that keeps appearing accumulates evidence.
-name: slop-vocabulary markers
+name: pr-vocabulary markers
 
 on:
   schedule:
@@ -61,7 +61,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B marker-proposals
           git add data/marker-proposals.json
-          git commit -m "slop-vocabulary: ${{ steps.any.outputs.count }} unrecognised signatures"
+          git commit -m "pr-vocabulary: ${{ steps.any.outputs.count }} unrecognised signatures"
           git push --force origin marker-proposals
 
       - name: Open or update the pull request
@@ -71,7 +71,7 @@ jobs:
         run: |
           gh pr view marker-proposals >/dev/null 2>&1 && { echo "pull request already open, branch updated"; exit 0; }
           gh pr create --base main --head marker-proposals \
-            --title "slop-vocabulary: unrecognised agent signatures" \
+            --title "pr-vocabulary: unrecognised agent signatures" \
             --body "Footers and sentinel comments seen recently that \`data/markers.json\` does not recognise.
 
           Move a real agent into \`confirmed\`, anything else into \`rejected\`. Both stop it being proposed again.

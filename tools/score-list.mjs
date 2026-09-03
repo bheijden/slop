@@ -58,10 +58,17 @@ function score(label, words) {
 }
 
 console.log(`corpus: ${human.length} human, ${ai.length} machine documents; budget ${BUDGET} false alarm(s)\n`);
-for (const dir of ['rules', 'candidates']) {
-  for (const f of readdirSync(join(ROOT, dir))) {
-    if (!f.endsWith('.json') || f === 'index.json') continue;
-    const set = JSON.parse(readFileSync(join(ROOT, dir, f), 'utf8'));
+// Explicit paths score just those files, which is how a sweep over a parameter
+// gets compared without its candidates living in rules/.
+const named = process.argv.slice(2).filter((a) => a.endsWith('.json'));
+const targets = named.length
+  ? named
+  : ['rules', 'candidates'].flatMap((dir) => readdirSync(join(ROOT, dir))
+      .filter((f) => f.endsWith('.json') && f !== 'index.json')
+      .map((f) => join(ROOT, dir, f)));
+{
+  for (const path of targets) {
+    const set = JSON.parse(readFileSync(path, 'utf8'));
     for (const r of set.rules || []) {
       const w = r.match?.pattern && r.match.distinct ? wordsOf(r.match.pattern) : null;
       if (w && w.length >= 100) score(`${set.name}/${r.id}`, w);

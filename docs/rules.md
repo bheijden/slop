@@ -13,7 +13,7 @@ sharing and writing them.
 | `simonwillison` | 27 | Stock phrasings and rhythms models overproduce. From Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter). |
 | `wikipedia-ai` | 11 | Tells catalogued in Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). |
 | `load-bearing` | 1 | One measurement of how far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing). Rebuilt from upstream by `tools/load-bearing.mjs`. |
-| `slop-vocabulary` | on | The same idea derived here instead of taken from elsewhere, rebuilt weekly from GitHub. See [vocabulary.md](vocabulary.md). |
+| `pr-vocabulary` | 1 | The same idea derived here instead of taken from elsewhere, rebuilt weekly from GitHub pull requests. See [vocabulary.md](vocabulary.md). |
 
 Off by default, alongside the 5 style profiles:
 
