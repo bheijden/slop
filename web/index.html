@@ -272,13 +272,21 @@ body.resizing{cursor:col-resize;user-select:none}
 
 <div class="dash">
 
+  <button class="themer" id="theme" title="Theme: follow the system, light, or dark" aria-label="Change the theme">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <g class="a"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5a6.5 6.5 0 0 0 0 13z" fill="currentColor" stroke="none"/></g>
+        <g class="s"><circle cx="10" cy="10" r="3.6"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.6 4.6l1.4 1.4M14 14l1.4 1.4M15.4 4.6L14 6M6 14l-1.4 1.4"/></g>
+        <g class="m"><path d="M15.5 12.4A6.5 6.5 0 0 1 7.6 4.5a6.5 6.5 0 1 0 7.9 7.9z"/></g>
+      </svg>
+    </button>
+
+
   <div class="cell pad mast">
     <h1>slop<em>.</em></h1>
     <nav class="modes">
       <button id="m-check" aria-pressed="true">check</button>
       <button id="m-fudge" aria-pressed="false">test rules</button>
       <a href="vocabulary.html">vocabulary</a>
-      <button class="chip" id="theme" style="margin-left:6px" title="Light, dark, or whatever the system says">auto</button>
     </nav>
   </div>
 
@@ -401,50 +409,14 @@ function remember(k, v) { try { localStorage.setItem(k, v); } catch {} }
 /* theme — the toggle wins over the OS, because a browser forced to dark for
    every site should not force it here too. */
 const THEMES = ['auto','light','dark'];
-let theme = (() => { try { return localStorage.getItem('pc-theme') || 'auto'; } catch { return 'auto'; } })();
+let theme = (() => { try { return localStorage.getItem('slop-theme') || 'auto'; } catch { return 'auto'; } })();
 function applyTheme() {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
-  $('btn-theme').textContent = theme;
-  try { localStorage.setItem('pc-theme', theme); } catch {}
+  // The icon shows the state; there is no label to keep in step.
+  try { localStorage.setItem('slop-theme', theme); } catch {}
 }
-$('btn-theme').onclick = () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(); };
-$('b-rules').onclick = (e) => {
-  e.stopPropagation();
-  const open = $('rules-pop').hidden;
-  $('rules-pop').hidden = !open;
-  $('b-rules').setAttribute('aria-expanded', String(open));
-  // Seventeen sets is taller than most viewports. Open into whichever side of
-  // the button has more room, and take only what is there.
-  if (open) {
-    const r = $('b-rules').getBoundingClientRect();
-    const above = r.top - 16, below = window.innerHeight - r.bottom - 16;
-    const up = above >= Math.min(below, 320) || above >= below;
-    const pop = $('rules-pop');
-    pop.style.bottom = up ? 'calc(100% + 8px)' : 'auto';
-    pop.style.top = up ? 'auto' : 'calc(100% + 8px)';
-    pop.style.maxHeight = Math.max(180, Math.round(up ? above : below)) + 'px';
-  }
-};
-document.addEventListener('click', (e) => {
-  if (!$('rules-pop').hidden && !$('rules-pop').contains(e.target) && e.target !== $('b-rules')) {
-    $('rules-pop').hidden = true;
-    $('b-rules').setAttribute('aria-expanded', 'false');
-  }
-});
-addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !$('rules-pop').hidden) {
-    $('rules-pop').hidden = true;
-    $('b-rules').setAttribute('aria-expanded', 'false');
-  }
-});
-applyTheme();
-
-/* URL */
-const b64urlToBytes = (s) => {
-  const b = atob(s.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(s.length/4)*4,'='));
-  return Uint8Array.from(b, (c) => c.charCodeAt(0));
-};
+$('theme').onclick = () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(); };
 const gunzip = async (bytes) =>
   new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
 
@@ -938,8 +910,8 @@ function renderRules() {
     } catch (e) { q('[data-err]').textContent = e.message; }
   });
   const total = S.sets.reduce((a, s2) => a + s2.rules.length, 0);
+  // The count lives in the panel header now; there is no button to label.
   $('rule-hint').textContent = `${S.active.size} of ${total} on`;
-  $('b-rules').textContent = S.active.size === total ? `${total} rules` : `${S.active.size}/${total} rules`;
 }
 
 const TEXTY = /\.(md|markdown|mdown|mdx|html?|xhtml|txt|text|rst)$/i;
@@ -1336,7 +1308,77 @@ underscoring the value of an ever-evolving landscape.
 
 The parser is a tiny state machine. The renderer is a tiny state machine.
 
-That's the whole point, and you already know the answer.`;
+That's the whole point, and you already know the answer.
+
+## What changed
+
+The import path was rewritten. The old one did two jobs at once, and pulling
+them apart turned out to be simpler than adding a third. The first stage works
+out what to fetch; the second fetches it. Neither knows about the other.
+
+The retry loop now has a ceiling. It used to keep going, and it used to say so
+on every attempt, which meant a job stuck for an hour left twelve thousand lines
+behind it. It stops after the fourth try and writes one line about why.
+
+Somebody asked whether the cache is load-bearing. It is: the read path does not
+work without it, and the write path does not touch it. That is deliberate, and
+it seemed worth writing down rather than leaving for the next person to work out
+from the code.
+
+## What did not change
+
+The wire format. A break has been promised in each of the last three releases
+and postponed every time. It is postponed again. The migration costs more than
+anyone has wanted to spend, and until that changes the old shape stays.
+
+The default timeout stays at thirty seconds. Every proposal to move it has come
+with a different number and no measurement behind it, so the number that was
+already there is the number that survived.
+
+## Known rough edges
+
+A malformed header looks the same as a truncated one. The parser treated both
+identically for eleven months and nobody noticed, which probably says more about
+how rarely either turns up than about the parser. It now reports which of the
+two it found, and refuses to guess when it cannot tell.
+
+The progress bar does not render under a pipe. Nobody has picked this up, and it
+has gone back into the backlog twice.
+
+Compression hurts on small payloads. Below roughly four kilobytes the header
+costs more than the body saves. The check that was supposed to catch this went
+missing in the spring; it is scheduled for next quarter.
+
+## Upgrading
+
+Nothing is required of you. The new path produces the same bytes as the old one
+for every input we have. That is the only claim being made here: not that it is
+correct, but that it is unchanged. If you have a corpus where the two disagree,
+please send it, because that result would be far more interesting than another
+passing run.
+
+Anyone still on the build from before the flush fix should move off it. There is
+a defect in that path which a long-running process eventually trips, and
+restarting only postpones it. The fix is small and has been on the main branch
+since the fourth of the month.
+
+## Numbers
+
+Throughput on the sample corpus is up about nine per cent, which is within the
+noise of the last three runs and should not be read as an improvement. Memory is
+flat. Start-up time went up by four milliseconds, all of it in the new import
+stage, and none of it worth chasing.
+
+The one number that moved for a reason is the retry count. It fell from a median
+of six to a median of two, because the ceiling stops the loop long before it
+used to give up on its own. That is not the loop getting better at its job. It
+is the loop being told to stop asking.
+
+## Thanks
+
+To everyone who filed a report that turned out to be their own configuration and
+then said so: that is worth more than it sounds. A report withdrawn clearly
+makes the next one easier to believe.`;
   grow(); run();
 };
 $('b-file').onclick = () => {

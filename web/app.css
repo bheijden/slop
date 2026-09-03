@@ -136,3 +136,22 @@ select.chip{padding:2px 4px}
   .cell{min-height:0}
   .cell.chart,.cell.words,.cell.detail,.cell.big{min-height:320px}
 }
+
+/* The theme control sits in the corner of the screen rather than among the
+   destinations: it changes how the page looks, not which page you are on.
+   Sun for light, moon for dark, half-filled circle for following the system —
+   the usual three, so no label is needed. */
+.themer{position:fixed;top:10px;right:12px;z-index:60;width:26px;height:26px;padding:0;
+  display:grid;place-items:center;border:1px solid var(--hair);border-radius:7px;
+  background:var(--paper);color:var(--muted);cursor:pointer}
+.themer:hover{background:var(--sunk);color:var(--ink)}
+.themer svg{width:14px;height:14px;display:block;fill:none;stroke:currentColor;
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.themer .m{display:none}
+:root[data-theme=light] .themer .a,:root[data-theme=light] .themer .m{display:none}
+:root[data-theme=light] .themer .s{display:block}
+:root[data-theme=dark] .themer .a,:root[data-theme=dark] .themer .s{display:none}
+:root[data-theme=dark] .themer .m{display:block}
+.themer .s{display:none}
+:root:not([data-theme]) .themer .a{display:block}
+:root:not([data-theme]) .themer .s,:root:not([data-theme]) .themer .m{display:none}

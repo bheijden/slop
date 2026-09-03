@@ -73,13 +73,21 @@
 
 <div class="dash">
 
+  <button class="themer" id="theme" title="Theme: follow the system, light, or dark" aria-label="Change the theme">
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <g class="a"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5a6.5 6.5 0 0 0 0 13z" fill="currentColor" stroke="none"/></g>
+        <g class="s"><circle cx="10" cy="10" r="3.6"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.6 4.6l1.4 1.4M14 14l1.4 1.4M15.4 4.6L14 6M6 14l-1.4 1.4"/></g>
+        <g class="m"><path d="M15.5 12.4A6.5 6.5 0 0 1 7.6 4.5a6.5 6.5 0 1 0 7.9 7.9z"/></g>
+      </svg>
+    </button>
+
+
   <div class="cell pad mast">
-    <h1>The vocabulary that<br>arrives with the <em>machines</em></h1>
+    <h1>slop<em>.</em></h1>
     <nav class="modes">
       <a href="./">check</a>
       <a href="./#mode=fudge">test rules</a>
       <a href="vocabulary.html" aria-current="page">vocabulary</a>
-      <button class="chip" id="theme" style="margin-left:6px" title="Light, dark, or whatever the system says">auto</button>
     </nav>
   </div>
 
@@ -130,18 +138,20 @@ const fmt = (n) => n.toLocaleString('en');
 const pc = (v) => (v * 100).toFixed(1) + '%';
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
-/* theme, same three states as the rest of the site */
-const theme = $('theme');
+/* theme — three states, the same key and the same order as the other pages, so
+   a choice made on one of them holds on all of them. The button shows which
+   state it is in through the icon, so nothing here reads a label back. */
+const THEMES = ['auto', 'light', 'dark'];
+let themeAt = 'auto';
+try { themeAt = localStorage.getItem('slop-theme') || 'auto'; } catch (e) { /* private window */ }
 const setTheme = (v) => {
+  themeAt = v;
   if (v === 'auto') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', v);
-  theme.textContent = v;
-  try { localStorage.setItem('slop-theme', v); } catch (e) { /* private window */ }
+  try { localStorage.setItem('slop-theme', v); } catch (e) { /* ditto */ }
 };
-let saved = 'auto';
-try { saved = localStorage.getItem('slop-theme') || 'auto'; } catch (e) { /* ditto */ }
-setTheme(saved);
-theme.onclick = () => setTheme({ auto: 'light', light: 'dark', dark: 'auto' }[theme.textContent] || 'auto');
+setTheme(themeAt);
+$('theme').onclick = () => setTheme(THEMES[(THEMES.indexOf(themeAt) + 1) % THEMES.length]);
 
 let DATA = null, SELECTED = null, GROUP = 0;
 const groupAt = () => DATA.browse[GROUP];
