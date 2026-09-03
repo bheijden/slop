@@ -398,6 +398,23 @@ async function main() {
     const ow = JSON.parse(own);
     check('editing the rules re-runs the tests', /0 failing/.test(ow.score), JSON.stringify(ow));
 
+    // The bug this catches shipped: the surface was moved inside a block that
+    // stays hidden until there are findings, so there was nothing to type into
+    // and therefore never any findings. Setting .value from a test does not
+    // notice, because it never has to see the thing.
+    await send('Page.navigate', { url: base });
+    await sleep(2500);
+    const empty = await evaluate(`(() => {
+      const t = document.getElementById('input');
+      const r = t.getBoundingClientRect();
+      return JSON.stringify({ visible: r.width > 100 && r.height > 40,
+                              onScreen: r.top < innerHeight && r.bottom > 0,
+                              placeholder: !!t.placeholder });
+    })()`);
+    const E = JSON.parse(empty);
+    check('with nothing typed yet, there is somewhere to type',
+      E.visible && E.onScreen && E.placeholder, JSON.stringify(E));
+
     // The text you paste and the findings on it are one surface now, not two.
     // The overlay technique is easy to get subtly wrong: the caret has to land
     // where you click, the marks have to sit on the words they belong to, and

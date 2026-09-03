@@ -449,7 +449,7 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
 
 
 
-  <div class="results" id="results" hidden>
+  <div class="results" id="results">
     <div class="rhead">
       <h2 id="r-title"></h2>
       <div class="nav" id="nav" hidden>
@@ -877,8 +877,18 @@ function renderResults() {
     return;
   }
   $('views').hidden = $('divider').hidden = false;
-  if (!currentDocs().some((d) => d.src.trim())) { res.hidden = true; return; }
   res.hidden = false;
+  // Empty is a normal state, not a hidden one: this block holds the surface you
+  // type into, so it has to be on screen before there is anything to lint.
+  if (!currentDocs().some((d) => d.src.trim())) {
+    $('doc').innerHTML = '';
+    $('list').innerHTML = '';
+    $('r-title').textContent = '';
+    $('list-head').textContent = 'findings';
+    $('nav').hidden = $('b-copy').hidden = true;
+    $('pane-doc').dataset.edit = 'on';
+    return;
+  }
 
   const results = S.results || [];
   const total = S.flat.length;
