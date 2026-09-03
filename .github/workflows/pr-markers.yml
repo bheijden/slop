@@ -12,6 +12,11 @@ on:
   schedule:
     - cron: "30 8 * * 1"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "rehearse: do every step, then report the push instead of making it"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -62,10 +67,15 @@ jobs:
           git checkout -B marker-proposals
           git add data/marker-proposals.json
           git commit -m "pr-vocabulary: ${{ steps.any.outputs.count }} unrecognised signatures"
-          git push --force origin marker-proposals
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "REHEARSAL — everything above ran for real. The push is what is skipped:"
+            git --no-pager show --stat --oneline HEAD
+          else
+            git push --force origin marker-proposals
+          fi
 
       - name: Open or update the pull request
-        if: steps.any.outputs.changed == 'true'
+        if: steps.any.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

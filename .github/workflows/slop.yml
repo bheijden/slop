@@ -1,5 +1,9 @@
 name: slop
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  # So the whole suite can be rehearsed by hand alongside the scheduled jobs.
+  workflow_dispatch:
 
 jobs:
   rules:
@@ -12,6 +16,11 @@ jobs:
       - run: node tests/run.mjs
       - run: node tests/tune.mjs
       - run: node tests/suggest.mjs
+      # The numbers docs/vocabulary.md states about the derived rule, checked
+      # against what the rule actually does. This job runs the test scripts one
+      # by one rather than `npm test`, so a test added to package.json alone
+      # never runs here -- which is exactly what happened to this one.
+      - run: node tests/claims.mjs
       # The catalogue is generated. It listed 38 of the 117 rules that ship for
       # a while, because it was built by the tool that ports two vendor sets.
       - run: node tools/build-catalogue.mjs --check

@@ -21,6 +21,10 @@ on:
         description: "rewrite even when the list has not moved (to test this workflow)"
         type: boolean
         default: false
+      dry_run:
+        description: "rehearse: do every step, then report the push instead of making it"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -86,4 +90,9 @@ jobs:
           The threshold is not re-derived here and cannot be: it was set once, by
           hand, against a corpus that is not in this repository. That is what the
           40% ceiling is for."
-          git push origin HEAD:main
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            echo "REHEARSAL — everything above ran for real. The push is what is skipped:"
+            git --no-pager show --stat --oneline HEAD
+          else
+            git push origin HEAD:main
+          fi
