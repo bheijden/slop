@@ -871,6 +871,24 @@ async function main() {
     check('the highlighted copy says exactly what was typed',
       ST2.equal && ST2.extra === 0, JSON.stringify(ST2));
 
+    // A mark may colour the text; it may not move it. Every pixel it adds to
+    // the horizontal advance displaces everything after it on that line, and
+    // the selection is drawn by the textarea underneath, which has no marks.
+    // 1px of padding either side was 2px per mark, compounding across a line.
+    const boxes = await evaluate(`(() => {
+      const m = document.querySelector('#doc mark');
+      if (!m) return JSON.stringify({err: 'no marks'});
+      const c = getComputedStyle(m);
+      const n = (v) => parseFloat(v) || 0;
+      return JSON.stringify({
+        left: n(c.paddingLeft) + n(c.marginLeft) + n(c.borderLeftWidth),
+        right: n(c.paddingRight) + n(c.marginRight) + n(c.borderRightWidth),
+        display: c.display });
+    })()`);
+    const BX = JSON.parse(boxes);
+    check('a mark colours the text without moving it',
+      Math.abs(BX.left) < 0.01 && Math.abs(BX.right) < 0.01, JSON.stringify(BX));
+
     // The example is the demonstration, so it has to demonstrate: one piece of
     // writing long enough to be scored, tripping the hand-written patterns and
     // both derived word lists, rather than a paragraph for each bolted on.
