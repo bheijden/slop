@@ -554,9 +554,9 @@ async function main() {
     const sizes = [];
     for (const [where, url] of [['check', base], ['rules', base + 'rules.html'],
                                 ['vocabulary', base + 'vocabulary.html']]) {
-      for (const h of [900, 800, 760, 620]) {
+      for (const h of [900, 880, 800, 620]) {
         await send('Emulation.setDeviceMetricsOverride',
-          { width: 1180, height: h, deviceScaleFactor: 1, mobile: false });
+          { width: h >= 880 ? 1500 : 1180, height: h, deviceScaleFactor: 1, mobile: false });
         await send('Page.navigate', { url });
         await sleep(1600);
         const got = await evaluate(`(() => { const p = document.querySelector('.say p');
@@ -566,7 +566,14 @@ async function main() {
           return JSON.stringify({ font: c.fontSize,
             fills: p.getBoundingClientRect().width / say.clientWidth,
             // The button must never be what a short window cuts off.
-            ctaWhole: cta.top >= panel.top - 1 && cta.bottom <= panel.bottom + 1 && cta.height > 30 });
+            ctaWhole: cta.top >= panel.top - 1 && cta.bottom <= panel.bottom + 1 && cta.height > 30,
+            // The freshness line is not an answer if you have to scroll to it,
+            // so it lives outside the prose and must always be whole.
+            stampWhole: (() => { const st = say.querySelector('.stamp').getBoundingClientRect();
+              return st.top >= panel.top - 1 && st.bottom <= panel.bottom + 1 && st.height > 8; })(),
+            // At the size the dashboard is designed for, nothing should scroll.
+            fitsAtSize: (() => { const pr = say.querySelector('.prose');
+              return pr.scrollHeight <= pr.clientHeight + 1; })() });
         })()`);
         sizes.push({ where, h, ...JSON.parse(got) });
       }
@@ -578,6 +585,18 @@ async function main() {
     // And it uses the column it is given rather than stopping short of it.
     check('the prose uses the width of its panel',
       sizes.every((x) => x.fills > 0.85), sizes.map((x) => x.fills.toFixed(2)).join(' '));
+    // The standing prose is the panel's whole job and it must fit without
+    // scrolling at a normal window: three claims, live numbers, and a stamp.
+    // The stamp and the button are the two things a smaller window must not eat.
+    check('the freshness line is always whole', sizes.every((x) => x.stampWhole),
+      sizes.filter((x) => !x.stampWhole).map((x) => `${x.where}@${x.h}`).join(' '));
+
+    // And at the size the dashboard is built for, the prose fits without one.
+    const roomy = sizes.filter((x) => x.h >= 880);
+    check('at a full-size window nothing in the panel scrolls',
+      roomy.length > 0 && roomy.every((x) => x.fitsAtSize),
+      roomy.filter((x) => !x.fitsAtSize).map((x) => `${x.where}@${x.h}`).join(' '));
+
     // Only the prose scrolls, so the call to action survives a short window.
     check('the call to action is never the thing that gets cut off',
       sizes.every((x) => x.ctaWhole),

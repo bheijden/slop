@@ -76,8 +76,8 @@
     <p id="say1">Reading the sample&hellip;</p>
     <p id="say2"></p>
     <p id="say3"></p>
-    <p id="stamp" class="stamp"></p>
     </div>
+    <p id="stamp" class="stamp"></p>
     <div id="cta"></div>
     <div class="more">
       <a href="https://github.com/bheijden/slop/blob/main/docs/vocabulary.md">How this was done.</a>
@@ -208,9 +208,9 @@ function render() {
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
   const inFive = Math.round(ai * 5);
-  $('say2').innerHTML = `One of them appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of all
-    pull requests this week. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five of those are
-    <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span> by the AI that wrote them.`;
+  $('say2').innerHTML = `One appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of pull
+    requests this week. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five are
+    <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span>.`;
   $('say3').innerHTML = `Its most representative words should look familiar to anyone who uses coding
     agents.`;
 

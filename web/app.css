@@ -51,7 +51,7 @@ a{color:var(--blue)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 .dash{display:grid;height:100dvh;
-  grid-template-columns:minmax(280px,25%) 1fr;
+  grid-template-columns:minmax(340px,25%) 1fr;
   grid-template-rows:auto minmax(180px,1fr) minmax(240px,1.25fr);
   background:var(--hair);gap:1px}
 .cell{background:var(--paper);min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -199,16 +199,26 @@ select.chip{padding:2px 4px}
 /* The auto margin belongs to the slot, not the button: the button is a child of
    the slot, so putting it on the button pushed it inside a box of its own height
    and left the panel's slack below the links. */
-#cta{display:flex;flex:none;padding-top:10px}
-.cta{display:grid;grid-template-columns:auto 1fr;gap:1px 9px;width:100%;
-  padding:9px 12px;border:1px solid transparent;border-radius:9px;background:var(--blue);
-  color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:var(--lift)}
-.cta:hover{filter:brightness(1.08)}
-.cta:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.cta svg{grid-row:1 / span 2;align-self:center;width:17px;height:17px;fill:none;stroke:currentColor;
-  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
-.cta-t{font-size:13px;font-weight:600;letter-spacing:.01em}
-.cta-s{font-size:11px;opacity:.82;line-height:1.35}
+#cta{display:flex;flex:none;padding-top:8px}
+/* Tinted from the theme's own accent rather than filled with it. A solid fill
+   was a dark slab on the light page and a pale one on the dark page, because a
+   single colour cannot be the right weight against two backgrounds. Mixing
+   against --card follows whichever surface is behind it. */
+.cta{display:grid;grid-template-columns:auto 1fr auto;gap:1px 9px;width:100%;align-items:center;
+  padding:8px 11px;border-radius:9px;font:inherit;text-align:left;cursor:pointer;
+  background:var(--sunk);border:1px solid var(--hair);color:var(--blue);
+  background:color-mix(in srgb, var(--blue) 11%, var(--card));
+  border:1px solid color-mix(in srgb, var(--blue) 34%, transparent)}
+.cta:hover{background:color-mix(in srgb, var(--blue) 19%, var(--card));
+  border-color:color-mix(in srgb, var(--blue) 55%, transparent)}
+.cta:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+/* Two rows, named, so nothing lands in an implicit third one. */
+.cta{grid-template-rows:auto auto}
+.cta svg{grid-column:1;grid-row:1 / 3;align-self:center;width:16px;height:16px;fill:none;
+  stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.cta .go{grid-column:3;grid-row:1 / 3;align-self:center;font-size:15px;opacity:.6}
+.cta-t{grid-column:2;grid-row:1;font-size:12.5px;font-weight:600;letter-spacing:.01em;line-height:1.35}
+.cta-s{grid-column:2;grid-row:2;font-size:11px;color:var(--muted);line-height:1.3}
 /* The panel's own links follow it, so the button is not the last thing pinned. */
 .say .more{margin-top:8px}
 .sheet{width:min(680px,calc(100vw - 32px));max-height:min(78vh,760px);padding:0;border:1px solid var(--hair);
@@ -250,5 +260,28 @@ select.chip{padding:2px 4px}
   border:1px solid var(--hair);border-radius:8px;background:var(--card);color:var(--ink);
   box-shadow:0 8px 24px rgba(0,0,0,.22);font-size:12px;line-height:1.5;pointer-events:none}
 .tip[hidden]{display:none}
-.stamp{margin:0;padding-top:2px;color:var(--muted);font-size:11.5px;line-height:1.5}
+/* Outside the scrolling prose: it reports how fresh the page is, which is not
+   an answer if you have to scroll to it. */
+.stamp{margin:0;flex:none;padding-top:8px;color:var(--muted);font-size:11.5px;line-height:1.5}
 .stamp b{white-space:nowrap;color:var(--ink);font-weight:600}
+
+/* ---- loading a rule set -------------------------------------------------- */
+/* The URL field and its two buttons were a wrap-when-it-must flex row with the
+   buttons unstyled, so they sat on top of the field in a narrow column. It is a
+   stack: the field takes the width, the buttons share the line under it. */
+.load{padding:10px 12px;border-top:1px solid var(--hair);display:grid;gap:6px}
+.load input{width:100%;min-width:0;background:var(--sunk);border:1px solid var(--hair);
+  border-radius:6px;padding:5px 8px;font-size:11.5px;color:var(--ink)}
+.load input::placeholder{color:var(--muted);opacity:.8}
+.load input:focus-visible{outline:2px solid var(--blue);outline-offset:-1px}
+.load .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.load .row button{padding:5px 8px;border:1px solid var(--hair);border-radius:6px;
+  background:var(--card);color:var(--ink);font:inherit;font-size:11.5px;cursor:pointer;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.load .row button:hover{background:var(--sunk);border-color:var(--muted)}
+.load .err{color:var(--flag);font-size:11px;line-height:1.4}
+.load .err:empty{display:none}
+/* The panel owns the load row; only the list above it scrolls. */
+#pane-rules{display:flex;flex-direction:column;min-height:0}
+#pane-rules #rules{flex:1 1 auto;min-height:0;overflow:auto}
+#pane-rules #load{flex:none}

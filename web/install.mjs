@@ -66,7 +66,8 @@ btn.id = 'installer';
 btn.innerHTML = `<svg viewBox="0 0 20 20" aria-hidden="true">
     <path d="M4 6.5L7.5 10 4 13.5"/><path d="M10.5 14h5.5"/></svg>
   <span class="cta-t">Install the skill</span>
-  <span class="cta-s">so your coding agent lints its own prose</span>`;
+  <span class="cta-s">so your coding agent lints its own prose</span>
+  <span class="go" aria-hidden="true">&rsaquo;</span>`;
 
 const dlg = document.createElement('dialog');
 dlg.className = 'sheet';

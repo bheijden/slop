@@ -44,6 +44,54 @@ const $ = (id) => document.getElementById(id)
   || GONE.get(id)
   || (GONE.set(id, Object.assign(document.createElement('div'), { id })), GONE.get(id));
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const attr = (s) => String(s).replace(/[&<>"']/g,
+  (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Terms this project invents, defined where they are used. web/tip.mjs turns
+// any [data-tip] into a tooltip that also works on a touch screen.
+const DEF = {
+  finding: 'One place a rule fired: the line it came from, the words that triggered it, and what '
+         + 'to write instead. A rule that reports on the document as a whole gives one finding '
+         + 'carrying its rate rather than one per occurrence.',
+  ruleSet: 'A single JSON file holding patterns, when each one is worth reporting, and the '
+         + 'examples it must catch and must not. Every set here is one file, and you can load '
+         + 'your own from a URL or off disk.',
+  derived: 'Two of these sets are not written by hand. They are word lists measured from public '
+         + 'GitHub pull request descriptions and rebuilt every Monday, so they follow how machine '
+         + 'writing actually moves rather than how anyone remembers it.',
+  variants: 'The same example marked up twenty-two different ways — bold in the middle of a word, '
+          + 'a link around half of it, an HTML entity for the apostrophe, a line break mid-phrase. '
+          + 'A pattern that only matches clean text passes the example and fails these.',
+};
+const term = (k, text) => `<span class="term" tabindex="0" data-tip="${attr(DEF[k])}">${esc(text)}</span>`;
+
+// The standing prose on the left, which is the only panel that does not change
+// between pages. One claim per paragraph, live numbers in bold, and a stamp
+// saying how fresh the derived lists are.
+function renderSay() {
+  const sets = S.sets.length;
+  const rules = S.sets.reduce((a, x) => a + x.rules.length, 0);
+  const built = (S.sets.find((x) => x.corpus?.built) || {}).corpus?.built;
+  if (PAGE === 'check') {
+    $('say1').innerHTML = `Paste anything you have written. <b>${rules} rules</b> in `
+      + `<b>${sets}</b> ${term('ruleSet', 'rule sets')} read it in your browser.`;
+    $('say2').innerHTML = `Every ${term('finding', 'finding')} names the line and the fix. `
+      + 'Nothing you paste leaves the page.';
+    $('say3').innerHTML = 'Turn rules off on the left; the findings redraw as you read.';
+  } else {
+    const n = S.fudge && S.fudge.length ? S.fudge.length : 0;
+    const ex = S.fudge ? S.fudge.reduce((a, r) => a + r.conform.ok + r.conform.fail, 0) : 0;
+    $('say1').innerHTML = 'Write a rule set and watch it hold or fail. The editor has '
+      + `<b>${n} ${n === 1 ? 'rule' : 'rules'}</b>`
+      + (ex ? `, <b>${ex}</b> ${ex === 1 ? 'example' : 'examples'}` : '') + '.';
+    $('say2').innerHTML = `Each runs as written, then again through <b>22</b> `
+      + `${term('variants', 'markup variants')}.`;
+    $('say3').innerHTML = `Open any of the <b>${sets}</b> sets on the left to read the format.`;
+  }
+  $('stamp').innerHTML = built
+    ? `${term('derived', 'two are derived')} &middot; rebuilt <b>${esc(built)}</b>`
+    : `<b>${rules}</b> rules in <b>${sets}</b> sets`;
+}
 const PAGE = document.body.dataset.page === 'rules' ? 'rules' : 'check';
 const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:0, skipped:0,
             kind:'md', name:'input', setFile:{},
@@ -535,9 +583,10 @@ function renderLibrary() {
       <span class="nm">${esc(set.title || set.name)}</span>
       <span class="cnt">${set.rules.length} ${set.rules.length === 1 ? 'rule' : 'rules'}${t ? ` &middot; ${t} examples` : ''}</span>
     </button>`;
-  }).join('') + `<div class="load">
+  }).join('');
+  $('load').innerHTML = `<div class="load">
       <input type="url" data-url placeholder="https://…/house-style.json">
-      <div class="row"><button data-add>Open from URL</button><button data-file>Choose file…</button></div>
+      <div class="row"><button data-add>Open from URL</button><button data-file>Open a file</button></div>
       <div class="err" data-err></div></div>`;
 
   for (const b of el.querySelectorAll('button[data-open]')) {
@@ -551,7 +600,7 @@ function renderLibrary() {
       } catch { el.querySelector('[data-err]').textContent = `Could not open ${url}.`; }
     };
   }
-  const q = (sel) => el.querySelector(sel);
+  const q = (sel) => $('load').querySelector(sel);
   q('[data-add]').onclick = async () => {
     const u = q('[data-url]').value.trim(); if (!u) return;
     try {
@@ -589,12 +638,13 @@ function renderRules() {
         <input type="checkbox" data-rule="${esc(r.id)}"${S.active.has(r.id) ? ' checked' : ''}>
         <span class="id">${esc(r.id)}</span>${r.default === 'off' ? '<span class="offtag">off</span>' : ''}<span class="n">${counts[r.id] || ''}</span></label>`).join('')}</div>
     </details>`;
-  }).join('') + `<div class="load">
+  }).join('');
+  $('load').innerHTML = `<div class="load">
       <input type="url" data-url placeholder="https://…/house-style.json">
-      <div class="row"><button data-add>Add rule set</button><button data-file>Choose file…</button></div>
+      <div class="row"><button data-add>Add from URL</button><button data-file>Add a file</button></div>
       <div class="err" data-err></div></div>`;
 
-  const q = (sel) => el.querySelector(sel);
+  const q = (sel) => $('load').querySelector(sel) || el.querySelector(sel);
   for (const d of el.querySelectorAll('details.rset')) {
     d.addEventListener('toggle', () => { S.setOpen[d.dataset.set] = d.open; });
   }
@@ -711,6 +761,7 @@ function run() {
   clearTimeout(timer);
   timer = setTimeout(async () => {
     renderRules();
+    renderSay();
     // The card stays for a loaded set — the text area gives way to a summary,
     // so the rules control and the file picker never go out of reach.
     $('doc-tools').hidden = S.mode === 'fudge';
@@ -760,6 +811,7 @@ function run() {
         return;
       }
       S.fudge = res.results;
+      renderSay();
       const bad = res.results.reduce((a,r) => a + r.conform.fail + r.fudge.fail, 0);
       $('score').className = 'score' + (bad ? '' : ' zero');
       $('score').innerHTML = `<b>${bad}</b> failing`;
@@ -1154,6 +1206,8 @@ $('pane-doc').addEventListener('scroll', () => {
 });
 
 await loadBuiltins();
+// run() is debounced, so the panel would sit empty for a moment on first load.
+renderSay();
 await readHash();
 S.kind = $('kind').value = S.kind;
 grow(); run();

@@ -67,9 +67,7 @@ body[data-mode=fudge] .surface{display:none}
 
 /* the rules pane */
 #rules{padding:0}
-#pane-rules .load{padding:10px 14px;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;gap:6px}
-#pane-rules .load input{flex:1;min-width:0;background:var(--sunk);border:1px solid var(--hair);
-  border-radius:6px;padding:3px 7px;font-size:11.5px}
+/* .load lives in app.css: both pages render the same row. */
 /* Two voices: everything the linter says is monospace, everything you wrote
    is serif. Light is the default; the toggle in the bar wins over the OS. */
 :root{
@@ -293,10 +291,11 @@ body.resizing{cursor:col-resize;user-select:none}
 
   <div class="cell pad say">
     <div class="prose">
-    <p>Write a rule set and watch it hold or fail. Every example you wrote is run
-      as written, then again through twenty-two ways of marking the same text up, so a
-      pattern that only works on clean input says so.</p>
+    <p id="say1"></p>
+    <p id="say2"></p>
+    <p id="say3"></p>
     </div>
+    <p id="stamp" class="stamp"></p>
     <div id="cta"></div>
     <div class="more" id="rule-tools">
       <button id="b-rreset">Reset to template</button>
@@ -315,6 +314,7 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="cell quiet" id="pane-rules">
     <header><span class="title">library</span><span class="spacer"></span><span class="dim" id="rule-hint"></span></header>
     <div class="body" id="rules"></div>
+    <div id="load"></div>
   </div>
 
   <div class="cell" id="pane-list">
