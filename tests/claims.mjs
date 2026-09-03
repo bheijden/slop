@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
 import { loadCorpus } from '../js/corpus.mjs';
 import { resolveRules } from '../js/config.mjs';
+import { compileRule } from '../js/engine.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 let failed = 0;
@@ -49,6 +50,26 @@ if (m) {
 
 // A false-alarm rate above this is not a linter anyone would leave switched on.
 check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.length} human documents flagged`);
+
+// `power` is the exponent under per: "root". 0.5 is a default, not a law, and
+// the engine has to honour another value. See research/length.md.
+// 50 matches in 100 words: over the root that is 50/10 = 5, over the length
+// itself 50/100 = 0.5. One threshold of 4 separates the two exponents.
+const mk = (power, at) => compileRule({
+  id: 'p', name: 'p', match: { kind: 'regex', pattern: '\\bthe\\b', flags: 'gi' },
+  notable: { '>=': at, per: 'root', ...(power === undefined ? {} : { power }),
+             needs: { words: 0, sentences: 0, matches: 0 } },
+  description: 'x', suggest: 'x', tests: { hit: [], miss: [] },
+}, 'test');
+const sample = `${'the '.repeat(50)}${'word '.repeat(50)}`;
+check('per root defaults to the square root',
+  mk(undefined, 4).fires(sample) && !mk(undefined, 6).fires(sample));
+check('an explicit 0.5 is the same as the default',
+  mk(0.5, 4).fires(sample) && !mk(0.5, 6).fires(sample));
+check('a higher exponent lowers the value', !mk(1, 4).fires(sample) && mk(1, 0.4).fires(sample));
+let threw = false;
+try { mk(0, 1); } catch { threw = true; }
+check('an exponent outside (0, 1] is refused', threw);
 
 console.log(failed ? `\ndocumented claims: ${failed} failed` : '\ndocumented claims: all hold');
 process.exit(failed ? 1 : 0);
