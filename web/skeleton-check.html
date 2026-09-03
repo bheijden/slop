@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slop · check</title>
+<meta name="description" content="Lint prose for stock language-model phrasing. Nothing leaves your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='25' font-size='26' font-family='Georgia,serif' fill='%23C2403C'%3E%C2%B6%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  /* two panels: the text you are linting, and what the rules found in it */
+  .work{--work:"text findings" 1fr / minmax(0,1.4fr) minmax(320px,1fr)}
+  #p-text{grid-area:text} #p-found{grid-area:findings}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="rail"></div>
+  <div class="work">
+    <section class="panel" id="p-text">
+      <header><span class="title">your text</span><span class="spacer"></span></header>
+      <div class="body"></div>
+    </section>
+    <section class="panel quiet" id="p-found">
+      <header><span class="title">findings</span><span class="spacer"></span></header>
+      <div class="body"></div>
+    </section>
+  </div>
+</div>
+<script type="module">
+import { rail } from './shell.mjs';
+rail('check', '<h2>skeleton</h2><p class="dim">context goes here</p>');
+</script>
+</body>
+</html>

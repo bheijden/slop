@@ -1,0 +1,122 @@
+/* The shell every page shares.
+ *
+ * One screen, never the page scrolling. A column down the left carries the
+ * identity, the three destinations and whatever that page's standing context
+ * is — the counts, the tools, the toggles. Everything else is a work area the
+ * page divides into panels. Panels scroll inside themselves.
+ *
+ * Each page sets --work to its own grid. Nothing else about the shell changes
+ * between them, which is the point: moving between check, rules and vocabulary
+ * should feel like changing what is on the bench, not changing rooms.
+ */
+
+:root{
+  --paper:#EDEDE9; --card:#FDFDFC; --sunk:#E0E0DA; --hair:#D4D4CC;
+  --ink:#14161A; --muted:#5C5F66; --blue:#2D5BD6; --flag:#B93B37; --ok:#2E7D4F;
+  --lift:0 1px 2px rgba(20,22,26,.05), 0 1px 1px rgba(20,22,26,.04);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
+  --rail:212px;
+  /* one hue per series, ordered by how much each carries */
+  --p0:#2D5BD6; --p1:#B93B37; --p2:#2E7D4F; --p3:#8A5CD6; --p4:#C07C1E;
+  --p5:#0F8B8D; --p6:#9C4A7A; --p7:#5C6470; --p8:#7A8B2E;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme=light]){
+    --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
+    --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60; --ok:#6FBF8B;
+    --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
+    --p0:#84A6FF; --p1:#E86B60; --p2:#6FBF8B; --p3:#B79BFF; --p4:#E0A945;
+    --p5:#4FC3C5; --p6:#D68CB4; --p7:#9AA3B0; --p8:#B5C95B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme=dark]{
+  --paper:#0F1115; --card:#191C22; --sunk:#23262E; --hair:#31353E;
+  --ink:#E8E8E3; --muted:#8B8F98; --blue:#84A6FF; --flag:#E86B60; --ok:#6FBF8B;
+  --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
+  --p0:#84A6FF; --p1:#E86B60; --p2:#6FBF8B; --p3:#B79BFF; --p4:#E0A945;
+  --p5:#4FC3C5; --p6:#D68CB4; --p7:#9AA3B0; --p8:#B5C95B;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--hair);color:var(--ink);font-family:var(--mono);
+     font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;border-radius:2px}
+a{color:var(--blue)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- the shell ---------------------------------------------------------- */
+.app{display:grid;grid-template-columns:var(--rail) 1fr;height:100dvh;gap:1px;background:var(--hair)}
+.work{display:grid;gap:1px;background:var(--hair);min-width:0;min-height:0;
+      grid-template:var(--work, "a" 1fr / 1fr)}
+
+/* ---- the rail ----------------------------------------------------------- */
+.rail{background:var(--paper);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.rail > *{padding:0 16px}
+.brand{padding-top:15px;padding-bottom:13px}
+.brand a{display:block;font-family:var(--serif);font-size:23px;line-height:1;letter-spacing:-.02em;
+         color:var(--ink);text-decoration:none;font-weight:500}
+.brand a b{color:var(--flag);font-weight:500}
+.brand p{margin:5px 0 0;color:var(--muted);font-size:11px}
+
+.dest{display:flex;flex-direction:column;gap:1px;padding:0;margin:4px 0 0}
+.dest a{display:flex;align-items:baseline;gap:9px;padding:7px 16px;text-decoration:none;
+        color:var(--muted);border-left:2px solid transparent}
+.dest a:hover{background:var(--sunk);color:var(--ink)}
+.dest a[aria-current=page]{color:var(--ink);border-left-color:var(--flag);background:var(--sunk)}
+.dest .k{font-size:10px;color:var(--muted);width:12px;flex:none;text-align:right}
+.dest a[aria-current=page] .k{color:var(--flag)}
+
+/* whatever standing context the page has: counts, tools, toggles */
+.context{flex:1;min-height:0;overflow:auto;scrollbar-width:thin;padding-top:14px;
+         border-top:1px solid var(--hair);margin-top:14px}
+.context h2{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+            margin:0 0 7px;font-weight:400}
+.context h2:not(:first-child){margin-top:18px}
+.figure{margin:0 0 11px}
+.figure b{display:block;font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.figure span{color:var(--muted);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+.figure i{display:block;height:2px;width:30px;border-radius:1px;margin-bottom:6px}
+.railfoot{padding-top:10px;padding-bottom:12px;border-top:1px solid var(--hair);
+          display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px}
+
+/* ---- panels ------------------------------------------------------------- */
+.panel{background:var(--paper);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.panel > header{display:flex;align-items:center;gap:8px;padding:8px 14px;min-height:34px;
+                border-bottom:1px solid var(--hair);color:var(--muted);font-size:11px;flex:none}
+.panel > header .title{color:var(--ink);font-size:11px;letter-spacing:.09em;text-transform:uppercase}
+.panel > header .spacer{flex:1}
+.panel > .body{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+.panel > .body.pad{padding:12px 14px}
+.panel.quiet{background:var(--card)}
+
+/* ---- small shared controls ---------------------------------------------- */
+.chip{background:none;border:1px solid var(--hair);border-radius:6px;padding:2px 8px;
+      color:var(--muted);cursor:pointer;font-size:11px;line-height:1.6}
+.chip:hover{background:var(--sunk);color:var(--ink)}
+.seg{display:flex;gap:2px}
+.seg button{background:none;border:0;padding:3px 9px;border-radius:5px;color:var(--muted);
+            cursor:pointer;font-size:11px}
+.seg button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
+select.chip{padding:2px 4px}
+.num{font-variant-numeric:tabular-nums}
+.dim{color:var(--muted)}
+svg{display:block;width:100%;height:100%}
+.axis{fill:var(--muted);font-size:10px}
+.grid{stroke:var(--hair);stroke-width:1}
+
+/* A dashboard stops being one below about this width, so the shell becomes a
+   single column that scrolls and each panel takes a workable height. */
+@media (max-width:900px){
+  body{overflow:auto}
+  .app{grid-template-columns:1fr;height:auto}
+  .rail{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--hair)}
+  .rail .context{display:none}
+  .work{grid-template:none!important;display:flex;flex-direction:column}
+  .panel{min-height:320px}
+}

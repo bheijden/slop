@@ -165,7 +165,7 @@ svg{display:block;width:100%;height:100%}
 }
 </style>
 </head>
-<body data-built="2026-09-02-0-1000">
+<body data-built="2026-09-03-7-250">
 
 <div class="dash">
 
@@ -261,18 +261,18 @@ function render() {
   ].map(([c, n, l]) => `<div><i style="background:${c}"></i><b>${n}</b><span>${l}</span></div>`).join('');
 
   const hw = DATA.history.weeks, wk1 = hw[0], wkN = hw[hw.length - 1];
-  const at = DATA.history.order.indexOf(DATA.register.id);
+  const at = DATA.history.order.indexOf(DATA.publish.id);
   const from = wk1.docs ? wk1.byGroup[at] / wk1.docs : 0;
   const to = wkN.docs ? wkN.byGroup[at] / wkN.docs : 0;
   const ai = wkN.byGroup[at] ? wkN.byGroupSigned[at] / wkN.byGroup[at] : 0;
-  $('say1').innerHTML = `We grouped GitHub pull requests since 2025 into <b>${f.kRegister} clusters</b>
+  $('say1').innerHTML = `We grouped GitHub pull requests since 2025 into <b>${f.k} clusters</b>
     of vocabulary.`;
   $('say2').innerHTML = `One cluster has grown from <b>${pc(from)}</b> of all pull requests to
     <b>${pc(to)}</b>, and <b>${pc(ai)}</b> of it is signed by the AI tool that wrote it.`;
   $('say3').innerHTML = `Its most representative words should look familiar to anyone who uses coding
     agents.`;
 
-  GROUP = Math.max(0, DATA.browse.findIndex((g) => g.register));
+  GROUP = Math.max(0, DATA.browse.findIndex((g) => g.published));
   showGroup();
 
   $('q').oninput = () => fillList($('q').value);
@@ -292,7 +292,7 @@ function showGroup() {
   const g = groupAt();
   const pad2 = (n) => String(n).padStart(2, '0');
   $('which').textContent = `${pad2(GROUP + 1)} / ${pad2(DATA.browse.length)}`;
-  $('about').textContent = `${fmt(g.size)} pull requests · ${pc(g.share)} signed by an AI tool · most representative first`;
+  $('about').textContent = `${fmt(g.size)} pull requests · ${pc(g.stamped)} signed by an AI tool · most representative first`;
   $('q').value = '';
   drawArrive();
   fillList('');

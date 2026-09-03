@@ -15,6 +15,12 @@ jobs:
       # The catalogue is generated. It listed 38 of the 117 rules that ship for
       # a while, because it was built by the tool that ports two vendor sets.
       - run: node tools/build-catalogue.mjs --check
+      # So is the data behind the vocabulary page. It served a stale result for
+      # a day after the derivation was rewritten, because rebuilding it was a
+      # thing someone had to remember rather than a thing that was checked.
+      - run: node tools/pr-page-data.mjs --check
+      # And the corpus files have to match the hashes in their own index.
+      - run: node tools/corpus.mjs --check
 
   candidates:
     name: candidate rule sets

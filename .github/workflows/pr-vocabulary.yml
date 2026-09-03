@@ -67,12 +67,17 @@ jobs:
             echo "fit=no" >> "$GITHUB_OUTPUT"
           fi
 
+      # The whole archive, ten ways. About four minutes on a CI box, which is
+      # why it runs weekly rather than daily; the sample below is the daily part.
       - name: Re-derive the list
         if: steps.when.outputs.fit == 'yes'
-        run: node tools/pr-cluster.mjs --days 40 --write
+        run: node --max-old-space-size=6000 tools/pr-cluster.mjs --write
 
+      # Every day, not only on fit days. The page shows the daily sample as well
+      # as the weekly fit, so a day that only samples still changes what it says.
+      # Leaving this to fit days let the published page fall a week behind its
+      # own inputs, and a CI check now fails when the two disagree.
       - name: Rebuild what the page reads
-        if: steps.when.outputs.fit == 'yes'
         run: node tools/pr-page-data.mjs
 
       # The rule has to pass its own tests and the repo has to stay clean, or
@@ -81,7 +86,7 @@ jobs:
       - name: The rule still has to hold up
         if: steps.when.outputs.fit == 'yes'
         run: |
-          node js/cli.mjs test-rules candidates/ai-vocabulary.json
+          node js/cli.mjs test-rules rules/ai-vocabulary.json
           node tests/run.mjs
           node js/cli.mjs check -r .
 
@@ -89,8 +94,9 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/docs data/cluster.json data/cluster-history.json \
-                  candidates/ai-vocabulary.json web/vocabulary-data.json
+          git add data/docs data/cluster.json data/cluster-series.json \
+                  data/cluster-history.json rules/ai-vocabulary.json \
+                  web/vocabulary-data.json web/vocabulary.html
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
           if [ "${{ steps.when.outputs.fit }}" = "yes" ]; then
             git commit -m "ai-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"

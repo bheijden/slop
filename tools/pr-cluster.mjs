@@ -214,7 +214,10 @@ console.log(`\nthe published list, ${keep.length} words:`);
 console.log('  ' + keep.slice(0, 30).map((j) => vocab[j]).join(' '));
 
 // ---- weekly history, for the page ---------------------------------------
-const tracked = [...new Set(clusters.flatMap((x) => x.words.slice(0, TRACK)))].sort();
+// clusters[].words holds vocabulary indices; the history is keyed by the word
+// itself, so this has to translate. Not doing so left every word without a
+// history and the page saying so on all 250 of them.
+const tracked = [...new Set(clusters.flatMap((x) => x.words.slice(0, TRACK).map((j) => vocab[j])))].sort();
 const tIdx = new Map(tracked.map((w, i) => [w, i]));
 const counts = Array.from({ length: weeks.length }, () => new Int32Array(tracked.length));
 const countsSigned = Array.from({ length: weeks.length }, () => new Int32Array(tracked.length));
