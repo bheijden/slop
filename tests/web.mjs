@@ -507,27 +507,35 @@ async function main() {
       P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.which)
       && /pull requests/.test(P.about), JSON.stringify(P).slice(0, 200));
 
-    // The selected cluster is drawn first so that it sits on the axis, and the
-    // others keep their order above it. So paging moves exactly one band.
+    // The stack is decided once. The cluster the rule is built from is on the
+    // axis and stays there; cycling recolours a band and moves nothing.
+    // Fresh, because an earlier check has already paged away from it.
+    await send('Page.navigate', { url: base + 'vocabulary.html' });
+    await sleep(3000);
     const stack = await evaluate(`(async () => {
-      const order = () => [...document.querySelectorAll('#arrive path')]
-        .map(p => (p.querySelector('title') || {}).textContent || '');
-      const first = () => (document.querySelector('#arrive path title') || {}).textContent || '';
-      const before = order(), beforeFirst = first();
+      const geom = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('d'));
+      const fills = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('fill'));
+      const bottom = () => (document.querySelector('#arrive path title') || {}).textContent || '';
+      const g1 = geom(), f1 = fills(), b1 = bottom();
       document.getElementById('next').click();
       await new Promise(r => setTimeout(r, 400));
-      const after = order(), afterFirst = first();
-      // Drop both selected bands from each list; what is left is every other
-      // cluster, and its order must not have changed.
-      const strip = (a) => a.filter(t => t !== beforeFirst && t !== afterFirst);
-      return JSON.stringify({ bands: before.length,
-        selectedMoved: beforeFirst !== afterFirst,
-        restStable: JSON.stringify(strip(before)) === JSON.stringify(strip(after)),
-        selectedIsRed: (document.querySelector('#arrive path') || {}).getAttribute('fill') === 'var(--flag)' });
+      document.getElementById('next').click();
+      await new Promise(r => setTimeout(r, 400));
+      return JSON.stringify({ bands: g1.length,
+        sameOrder: JSON.stringify(g1) === JSON.stringify(geom()),
+        sameBottom: b1 === bottom(),
+        highlightMoved: JSON.stringify(f1) !== JSON.stringify(fills()),
+        // the page opens on the published cluster, so at first render the
+        // bottom band is the coloured one; after cycling it must still be the
+        // same band, but no longer coloured
+        bottomStartsColoured: f1[0] === 'var(--flag)',
+        bottomNoLongerColoured: fills()[0] !== 'var(--flag)' });
     })()`);
     const ST = JSON.parse(stack);
-    check('the selected cluster is the bottom band and the rest keep their order',
-      ST.bands >= 5 && ST.selectedMoved && ST.restStable && ST.selectedIsRed, JSON.stringify(ST));
+    check('the stack never moves; only the highlight does',
+      ST.bands >= 5 && ST.sameOrder && ST.sameBottom && ST.highlightMoved
+      && ST.bottomStartsColoured && ST.bottomNoLongerColoured,
+      JSON.stringify(ST));
 
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.

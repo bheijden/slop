@@ -245,13 +245,16 @@ function drawArrive() {
       stroke-opacity=".55"><title>group ${c}: ${pc(share)} of the last week</title></path>`);
     for (let i = 0; i < S.length; i++) base[i] = upper[i];
   };
-  // The selected cluster is the bottom band, always, so the one you are reading
-  // about is the one sitting on the axis. Everything else keeps a fixed order
-  // above it, so paging lifts one band out and drops it at the bottom rather
-  // than reshuffling all ten.
-  band(reg, 'var(--flag)', 0.85);
+  // The stack is decided once and never moves. The cluster the slop rule is
+  // built from sits on the axis, because that is what the page is about; the
+  // other nine sit above it in a fixed order. Cycling changes which band is
+  // coloured and nothing else. An earlier version dragged the selected band to
+  // the bottom, which reshuffled the chart under the reader on every press.
+  const published = DATA.publish.id;
+  const stack = [published, ...order.filter((c) => c !== published)];
   const steps = [0.46, 0.38, 0.31, 0.25, 0.20, 0.16, 0.13, 0.10, 0.08, 0.06];
-  order.filter((c) => c !== reg).forEach((c, i) => band(c, 'var(--muted)', steps[i % steps.length]));
+  stack.forEach((c, i) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
+                               c === reg ? 0.85 : steps[i % steps.length]));
   let last = null;
   const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
   for (let i = 0; i < S.length; i += every) {
