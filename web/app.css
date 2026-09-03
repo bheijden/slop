@@ -291,3 +291,6 @@ select.chip{padding:2px 4px}
 #pane-rules{display:flex;flex-direction:column;min-height:0}
 #pane-rules #rules{flex:1 1 auto;min-height:0;overflow:auto}
 #pane-rules #load{flex:none}
+/* A defined term that is also a link keeps the term's colour, not the link's. */
+a.term{color:var(--flag);text-decoration:none}
+a.term:hover{text-decoration:underline;text-underline-offset:2px}

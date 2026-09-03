@@ -64,6 +64,7 @@ document.addEventListener('pointerout', (e) => {
 // A tap toggles: on a touch screen there is no hover to leave.
 document.addEventListener('click', (e) => {
   const el = of(e);
+  if (el && el.closest('a[href]')) { hide(); return; }
   if (el) { e.preventDefault(); el === anchor ? hide() : show(el); }
   else if (!tip.contains(e.target)) hide();
 });

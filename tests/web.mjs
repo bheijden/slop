@@ -655,6 +655,9 @@ async function main() {
       JSON.stringify(L.order) === JSON.stringify(['Simon Willison', 'AI tells',
         'Signs of AI writing (Wikipedia)']), JSON.stringify(L.order));
     check('the page is called rule sets', L.nav.includes('rule sets'), L.nav.join(','));
+    // "vocabulary" did not say which vocabulary. The nav names the set, and the
+    // set's name in the panel is the way to the page that argues for it.
+    check('the nav names the derived set', L.nav.includes('PR vocabulary'), L.nav.join(','));
     await send('Page.navigate', { url: base });
     await waitFor('#rules input[type=checkbox]');
     const box = await evaluate(`JSON.stringify({
@@ -662,6 +665,30 @@ async function main() {
       sets: document.querySelectorAll('.libset').length})`);
     const B = JSON.parse(box);
     check('check still asks which sets to run', B.boxes > 5 && B.sets === 0, JSON.stringify(B));
+
+    // The stamp's set name is a link. tip.mjs swallows a click on anything
+    // carrying a definition so a tap can toggle it, which would have made this
+    // link inert on touch and on the desk alike.
+    await send('Page.navigate', { url: base });
+    await sleep(2200);
+    const stampLink = await evaluate(`(async () => {
+      const a = document.querySelector('.stamp a.term');
+      if (!a) return JSON.stringify({err: 'the set name is not a link'});
+      a.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
+      await new Promise(r => setTimeout(r, 250));
+      const tip = document.getElementById('deftip');
+      return JSON.stringify({ text: a.textContent, href: a.getAttribute('href'),
+        defines: getComputedStyle(tip).opacity === '1' && tip.textContent.length > 40 });
+    })()`);
+    const SL = JSON.parse(stampLink);
+    check('the derived set names itself and links to its page',
+      SL.href === 'vocabulary.html' && /vocabulary/i.test(SL.text || '') && SL.defines,
+      JSON.stringify(SL));
+    await evaluate(`document.querySelector('.stamp a.term').click()`);
+    await sleep(2500);
+    const landed = await evaluate(`location.pathname.split('/').pop()`);
+    check('and clicking it actually goes there',
+      /vocabulary\.html/.test(landed), landed);
 
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data

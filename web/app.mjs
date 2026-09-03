@@ -58,12 +58,15 @@ const DEF = {
          + 'your own from a URL or off disk.',
   derived: 'This set is not written by hand. It is a word list measured from public GitHub pull '
          + 'request descriptions, re-derived every Monday, so it follows how machine writing '
-         + 'actually moves rather than how anyone remembers it. The date is that last rebuild.',
+         + 'actually moves rather than how anyone remembers it. The date is that last rebuild. '
+         + 'Open the PR vocabulary page to see where the words came from.',
   variants: 'The same example marked up twenty-two different ways — bold in the middle of a word, '
           + 'a link around half of it, an HTML entity for the apostrophe, a line break mid-phrase. '
           + 'A pattern that only matches clean text passes the example and fails these.',
 };
 const term = (k, text) => `<span class="term" tabindex="0" data-tip="${attr(DEF[k])}">${esc(text)}</span>`;
+const termLink = (k, text, href) => `<a class="term" href="${attr(href)}" `
+  + `data-tip="${attr(DEF[k])}">${esc(text)}</a>`;
 
 // The standing prose on the left, which is the only panel that does not change
 // between pages. One claim per paragraph, live numbers in bold, and a stamp
@@ -95,7 +98,7 @@ function renderSay() {
       + 'JSON file you can fork.';
   }
   $('stamp').innerHTML = measured
-    ? `${term('derived', esc(measured.title || measured.name))} rebuilt `
+    ? `${termLink('derived', measured.title || measured.name, 'vocabulary.html')} rebuilt `
       + `<b>${esc(measured.corpus.built)}</b>`
     : `<b>${rules}</b> rules in <b>${sets}</b> sets`;
 }
