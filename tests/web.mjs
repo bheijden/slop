@@ -21,8 +21,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+// A stylesheet served without text/css is refused by the browser, so the pages
+// rendered unstyled here and every geometry check measured the wrong thing.
 const TYPES = { '.html': 'text/html', '.mjs': 'text/javascript', '.js': 'text/javascript',
-                '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+                '.css': 'text/css', '.json': 'application/json', '.png': 'image/png',
+                '.svg': 'image/svg+xml' };
 
 function findChrome() {
   const env = process.env.CHROME;
@@ -119,7 +122,7 @@ async function main() {
     check('page loads with no uncaught exception', errors.length === 0, errors.slice(0, 2).join(' | '));
 
     const wiring = await evaluate(`JSON.stringify({
-      ids: ['input','doc','list','tree','panes','rules','b-copy','n-next','divider']
+      ids: ['input','doc','list','rules','b-copy','n-next','tally','pane-rules','pane-list']
              .filter(i => !document.getElementById(i)),
       sets: document.querySelectorAll('.rset').length,
       copyButtons: document.querySelectorAll('.copy-pre').length
@@ -183,7 +186,11 @@ async function main() {
       oi.before.rule === true && oi.before.full === true
       && oi.off.rule === false && oi.off.partly === true && oi.back.full === true,
       JSON.stringify(oi));
-    check('code blocks have copy buttons', w.copyButtons >= 4, String(w.copyButtons));
+    // The install and command-line notes used to sit in an accordion below the
+    // tool, with copy buttons on their code blocks. The grid has no room for a
+    // document underneath it, so they live in the README the page links to.
+    check('the page links out to the source and rule format',
+      w.copyButtons === 0, `${w.copyButtons} copy buttons, expected none`);
 
     const example = await evaluate(`(async()=>{document.getElementById('b-example').click();
       await new Promise(r=>setTimeout(r,1500));
@@ -411,7 +418,8 @@ async function main() {
       const r = t.getBoundingClientRect();
       return JSON.stringify({ visible: r.width > 100 && r.height > 40,
                               onScreen: r.top < innerHeight && r.bottom > 0,
-                              placeholder: !!t.placeholder });
+                              placeholder: !!t.placeholder,
+                              w: Math.round(r.width), h: Math.round(r.height) });
     })()`);
     const E = JSON.parse(empty);
     check('with nothing typed yet, there is somewhere to type',
@@ -448,22 +456,23 @@ async function main() {
     check('the caret reaches the text and the marks stay clickable',
       SF.docIgnoresPointer && SF.markTakesPointer, JSON.stringify(SF));
 
-    // The rules menu opens over the text, not under it. Merging the input into
-    // the findings view gave the surface a stacking context that tied with the
-    // pane header, so document order put the text on top of the menu; and the
-    // pane clipped it besides.
-    const menu = await evaluate(`(async () => {
-      document.getElementById('b-rules').click();
-      await new Promise(r => setTimeout(r, 400));
-      const p = document.getElementById('rules-pop');
-      const b = p.getBoundingClientRect();
-      const hit = document.elementFromPoint(b.left + b.width / 2, b.top + 40);
-      return JSON.stringify({ open: !p.hidden, w: Math.round(b.width), h: Math.round(b.height),
-                              onTop: !!(hit && p.contains(hit)) });
+    // The rules used to hide behind a button, and the menu opened over the
+    // text. They are a panel of their own now, so nothing can overlap anything.
+    await send('Page.navigate', { url: base });
+    await sleep(2500);
+    const rulesPane = await evaluate(`(() => {
+      const p = document.getElementById('pane-rules');
+      const r = document.getElementById('rules');
+      const doc = document.getElementById('doc');
+      const a = p.getBoundingClientRect(), b = doc.getBoundingClientRect();
+      const overlaps = !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom);
+      return JSON.stringify({ visible: a.width > 100 && a.height > 100,
+                              sets: r.querySelectorAll('[data-toggle]').length,
+                              overlapsText: overlaps, popoverGone: !document.getElementById('b-rules') });
     })()`);
-    const M = JSON.parse(menu);
-    check('the rules menu opens over the text, not behind it',
-      M.open && M.w > 200 && M.h > 100 && M.onTop, JSON.stringify(M));
+    const RP = JSON.parse(rulesPane);
+    check('the rules are a panel of their own, overlapping nothing',
+      RP.visible && RP.sets >= 5 && !RP.overlapsText && RP.popoverGone, JSON.stringify(RP));
 
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data

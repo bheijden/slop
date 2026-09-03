@@ -9,7 +9,67 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
 <style>
+/* only what the check page adds to the shell */
+/* the results header in rules mode */
+#list-head .bad{color:var(--flag)}
+#list-head .tot{color:var(--muted);margin-left:10px;text-transform:none;letter-spacing:0}
+/* The findings list. app.css styles a list of words picked from; a finding is
+   a different shape: a location, then a rule name, the match and the fix. */
+.list{list-style:none;margin:0;padding:0}
+.list li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:9px 10px;
+  border-bottom:1px solid var(--hair);cursor:pointer;border-radius:0;align-items:start}
+.list li:hover{background:var(--sunk)}
+.list li.on{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
+.list .loc{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right}
+.list .cnt{text-align:left;cursor:help;border-bottom:1px dotted var(--hair)}
+.list .rid{color:var(--flag);font-weight:500}
+.list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
+.list .fix{color:var(--muted);font-size:11.5px;line-height:1.55}
+.list li.fgroup{display:block;position:sticky;top:0;z-index:1;background:var(--paper);cursor:default;
+  border-bottom:1px solid var(--hair);color:var(--muted);font-size:11.5px;
+  padding:6px 10px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list li.fgroup:hover{background:var(--paper)}
+.list li.none{display:block;color:var(--muted);font-size:11.5px;padding:7px 10px;cursor:default}
+.list li.none:hover{background:none}
+.rate{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin:3px 0 1px}
+.rate b{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.rate .ru{color:var(--muted);font-size:11.5px}
+.rate .rb{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums;color:var(--flag);
+  border:1px solid var(--hair);border-radius:999px;padding:1.5px 7px;white-space:nowrap}
+/* The text you paste and the findings on it are one surface, in two layers.
+   The textarea is underneath with a visible caret and transparent text; the
+   highlighted copy is on top and ignores the pointer except on the marks. A
+   click lands where you aimed it, and a hover over a finding still opens it. */
+.surface{position:relative;flex:1 1 auto;min-height:0}
+.surface > #input,.surface > #doc{
+  position:absolute;inset:0;margin:0;width:100%;height:100%;overflow:auto;
+  padding:12px 14px 22px;border:0;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+  white-space:pre-wrap;overflow-wrap:break-word;scrollbar-width:thin;
+}
+.surface > #input{background:none;color:transparent;caret-color:var(--ink);resize:none;z-index:1}
+.surface > #input:focus{outline:none}
+.surface > #input::placeholder{color:var(--muted)}
+.surface > #doc{z-index:2;pointer-events:none;background:none}
+.surface > #doc mark{pointer-events:auto}
+#pane-doc[data-edit=off] .surface > #input{display:none}
+#pane-doc[data-edit=off] .surface{position:static}
+#pane-doc[data-edit=off] .surface > #doc{position:static;height:auto;pointer-events:auto;overflow:visible}
+body.dragging #pane-doc{background:var(--sunk)}
+
+/* the rule set being tested shares the same slot as the text */
+#rules-src{display:none;flex:1;min-height:0;width:100%;border:0;background:none;resize:none;
+  padding:12px 14px;font-family:var(--mono);font-size:12.5px;line-height:1.6;scrollbar-width:thin}
+body[data-mode=fudge] #rules-src{display:block}
+body[data-mode=fudge] .surface{display:none}
+.rerr{margin:0;padding:8px 14px;color:var(--flag);font-size:11.5px;border-top:1px solid var(--hair)}
+
+/* the rules pane */
+#rules{padding:0}
+#pane-rules .load{padding:10px 14px;border-top:1px solid var(--hair);display:flex;flex-wrap:wrap;gap:6px}
+#pane-rules .load input{flex:1;min-width:0;background:var(--sunk);border:1px solid var(--hair);
+  border-radius:6px;padding:3px 7px;font-size:11.5px}
 /* Two voices: everything the linter says is monospace, everything you wrote
    is serif. Light is the default; the toggle in the bar wins over the OS. */
 :root{
@@ -42,177 +102,41 @@
   --lift:0 1px 2px rgba(0,0,0,.4), 0 1px 1px rgba(0,0,0,.3);
   color-scheme:dark;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,select,textarea,input{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:3px}
 [hidden]{display:none!important}
-
 /* bar */
-.bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:16px;height:46px;
-     padding:0 var(--gutter);
-     background:var(--card);border-bottom:1px solid var(--hair)}
-.wordmark{font-weight:600;font-size:14px;letter-spacing:-.02em}
-.wordmark b{color:var(--flag);font-weight:600}
-.modes{display:flex;gap:2px}
-.modes button{background:none;border:0;padding:4px 9px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:12px}
-.modes .modelink{padding:3px 9px;border-radius:5px;text-decoration:none;color:var(--muted);display:inline-flex;align-items:center}
-.modes .modelink:hover{background:var(--sunk);color:var(--ink)}
-.modes button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
-.spacer{flex:1}
-.chip{background:none;border:1px solid var(--hair);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:var(--muted)}
-.chip:hover{border-color:var(--blue);color:var(--ink)}
-.score{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.score b{color:var(--ink);font-weight:600}
 .score.zero b{color:var(--blue)}
-.score .err{color:var(--flag)}
-
 /* page */
 /* The page grows with the window. Individual blocks cap their own measure in
    ch, so a wider window gives more room to the panes rather than longer lines
    of prose. */
-.page{margin:0 auto;padding:28px var(--gutter) 80px}
-.hero h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.028em;margin:0 0 6px;line-height:1}
-.hero h1 em{font-style:normal;color:var(--flag)}
-.hero .lede{font-family:var(--serif);font-size:20px;margin:0 0 8px;line-height:1.4}
-.hero .sub{color:var(--muted);font-size:12.5px;line-height:1.6;margin:0;max-width:62ch}
-.hero .sub code{background:var(--sunk);border-radius:4px;padding:1px 5px;color:var(--ink);white-space:nowrap}
-
 /* The text you paste and the findings on it are the same surface, in two
    layers. The textarea is underneath with a visible caret and transparent
    text; the highlighted copy is on top and ignores the pointer except on the
    marks themselves. A click lands where you aimed it, and a hover over a
    finding still opens the finding. */
 body.dragging #pane-doc{border-color:var(--blue);background:var(--sunk)}
-.surface{position:relative;flex:1 1 auto;min-height:0}
-.surface > #input,.surface > #doc{
-  position:absolute;inset:0;margin:0;width:100%;height:100%;overflow:auto;
-  padding:2px 2px 22px;border:0;font-family:var(--mono);font-size:12.5px;line-height:1.7;
-  white-space:pre-wrap;overflow-wrap:break-word;scrollbar-width:thin;
-}
-.surface > #input{background:none;color:transparent;caret-color:var(--ink);resize:none;z-index:1}
-.surface > #input:focus{outline:none}
-.surface > #input::placeholder{color:var(--muted)}
-.surface > #doc{z-index:2;pointer-events:none;background:none}
-.surface > #doc mark{pointer-events:auto}
 /* Reading mode: the stripped prose, no caret, the whole thing clickable. */
-#pane-doc[data-edit=off] .surface > #input{display:none}
-#pane-doc[data-edit=off] .surface{position:static}
-#pane-doc[data-edit=off] .surface > #doc{position:static;height:auto;pointer-events:auto;overflow:visible}
-.loaded{padding:16px;color:var(--muted);font-size:12.5px}
-.loaded b{color:var(--ink);font-weight:500}
-.tools{
-  display:flex;gap:7px;align-items:center;flex-wrap:wrap;
-  padding:7px 10px;border-top:1px solid var(--hair);
-  border-radius:0 0 9px 9px;
-}
-.tools select{background:transparent;border:1px solid var(--hair);border-radius:6px;padding:4px 7px;font-size:12px;color:var(--ink)}
 /* Everything after this sits at the right end: what the document is, not what
    you can do to it. */
-.tools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
-.rulewrap{position:relative;display:inline-flex}
-
 /* results */
-.results{margin:26px 0 0}
-.rhead{display:flex;align-items:center;gap:10px;padding-bottom:9px;border-bottom:1px solid var(--hair);margin-bottom:16px;flex-wrap:wrap}
-.rhead h2{font-family:var(--serif);font-size:22px;font-weight:400;margin:0;letter-spacing:-.015em}
-.rhead .chip{padding:3px 9px;font-size:11.5px}
-.rhead .chip.done{border-color:var(--blue);color:var(--blue)}
-#copy-fallback{width:100%;height:150px;margin-bottom:12px;font-family:var(--mono);font-size:11.5px;
-  border:1px solid var(--blue);border-radius:8px;background:var(--sunk);padding:10px;color:var(--ink)}
-.rhead .spacer{flex:1}
-.seg{display:flex;gap:2px}
-.seg button{background:none;border:0;padding:3px 8px;border-radius:5px;cursor:pointer;color:var(--muted);font-size:11.5px}
-.seg button[aria-pressed=true]{background:var(--sunk);color:var(--ink)}
-.nav{display:flex;align-items:center;gap:3px}
-.nav button{background:none;border:1px solid var(--hair);border-radius:5px;width:23px;height:21px;padding:0;
-            cursor:pointer;color:var(--muted);line-height:1;font-size:11px}
-.nav button:hover{border-color:var(--blue);color:var(--ink)}
-.nav #n-count{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
-
 /* panes */
 /* A file tree appears beside the panes only when more than one document is
    loaded, so the single-document layout is untouched. */
-.workspace{display:grid;grid-template-columns:minmax(0,1fr)}
-.workspace[data-multi]{grid-template-columns:var(--tree,220px) 44px minmax(0,1fr)}
-.workspace[data-multi][data-tree=closed]{grid-template-columns:0 44px minmax(0,1fr)}
 /* Pinned columns, so hiding the list does not slide the panes across. */
-.workspace[data-multi] > .tree{grid-column:1}
-.workspace[data-multi] > #tdivider{grid-column:2}
-.workspace[data-multi] > .panes{grid-column:3}
-.workspace[data-tree=closed] .tree{display:none}
-.tree{height:min(70vh,680px);overflow:auto;scrollbar-width:thin;padding-right:8px}
-.tree .thead{position:sticky;top:0;background:var(--paper);z-index:2;padding:0 0 7px;min-height:26px;
-  color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;display:flex;gap:8px;align-items:baseline}
-.tree .dir{color:var(--muted);font-size:11px;margin:9px 0 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tree .dir:first-of-type{margin-top:0}
-.tree button.f{display:flex;gap:8px;width:100%;text-align:left;background:none;border:0;cursor:pointer;
-  padding:3px 6px;border-radius:5px;font-size:12px;color:var(--ink);align-items:baseline}
-.tree button.f:hover{background:var(--sunk)}
-.tree button.f[aria-current=true]{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
-.tree button.f .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tree button.f .ct{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
-.tree button.f.clean .ct{color:var(--muted);font-weight:400}
-.tree .skipped{color:var(--muted);font-size:11px;margin-top:12px;padding-top:8px;border-top:1px solid var(--hair)}
 @media(max-width:820px){
-  .workspace[data-multi],.workspace[data-multi][data-tree=closed]{grid-template-columns:1fr}
-  .workspace[data-multi] > .tree,.workspace[data-multi] > #tdivider,.workspace[data-multi] > .panes{grid-column:1}
-  .tree{height:auto;max-height:200px;border-bottom:1px solid var(--hair);padding:0 0 10px;margin-bottom:12px}
-  #tdivider{display:none}
 }
-
 /* Two panes and a divider you can drag, or step left/right to collapse a side. */
-.panes{display:grid;grid-template-columns:var(--split,60%) 44px minmax(0,1fr);
-       height:min(70vh,680px);align-items:stretch}
-.panes[data-layout=text]{grid-template-columns:minmax(0,1fr) 44px 0}
-.panes[data-layout=list]{grid-template-columns:0 44px minmax(0,1fr)}
-.panes[data-layout=text] #pane-list,.panes[data-layout=list] #pane-doc{display:none}
 /* Pin each child to its column. Without this, `display:none` on a collapsed
    pane drops it from the flow and the rest slide left, so the findings pane
    would inherit the divider's 44px column. */
-#pane-doc{grid-column:1}
-.divider{grid-column:2}
-#pane-list{grid-column:3}
-.pane{min-width:0;overflow:auto;scrollbar-width:thin;position:relative;
-      background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:11px 14px}
 /* The text pane is a column: its header, then a surface taking what is left.
    The pane itself must not scroll while editing — the surface inside does. */
-#pane-doc{display:flex;flex-direction:column;overflow:visible}
-#pane-doc[data-edit=off]{overflow:auto}
-.dtools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-left:auto}
-.dtools .n{color:var(--muted);font-size:11.5px}
-.phead{position:relative;z-index:20;background:var(--card);padding:0 0 7px;
-       display:flex;align-items:center;gap:8px;min-height:26px}
-#pane-list .phead{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-left:2px}
-#pane-list{padding-left:14px}
-#pane-doc{padding-right:14px}
-.panes[data-layout=text] #doc{max-width:70ch}
-
 /* The control sits at the middle of the divider, where you would reach for it. */
-.divider{position:relative;user-select:none}
-.grip{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:7px;
-      border-radius:4px;background:var(--hair);cursor:col-resize;transition:background .12s}
-.grip:hover,.grip:focus-visible,body.resizing .grip{background:var(--blue)}
-.dctl{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;
-      display:flex;gap:2px;padding:3px;border-radius:8px;
-      background:var(--paper);border:1px solid var(--hair)}
-.divider .arrow{
-  background:none;border:0;border-radius:5px;width:16px;height:22px;padding:0;
-  cursor:pointer;color:var(--muted);line-height:1;font-size:13px;
-}
-.divider .arrow:hover:not(:disabled){background:var(--sunk);color:var(--ink)}
-.divider .arrow:disabled{opacity:.25;cursor:default}
 body.resizing{cursor:col-resize;user-select:none}
-
 @media(max-width:820px){
-  .panes,.panes[data-layout=text],.panes[data-layout=list]{grid-template-columns:1fr;height:auto}
-  #pane-doc,.divider,#pane-list{grid-column:1}
-  .panes[data-layout=split] .pane{height:auto;overflow:visible}
-  .divider{height:34px}
-  .grip{top:50%;bottom:auto;left:0;right:0;transform:translateY(-50%);width:auto;height:7px;cursor:default}
-  #pane-list{padding-left:0;border-top:1px solid var(--hair);padding-top:10px}
 }
-
 #doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
 #doc.prose p{margin:0 0 .8em}
 #doc.source{font-family:var(--mono);font-size:12.5px;line-height:1.75}
@@ -228,33 +152,12 @@ body.resizing{cursor:col-resize;user-select:none}
 .fname .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:rtl;text-align:left}
 .fname .ct{color:var(--flag);font-variant-numeric:tabular-nums}
 .fname .ct.clean{color:var(--muted);font-weight:400}
-.list li.fgroup{
-  display:block;position:sticky;top:0;z-index:1;background:var(--paper);cursor:default;
-  border-bottom:1px solid var(--hair);color:var(--muted);font-size:11.5px;
-  padding:6px 6px 5px;margin-top:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  direction:rtl;text-align:left;border-radius:0;
-}
-.list li.fgroup:first-child{margin-top:0}
-.list li.fgroup:hover{background:var(--paper)}
-.list li.none{display:block;color:var(--muted);font-size:11.5px;padding:7px 6px;cursor:default}
-.list li.none:hover{background:none}
 #doc mark{
   background:var(--mark);color:var(--mark-ink);
   box-shadow:inset 0 -2px 0 var(--mark-edge);
   border-radius:2px;padding:.5px 1px;cursor:pointer;
 }
 #doc mark:hover,#doc mark.on{background:var(--mark-on)}
-
-.list{list-style:none;margin:0;padding:0}
-.list li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:9px 6px;border-bottom:1px solid var(--hair);cursor:pointer;border-radius:6px}
-.list li:hover{background:var(--sunk)}
-.list li.on{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
-.list .loc{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums;text-align:right}
-.list .cnt{text-align:left;cursor:help;border-bottom:1px dotted var(--hair)}
-.list .rid{color:var(--flag);font-weight:500}
-.list .m{font-family:var(--serif);font-size:15px;margin:2px 0 3px}
-.list .fix{color:var(--muted);font-size:11.5px;line-height:1.55}
-
 /* A doc-level finding measures the whole document, so it shows a rate rather
    than a quoted phrase: what the document reached, the edge it crossed, and
    the count the rate was computed from. */
@@ -264,36 +167,17 @@ body.resizing{cursor:col-resize;user-select:none}
 .rate .rb{margin-left:auto;font-size:11px;font-variant-numeric:tabular-nums;
   color:var(--flag);border:1px solid var(--hair);border-radius:999px;
   padding:1.5px 7px;white-space:nowrap}
-.list .rate .rb{cursor:help}
 .rsub{color:var(--muted);font-size:11.5px;margin:0 0 3px;font-variant-numeric:tabular-nums}
 /* The hover card is narrower than the list row and sits above the fix, which
    carries its own rule, so the rate needs a little more room under it. */
 .tip .rate{margin-top:4px}
 .tip .rate b{font-size:17px}
 .tip .rsub{margin-bottom:6px}
-
 /* An occurrence behind a rate is evidence for a measurement, not a flagged
    phrase, so it is underlined rather than filled in until it is selected. */
 #doc mark.occ{background:none;box-shadow:inset 0 -1px 0 var(--mark-edge)}
 #doc mark.occ:hover,#doc mark.occ.on{background:var(--mark-on);box-shadow:inset 0 -2px 0 var(--mark-edge)}
-
 /* the rules control: a panel under the bar, not a documentation section */
-.pop{
-  position:absolute;top:calc(100% + 8px);right:0;z-index:40;width:380px;
-  max-width:calc(100vw - 32px);
-  max-height:min(62vh,560px);overflow:auto;scrollbar-width:thin;overscroll-behavior:contain;
-  background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:12px 14px;
-  box-shadow:0 16px 44px -14px rgba(0,0,0,.30);
-}
-.pop[hidden]{display:none}
-.pop-head{
-  display:flex;gap:8px;align-items:baseline;padding-bottom:8px;margin-bottom:4px;
-  border-bottom:1px solid var(--hair);
-  font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
-}
-.pop-head span{margin-left:auto;text-transform:none;letter-spacing:0}
-.chip[aria-expanded=true]{border-color:var(--blue);color:var(--ink)}
-
 /* hover card */
 .tip{
   position:fixed;z-index:60;max-width:340px;pointer-events:none;opacity:0;transition:opacity .1s;
@@ -310,7 +194,6 @@ body.resizing{cursor:col-resize;user-select:none}
 .offtag{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
   border:1px solid var(--hair);border-radius:3px;padding:0 3px;margin-left:5px}
 .tip-fix{color:var(--ink);margin-top:6px;padding-top:6px;border-top:1px solid var(--hair)}
-
 /* fudge */
 .frow{display:grid;grid-template-columns:1fr 92px 92px;gap:14px;padding:5px 0;border-bottom:1px solid var(--hair);align-items:baseline}
 .frow.head{border-bottom:1px solid var(--ink);padding-bottom:6px}
@@ -322,32 +205,16 @@ body.resizing{cursor:col-resize;user-select:none}
 .tallies .big{font-family:var(--serif);font-size:26px;letter-spacing:-.02em}
 .tallies .big.bad{color:var(--flag)}
 .tallies .lbl{color:var(--muted);font-size:11.5px}
-
 /* disclosures */
-.docs{margin:34px 0 0}
-.docs details{border-top:1px solid var(--hair)}
-.docs details:last-of-type{border-bottom:1px solid var(--hair)}
-.docs summary{cursor:pointer;padding:11px 2px;font-size:12.5px;list-style:none;display:flex;gap:9px;align-items:baseline}
-.docs summary::-webkit-details-marker{display:none}
-.docs summary::before{content:"+";color:var(--blue);width:9px;flex:none}
-.docs details[open] summary::before{content:"−"}
-.docs summary .hint{margin-left:auto;color:var(--muted);font-size:11.5px}
-.docs .body{padding:2px 0 18px 18px}
-.docs p{color:var(--muted);font-size:12.5px;line-height:1.65;margin:0 0 11px;max-width:64ch}
-.docs p code{background:var(--sunk);border-radius:4px;padding:1px 5px;font-size:11.5px;color:var(--ink)}
-.docs pre{position:relative;background:var(--sunk);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;line-height:1.7;margin:0 0 11px}
 .copy-pre{
   position:absolute;top:6px;right:6px;z-index:2;
   border:1px solid var(--hair);background:var(--paper);color:var(--muted);
   border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;
   opacity:0;transition:opacity .12s;
 }
-.docs pre:hover .copy-pre,.copy-pre:focus-visible{opacity:1}
 .copy-pre:hover{border-color:var(--blue);color:var(--ink)}
 .copy-pre.done{opacity:1;border-color:var(--blue);color:var(--blue)}
 @media (hover:none){.copy-pre{opacity:1}}
-.docs pre .c{color:var(--muted)} .docs pre .p{color:var(--flag)} .docs pre .k{color:var(--blue)}
-.docs a{color:var(--blue)}
 .rulebox{}
 .rset{border-bottom:1px solid var(--hair)}
 .rset:first-child{border-top:1px solid var(--hair)}
@@ -368,35 +235,16 @@ body.resizing{cursor:col-resize;user-select:none}
 }
 #rules-src:focus{outline:none}
 #rules-src::placeholder{color:var(--muted)}
-body[data-mode=fudge] #rules-src{display:block}
-body[data-mode=fudge] #doc{display:none}
-body[data-mode=fudge] #views{display:none}
 .rtools{display:flex;gap:7px;align-items:center;width:100%}
 .rtools .n{margin-left:auto;color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
 .rerr{margin:8px 0 0;font:12px/1.5 var(--mono);color:var(--flag);cursor:pointer}
 .rerr:hover{text-decoration:underline;text-underline-offset:3px}
 /* the rule-writing sections only belong to that mode */
-.ronly{display:none}
-body[data-mode=fudge] .ronly{display:block}
-body[data-mode=fudge] .docs details:not(.ronly){display:none}
 /* a result row points back at the rule that produced it */
-.list li.bad .rid{color:var(--flag)}
-body[data-mode=fudge] .list .rid{color:var(--ink)}
-body[data-mode=fudge] .list li.bad .rid{color:var(--flag)}
-.list li.good .loc,.list li.bad .loc{font-size:13px}
-.list li.good .loc{color:var(--ok)}
-body[data-mode=fudge] .list li.good.on{box-shadow:inset 2px 0 0 var(--ok)}
-.list li.bad .loc{color:var(--flag)}
-.list .counts{color:var(--muted);font-size:11.5px;margin-top:2px}
 /* only the phase that actually failed is marked, so the two are never read
    as one pool with one failure count between them */
-.list .counts .x{color:var(--flag)}
-.list li .why{color:var(--flag);font-size:11.5px;padding-left:9px;
-  border-left:2px solid var(--flag);margin:4px 0 2px;white-space:pre-wrap;word-break:break-word}
-.list li .why b{font-weight:600}
 #list-head .bad{color:var(--flag)}
 #list-head .tot{margin-left:auto;text-transform:none;letter-spacing:0;opacity:.7}
-body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:baseline}
 /* a result row points back at the rule that produced it */
 .frow.click{cursor:pointer}
 .frow.click:hover span:first-child{text-decoration:underline;text-underline-offset:3px}
@@ -415,230 +263,90 @@ body[data-mode=fudge] #list-head{display:flex;width:100%;gap:10px;align-items:ba
 .rulebox label input{margin:0;flex:none;accent-color:var(--blue)}
 .rulebox label .id{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rulebox label .n{color:var(--flag);font-variant-numeric:tabular-nums;font-weight:500}
-.load{margin-top:12px;padding-top:11px;border-top:1px solid var(--hair)}
-.load input[type=url]{width:100%;padding:5px 8px;border:1px solid var(--hair);border-radius:6px;background:var(--card);font-size:11.5px}
-.load .row{display:flex;gap:6px;margin-top:6px}
-.load .row button{border:1px solid var(--hair);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11.5px}
 .err{color:var(--flag);font-size:11.5px}
-.colophon{color:var(--muted);font-size:11.5px;line-height:1.6;margin:22px 0 0;max-width:66ch}
-.colophon a{color:var(--blue)}
 @media (max-width:640px){.page{padding-top:20px;padding-bottom:60px}.hero h1{font-size:32px}#doc.prose{font-size:16px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 
-<div class="bar">
-  <span class="wordmark">slop<b>.</b></span>
-  <div class="modes" role="group" aria-label="Mode">
-    <button id="m-check" aria-pressed="true">check</button>
-    <button id="m-fudge" aria-pressed="false">test rules</button>
-    <a class="modelink" href="vocabulary.html">vocabulary</a>
-  </div>
-  <span class="spacer"></span>
-  <button class="chip" id="btn-theme" title="Light, dark or follow the system">auto</button>
-  <span class="score" id="score"></span>
-</div>
+<div class="dash">
 
-<div class="page">
-  <div class="hero">
+  <div class="cell pad mast">
     <h1>slop<em>.</em></h1>
-    <p class="lede">A linter for prose.</p>
-    <p class="sub">Flags stock LLM phrasing: <code>it is important to note that</code>, <code>no X, no Y, no Z</code>, at the line it came from, with the fix. Nothing leaves your browser.</p>
+    <nav class="modes">
+      <button id="m-check" aria-pressed="true">check</button>
+      <button id="m-fudge" aria-pressed="false">test rules</button>
+      <a href="vocabulary.html">vocabulary</a>
+      <button class="chip" id="theme" style="margin-left:6px" title="Light, dark, or whatever the system says">auto</button>
+    </nav>
   </div>
 
+  <div class="cell tally" id="tally"></div>
 
+  <div class="cell pad say">
+    <p id="blurb">A linter for prose. It flags stock language-model phrasing &mdash;
+      <b>it is important to note that</b>, <b>no X, no Y, no Z</b> &mdash; at the line it came
+      from, with a fix. Nothing leaves your browser.</p>
+    <p class="dim" id="loaded" hidden></p>
+    <aside class="tree" id="tree" hidden></aside>
+    <div class="more" id="doc-tools">
+      <button id="b-example">Load an example</button>
+      <button id="b-file">Choose a file</button>
+      <a href="https://github.com/bheijden/slop">Source and rule format</a>
+    </div>
+    <div class="more" id="rule-tools" hidden>
+      <button id="b-rreset">Reset to template</button>
+      <button id="b-rfile">Choose a file</button>
+      <span class="dim" id="rmeta"></span>
+    </div>
+  </div>
 
-  <div class="results" id="results">
-    <div class="rhead">
-      <h2 id="r-title"></h2>
-      <div class="nav" id="nav" hidden>
-        <button id="n-prev" title="Previous finding (k or ↑)" aria-label="Previous finding">↑</button>
-        <span id="n-count">·</span>
-        <button id="n-next" title="Next finding (j or ↓)" aria-label="Next finding">↓</button>
+  <div class="cell big" id="pane-doc" data-edit="on">
+    <header>
+      <div class="seg" id="views">
+        <button id="v-source" aria-pressed="true">your text</button>
+        <button id="v-prose" aria-pressed="false">what it reads</button>
       </div>
       <span class="spacer"></span>
-      <button class="chip" id="b-copy" hidden title="Copy the findings as JSON — the same shape as --format json">copy JSON</button>
+      <select id="kind" class="chip" aria-label="How to parse the input">
+        <option value="md">markdown</option>
+        <option value="html">html</option>
+        <option value="txt">plain text</option>
+      </select>
+    </header>
+    <div class="surface">
+      <textarea id="input" spellcheck="false"
+        placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
+      <div id="doc" class="source"></div>
     </div>
+    <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
+      placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
+    <p class="rerr" id="rerr" hidden></p>
+  </div>
+
+  <div class="cell quiet" id="pane-rules">
+    <header><span class="title">rules</span><span class="spacer"></span><span class="dim" id="rule-hint"></span></header>
+    <div class="body" id="rules"></div>
+  </div>
+
+  <div class="cell" id="pane-list">
+    <header>
+      <span class="title" id="list-head">findings</span>
+      <span class="spacer"></span>
+      <span class="nav" id="nav" hidden>
+        <button class="chip" id="n-prev" title="Previous finding (k or up)" aria-label="Previous finding">&uarr;</button>
+        <span class="dim" id="n-count">&middot;</span>
+        <button class="chip" id="n-next" title="Next finding (j or down)" aria-label="Next finding">&darr;</button>
+      </span>
+      <button class="chip" id="b-copy" hidden title="Copy the findings as JSON">copy JSON</button>
+    </header>
+    <ol class="list" id="list"></ol>
+    <div class="results" id="results" hidden></div>
+    <div class="score" id="score" hidden></div>
     <textarea id="copy-fallback" hidden aria-label="Findings JSON, select and copy"></textarea>
-    <div class="workspace" id="workspace">
-    <aside class="tree" id="tree" hidden></aside>
-    <div class="divider" id="tdivider" hidden>
-      <div class="grip" id="tgrip" role="separator" aria-orientation="vertical"
-           tabindex="0" aria-label="Resize the file list — drag, or use the arrow keys"></div>
-      <div class="dctl">
-        <button class="arrow" id="t-left" title="Hide the file list">‹</button>
-        <button class="arrow" id="t-right" title="Show the file list">›</button>
-      </div>
-    </div>
-    <div class="panes" id="panes" data-layout="split">
-      <div class="pane" id="pane-doc" data-edit="on">
-        <div class="phead">
-          <div class="seg" id="views">
-            <button id="v-source" aria-pressed="true">your text</button>
-            <button id="v-prose" aria-pressed="false">what it reads</button>
-          </div>
-          <div class="dtools" id="doc-tools">
-            <button class="chip" id="b-example">Example</button>
-            <button class="chip" id="b-file">File</button>
-            <select id="kind" aria-label="How to parse the input">
-              <option value="md">markdown</option>
-              <option value="html">html</option>
-              <option value="txt">plain text</option>
-            </select>
-            <span class="n" id="meta"></span>
-            <span class="rulewrap">
-              <button class="chip" id="b-rules" aria-expanded="false" title="Choose which rules run">rules</button>
-              <div class="pop" id="rules-pop" hidden>
-                <div class="pop-head">Rules <span id="rule-hint"></span></div>
-                <div class="rulebox" id="rules"></div>
-              </div>
-            </span>
-          </div>
-          <div class="rtools" id="rule-tools" hidden>
-            <button class="chip" id="b-rreset">Reset to template</button>
-            <button class="chip" id="b-rfile">Choose a file</button>
-            <span class="n" id="rmeta"></span>
-          </div>
-        </div>
-        <div class="loaded" id="loaded" hidden></div>
-        <div class="surface">
-          <textarea id="input" spellcheck="false"
-            placeholder="Paste text here, or drop files, a folder or a .zip anywhere on the page."></textarea>
-          <div id="doc" class="source"></div>
-        </div>
-        <textarea id="rules-src" spellcheck="false" aria-label="A rule set to test"
-          placeholder="Paste a rule set here, or drop a .json on the page."></textarea>
-        <p class="rerr" id="rerr" hidden></p>
-      </div>
-      <div class="divider" id="divider">
-        <div class="grip" id="grip" role="separator" aria-orientation="vertical"
-             tabindex="0" aria-label="Resize panes — drag, or use the arrow keys"></div>
-        <div class="dctl">
-          <button class="arrow" id="d-left" title="Move the divider left (findings only)">‹</button>
-          <button class="arrow" id="d-right" title="Move the divider right (text only)">›</button>
-        </div>
-      </div>
-      <div class="pane" id="pane-list">
-        <div class="phead"><span id="list-head">findings</span></div>
-        <ol class="list" id="list"></ol>
-      </div>
-    </div>
-    </div>
   </div>
 
-  <div class="docs">
-    <details class="ronly">
-      <summary>What the two phases check<span class="hint">conformance and fudging</span></summary>
-      <div class="body">
-        <p><b>Conformance</b> runs every example you wrote. Each <code>tests.hit</code>
-        must match, and each <code>tests.miss</code> must not. That is what catches the
-        <code>very</code> rule below, whose pattern has no word boundaries and so
-        fires on "E<b>very</b> request".</p>
-        <p><b>Fudging</b> then rewrites each hit 27 ways with the markup real files
-        carry, and requires the rule to still fire:</p>
-<pre>**It is important to note that** this works.   <span class="c">md:bold-span</span>
-It is imp**ort**ant to note that this works.   <span class="c">md:bold-inside-word</span>
-It is important\nto note that this works.      <span class="c">md:soft-wrap</span>
-&lt;p&gt;It is imp&lt;b&gt;ort&lt;/b&gt;ant to note that …       <span class="c">html:tag-inside-word</span></pre>
-        <p>A rule that passes a clean sentence but fails a marked-up one will miss
-        things in real files. Soft-wrapped markdown is the usual culprit (a sentence
-        broken across two lines at column 80 stops matching) and nothing tells you.</p>
-      </div>
-    </details>
-    <details class="ronly">
-      <summary>The rule format<span class="hint">eight kinds</span></summary>
-      <div class="body">
-        <p><code>regex</code> covers most rules. The other seven count things a regex
-        cannot express, such as repeated sentence shapes or a rate across a whole
-        document. All eight, with their parameters, are in the
-        <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">rule format
-        reference</a>.</p>
-        <p>Wrap your rules in a set and the file is shareable as it is:
-        <code>{ "name": "house-style", "version": "0.1.0", "rules": [ … ] }</code>.</p>
-      </div>
-    </details>
-    <details class="ronly">
-      <summary>Using your rules for real<span class="hint">page, URL or CLI</span></summary>
-      <div class="body">
-        <p>Three ways in, all the same file:</p>
-<pre>drop the .json on the check page               <span class="c"># or use its rules panel</span>
-?rules=https://example.com/house-style.json    <span class="c"># fetched, then run here</span>
-slop check --rules house-style.json docs/ -r   <span class="c"># command line</span></pre>
-        <p>Passing tests means a rule does what you wrote. It does not mean the rule
-        is worth having. For that, run it over prose you did not write it against and
-        read the hits:</p>
-<pre>slop check --rules mine.json --select mine ~/writing -r</pre>
-        <p>A rule firing on a lot of good prose is a rule to tighten, whatever its
-        examples say. Two worked examples, one tightened and one kept with its false
-        firing documented, are in
-        <a href="https://github.com/bheijden/slop/blob/main/docs/calibration.md">calibration</a>
-        and the <a href="https://github.com/bheijden/slop/blob/main/research/audit.md">rule audit</a>.</p>
-      </div>
-    </details>
-  
-    <details>
-      <summary>Command line<span class="hint">for agents and CI</span></summary>
-      <div class="body">
-<pre><span class="c"># one-off, nothing installed</span>
-npx --yes <span class="k">github:bheijden/slop</span> check docs/ <span class="p">-r</span>
-
-<span class="c"># repeated use: npx re-resolves the repo each call (~5s), a clone runs in ~0.2s</span>
-git clone --depth 1 <span class="k">https://github.com/bheijden/slop</span>
-node slop/js/cli.mjs check docs/ <span class="p">-r</span>
-
-node slop/js/cli.mjs check <span class="p">--format</span> json docs/ <span class="p">-r</span>   <span class="c"># match, sentence, why, suggest</span>
-node slop/js/cli.mjs check <span class="p">--select</span> wikipedia-ai .  <span class="c"># a set name or one rule id</span>
-node slop/js/cli.mjs check <span class="p">--share</span> <span class="p">-r</span> docs/        <span class="c"># a link to this page</span></pre>
-        <p>No dependencies; the clone is 380&nbsp;KB and needs only Node. Same engine and rule files as this page.</p>
-        <p>Findings never fail a run on their own. They are style smells, not errors. Add <code>--max-per-1000 2</code> or <code>--max 0</code> when you want CI to gate on them. Exit <code>0</code> ok, <code>1</code> over a budget you set, <code>2</code> usage or read error.</p>
-      </div>
-    </details>
-    <details>
-      <summary>Install as an agent skill<span class="hint">SKILL.md</span></summary>
-      <div class="body">
-        <p>A <a href="https://github.com/bheijden/slop/blob/main/skill/SKILL.md">SKILL.md</a> ships with the repo, so a coding agent runs this by itself whenever it is writing or editing prose for you. Copy it into your skills directory:</p>
-<pre>D=~/.claude/skills/linting-prose        <span class="c"># or .claude/skills/… for one project</span>
-R=https://raw.githubusercontent.com/bheijden/slop/main/skill
-
-mkdir -p $D/reference
-curl -sL $R/SKILL.md -o $D/SKILL.md
-for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; done</pre>
-        <p>Or hand the instruction to the agent and let it install itself:</p>
-<pre><span class="c">Install the slop skill from
-github.com/bheijden/slop/tree/main/skill into
-~/.claude/skills/linting-prose/, keeping the reference/ files.</span></pre>
-        <p>Only the <code>name</code> and <code>description</code> sit in context until the skill is triggered, so it costs about 100 tokens to have installed. The body loads when the agent is actually editing prose, and <code>reference/rules.md</code> and <code>reference/authoring.md</code> only when it needs the rule catalogue or is writing a rule.</p>
-        <p>A skill gives an agent instructions it will act on, so read one before installing it. This one runs <code>npx</code> or a clone of this repo and nothing else. See Anthropic's <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview">Agent Skills docs</a>.</p>
-      </div>
-    </details>
-    <details>
-      <summary>Update an earlier install<span class="hint">the rule format changed</span></summary>
-      <div class="body">
-        <p>Hand this to your agent:</p>
-<pre><span class="c">Update my slop install from github.com/bheijden/slop.
-Pull the clone if I have one, and re-copy skill/SKILL.md and
-skill/reference/*.md over ~/.claude/skills/linting-prose/.
-The rule format changed: a rule now carries "match" (what it
-finds) and "notable" (when that is worth reporting) instead of
-top-level "kind" and "params". If I have my own rule sets under
-.slop/rules/, migrate them and run: slop test-rules &lt;file&gt;</span></pre>
-        <p>Or by hand:</p>
-<pre><span class="c"># the clone</span>
-git <span class="p">-C</span> slop pull <span class="p">--ff-only</span>
-
-<span class="c"># the skill: the same commands as installing, -o overwrites</span>
-D=~/.claude/skills/linting-prose
-R=https://raw.githubusercontent.com/bheijden/slop/main/skill
-curl -sL $R/SKILL.md -o $D/SKILL.md
-for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; done</pre>
-        <p><code>npx</code> needs nothing. It re-resolves the repo on every call, so it is already current.</p>
-        <p>Your own rule sets need editing. <code>kind</code> and <code>params</code> move inside <code>match</code>, and <code>notable</code> says when a count is worth reporting: <code>{ "&gt;": 0 }</code> for a rule that fires on any occurrence. Loading an old set names the rule and what to change. <a href="https://github.com/bheijden/slop/blob/main/docs/rules.md">The rule format</a> has the rest.</p>
-      </div>
-    </details>
-  </div>
-
-  <p class="colophon">Markup is stripped before the rules run and every offset maps back, so a finding points at the line in your file. <a href="https://github.com/bheijden/slop">Source and rule format</a> · Apache-2.0 · patterns from <a href="https://tools.simonwillison.net/llm-cliche-highlighter">Simon Willison's LLM cliché highlighter</a> and Wikipedia's <a href="https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing">Signs of AI writing</a>.</p>
 </div>
 
 <div class="tip" id="tip"></div>
@@ -646,7 +354,37 @@ for f in rules authoring; do curl -sL $R/reference/$f.md -o $D/reference/$f.md; 
 <script type="module">
 import { readZip } from '../js/zip.mjs';
 
-const $ = (id) => document.getElementById(id);
+// The three counts in the top-right cell. Same shape on every page: a rule of
+// colour, a number, a label.
+function tally(words) {
+  const n = (S.flat || []).length;
+  const w = words != null ? words : (S.results || []).reduce((a, r) => a + (r.words || 0), 0);
+  const rate = w ? (1000 * n / w) : 0;
+  const cells = S.mode === 'fudge'
+    ? (() => {
+        const f = S.fudge || [];
+        const t = f.reduce((a, r) => ({ n: a.n + 1,
+          ok: a.ok + r.conform.ok + r.fudge.ok,
+          bad: a.bad + r.conform.fail + r.fudge.fail }), { n: 0, ok: 0, bad: 0 });
+        return [['var(--p0)', String(t.n), t.n === 1 ? 'rule' : 'rules'],
+                ['var(--p2)', String(t.ok), 'passing'],
+                ['var(--p1)', String(t.bad), 'failing']];
+      })()
+    : [['var(--p0)', w.toLocaleString('en'), 'words'],
+       ['var(--p1)', String(n), n === 1 ? 'finding' : 'findings'],
+       ['var(--p4)', rate ? rate.toFixed(1) : '0', 'per 1000 words']];
+  const el = document.getElementById('tally');
+  if (el) el.innerHTML = cells.map(([c, v, l]) =>
+    `<div><i style="background:${c}"></i><b>${v}</b><span>${l}</span></div>`).join('');
+}
+
+const GONE = new Map();
+// The layout no longer has resizable dividers, a file-tree splitter or a rules
+// popover; the code driving them is gone. A stub keeps any straggler harmless
+// instead of throwing on a null.
+const $ = (id) => document.getElementById(id)
+  || GONE.get(id)
+  || (GONE.set(id, Object.assign(document.createElement('div'), { id })), GONE.get(id));
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:0, skipped:0,
             kind:'md', name:'input',
@@ -892,6 +630,7 @@ function renderResults() {
   const multi = results.length > 1;
   const useSrc = S.view === 'source';
   const srcs = currentDocs();
+  tally();
   $('r-title').textContent = multi
     ? `${total} finding${total === 1 ? '' : 's'} in ${results.length} files`
     : (total ? `${total} finding${total === 1 ? '' : 's'}` : 'No findings');
@@ -1283,10 +1022,14 @@ function run() {
     $('doc-tools').hidden = S.mode === 'fudge';
     document.body.dataset.mode = S.mode;
     $('rule-tools').hidden = S.mode !== 'fudge';
+    $('views').hidden = S.mode === 'fudge';
+    $('kind').hidden = S.mode === 'fudge';
+    tally();
     if (S.mode === 'fudge') $('results').hidden = false;
     const many = S.docs.length > 1;
     // Several files have nothing single to type into; data-edit does the hiding.
-    $('kind').hidden = many;
+    // Rules mode has no text to parse at all, so the choice goes either way.
+    $('kind').hidden = many || S.mode === 'fudge';
     $('loaded').hidden = !many;
     if (many) {
       $('loaded').innerHTML = `<b>${S.docs.length} files</b> loaded`
@@ -1327,11 +1070,12 @@ function run() {
       $('score').className = 'score' + (bad ? '' : ' zero');
       $('score').innerHTML = `<b>${bad}</b> failing`;
       renderResults();
+      tally();
       return;
     }
     const docs = currentDocs();
     if (!docs.some((d) => d.src.trim())) {
-      S.results = []; S.flat = []; $('score').textContent = ''; $('meta').textContent = '';
+      S.results = []; S.flat = []; $('score').textContent = ''; $('meta').textContent = ''; tally(0);
       renderResults(); return;
     }
     const res = await ask({ mode:'check', docs, sets:S.sets, active:[...S.active] }, 20000);
@@ -1349,6 +1093,7 @@ function run() {
     $('score').innerHTML = `<b>${total}</b> · ${per}/1k`
       + (S.results.length > 1 ? ` · ${S.results.length} files` : '');
     $('meta').textContent = `${words} words`;
+    tally(words);
     renderResults(); renderRules();
   }, 160);
 }
