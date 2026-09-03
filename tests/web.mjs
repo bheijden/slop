@@ -430,12 +430,33 @@ async function main() {
       P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.which)
       && /pull requests/.test(P.about), JSON.stringify(P).slice(0, 200));
 
+    // Paging must recolour the chart, never restack it. Drawing the selected
+    // cluster first put it at the bottom, so every page changed the geometry
+    // under the reader.
+    const stack = await evaluate(`(async () => {
+      const geom = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('d'));
+      const fills = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('fill'));
+      const g1 = geom(), f1 = fills();
+      document.getElementById('next').click();
+      await new Promise(r => setTimeout(r, 400));
+      return JSON.stringify({ sameGeometry: JSON.stringify(g1) === JSON.stringify(geom()),
+                              differentFills: JSON.stringify(f1) !== JSON.stringify(fills()),
+                              bands: g1.length });
+    })()`);
+    const ST = JSON.parse(stack);
+    check('paging recolours the chart without restacking it',
+      ST.sameGeometry && ST.differentFills && ST.bands >= 5, JSON.stringify(ST));
+
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.
+    // Scoped to the copy we wrote, not the whole page: the word list is data, and
+    // it legitimately contains words like "registered". Whole words only, for the
+    // same reason.
     const jargon = await evaluate(`(() => {
-      const t = document.body.innerText.toLowerCase();
+      const sel = '.mast, .say, .capbar, .find, .strip, .tally, .word-head .u';
+      const t = [...document.querySelectorAll(sel)].map(e => e.innerText).join(' ').toLowerCase();
       return JSON.stringify(['register', 'small group', 'unsigned', 'lift', 'stratum', 'strata',
-        'contrast', 'corpus'].filter(w => t.includes(w)));
+        'contrast', 'corpus'].filter(w => new RegExp('\\b' + w + '\\b').test(t)));
     })()`);
     const J = JSON.parse(jargon);
     check('the page uses no word invented in this project', J.length === 0, J.join(', '));

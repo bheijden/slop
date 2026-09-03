@@ -1,246 +1,243 @@
-# The derived vocabulary
+# Where the word list comes from
 
-Most of what slop ships is fixed. Someone read a source, wrote a rule, and it
-stays put. One rule set works differently. `ai-vocabulary` is derived from
-public GitHub pull request descriptions, and its words move as the writing
-moves.
+slop ships one rule that works differently from all the others. Every other
+rule is a pattern somebody wrote down. This one is a list of about 1,200
+ordinary English words, and a document that reaches for a lot of them at once
+is probably machine-written. The list is rebuilt from scratch every week.
 
-[The page](https://bheijden.github.io/slop/web/vocabulary.html) shows what it
-currently says, what the derivation found, and what it threw away.
+This page explains how the list is made, why the obvious way of making it
+fails, and what evidence there is that the way we settled on works.
 
-## Why pull requests
+## Where the raw material comes from
 
-They are the only large body of public text that refreshes daily, is written by
-people doing everyday work, and where a growing share is machine-written **and
-says so**. Claude Code, Codex, Cursor, Gemini, Devin and others sign the body
-they generate. The signature is a label nobody has to work out.
+Every day we collect about a thousand pull request descriptions from public
+GitHub repositories. A pull request description is the paragraph or two a
+programmer writes to explain a change to whoever will review it.
 
-## Two words this page needs
+Three things make it unusually good material:
 
-**Register** is a way of writing, as opposed to a thing written about. Academic,
-tabloid, legal, chatty are registers; so is the way a machine writes a pull
-request description. It is the same sense `data/corpus` uses when it files its
-pairs under `academic`, `journalism`, `literary`. Two authors describing the
-same lockfile bump in different registers produce different sentences, and a
-word list is only about the writing if the subject is held still. Everything
-below is an attempt to hold it still.
+- **There is a lot of it, and more every day.** Most public writing is a fixed
+  archive. This refreshes.
+- **It is ordinary work writing.** Nobody is performing. They are explaining a
+  change to a colleague.
+- **A growing share of it is written by AI, and says so.** Claude Code, Codex,
+  Cursor, Copilot and others add a line at the end of what they write:
+  `Generated with Claude Code`, `Co-authored-by: ...`, or an HTML comment with
+  the tool's name in it.
 
-**Small group** is a cluster from the finer of the two cuts, and nothing more.
-The same descriptions are clustered twice: once into five groups, to find the
-register, and once into ten, which are only ever used to remove words. The
-register is *not* one of the ten — its descriptions scatter, most into one small
-group and the rest across three or four others. "One corner of the register"
-means one of those scattered pieces.
+Everything below depends on that last point. Across the whole archive, about
+one description in twelve carries a stamp from the tool that wrote it. Over the
+last two months it has been closer to one in four. We cut the stamp off before
+counting a single word, so nothing downstream can cheat by learning the stamp
+itself.
 
-## What the signature says, and what it does not
+We now have 609 days of this, back to January 2025 (about 274,000 descriptions,
+32 million words).
 
-A signed description was written by a machine. That is the whole of what the
-signature establishes. Three things it does **not** establish, each of which
-cost a working method before it was measured:
+## What the stamp does and does not tell you
 
-- **It does not say the unsigned ones are human.** Plenty are machine-written
-  with the footer stripped, so the unsigned side is a mixture and every contrast
-  against it is diluted.
-- **It does not say a group holding more signatures is more machine-sounding.**
-  Measured: the most-signed group in a ten-way clustering scores 16 of 24 on the
-  back-testing corpus while a less-signed one scores 22.
-- **It does not make a good ranking.** Scoring words by how much more the signed
-  half uses them finds the *work*, not the writing. Agents get pointed at
-  typecheck failures and lockfile bumps, so that vocabulary comes back, with a
-  tool's own name (`bugbot`, at 462×) at the top. That list catches **9 of 24**.
+It tells you exactly one thing, and it tells you it perfectly. **This
+particular description was written by a machine.**
 
-So the signature is used in exactly one place below: choosing which of five
-groups to publish. Everything else is a contrast against the corpus.
+It does not tell you that the *unstamped* ones were written by people. Plenty
+of machine-written text has the stamp removed, or came from a tool that never
+added one. The unstamped pile is a mixture, not a control group.
 
-## The five steps
+That distinction is easy to nod along to and expensive to forget. We forgot it
+twice.
 
-**1. Sample.** Ten windows of five minutes a day, one from each 2.4-hour block,
-with start times derived from the date so any day can be re-collected to the
-second. About a thousand descriptions a day.
+## The obvious approach, and why it fails
 
-History was seeded rather than crawled. Every day from January 2025 to September
-2026 already existed as a published file of raw descriptions in
-[louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), so
-those days were read from there in a few minutes instead of collected ten
-requests at a time over several months. Every day since is our own. Each day
-file records which, under `source`, because the two collect differently and a
-window straddling the seam is comparing two samples rather than one. This is a
-fact about where the text came from, not about the method.
+The obvious thing is to compare the two directly. For every word, work out how
+much more often it appears in stamped descriptions than in unstamped ones, and
+keep whatever rises to the top.
 
-**2. Split off the signature.** Tools sign in two shapes: a trailing line whose
-grammar is attribution ("Generated with", "Co-authored-by"), or an HTML comment
-carrying a shouted sentinel, which is how Cursor signs. Both are matched on
-form, not on product name, and both leave the text before any word is counted.
-
-**3. Keep the bag, drop the prose.** Each description becomes a list of words
-and how often each occurred. Order is gone, the signature is gone, and the
-account name becomes a number meaningful only inside its own day. One gzipped
-file per day in `data/docs/`, about 150 KB.
-
-**4. Find the register, then rank against everything else.** Cluster forty days
-of descriptions into **five** groups by word use, with the signatures hidden
-from the fit, and take the group with the largest signed share. Then score each
-word by
+We built that. Here is what came back, best first:
 
 ```
-rate of the word inside that group  ÷  rate of the word in every other description
+bugbot   462x       nbsp   57x       seats   6.7x       whole-branch   5.7x
 ```
 
-The second term is the whole point. A ratio of signed against unsigned has no
-term for rarity, so `here` and `note` outrank `amendment` and `cited`. A
-contrast against the rest of the corpus buries any word everybody uses.
+`bugbot` is the name of a tool. `nbsp` is an HTML escape. Neither is a way of
+writing. Both are traces of *what AI gets asked to do*. Agents get pointed at
+type errors, dependency updates and flaky tests, so the comparison hands back
+the vocabulary of that work.
 
-Five groups, not ten, and this matters. At ten the register splits in two and
-the wrong half wins the signed share; at five it is one group and three
-independent ways of choosing it — signed share, how well its vocabulary marks
-machine writing *elsewhere*, and how fast it grew — all agree. That agreement is
-checked on every build and reported when it fails, because a disagreement means
-the clustering has split the register and the list is drawn from part of it.
+There is a second problem, subtler and worse. A ratio like this has no sense of
+whether a word is rare to begin with. `here` and `note` are used a little more
+by AI, so they score well. `amendment` and `cited` are used far more, but are
+not common enough in absolute terms to beat them. The list fills up with words
+everybody uses.
 
-**5. Drop what only lives in one corner.** Cluster again, into ten small groups. The
-register does not become one of these — it spreads across several, and one
-small group is 95% register, its densest part. Check each candidate word inside
-every small group, signed against unsigned, and drop any word common enough to be
-measured in exactly one of them. Words spread across several parts are kept,
-and so is anything too rare to be measured anywhere: **this test may remove
-evidence and never demand it.** Requiring a word to lift in three small groups rather
-than merely not-fail in one costs ten of the twenty-four documents, because the
-requirement is a frequency floor and the rare words are the signal.
+Measured against our test set, described near the bottom of this page, a list
+built this way correctly flags **9 out of 24** machine-written documents. It is
+close to useless.
 
-Two obvious readings of step 5 are both wrong, and were both checked. It is not
-a rarity filter: the words it drops are *rarer* in ordinary human prose than the
-ones it keeps. And it is not merely reaching further down the ranking: at a list
-of 1,200 it scores 21 of 24 against 20 for an unfiltered list of the same
-length, and 20 for an unfiltered list of the same depth.
+## What we do instead
 
-## What it scores
+The fix is to stop comparing stamped against unstamped, and start comparing one
+*kind of writing* against every other kind.
 
-Against `data/corpus`, at each rule's own shipped threshold:
+### Step 1. Sort the descriptions into five piles by the words they use
 
-| | false alarms | machine documents caught |
-|---|---|---|
-| `load-bearing` | 1 of 24 | 22 of 24 |
-| `ai-vocabulary` | **0 of 24** | 20 of 24 |
+This is ordinary clustering. Descriptions that reach for similar vocabulary end
+up together, and the sorting never sees the stamps. It looks only at which
+words turn up alongside which.
 
-Allowing one false alarm for both, the derived list reaches 21 of 24 against
-their 22; allowing none, both reach 21. Both miss `government-1` and `policy-1`,
-which are bureaucratic registers where the human half already reads like the
-machine half.
+The five piles come out like this:
 
-The route there is worth recording, because most of it was wrong:
+| pile | descriptions | share carrying an AI stamp | words that characterise it |
+|---|---|---|---|
+| **0** | 4,136 | **44%** | drawn, somebody, ruling, priced, cell, figure |
+| 1 | 7,436 | 2% | exact-head, rebase/retry, preserve, automerge |
+| 2 | 4,237 | 27% | logger, str, pid, ctx, err, tuple |
+| 3 | 3,654 | 32% | pull_request, yml, dependabot, workflow_dispatch |
+| 4 | 4,541 | 31% | logo, hero, icons, nav, aria-label, sidebar |
 
-| what was ranked | catches |
-|---|---|
-| signed against unsigned, whole corpus | 9 of 24 |
-| the same, compared separately inside each small group | 9 of 24 |
-| register against the rest, ten groups, most-signed picked | 16 of 24 |
-| register against the rest, five groups | 18–21 of 24 |
-| and with step 5 | **21–22 of 24** |
+Piles 1 to 4 are recognisably about *subjects*: git plumbing, backend code,
+build configuration, front-end work. Pile 0 is not about a subject at all. Its
+characteristic words are the connective tissue of English prose, and it is the
+pile where nearly half the descriptions carry an AI stamp.
 
-The last two rows are ranges over four fits — two window lengths, three random
-seeds. Step 5 does not only raise the number, it collapses the spread.
+Pile 0 is the one we publish.
 
-## What is hardcoded, and what is not
+### Step 2. Score each word against every other pile combined
 
-Which tools exist is the one fact that goes stale by itself, so it is
-discovered. `tools/pr-markers.mjs` looks for attribution-shaped lines that
-`data/markers.json` does not know, and proposes them through a pull request
-that is redone weekly, so a candidate that turns out to be a fluke disappears
-before it is merged. Nothing is added automatically.
+A word scores 7.4x if descriptions in pile 0 write it 7.4 times as often as the
+rest of GitHub does.
 
-Everything else is a stated number, written where it is used, in the header of
-`tools/pr-cluster.mjs`:
+That "rest of GitHub" half of the fraction is what was missing before. A word
+everybody uses has a large number underneath it and cannot score highly,
+however fond of it AI happens to be. This is what finally puts `amendment`
+above `here`.
 
-| | | |
-|---|---|---|
-| `K_REGISTER` | 5 | groups in the coarse fit, where the register has to stay whole |
-| `K_SMALL` | 10 | small groups in the fine fit, used only to remove words |
-| `MIN_DF` | 25 | descriptions a word needs across the window to enter the vocabulary |
-| `MIN_IN` | 8 | and on each side of a small group before that small group can judge it |
-| `MIN_SIDE` | 40 | a small group needs this many on each side to judge anything |
-| `MIN_GROUP` | 0.03 | a group smaller than this is noise, not a register |
-| `PRIOR` | 25 | appearances credited to a word outside its group, so a word seen nowhere else is ranked by how often it was used inside rather than by a tiny divisor |
-| `TOP` | 1200 | words published |
-| `ENGLISH_MIN` | 0.12 | share of function words for a description to count as prose |
-| `TOKENS_MIN` | 25 | below this a description is a stub |
-| letters per word | 3 | below this the list fills with `375px` and `a2` |
+### Step 3. Sort again into ten finer piles, and drop the narrow words
 
-A number you can read and argue with is better than a formula that hides one.
-`K_REGISTER` is the one that was chosen by measurement rather than by taste, and
-the build re-checks it: if the three ways of picking the register stop agreeing,
-the register has split and the number is wrong.
+Pile 0 is not uniform. Cut the same descriptions ten ways instead of five and
+it breaks into pieces, most of it into one and the rest spread over three or
+four others. Some words live only in one of those pieces. `somebody`, `priced`,
+`rectangle` and `morning` are all like this. They score well in step 2, but
+they belong to one corner of pile 0, not to pile 0 as a whole, so they go.
 
-## What it will not tell you
+A word too rare to be measured anywhere is **kept**, and that matters more than
+it sounds. We first wrote this step as a requirement, where a word had to
+*prove* itself in three piles or be dropped. That version costs ten of the
+twenty-four documents, because proving anything requires a word to be common,
+and the rare words carry most of the signal. The test may only take a word
+away. It may never demand that one earn its place.
 
-**The control is not human.** Plenty of machine-written descriptions carry no
-signature. That makes the two groups more alike, so every score is an
-underestimate.
+About 1,200 words survive. The top of the list:
 
-**This is software prose.** The words are derived from pull requests and carry
-that shape. Whether a difference found there carries over to an essay is a
-separate question, which is what `data/corpus/` exists to answer: twenty-four
-topics, each written once by a person before these tools existed and once by a
-model, so the only thing left between the two halves of a pair is register.
+```
+drawn  ruling  cell  figure  draws  beat  instrument  picture  population  drew
+```
 
-**A signed description is one tool's users.** People who leave the footer in
-place are not a random sample of everyone writing with a machine.
+## Three reasons to believe it
 
-**One register, not all of them.** The coarse fit publishes a single group. If
-machine writing has settled into two distinguishable registers, this reports the
-larger and says nothing about the other.
+None of these were used to build the list. Each of them could have come out
+wrong.
 
-**The threshold is calibrated on 24 documents.** It sits above every human
-document in the corpus with a margin rather than on the highest one, because 24
-documents cannot resolve a boundary more finely than that. Sitting on the
-maximum would read 21 of 24 instead of 20 and be worth less than it looks.
+**The pile grew, and nothing in the method knows about time.** The clustering
+saw no dates at all. Assign all 609 days to the five piles afterwards and pile
+0 runs from **1.1%** of all pull requests in January 2025 to **18.7%** in
+August 2026, seventeen times larger.
 
-## The page
+The other four move too, and it would be dishonest to say otherwise. Pile 1
+falls from 57% to 32% as the others take share from it, and pile 3 more than
+doubles. But pile 0 is the only one that starts at essentially nothing. The
+others were already there in January 2025 and got bigger or smaller. Pile 0
+*appeared*.
 
-[The vocabulary page](https://bheijden.github.io/slop/web/vocabulary.html) is
-built to be checked rather than believed. It opens with a glossary, because
-`signed`, `register`, `group`, `small group` and `lift` are all terms invented
-here and nothing on the page means anything without them. Then:
+**The stamps agree, word by word.** Take any word on the list and count it
+separately in stamped and unstamped descriptions across the whole archive.
+`drawn` appears 63 times per million words in stamped ones against 13 in
+unstamped. `nobody`, 129 against 27. Four to five times more, consistently,
+across the list. Step 2 never looked at a stamp.
 
-- **What a plain ratio would have published**, next to what the contrast
-  publishes, so the failure the method exists to fix is visible rather than
-  described.
-- **The five groups**, with the signed share that chose one of them, and a
-  stacked chart of every group's share of the corpus across all 88 weeks. The
-  register goes from 1.1% of descriptions to 18.7%, which is a second and
-  entirely independent reason to believe the choice: the group picked for having
-  the most signatures is also the one that arrived.
-- **Every group's word list**, paged through with the arrows or the arrow keys.
-  Each is built the same way as the published one, so what you read is what
-  would ship had that group been the register.
-- **Each word's weekly rate** per million words since January 2025, drawn twice:
-  over all descriptions, and over signed ones only. Neither the ranking nor the
-  filter ever looked at a date or a signature, so the signed line sitting four
-  or five times above the other is a check the derivation could have failed and
-  did not.
+**It works on writing that has nothing to do with software.** `data/corpus/`
+holds 24 topics, each written twice: once by a person and published before
+generative writing tools existed, and once by a language model given the topic,
+the audience and a list of points to cover, and never shown the human version.
+Twelve kinds of writing in all, among them academic papers, journalism, essays,
+government guidance, technical documentation, letters and travel writing. Both
+halves of a pair say the same things at the same length, so the only thing left
+between them is *how* they are written.
 
-To try the list on your own text, open [the checker](https://bheijden.github.io/slop/web/)
-and tick `ai-vocabulary` in the rules panel. It is loaded but off, like every
-candidate set.
+At the threshold the rule ships with, it flags **0 of the 24 human documents
+and 20 of the 24 machine-written ones.**
 
-## Running it
+For comparison,
+[louisabraham/load-bearing](https://github.com/louisabraham/load-bearing),
+which arrives at a similar list by a different route, flags 1 human and 22
+machine on the same test. Allow neither list a false alarm and the two tie at
+21.
+
+## What this cannot tell you
+
+**It is built from software writing.** The words come from programmers
+describing code changes (and reviewing them, and arguing about them). That the
+difference carries over to essays is something the 24-pair test supports
+without proving. Twenty-four documents is a small test.
+
+**Every number here is a floor.** The unstamped pile contains machine-written
+text, which makes the two sides look more alike than they are. Whatever
+difference we measure, the real one is larger.
+
+**Only tools that leave a stamp are represented.** Anyone who deletes the
+footer, or uses a tool that never adds one, is invisible to us.
+
+**No word on the list is evidence by itself.** `figure`, `beat` and `picture`
+are ordinary words. The rule fires on a document using *many* of them at once,
+never on one. Human writers use every one of them constantly.
+
+## Reproducing it
 
 ```sh
-node tools/pr-sample.mjs 2026-09-01              # sample one day
-node tools/pr-sample.mjs 2026-08-01..2026-09-01  # a range
-node tools/pr-sample.mjs --backfill 5            # the 5 oldest missing days
-node tools/pr-sample.mjs --source search 2026-09-01   # ignore the archive
-node tools/pr-sample.mjs --archive ./days 2025-01-01..2026-09-01
-node tools/pr-cluster.mjs --days 40              # derive, and report
-node tools/pr-cluster.mjs --days 40 --write      # and rebuild the rule
-node tools/pr-page-data.mjs                      # rebuild what the page reads
-node tools/pr-markers.mjs --days 21              # look for unrecognised signatures
-node tools/score-list.mjs                        # score every word list on data/corpus
-node tools/audit.mjs                             # score every rule on data/corpus
+node tools/pr-sample.mjs 2026-09-01              # collect one day
+node tools/pr-sample.mjs --backfill 5            # fill the five oldest gaps
+node tools/pr-cluster.mjs --days 40              # rebuild the list, and report
+node tools/pr-cluster.mjs --days 40 --write      # and write it into the rule
+node tools/pr-page-data.mjs                      # rebuild what the web page reads
+node tools/score-list.mjs                        # score every word list on the 24 pairs
+node tools/audit.mjs                             # score every rule on the 24 pairs
 ```
 
-CI samples every morning and re-derives on Mondays, filling in ten days of
-older history on every run, so the archive fills itself in from the back.
+Every number the method uses is a constant near the top of
+`tools/pr-cluster.mjs`, each with a comment explaining the choice. The two that
+matter most are these.
 
-`rules/load-bearing.json` is a separate thing entirely: a port of an outside
-word list, tracked by its own workflow so both sets stay current. See
+- **Five piles, not ten.** At ten, the AI writing splits across two piles and
+  the larger of the two is a false lead. At five it holds together, and three
+  separate ways of picking the right pile all land on the same one. The build
+  checks that agreement every time and says so when it breaks.
+- **A word must appear in 25 descriptions** before it is considered at all.
+  Below that, one prolific author can invent a word single-handed.
+
+The only thing kept up to date by hand is which AI tools exist, since new ones
+keep appearing and each stamps its work differently. `tools/pr-markers.mjs`
+watches for unfamiliar stamps and opens a pull request proposing them. Nothing
+is added automatically.
+
+Collection runs every morning and the list is rebuilt every Monday, both by
+[GitHub
+Actions](https://github.com/bheijden/slop/blob/main/.github/workflows/pr-vocabulary.yml).
+[The web page](https://bheijden.github.io/slop/web/vocabulary.html) shows the
+current state, showing all five piles, the words in each, and how often each
+word has been written every week since January 2025.
+
+## A note on this page
+
+Run slop over this file and it fires. 85 of its 1,672 words are on the list,
+which is well past the threshold.
+
+That is not a bug and it is not irony. A page explaining a vocabulary has to
+use that vocabulary, and the words on the list are ordinary English (`figure`,
+`piece`, `whole`, `says`) that any explanation of anything reaches for. It is a
+good illustration of the last warning above: the rule measures a rate across a
+whole document, it has no idea what the document is about, and a human writer
+can absolutely trip it. A finding is a prompt to reread a passage, never a
+verdict on who wrote it.
+
+`rules/load-bearing.json` is a separate thing entirely: a port of somebody
+else's list, tracked by its own workflow so that both stay current. See
 [research/load-bearing-labels.md](../research/load-bearing-labels.md).

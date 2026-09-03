@@ -336,11 +336,13 @@ function drawArrive() {
       stroke-opacity=".55"><title>group ${c}: ${pc(share)} of the last week</title></path>`);
     for (let i = 0; i < S.length; i++) base[i] = upper[i];
   };
-  band(reg, 'var(--flag)', 0.85);
-  // The other groups are not the subject, but they still have to read as four
-  // bands rather than one grey mass.
+  // The stacking order never changes, and neither does a band's shade. Paging
+  // recolours one band; it must not reshuffle the chart underneath the reader,
+  // which is what happened when the selected cluster was drawn first so that it
+  // sat at the bottom.
   const steps = [0.46, 0.34, 0.24, 0.16, 0.11, 0.08, 0.06];
-  order.filter((c) => c !== reg).forEach((c, i) => band(c, 'var(--muted)', steps[i % steps.length]));
+  order.forEach((c, i) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
+                               c === reg ? 0.85 : steps[i % steps.length]));
   let last = null;
   const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
   for (let i = 0; i < S.length; i += every) {
