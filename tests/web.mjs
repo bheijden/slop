@@ -114,7 +114,22 @@ async function main() {
     await send('Log.enable');
     await send('Page.enable');
     await send('Page.navigate', { url: base });
-    await sleep(3500);
+    await sleep(1200);
+
+    // The rule list is painted after five rule sets are fetched, so a fixed
+    // sleep is a race that fails under load. Wait for the thing instead: this
+    // went red twice on a loaded machine, both times reported as a null
+    // checkbox rather than as the timing problem it was.
+    const waitFor = async (selector, ms = 15000) => {
+      const until = Date.now() + ms;
+      while (Date.now() < until) {
+        const got = await evaluate(`Boolean(document.querySelector(${JSON.stringify(selector)}))`);
+        if (got === 'true' || got === true) return true;
+        await sleep(150);
+      }
+      throw new Error(`timed out waiting for ${selector}`);
+    };
+    await waitFor('#rules input[data-rule="em-dash"]');
 
     const checks = [];
     const check = (name, ok, detail = '') => checks.push({ name, ok, detail });
@@ -579,7 +594,7 @@ async function main() {
         'Signs of AI writing (Wikipedia)']), JSON.stringify(L.order));
     check('the page is called rule sets', L.nav.includes('rule sets'), L.nav.join(','));
     await send('Page.navigate', { url: base });
-    await sleep(2200);
+    await waitFor('#rules input[type=checkbox]');
     const box = await evaluate(`JSON.stringify({
       boxes: document.querySelectorAll('#rules input[type=checkbox]').length,
       sets: document.querySelectorAll('.libset').length})`);
@@ -709,6 +724,21 @@ async function main() {
     const O = JSON.parse(ord);
     check('the stack is ordered by one number, and the rule comes from the top of it',
       O.sorted && O.publishedIsZero, JSON.stringify(O));
+
+    // Two clocks run behind this page -- a daily sample and a weekly fit -- and
+    // which one last moved was only answerable by reading the workflow file.
+    const fresh = await evaluate(`(async () => {
+      const d = await fetch('vocabulary-data.json').then(r => r.json());
+      const el = document.getElementById('stamp');
+      const box = el.getBoundingClientRect();
+      return JSON.stringify({ text: el.innerText,
+        saysSampled: el.innerText.includes(d.sample.to),
+        saysBuilt: el.innerText.includes(d.built),
+        oneLine: box.height < 26 });
+    })()`);
+    const F = JSON.parse(fresh);
+    check('the page says how fresh it is', F.saysSampled && F.saysBuilt && F.oneLine,
+      JSON.stringify(F));
 
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.

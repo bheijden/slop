@@ -174,14 +174,20 @@ halves of a pair say the same things at the same length, so the only thing left
 between them is *how* they are written.
 
 At the threshold the rule ships with, it flags **1 of the 24 human documents and
-20 of the 24 machine-written ones.**
+22 of the 24 machine-written ones.**
 
-A tuned operating point does better — the top 200 words at a threshold of 0.31
-catch 22 — and the shipped one is deliberately not that. It sits further from
-the human distribution than the best score would put it, which costs two
-documents and buys margin for text unlike anything in this corpus. Both numbers
-move when the list re-derives on a Monday, so `tests/claims.mjs` recomputes
-them and fails if this paragraph goes stale.
+The score counts how many *different* list words a document uses, divided by
+its length raised to the power 0.7. A count of different things saturates — a
+long document runs out of new list words to find — so a plain rate per thousand
+words would fall with length and one threshold would mean two things on a page
+and on a chapter. The exponent is what makes the threshold portable, and 0.7
+rather than the square root because that is what holds the false-alarm rate
+steady as documents shorten: see [research/length.md](../research/length.md).
+
+Six of the 24 machine documents score below the highest-scoring human one, and
+no threshold separates those. Both numbers here move when the list re-derives
+on a Monday, so `tests/claims.mjs` recomputes them and fails if this paragraph
+goes stale.
 
 ## What this cannot tell you
 

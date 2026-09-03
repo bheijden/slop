@@ -16,8 +16,8 @@
         "distinct": true
       },
       "notable": {
-        ">=": 0.4,
-        "power": 0.5,
+        ">=": 0.095,
+        "power": 0.7,
         "unit": "words",
         "needs": {
           "words": 600,

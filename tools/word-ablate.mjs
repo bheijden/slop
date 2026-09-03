@@ -26,6 +26,8 @@ const set = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf
 const ALL = set.rules[0].match.pattern.replace(/^\\b\(\?:/, '').replace(/\)\\b$/, '')
   .split('|').map((w) => w.replace(/\\/g, ''));
 
+const POWER = set.rules[0].notable.power ?? 0.5;
+
 const { human, ai } = loadCorpus();
 const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const bag = (d) => new Set((d.text.toLowerCase().match(/[a-z][a-z'’-]*/g) || []));
@@ -48,7 +50,7 @@ function truncate(d, n) {
 
 function score(words, n) {
   const re = new RegExp(`\\b(?:${words.map(esc).join('|')})\\b`, 'gi');
-  const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.sqrt(d.words);
+  const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.pow(d.words, POWER);
   const h = human.map((d) => of(truncate(d, n))).sort((a, b) => b - a);
   const a = ai.map((d) => of(truncate(d, n)));
   const t = h[BUDGET] + 1e-9;
@@ -105,7 +107,7 @@ for (let f = 0; f < FOLDS; f++) {
   const keep = ALL.filter((w) => !drop.includes(w));
   const on = (words) => {
     const re = new RegExp(`\\b(?:${words.map(esc).join('|')})\\b`, 'gi');
-    const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.sqrt(d.words);
+    const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.pow(d.words, POWER);
     const h = test.map((p) => of(p.h)).sort((x, y) => y - x);
     const t = h[BUDGET] !== undefined ? h[BUDGET] + 1e-9 : h[h.length - 1] + 1e-9;
     return test.map((p) => of(p.a)).filter((x) => x >= t).length;

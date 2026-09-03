@@ -98,7 +98,7 @@ So the exponent is not a better detector. It is a better *ruler*: it makes one
 threshold portable across lengths. All of its value is on documents shorter
 than the corpus, and none of it is at full length.
 
-## The recommendation, and what it costs
+## What was adopted
 
 `js/engine.mjs` takes `power`, the exponent the count is divided by. It
 replaced `per: "root"`, which was the same thing named twice. Switching the
@@ -109,10 +109,10 @@ derived rule is one number plus a recalibrated threshold:
              "needs": { "words": 600, "sentences": 5, "matches": 10 } }
 ```
 
-**The proposed value is 0.7.** Not 0.8, which scores identically on every
-length measured and sits one step from 0.9, where false-alarm control fails at
-300 words. 0.7 is the lowest exponent that gets the full gain, and the only one
-all four folds agree on.
+**0.7 is what ships**, as of this note. Not 0.8, which scores identically on
+every length measured but sits one step from 0.9, where false-alarm control
+fails at 300 words. 0.7 is the lowest exponent that gets the full gain and the
+only one all four folds agree on.
 
 Measured against what ships today:
 
@@ -122,8 +122,12 @@ Measured against what ships today:
 | 0.7 @ 0.095 | 1 false alarm, 22/24 | 2 false alarms, 18/24 |
 
 Two more at full length and two more at the floor, for one more false alarm at
-the floor. That is a real trade rather than a free win, which is why it is
-written down here rather than applied.
+the floor. A real trade rather than a free win, and it was taken deliberately.
+
+`needs.words` stays at 600. The exponent makes shorter documents *scoreable*
+— at 400 words it catches 17 of 24 against the square root's 14 — but lowering
+the floor is a separate decision resting on the same truncated evidence, so it
+has not been made.
 
 **The caveat that matters.** Every short-document number above comes from
 truncating a long document. A 400-word slice of a 1,000-word essay has an

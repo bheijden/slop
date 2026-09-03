@@ -22,7 +22,6 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i < 0 ? d : process.argv[i + 1]; };
 const BUDGET = Number(arg('--budget', 1));
 const SIZES = String(arg('--sizes', '200,400,700,1000,1200')).split(',').map(Number);
-
 const { human, ai } = loadCorpus();
 const esc = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -37,12 +36,14 @@ function wordsOf(pattern) {
   return parts.every(plain) ? parts.map((p) => p.replace(/\\(.)/g, '$1')) : null;
 }
 
-function score(label, words) {
+// The exponent comes from the rule being scored, not from a copy kept here: two
+// list rules ship and they need not agree on it.
+function score(label, words, POWER = 0.5) {
   const rows = [];
   for (const n of SIZES) {
     if (n > words.length) continue;
     const re = new RegExp(`\\b(?:${words.slice(0, n).map(esc).join('|')})\\b`, 'gi');
-    const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.sqrt(d.words);
+    const of = (d) => new Set((d.text.match(re) || []).map((w) => w.toLowerCase())).size / Math.pow(d.words, POWER);
     const h = human.map(of).sort((a, b) => b - a);
     const a = ai.map(of);
     // The lowest threshold that keeps false alarms inside the budget, which is
@@ -71,7 +72,7 @@ const targets = named.length
     const set = JSON.parse(readFileSync(path, 'utf8'));
     for (const r of set.rules || []) {
       const w = r.match?.pattern && r.match.distinct ? wordsOf(r.match.pattern) : null;
-      if (w && w.length >= 100) score(`${set.name}/${r.id}`, w);
+      if (w && w.length >= 100) score(`${set.name}/${r.id}`, w, r.notable?.power ?? 0.5);
     }
   }
 }

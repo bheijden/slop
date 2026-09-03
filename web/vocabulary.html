@@ -75,6 +75,7 @@
     <p id="say1">Reading the sample&hellip;</p>
     <p id="say2"></p>
     <p id="say3"></p>
+    <p id="stamp" class="stamp"></p>
     <div class="more">
       <a href="https://github.com/bheijden/slop/blob/main/docs/vocabulary.md">How this was done.</a>
       <a href="./">Try it on your own writing.</a>
@@ -149,6 +150,12 @@ const DEF = {
         + 'can be compared. The red line counts only signed pull requests.',
   share: 'This cluster\'s share of all pull requests collected that week — how much of GitHub it '
         + 'accounts for, not how much of it is signed.',
+  sampled: 'One more day of pull requests is collected every morning at 08:00 UTC and these three '
+        + 'numbers move with it. The archive only ever reaches yesterday, so the newest day here is '
+        + '{to}.',
+  built: 'The clustering and the word list are redone weekly, on Mondays, because that pass reads '
+        + 'the whole archive and takes minutes rather than seconds. Between Mondays the counts above '
+        + 'keep moving while the words below stay put.',
 };
 
 let DATA = null, SELECTED = null, GROUP = 0;
@@ -172,10 +179,17 @@ function render() {
   const hist = DATA.history;
   const words = hist.weeks.reduce((a, e) => a + e.words, 0);
   $('tally').innerHTML = [
-    ['var(--p1)', fmt(s.days), 'days'],
-    ['var(--p0)', fmt(s.descriptions), 'pull requests'],
-    ['var(--p4)', fmt(words), 'words'],
-  ].map(([c, n, l]) => `<div><i style="background:${c}"></i><b>${n}</b><span>${l}</span></div>`).join('');
+    ['var(--p1)', fmt(s.days), 'days', DEF.sampled.replace('{to}', s.to)],
+    ['var(--p0)', fmt(s.descriptions), 'pull requests', DEF.sampled.replace('{to}', s.to)],
+    ['var(--p4)', fmt(words), 'words', DEF.sampled.replace('{to}', s.to)],
+  ].map(([c, n, l, tip]) => `<div data-tip="${attr(tip)}"><i style="background:${c}"></i>`
+    + `<b>${n}</b><span>${esc(l)}</span></div>`).join('');
+  // Which of the two clocks last moved, so "is this stale?" is answerable from
+  // the page instead of from the workflow file.
+  $('stamp').innerHTML = `<span class="term" tabindex="0" data-tip="${attr(DEF.sampled.replace('{to}', s.to))}">`
+    + `sampled</span> to <b>${esc(s.to)}</b> &middot; `
+    + `<span class="term" tabindex="0" data-tip="${attr(DEF.built)}">rebuilt</span> `
+    + `<b>${esc(DATA.built)}</b>`;
 
   const hw = DATA.history.weeks, wk1 = hw[0], wkN = hw[hw.length - 1];
   const at = DATA.history.order.indexOf(DATA.publish.id);

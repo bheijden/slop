@@ -81,5 +81,13 @@ for (const dir of ['rules', 'candidates']) {
 }
 check('no shipped rule still says per: "root"', stale.length === 0, stale.join(' '));
 
+// The exponent is a measured choice, not a default. pr-cluster rewrites this
+// rule's pattern every Monday and must leave its arithmetic alone.
+const shipped = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf8'));
+const n = shipped.rules[0].notable;
+check('the derived rule keeps the exponent research/length.md chose',
+  n.power === 0.7, `power is ${n.power}`);
+check('and the threshold calibrated for it', n['>='] === 0.095, `threshold is ${n['>=']}`);
+
 console.log(failed ? `\ndocumented claims: ${failed} failed` : '\ndocumented claims: all hold');
 process.exit(failed ? 1 : 0);
