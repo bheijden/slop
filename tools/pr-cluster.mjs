@@ -42,7 +42,11 @@ const MIN_WORDS = 5;                         // a description with fewer known w
 const SMOOTH = 0.01;                         // added to every count in a centre
 const MIN_AUTHORS = 50;                      // half of it is the prior on a word's outside count
 const ITERS = Number(arg('--iters', 25));
-const TOP = Number(arg('--top', 1200));
+// The length that ships, and therefore the default. It was a flag the workflow
+// had to remember to pass, so CI derived a 1,200-word list while the rule's
+// threshold was calibrated for 250, and the rule failed its own fixtures the
+// first time the job ran. A default nobody has to remember cannot drift.
+const TOP = Number(arg('--top', 250));
 const SEED = Number(arg('--seed', 12345));
 const TRACK = 400;                           // words per cluster given a weekly history for the page
 

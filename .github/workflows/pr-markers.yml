@@ -31,14 +31,24 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: node tools/pr-markers.mjs --days 21 --write
 
+      # The file is not committed to main — it only ever lives on the proposal
+      # branch — so `git diff` sees an untracked path and reports no change,
+      # every time, forever. The first real run found an unrecognised Codex
+      # signature and proposed nothing. Ask the file how many proposals it holds
+      # instead of asking git whether it moved.
       - name: Anything to propose
         id: any
         run: |
-          if git diff --quiet -- data/marker-proposals.json; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
+          n=0
+          [ -f data/marker-proposals.json ] && \
+            n=$(node -e "console.log((require('./data/marker-proposals.json').proposals||[]).length)")
+          echo "count=$n" >> "$GITHUB_OUTPUT"
+          if [ "$n" -gt 0 ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "count=$(node -e "console.log(require('./data/marker-proposals.json').proposals.length)")" >> "$GITHUB_OUTPUT"
+            echo "$n candidate signature(s) to propose"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nothing unrecognised in the window"
           fi
 
       # Force-pushed to a fixed branch so each run supersedes the last. If the
