@@ -54,7 +54,12 @@
 .surface > #doc{z-index:2;pointer-events:none;background:none}
 .surface > #doc mark{pointer-events:auto}
 #pane-doc[data-edit=off] .surface > #input{display:none}
-#pane-doc[data-edit=off] .surface{position:static}
+/* With editing off the surface is no longer two stacked layers, so it becomes
+   the scroller and the documents run one after another inside it. Nothing in
+   the chain scrolled before this: the pane clips, and everything under it was
+   overflow:visible, so files after the first were simply unreachable. */
+#pane-doc[data-edit=off] .surface{position:static;overflow-y:auto;min-height:0;
+  overscroll-behavior:contain;scrollbar-width:thin}
 #pane-doc[data-edit=off] .surface > #doc{position:static;height:auto;pointer-events:auto;overflow:visible}
 body.dragging #pane-doc{background:var(--sunk)}
 

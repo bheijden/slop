@@ -292,14 +292,66 @@ async function main() {
 
     const many = await evaluate(`(async()=>{
       const dt = new DataTransfer();
-      dt.items.add(new File(['It is important to note that a.\\n'], 'a.md'));
-      dt.items.add(new File(['No x, no y, no z.\\n'], 'b.md'));
+      // Long enough to overflow the pane: the point of the test is what happens
+      // when you read down through more than fits on a screen.
+      const body = (n) => ('# File ' + n + '\\n\\n')
+        + ('It is important to note that the ingest path quietly carried a load-bearing '
+         + 'assumption nobody had plainly written down. No flags, no metrics, no alerting.\\n\\n').repeat(14);
+      dt.items.add(new File([body('a')], 'a.md'));
+      dt.items.add(new File([body('b')], 'b.md'));
       dispatchEvent(new DragEvent('drop', {dataTransfer: dt, bubbles: true, cancelable: true}));
       await new Promise(r=>setTimeout(r,1600));
+      const tree = document.getElementById('tree');
+      const surface = document.querySelector('#pane-doc .surface');
       return JSON.stringify({files: document.querySelectorAll('#tree button.f').length,
-        tree: !document.getElementById('tree').hidden})})()`);
+        tree: !tree.hidden,
+        // The list of files belongs to the pane showing the files. It used to
+        // be dropped into the standing prose in the top-left panel.
+        inPane: !!tree.closest('#pane-doc'), inSay: !!tree.closest('.say'),
+        // Every document is laid out one after another in one scroller, so
+        // reading down carries you into the next file.
+        sections: document.querySelectorAll('#doc .filesec').length,
+        scrolls: surface.scrollHeight > surface.clientHeight + 4})})()`);
     const mn = JSON.parse(many);
-    check('dropping several files builds a tree', mn.files === 2 && mn.tree, JSON.stringify(mn));
+    check('several files list themselves beside the text, not in the prose',
+      mn.files === 2 && mn.tree && mn.inPane && !mn.inSay, JSON.stringify(mn));
+    check('and are laid end to end in one scroller',
+      mn.sections === 2 && mn.scrolls, JSON.stringify(mn));
+
+    // Reading into the second file moves the marker and the findings with it.
+    const followed = await evaluate(`(async () => {
+      const surface = document.querySelector('#pane-doc .surface');
+      const secs = [...document.querySelectorAll('#doc .filesec')];
+      surface.scrollTop += secs[1].getBoundingClientRect().top
+                         - surface.getBoundingClientRect().top - 10;
+      surface.dispatchEvent(new Event('scroll', {bubbles: true}));
+      await new Promise(r => setTimeout(r, 700));
+      const cur = document.querySelector('#tree button.f[aria-current=true]');
+      const list = document.getElementById('list');
+      const grp = list.querySelector('li.fgroup[data-doc="1"]');
+      return JSON.stringify({
+        marked: cur ? cur.dataset.i : null,
+        // The second file's findings sit at the top of the list, not below a
+        // screenful of the first file's.
+        groupOffset: grp ? Math.round(grp.getBoundingClientRect().top
+                                    - list.getBoundingClientRect().top) : null });
+    })()`);
+    const FW = JSON.parse(followed);
+    check('reading into the next file carries the marker and the findings',
+      FW.marked === '1' && FW.groupOffset !== null && Math.abs(FW.groupOffset) < 8,
+      JSON.stringify(FW));
+
+    // One document needs no list of documents.
+    const single = await evaluate(`(async () => {
+      const dt = new DataTransfer();
+      dt.items.add(new File(['It is important to note that a. No x, no y, no z.\\n'], 'solo.md'));
+      dispatchEvent(new DragEvent('drop', {dataTransfer: dt, bubbles: true, cancelable: true}));
+      await new Promise(r => setTimeout(r, 1600));
+      return JSON.stringify({hidden: document.getElementById('tree').hidden,
+        sections: document.querySelectorAll('#doc .filesec').length});
+    })()`);
+    const SG = JSON.parse(single);
+    check('one file shows no list of files', SG.hidden === true, JSON.stringify(SG));
 
     // Testing rules is its own page now, not a mode of this one. It prefills a
     // rule set with one rule that fails on purpose, so it shows what a failure

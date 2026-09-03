@@ -111,9 +111,7 @@ const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:
             sel:-1, fudge:null,
             layout:store('pc-layout', 'split'),
             split:parseFloat(store('pc-split', '60')),
-            setOpen:{}, byId:{},
-            tree:store('pc-tree', 'open'),
-            treeW:parseFloat(store('pc-treew', '220')) };
+            setOpen:{}, byId:{} };
 
 function store(k, dflt) { try { return localStorage.getItem(k) ?? dflt; } catch { return dflt; } }
 function remember(k, v) { try { localStorage.setItem(k, v); } catch {} }
@@ -327,7 +325,6 @@ function renderResults() {
     $('copy-fallback').hidden = true;
     $('divider').hidden = false;
     $('panes').dataset.layout = S.layout === 'text' ? 'split' : S.layout;
-    $('workspace').removeAttribute('data-multi');
     $('tree').hidden = true;
     renderFudge();
     return;
@@ -430,6 +427,12 @@ function markCurrentDoc(i, pin) {
   }
   const on = $('tree').querySelector('button.f[aria-current=true]');
   if (on) on.scrollIntoView({ block: 'nearest' });
+  // The findings travel with the text. Reading down through four files and
+  // leaving the list on the first one is what made the two panes feel like
+  // separate pages. Instant rather than smooth: a smooth scroll started on
+  // every frame of a drag never arrives.
+  const grp = $('list').querySelector(`li.fgroup[data-doc="${i}"]`);
+  if (grp && S.layout !== 'text') grp.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 // The copied object is the same shape the CLI writes with --format json, so it
@@ -564,13 +567,11 @@ ${r.what ? `<div class="m">${esc(r.what)}</div>` : ''}
 // The tree only exists for a multi-document load; a single file keeps the
 // layout it had.
 function renderTree() {
+  // One document needs no list of documents.
   const multi = (S.results || []).length > 1;
-  const ws = $('workspace');
-  ws.toggleAttribute('data-multi', multi);
-  $('tree').hidden = $('tdivider').hidden = !multi;
+  $('tree').hidden = !multi;
   if (!multi) return;
-  applyTree();
-  let html = '<div class="thead">files</div>';
+  let html = `<div class="thead">${S.results.length} files</div>`;
   let dir = null;
   S.results.forEach((r, i) => {
     const parts = r.name.split('/');
@@ -945,41 +946,6 @@ const stepLayout = (d) => {
   const i = ORDER.indexOf(S.layout) + d;
   if (i >= 0 && i < ORDER.length) setLayout(ORDER[i]);
 };
-// The file list collapses the same way the panes do.
-function applyTree() {
-  const ws = $('workspace');
-  ws.dataset.tree = S.tree;
-  ws.style.setProperty('--tree', S.treeW + 'px');
-  $('t-left').disabled = S.tree === 'closed';
-  $('t-right').disabled = S.tree === 'open';
-}
-function setTree(state) { S.tree = state; remember('pc-tree', state); applyTree(); }
-$('t-left').onclick = () => setTree('closed');
-$('t-right').onclick = () => setTree('open');
-
-let tdrag = false;
-$('tgrip').addEventListener('pointerdown', (e) => {
-  if (innerWidth <= 820) return;
-  tdrag = true; document.body.classList.add('resizing');
-  try { $('tgrip').setPointerCapture(e.pointerId); } catch {}
-});
-addEventListener('pointermove', (e) => {
-  if (!tdrag) return;
-  const left = $('workspace').getBoundingClientRect().left;
-  S.treeW = Math.max(120, Math.min(420, e.clientX - left));
-  if (S.tree !== 'open') S.tree = 'open';
-  applyTree();
-});
-for (const ev of ['pointerup', 'pointercancel']) addEventListener(ev, () => {
-  if (!tdrag) return;
-  tdrag = false; document.body.classList.remove('resizing');
-  remember('pc-treew', S.treeW); remember('pc-tree', S.tree);
-});
-$('tgrip').addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); S.treeW = Math.max(120, S.treeW - 20); applyTree(); remember('pc-treew', S.treeW); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); S.treeW = Math.min(420, S.treeW + 20); applyTree(); remember('pc-treew', S.treeW); }
-});
-
 $('d-left').onclick = () => stepLayout(-1);
 $('d-right').onclick = () => stepLayout(1);
 
@@ -1248,7 +1214,7 @@ let scrollTick = null;
 $('pane-doc').addEventListener('scroll', () => {
   if (scrollTick) return;
   scrollTick = requestAnimationFrame(() => { scrollTick = null; markCurrentDoc(currentDocFromScroll()); });
-});
+}, true);
 
 await loadBuiltins();
 // run() is debounced, so the panel would sit empty for a moment on first load.

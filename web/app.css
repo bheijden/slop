@@ -294,3 +294,25 @@ select.chip{padding:2px 4px}
 /* A defined term that is also a link keeps the term's colour, not the link's. */
 a.term{color:var(--flag);text-decoration:none}
 a.term:hover{text-decoration:underline;text-underline-offset:2px}
+
+/* ---- the file list, when there is more than one file --------------------- */
+/* It lives in the pane showing the files. One document and it is not there at
+   all, so the single-file layout is exactly what it was. */
+.docbody{display:flex;flex:1 1 auto;min-height:0;min-width:0}
+.docbody > .surface{flex:1 1 auto;min-width:0}
+.tree{flex:0 0 clamp(140px, 22%, 210px);min-width:0;overflow-y:auto;overscroll-behavior:contain;
+  border-right:1px solid var(--hair);background:var(--paper);scrollbar-width:thin;
+  font-size:11.5px;padding-bottom:6px}
+.tree[hidden]{display:none}
+.tree .thead{position:sticky;top:0;background:var(--paper);border-bottom:1px solid var(--hair);
+  padding:6px 10px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;font-size:10.5px}
+.tree .dir{padding:6px 10px 2px;color:var(--muted);font-size:10.5px;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.tree button.f{display:flex;gap:6px;align-items:baseline;width:100%;padding:3px 10px;border:0;
+  background:none;color:var(--ink);font:inherit;font-size:11.5px;text-align:left;cursor:pointer}
+.tree button.f .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree button.f .ct{color:var(--flag);font-variant-numeric:tabular-nums}
+.tree button.f.clean .ct{color:var(--muted)}
+.tree button.f:hover{background:var(--sunk)}
+.tree button.f[aria-current=true]{background:var(--sunk);box-shadow:inset 2px 0 0 var(--flag)}
+.tree .skipped{padding:6px 10px;color:var(--muted);font-size:10.5px;line-height:1.4}
