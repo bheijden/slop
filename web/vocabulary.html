@@ -160,8 +160,9 @@ const DEF = {
         + '"Co-authored-by: ...", or an HTML comment carrying its name. That line is cut off before '
         + 'a single word is counted, so nothing here can be recognising the line itself.',
   cluster: 'A pile of pull requests that reach for similar words, found by grouping on vocabulary '
-        + 'alone. The grouping never sees which ones are signed. There are ten; number 0 is the one '
-        + 'the slop rule is built from, and it sits on the axis of the chart.',
+        + 'alone. The grouping never sees which ones are signed. There are ten, ordered by how much '
+        + 'of each is signed: the first sits on the axis of the chart and is the one the slop rule '
+        + 'is built from, and each one above it is signed a little less.',
   freq: 'How many times more often this cluster writes the word than every other cluster put '
         + 'together. A word everyone uses scores near 1, however fond of it this cluster is.',
   perMillion: 'How often the word is written, per million words, so weeks of very different sizes '
