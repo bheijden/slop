@@ -41,6 +41,10 @@ jobs:
       # Candidate sets are not shipped on by default, but they are held to
       # the same bar so they do not rot between mining runs.
       - run: node tests/run.mjs candidates/*.json
+      # And the example a reader is told to copy. It sat in the pre-match/notable
+      # format long enough for the engine to start refusing it outright, because
+      # nothing here ever loaded it.
+      - run: node tests/run.mjs examples/*.json
 
   web:
     name: web smoke test

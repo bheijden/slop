@@ -95,7 +95,11 @@ async function main() {
           || m.params.exceptionDetails.text || 'exception');
       }
       if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') {
-        errors.push(`${m.params.entry.text} <- ${m.params.entry.url || '?'}`);
+        // One test asks for a URL that is not there, on purpose, to prove the
+        // page says so. Its 404 is the expected result, not a fault.
+        if (!/definitely-not-here/.test(m.params.entry.url || '')) {
+          errors.push(`${m.params.entry.text} <- ${m.params.entry.url || '?'}`);
+        }
       }
     });
     const send = (method, params = {}) =>
@@ -702,6 +706,37 @@ async function main() {
         V.opacity === '1' && V.display !== 'none' && V.width > 60 && V.text > 40 && V.copies === 1,
         JSON.stringify(V));
     }
+
+    // An error has to be visible. note() wrote to #score, which existed only on
+    // the rule sets page, so on check a bad URL or a worker timeout produced
+    // nothing at all on screen.
+    await send('Page.navigate', { url: `${base}?probe=err#url=./definitely-not-here.md` });
+    await sleep(2600);
+    const errored = await evaluate(`JSON.stringify({
+      shown: (document.getElementById('score') || {}).textContent || '',
+      hasSurface: !!document.getElementById('score') })`);
+    const ER = JSON.parse(errored);
+    check('a failure says so on the page', ER.hasSurface && ER.shown.trim().length > 0,
+      JSON.stringify(ER));
+    await send('Page.navigate', { url: base });
+    await sleep(2000);
+
+    // `slop check --share` prints a link carrying the text in the fragment.
+    // The helper that decodes it was left behind when this page's script moved
+    // out of index.html, and the three calls went with it, so every shared link
+    // threw ReferenceError and opened an empty page.
+    const shared = Buffer.from('It is important to note that a. No x, no y, no z.\n')
+      .toString('base64url');
+    await send('Page.navigate', { url: `${base}?probe=share#text=${shared}&kind=md&name=shared.md` });
+    await sleep(2600);
+    const opened = await evaluate(`JSON.stringify({
+      text: document.getElementById('input').value.trim(),
+      findings: document.querySelectorAll('#list li').length })`);
+    const SH = JSON.parse(opened);
+    check('a shared link opens the text it carries',
+      /important to note/.test(SH.text) && SH.findings > 0, JSON.stringify(SH));
+    await send('Page.navigate', { url: base });
+    await sleep(2000);
 
     // The lower-left panel belongs to the page it is on. On check it asks which
     // sets to run; on test rules that question is meaningless -- the page tests

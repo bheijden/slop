@@ -137,7 +137,6 @@ body.dragging #pane-doc{border-color:var(--blue);background:var(--sunk)}
 /* The text pane is a column: its header, then a surface taking what is left.
    The pane itself must not scroll while editing — the surface inside does. */
 /* The control sits at the middle of the divider, where you would reach for it. */
-body.resizing{cursor:col-resize;user-select:none}
 @media(max-width:820px){
 }
 #doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
@@ -322,6 +321,10 @@ body.resizing{cursor:col-resize;user-select:none}
         <button id="v-prose" aria-pressed="false">what it reads</button>
       </div>
       <span class="spacer"></span>
+      <!-- Where note() puts an error. Without it a failed URL, an unreadable
+           file or the worker timing out wrote to nothing and the page just sat
+           there, because #score existed only on the rule sets page. -->
+      <span class="dim" id="score"></span>
       <select id="kind" class="chip" aria-label="How to parse the input">
         <option value="md">markdown</option>
         <option value="html">html</option>

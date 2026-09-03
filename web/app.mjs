@@ -109,8 +109,6 @@ const S = { sets:[], active:new Set(), docs:[], results:[], flat:[], cur:0, doc:
             kind:'md', name:'input', setFile:{},
             view:'source', mode:(PAGE === 'rules' ? 'fudge' : 'check'),
             sel:-1, fudge:null,
-            layout:store('pc-layout', 'split'),
-            split:parseFloat(store('pc-split', '60')),
             setOpen:{}, byId:{} };
 
 function store(k, dflt) { try { return localStorage.getItem(k) ?? dflt; } catch { return dflt; } }
@@ -131,6 +129,15 @@ function applyTheme() {
 // vocabulary page vanished the moment you moved to another one.
 applyTheme();
 $('theme').onclick = () => { theme = THEMES[(THEMES.indexOf(theme) + 1) % 3]; applyTheme(); };
+// Shared links carry their text in the fragment, base64url so it survives a URL.
+// This helper was left behind when the page's script moved out of index.html
+// into this file, and the three calls below went with it: every link `slop
+// check --share` printed threw ReferenceError on open, and the page came up
+// empty with the text still sitting in the address bar.
+const b64urlToBytes = (s) => {
+  const b = atob(s.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(s.length / 4) * 4, '='));
+  return Uint8Array.from(b, (c) => c.charCodeAt(0));
+};
 const gunzip = async (bytes) =>
   new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
 
@@ -316,27 +323,19 @@ function marked(body, ranges, keepBlank) {
 }
 
 function renderResults() {
-  const res = $('results');
   if (S.mode === 'fudge') {
-    res.hidden = false;
-    // The rule set is the document and the test results are the findings, so
-    // this keeps the split, the divider and the collapse arrows.
     $('views').hidden = $('nav').hidden = $('b-copy').hidden = true;
     $('copy-fallback').hidden = true;
-    $('divider').hidden = false;
-    $('panes').dataset.layout = S.layout === 'text' ? 'split' : S.layout;
     $('tree').hidden = true;
     renderFudge();
     return;
   }
-  $('views').hidden = $('divider').hidden = false;
-  res.hidden = false;
+  $('views').hidden = false;
   // Empty is a normal state, not a hidden one: this block holds the surface you
   // type into, so it has to be on screen before there is anything to lint.
   if (!currentDocs().some((d) => d.src.trim())) {
     $('doc').innerHTML = '';
     $('list').innerHTML = '';
-    $('r-title').textContent = '';
     $('list-head').textContent = 'findings';
     $('nav').hidden = $('b-copy').hidden = true;
     $('pane-doc').dataset.edit = 'on';
@@ -349,9 +348,6 @@ function renderResults() {
   const useSrc = S.view === 'source';
   const srcs = currentDocs();
   tally();
-  $('r-title').textContent = multi
-    ? `${total} finding${total === 1 ? '' : 's'} in ${results.length} files`
-    : (total ? `${total} finding${total === 1 ? '' : 's'}` : 'No findings');
 
   // Documents render in sequence so scrolling runs from one file straight into
   // the next, the way a diff view does.
@@ -399,7 +395,6 @@ function renderResults() {
 
   $('v-prose').setAttribute('aria-pressed', String(!useSrc));
   $('v-source').setAttribute('aria-pressed', String(useSrc));
-  applyLayout();
   $('nav').hidden = !total;
   $('b-copy').hidden = !results.length;
   $('n-count').textContent = total ? (S.sel >= 0 ? `${S.sel + 1} / ${total}` : `– / ${total}`) : '';
@@ -432,7 +427,7 @@ function markCurrentDoc(i, pin) {
   // separate pages. Instant rather than smooth: a smooth scroll started on
   // every frame of a drag never arrives.
   const grp = $('list').querySelector(`li.fgroup[data-doc="${i}"]`);
-  if (grp && S.layout !== 'text') grp.scrollIntoView({ block: 'start', behavior: 'auto' });
+  if (grp) grp.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 // The copied object is the same shape the CLI writes with --format json, so it
@@ -515,9 +510,9 @@ function select(i, scroll = true) {
   // pane that scrolls on its own and for the page.
   const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
   const m = $('doc').querySelector(`mark[data-i="${i}"]`);
-  if (m && S.layout !== 'list') m.scrollIntoView({ block: 'center', behavior });
+  if (m) m.scrollIntoView({ block: 'center', behavior });
   const li = $('list').querySelector(`li[data-i="${i}"]`);
-  if (li && S.layout !== 'text') li.scrollIntoView({ block: 'nearest', behavior });
+  if (li) li.scrollIntoView({ block: 'nearest', behavior });
 }
 
 const step = (d) => {
@@ -528,7 +523,6 @@ const step = (d) => {
 
 function renderFudge() {
   const set = S.fudge && S.fudge.length ? S.fudge[0].set : null;
-  $('r-title').textContent = set ? `Testing ${set}` : 'Testing your rules';
   $('doc').innerHTML = '';
   if (!S.fudge) { $('list-head').textContent = 'testing…'; $('list').innerHTML = ''; return; }
 
@@ -594,9 +588,9 @@ function scrollToDoc(i) {
   markCurrentDoc(i, true);
   const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
   const sec = $('doc').querySelector(`.filesec[data-doc="${i}"]`);
-  if (sec && S.layout !== 'list') sec.scrollIntoView({ block: 'start', behavior });
+  if (sec) sec.scrollIntoView({ block: 'start', behavior });
   const grp = $('list').querySelector(`li.fgroup[data-doc="${i}"]`);
-  if (grp && S.layout !== 'text') grp.scrollIntoView({ block: 'start', behavior });
+  if (grp) grp.scrollIntoView({ block: 'start', behavior });
 }
 
 // On test rules the lower-left holds a library instead of a switchboard. The
@@ -810,7 +804,6 @@ function run() {
     $('views').hidden = S.mode === 'fudge';
     $('kind').hidden = S.mode === 'fudge';
     tally();
-    if (S.mode === 'fudge') $('results').hidden = false;
     const many = S.docs.length > 1;
     // Several files have nothing single to type into; data-edit does the hiding.
     // Rules mode has no text to parse at all, so the choice goes either way.
@@ -861,7 +854,9 @@ function run() {
     }
     const docs = currentDocs();
     if (!docs.some((d) => d.src.trim())) {
-      S.results = []; S.flat = []; $('score').textContent = ''; $('meta').textContent = ''; tally(0);
+      S.results = []; S.flat = [];
+      if (!$('score').querySelector('.err')) $('score').textContent = '';
+      tally(0);
       renderResults(); return;
     }
     const res = await ask({ mode:'check', docs, sets:S.sets, active:[...S.active] }, 20000);
@@ -874,11 +869,7 @@ function run() {
     S.sel = -1;
     const total = S.flat.length;
     const words = S.results.reduce((a, r) => a + r.words, 0);
-    const per = words ? (total / words * 1000).toFixed(1) : '0.0';
-    $('score').className = 'score' + (total ? '' : ' zero');
-    $('score').innerHTML = `<b>${total}</b> · ${per}/1k`
-      + (S.results.length > 1 ? ` · ${S.results.length} files` : '');
-    $('meta').textContent = `${words} words`;
+    note('');
     tally(words);
     renderResults(); renderRules();
   }, 160);
@@ -925,62 +916,6 @@ $('v-prose').onclick = () => { S.view = 'prose'; renderResults(); };
 $('v-source').onclick = () => { S.view = 'source'; renderResults(); };
 $('n-prev').onclick = () => step(-1);
 $('n-next').onclick = () => step(1);
-
-// The divider is the layout control: drag it, or step it left and right to
-// collapse a side. Order runs findings-only <- split -> text-only.
-const ORDER = ['list', 'split', 'text'];
-function applyLayout() {
-  const panes = $('panes');
-  panes.dataset.layout = S.layout;
-  panes.style.setProperty('--split', S.split + '%');
-  const i = ORDER.indexOf(S.layout);
-  $('d-left').disabled = i <= 0;
-  $('d-right').disabled = i >= ORDER.length - 1;
-  $('grip').setAttribute('aria-valuenow', Math.round(S.split));
-}
-function setLayout(l) {
-  S.layout = l;
-  remember('pc-layout', l);
-  applyLayout();
-  if (S.sel >= 0) select(S.sel);
-}
-const stepLayout = (d) => {
-  const i = ORDER.indexOf(S.layout) + d;
-  if (i >= 0 && i < ORDER.length) setLayout(ORDER[i]);
-};
-$('d-left').onclick = () => stepLayout(-1);
-$('d-right').onclick = () => stepLayout(1);
-
-function setSplit(pct) {
-  S.split = Math.max(20, Math.min(80, pct));
-  if (S.layout !== 'split') { S.layout = 'split'; remember('pc-layout', 'split'); }
-  applyLayout();
-}
-let dragging = false;
-$('grip').addEventListener('pointerdown', (e) => {
-  if (innerWidth <= 820) return;
-  dragging = true;
-  document.body.classList.add('resizing');
-  try { $('grip').setPointerCapture(e.pointerId); } catch {}
-});
-addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  const r = $('panes').getBoundingClientRect();
-  setSplit((e.clientX - r.left) / r.width * 100);
-});
-for (const ev of ['pointerup', 'pointercancel']) addEventListener(ev, () => {
-  if (!dragging) return;
-  dragging = false;
-  document.body.classList.remove('resizing');
-  remember('pc-split', S.split);
-});
-$('grip').addEventListener('dblclick', () => { setSplit(60); remember('pc-split', 60); });
-$('grip').addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') { e.preventDefault(); setSplit(S.split - 4); remember('pc-split', S.split); }
-  if (e.key === 'ArrowRight') { e.preventDefault(); setSplit(S.split + 4); remember('pc-split', S.split); }
-  if (e.key === 'Home') { e.preventDefault(); setLayout('list'); }
-  if (e.key === 'End') { e.preventDefault(); setLayout('text'); }
-});
 
 /* A result points back at the text that produced it, the way a finding points
    at a line. Clicking a rule selects that rule in the editor; clicking the

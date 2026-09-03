@@ -10,7 +10,7 @@
 // which is what tests/conformance lets us prove. Do not "improve" a detector
 // here without regenerating the rule tests.
 
-export const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'rhythm', 'frame'];
+const KINDS = ['regex', 'chain', 'echo', 'question-chain', 'anaphora', 'rhythm', 'frame'];
 
 const CHAIN_BODY = String.raw`[^,.;:!?\n–—…]*`;
 const CHAIN_SEP = String.raw`(?:\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+|\s*[;&–—]\s*(?:and\s+|or\s+)?|\s+-{1,2}\s+)`;

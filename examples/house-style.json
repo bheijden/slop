@@ -1,14 +1,13 @@
 {
   "name": "house-style",
   "title": "Our house style",
-  "description": "Team-specific prose rules.",
+  "description": "Team-specific prose rules. Copy this file, change the rules, and point slop at it with --rules ./house-style.json.",
   "rules": [
     {
       "id": "utilise",
       "name": "\"utilise\" for \"use\"",
-      "kind": "regex",
-      "pattern": "\\butili[sz]e[sd]?\\b",
-      "flags": "gi",
+      "match": { "kind": "regex", "pattern": "\\butili[sz]e[sd]?\\b", "flags": "gi" },
+      "notable": { ">": 0 },
       "severity": "error",
       "description": "\"Utilise\" is never better than \"use\".",
       "suggest": "Write \"use\".",
@@ -17,9 +16,8 @@
     {
       "id": "chatgpt-refs",
       "name": "ChatGPT citation debris",
-      "kind": "regex",
-      "pattern": "\\bfilecite\\S*|turn\\d+file\\d+",
-      "flags": "g",
+      "match": { "kind": "regex", "pattern": "\\bfilecite\\S*|turn\\d+file\\d+", "flags": "g" },
+      "notable": { ">": 0 },
       "description": "Citation markers pasted straight out of ChatGPT.",
       "suggest": "Delete the marker and cite the source properly.",
       "tests": { "hit": ["See fileciteturn0file0 for the derivation."], "miss": ["The file cite was correct."] }

@@ -14,7 +14,10 @@ name: pr-vocabulary
 
 on:
   schedule:
-    - cron: "0 8 * * *"
+    # An hour after load-bearing, which also pushes to main. Both used to be
+    # at 08:00 and had only avoided each other because GitHub staggers
+    # scheduled runs by a few minutes.
+    - cron: "0 9 * * *"
   workflow_dispatch:
     inputs:
       days:
@@ -100,7 +103,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/docs data/cluster.json data/cluster-series.json \
                   data/cluster-history.json rules/pr-vocabulary.json \
-                  web/vocabulary-data.json web/vocabulary.html
+                  web/vocabulary-data.json
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
           if [ "${{ steps.when.outputs.fit }}" = "yes" ]; then
             git commit -m "pr-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"
@@ -111,5 +114,8 @@ jobs:
             echo "REHEARSAL — everything above ran for real. The push is what is skipped:"
             git --no-pager show --stat --oneline HEAD
           else
+            # Rebase first: staggered schedules make a collision unlikely, not
+            # impossible, and a rejected push fails the whole job.
+            git pull --rebase --autostash -q origin main
             git push origin HEAD:main
           fi

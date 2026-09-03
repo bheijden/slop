@@ -124,7 +124,6 @@ export function variants(example, s, e) {
   return out;
 }
 
-export const LOSSLESS_ONLY = (v) => v.lossless;
 
 /**
  * Run both phases over a list of compiled rules: every tests.hit example must

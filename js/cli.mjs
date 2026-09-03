@@ -15,7 +15,7 @@ import process from 'node:process';
 import { pathToFileURL } from 'node:url';
 import { analyze, sentenceBounds, countWords } from './engine.mjs';
 import { resolveRules, findConfig, loadConfig, mergeConfig, fetchSetUrl,
-         libraryDir, loadLibrarySets, loadSetFile } from './config.mjs';
+         libraryDir } from './config.mjs';
 import { compareVersions } from './engine.mjs';
 import { BUILTIN_DIR as BUILTIN } from './config.mjs';
 import { testRules } from './fudge.mjs';

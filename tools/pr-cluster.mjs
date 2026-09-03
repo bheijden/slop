@@ -57,8 +57,11 @@ const TRACK = 400;                           // words per cluster given a weekly
 // what that costs.
 const FROM = arg('--from', ''), TO = arg('--to', '');
 const days = availableDays(DOCS).filter((d) => (!FROM || d >= FROM) && (!TO || d <= TO));
-if (!days.length) { console.error(`no sampled days in ${FROM || 'start'}..${TO || 'end'}`); process.exit(1); }
-if (!days.length) { console.error(`no sampled days in ${DOCS}; run tools/pr-sample.mjs first`); process.exit(2); }
+if (!days.length) {
+  console.error(`no sampled days in ${FROM || 'start'}..${TO || 'end'} under ${DOCS}`
+    + '; run tools/pr-sample.mjs first');
+  process.exit(1);
+}
 
 // ---- pass one: how many documents each word appears in -------------------
 const df = new Map();
