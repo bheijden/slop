@@ -805,6 +805,40 @@ async function main() {
     check('the page says how fresh it is', F.saysSampled && F.saysBuilt && F.oneLine,
       JSON.stringify(F));
 
+    // The editing surface draws the same text twice: a transparent textarea for
+    // the caret and selection, and a highlighted copy on top. Any metric that
+    // differs makes the selection drift off the words, a little more with every
+    // line. It was 1.7 against 1.75 -- 49px apart by the end of the example.
+    await send('Page.navigate', { url: base });
+    await sleep(2200);
+    const layers = await evaluate(`(async () => {
+      document.getElementById('b-example').click();
+      await new Promise(r => setTimeout(r, 1500));
+      const ta = document.getElementById('input'), doc = document.getElementById('doc');
+      const a = getComputedStyle(ta), b = getComputedStyle(doc);
+      const same = (k) => a[k] === b[k];
+      return JSON.stringify({
+        metrics: ['fontSize', 'lineHeight', 'fontFamily', 'letterSpacing', 'wordSpacing',
+                  'paddingTop', 'paddingLeft', 'paddingRight'].filter((k) => !same(k)),
+        drift: Math.abs(ta.scrollHeight - doc.scrollHeight),
+        lines: Math.round(ta.scrollHeight / parseFloat(a.lineHeight)) });
+    })()`);
+    const LY = JSON.parse(layers);
+    check('the two layers of the editor line up exactly',
+      LY.metrics.length === 0 && LY.drift <= 1 && LY.lines > 20, JSON.stringify(LY));
+
+    // The example is the demonstration, so it has to demonstrate: one piece of
+    // writing long enough to be scored, tripping the hand-written patterns and
+    // both derived word lists, rather than a paragraph for each bolted on.
+    const shown = await evaluate(`JSON.stringify({
+      findings: document.querySelectorAll('#list li').length,
+      sets: [...document.querySelectorAll('#rules .hits')].length,
+      words: (document.querySelector('.tally b') || {}).textContent || '0' })`);
+    const EX = JSON.parse(shown);
+    check('the example sets off enough to be worth reading',
+      EX.findings >= 25 && EX.sets >= 4 && Number(String(EX.words).replace(/,/g, '')) >= 600,
+      JSON.stringify(EX));
+
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.
     // Scoped to the copy we wrote, not the whole page: the word list is data, and

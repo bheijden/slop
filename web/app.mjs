@@ -1072,85 +1072,84 @@ $('rules-src').value = RULE_TEMPLATE;
 $('b-example').onclick = () => {
   $('kind').value = S.kind = 'md';
   S.name = 'example.md';
-  $('input').value = `# Release notes
+  $('input').value = `# Why we deleted the retry loop
 
-It is important to note that the rollout happened in stages. No sign-ups, no
-downloads, no hassle. Community feedback plays a pivotal role in every release,
-underscoring the value of an ever-evolving landscape.
+Don't call it a rewrite. Call it a deletion.
 
-The parser is a tiny state machine. The renderer is a tiny state machine.
+The loop had been in the ingest path since the first week. Nobody defended it
+and nobody removed it, so it sat there quietly, load-bearing in the way that
+undocumented code becomes load-bearing: not because anyone showed it works, but
+because nothing had plainly shown it doesn't.
 
-That's the whole point, and you already know the answer.
+We went looking for the reason. Turns out the loop was never warm. It fired on
+every timeout, it fired on every 500, and it fired on the one error class that
+genuinely needed a person. It did not warn, did not retry, did not stop. No
+flags, no metrics, no alerting. That's the whole point of a retry — it parks a
+hazard behind patience, and patience is indistinguishable from health until
+somebody reads the graph.
+
+I won't pretend the migration was painless.
+
+Here's the twist: the loop had never retried anything. A caller upstream had
+been swallowing the exception for eleven months, so the retry sat one rung
+below a handler that had already decided the request was finished. Half the
+timeouts arrived at a socket that was closed. The other half arrived nowhere.
+
+Sit with that for a moment.
+
+## What we found
+
+The fix needed three things: a deadline the caller owns, one place that decides,
+and a test that survives a rerun. Determinism is the whole game. You already
+know how this ends.
+
+The job died; the queue didn't. That asymmetry is what carried the defect for
+so long. A worker would fold, a supervisor would restart it, and the counter
+that everyone watched would tick up by one and settle. Nobody was told. The
+dashboard stood at green for twelve consecutive days while the ceiling on
+throughput quietly walked down a rung a week.
+
+Do I know exactly when it started? Where the first drop landed? Which callers
+depended on the old behaviour? No. The audit trail was deliberate about what it
+kept and silent about the rest, and the answer is nowhere in it.
+
+Maybe the loop mattered once. Maybe it never did. Maybe both, in different
+halves of the year.
 
 ## What changed
 
-The import path was rewritten. The old one did two jobs at once, and pulling
-them apart turned out to be simpler than adding a third. The first stage works
-out what to fetch; the second fetches it. Neither knows about the other.
+A queue is a promise about order. A retry is a promise about time. A deadline
+is a promise about both, and it is the only one a caller can genuinely hold.
 
-The retry loop now has a ceiling. It used to keep going, and it used to say so
-on every attempt, which meant a job stuck for an hour left twelve thousand lines
-behind it. It stops after the fourth try and writes one line about why.
+We deleted the loop outright. The callers that refused to carry their own
+deadline were handed one. Ten of them needed nothing; two of them disagreed
+loudly enough that somebody had to make a judgement call, and that judgement is
+filed in the design note beside the premise it rests on.
 
-Somebody asked whether the cache is load-bearing. It is: the read path does not
-work without it, and the write path does not touch it. That is deliberate, and
-it seemed worth writing down rather than leaving for the next person to work out
-from the code.
+That loss is real and it's worth naming: the ingest path no longer hides a slow
+dependency. It fails, and it says so. Whoever is on call arrives at an error
+instead of a mystery.
 
-## What did not change
+Manual reconciliation is dead. The new path is small enough to hold in your
+head — one deadline, one decision, one place where a request stops.
 
-The wire format. A break has been promised in each of the last three releases
-and postponed every time. It is postponed again. The migration costs more than
-anyone has wanted to spend, and until that changes the old shape stays.
+## What it cost
 
-The default timeout stays at thirty seconds. Every proposal to move it has come
-with a different number and no measurement behind it, so the number that was
-already there is the number that survived.
+The slowdown is real, and it's not subtle. Removing the retry moved about four
+per cent of ingest failures from silent to loud, and every one of those is a
+page. That's not nothing.
 
-## Known rough edges
+But a page that fires is worth more than a graph that lies. That's the part a
+dashboard can't reach, and that's why being able to replay the queue from a
+fixed offset mattered.
 
-A malformed header looks the same as a truncated one. The parser treated both
-identically for eleven months and nobody noticed, which probably says more about
-how rarely either turns up than about the parser. It now reports which of the
-two it found, and refuses to guess when it cannot tell.
+You don't have to take my word for it. The replay is checked in, the offsets
+are in the fixture, and the whole thing runs in about ten seconds on a laptop.
+Run it twice and compare the output — it is byte-identical, which is precisely
+the property the old path could never assert.
 
-The progress bar does not render under a pipe. Nobody has picked this up, and it
-has gone back into the backlog twice.
-
-Compression hurts on small payloads. Below roughly four kilobytes the header
-costs more than the body saves. The check that was supposed to catch this went
-missing in the spring; it is scheduled for next quarter.
-
-## Upgrading
-
-Nothing is required of you. The new path produces the same bytes as the old one
-for every input we have. That is the only claim being made here: not that it is
-correct, but that it is unchanged. If you have a corpus where the two disagree,
-please send it, because that result would be far more interesting than another
-passing run.
-
-Anyone still on the build from before the flush fix should move off it. There is
-a defect in that path which a long-running process eventually trips, and
-restarting only postpones it. The fix is small and has been on the main branch
-since the fourth of the month.
-
-## Numbers
-
-Throughput on the sample corpus is up about nine per cent, which is within the
-noise of the last three runs and should not be read as an improvement. Memory is
-flat. Start-up time went up by four milliseconds, all of it in the new import
-stage, and none of it worth chasing.
-
-The one number that moved for a reason is the retry count. It fell from a median
-of six to a median of two, because the ceiling stops the loop long before it
-used to give up on its own. That is not the loop getting better at its job. It
-is the loop being told to stop asking.
-
-## Thanks
-
-To everyone who filed a report that turned out to be their own configuration and
-then said so: that is worth more than it sounds. A report withdrawn clearly
-makes the next one easier to believe.`;
+The punchline is that nobody noticed the loop for three years, and everybody
+noticed its absence in a day.`;
   grow(); run();
 };
 $('b-file').onclick = () => {

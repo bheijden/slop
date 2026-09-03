@@ -45,7 +45,7 @@
 .surface{position:relative;flex:1 1 auto;min-height:0}
 .surface > #input,.surface > #doc{
   position:absolute;inset:0;margin:0;width:100%;height:100%;overflow:auto;
-  padding:12px 14px 22px;border:0;font-family:var(--mono);font-size:12.5px;line-height:1.7;
+  padding:12px 14px 22px;border:0;font-family:var(--mono);font-size:var(--src-fs);line-height:var(--src-lh);
   white-space:pre-wrap;overflow-wrap:break-word;scrollbar-width:thin;
 }
 .surface > #input{background:none;color:transparent;caret-color:var(--ink);resize:none;z-index:1}
@@ -137,8 +137,8 @@ body.resizing{cursor:col-resize;user-select:none}
 }
 #doc.prose{font-family:var(--serif);font-size:18px;line-height:1.62}
 #doc.prose p{margin:0 0 .8em}
-#doc.source{font-family:var(--mono);font-size:12.5px;line-height:1.75}
-#doc.source p{margin:0;white-space:pre-wrap;word-break:break-word;min-height:1.75em}
+#doc.source{font-family:var(--mono);font-size:var(--src-fs);line-height:var(--src-lh)}
+#doc.source p{margin:0;white-space:pre-wrap;word-break:break-word;min-height:calc(var(--src-lh) * 1em)}
 #doc p{word-break:break-word}
 .filesec + .filesec{margin-top:26px;padding-top:4px}
 .fname{

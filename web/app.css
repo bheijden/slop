@@ -16,6 +16,9 @@
   --lift:0 1px 2px rgba(20,22,26,.05), 0 1px 1px rgba(20,22,26,.04);
   --gutter:clamp(16px, 4vw, 112px);
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  /* The editing surface is two layers showing the same text. One size and
+     one line height for both, or a selection drifts off the words. */
+  --src-fs:12.5px; --src-lh:1.7;
   --serif:"Newsreader",Georgia,"Iowan Old Style",serif;
   /* One hue per signing tool. Ordered by how much of the corpus each carries,
      so the largest band is the most saturated and the tail stays quiet. */
