@@ -446,6 +446,23 @@ async function main() {
     check('the caret reaches the text and the marks stay clickable',
       SF.docIgnoresPointer && SF.markTakesPointer, JSON.stringify(SF));
 
+    // The rules menu opens over the text, not under it. Merging the input into
+    // the findings view gave the surface a stacking context that tied with the
+    // pane header, so document order put the text on top of the menu; and the
+    // pane clipped it besides.
+    const menu = await evaluate(`(async () => {
+      document.getElementById('b-rules').click();
+      await new Promise(r => setTimeout(r, 400));
+      const p = document.getElementById('rules-pop');
+      const b = p.getBoundingClientRect();
+      const hit = document.elementFromPoint(b.left + b.width / 2, b.top + 40);
+      return JSON.stringify({ open: !p.hidden, w: Math.round(b.width), h: Math.round(b.height),
+                              onTop: !!(hit && p.contains(hit)) });
+    })()`);
+    const M = JSON.parse(menu);
+    check('the rules menu opens over the text, not behind it',
+      M.open && M.w > 200 && M.h > 100 && M.onTop, JSON.stringify(M));
+
     // The vocabulary page is a separate document with its own data file and its
     // own layout, so nothing above touches it. It has broken three times on data
     // shape alone, and once on a stale cached data file paired with a fresh page.
@@ -488,22 +505,27 @@ async function main() {
       P.rows > 0 && P.first.join() !== P.second.join() && /^\d+ \/ \d+$/.test(P.which)
       && /pull requests/.test(P.about), JSON.stringify(P).slice(0, 200));
 
-    // Paging must recolour the chart, never restack it. Drawing the selected
-    // cluster first put it at the bottom, so every page changed the geometry
-    // under the reader.
+    // The selected cluster is drawn first so that it sits on the axis, and the
+    // others keep their order above it. So paging moves exactly one band.
     const stack = await evaluate(`(async () => {
-      const geom = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('d'));
-      const fills = () => [...document.querySelectorAll('#arrive path')].map(p => p.getAttribute('fill'));
-      const g1 = geom(), f1 = fills();
+      const order = () => [...document.querySelectorAll('#arrive path')]
+        .map(p => (p.querySelector('title') || {}).textContent || '');
+      const first = () => (document.querySelector('#arrive path title') || {}).textContent || '';
+      const before = order(), beforeFirst = first();
       document.getElementById('next').click();
       await new Promise(r => setTimeout(r, 400));
-      return JSON.stringify({ sameGeometry: JSON.stringify(g1) === JSON.stringify(geom()),
-                              differentFills: JSON.stringify(f1) !== JSON.stringify(fills()),
-                              bands: g1.length });
+      const after = order(), afterFirst = first();
+      // Drop both selected bands from each list; what is left is every other
+      // cluster, and its order must not have changed.
+      const strip = (a) => a.filter(t => t !== beforeFirst && t !== afterFirst);
+      return JSON.stringify({ bands: before.length,
+        selectedMoved: beforeFirst !== afterFirst,
+        restStable: JSON.stringify(strip(before)) === JSON.stringify(strip(after)),
+        selectedIsRed: (document.querySelector('#arrive path') || {}).getAttribute('fill') === 'var(--flag)' });
     })()`);
     const ST = JSON.parse(stack);
-    check('paging recolours the chart without restacking it',
-      ST.sameGeometry && ST.differentFills && ST.bands >= 5, JSON.stringify(ST));
+    check('the selected cluster is the bottom band and the rest keep their order',
+      ST.bands >= 5 && ST.selectedMoved && ST.restStable && ST.selectedIsRed, JSON.stringify(ST));
 
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.

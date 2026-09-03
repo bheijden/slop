@@ -177,11 +177,11 @@ body.dragging #pane-doc{border-color:var(--blue);background:var(--sunk)}
       background:var(--card);border:1px solid var(--hair);border-radius:10px;padding:11px 14px}
 /* The text pane is a column: its header, then a surface taking what is left.
    The pane itself must not scroll while editing — the surface inside does. */
-#pane-doc{display:flex;flex-direction:column;overflow:hidden}
+#pane-doc{display:flex;flex-direction:column;overflow:visible}
 #pane-doc[data-edit=off]{overflow:auto}
 .dtools{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-left:auto}
 .dtools .n{color:var(--muted);font-size:11.5px}
-.phead{position:sticky;top:0;z-index:2;background:var(--card);padding:0 0 7px;
+.phead{position:relative;z-index:20;background:var(--card);padding:0 0 7px;
        display:flex;align-items:center;gap:8px;min-height:26px}
 #pane-list .phead{color:var(--muted);font-size:11px;letter-spacing:.09em;text-transform:uppercase;padding-left:2px}
 #pane-list{padding-left:14px}
@@ -279,7 +279,7 @@ body.resizing{cursor:col-resize;user-select:none}
 
 /* the rules control: a panel under the bar, not a documentation section */
 .pop{
-  position:absolute;bottom:calc(100% + 8px);right:0;z-index:40;width:380px;
+  position:absolute;top:calc(100% + 8px);right:0;z-index:40;width:380px;
   max-width:calc(100vw - 32px);
   max-height:min(62vh,560px);overflow:auto;scrollbar-width:thin;overscroll-behavior:contain;
   background:var(--paper);border:1px solid var(--hair);border-radius:10px;padding:12px 14px;

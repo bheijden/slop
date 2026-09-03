@@ -126,16 +126,9 @@ if (process.argv.includes('--check')) {
 
 writeFileSync(dataPath, json + '\n');
 
-// Stamp the page with the build it belongs to. The page appends this to its
-// fetch, so a browser that has cached one of the two files cannot pair it with
-// a fresh copy of the other and fail in a way that looks like a drawing bug.
-{
-  const pagePath = join(ROOT, 'web/vocabulary.html');
-  const stamp = `${out.built}-${cluster.publish.id}-${out.words.length}`;
-  const page = readFileSync(pagePath, 'utf8');
-  const next = page.replace(/<body(?: data-built="[^"]*")?>/, `<body data-built="${stamp}">`);
-  if (next !== page) { writeFileSync(pagePath, next); console.log(`stamped web/vocabulary.html with ${stamp}`); }
-}
+// The page is deliberately not touched here. It fetches this file at load and
+// revalidates, so new figures never mean a new HTML file — which is what a
+// build stamp in the page used to force.
 console.log(`sample: ${days.length} days, ${totals.signed} signed of ${totals.signed + totals.unsigned}`);
 console.log(`fit:    ${cluster.descriptions.toLocaleString()} descriptions in ${cluster.k} clusters, ` +
   `publishing ${cluster.publish.id} at ${(cluster.publish.stamped * 100).toFixed(1)}% signed, ` +

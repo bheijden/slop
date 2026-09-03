@@ -165,7 +165,7 @@ svg{display:block;width:100%;height:100%}
 }
 </style>
 </head>
-<body data-built="2026-09-03-7-250">
+<body>
 
 <div class="dash">
 
@@ -245,7 +245,12 @@ const rows = () => groupAt().words;
 
 // The catch belongs to the fetch, not to render(). Chaining it after render()
 // reports every drawing bug as a missing file, which cost an hour once.
-fetch('vocabulary-data.json?v=' + (document.body.dataset.built || ''))
+// The data is fetched at load and nothing in this page depends on what is in
+// it, so rebuilding the data never means rebuilding the page. The URL used to
+// carry a build stamp for cache-busting, which coupled the two: every new
+// figure produced a new HTML file. Revalidating keeps them independent, at the
+// cost of one conditional request.
+fetch('vocabulary-data.json', { cache: 'no-cache' })
   .then((r) => r.json())
   .catch(() => { $('say1').textContent = 'Could not load vocabulary-data.json.'; return null; })
   .then((d) => { if (d) { DATA = d; render(); } });
@@ -336,13 +341,13 @@ function drawArrive() {
       stroke-opacity=".55"><title>group ${c}: ${pc(share)} of the last week</title></path>`);
     for (let i = 0; i < S.length; i++) base[i] = upper[i];
   };
-  // The stacking order never changes, and neither does a band's shade. Paging
-  // recolours one band; it must not reshuffle the chart underneath the reader,
-  // which is what happened when the selected cluster was drawn first so that it
-  // sat at the bottom.
-  const steps = [0.46, 0.34, 0.24, 0.16, 0.11, 0.08, 0.06];
-  order.forEach((c, i) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
-                               c === reg ? 0.85 : steps[i % steps.length]));
+  // The selected cluster is the bottom band, always, so the one you are reading
+  // about is the one sitting on the axis. Everything else keeps a fixed order
+  // above it, so paging lifts one band out and drops it at the bottom rather
+  // than reshuffling all ten.
+  band(reg, 'var(--flag)', 0.85);
+  const steps = [0.46, 0.38, 0.31, 0.25, 0.20, 0.16, 0.13, 0.10, 0.08, 0.06];
+  order.filter((c) => c !== reg).forEach((c, i) => band(c, 'var(--muted)', steps[i % steps.length]));
   let last = null;
   const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
   for (let i = 0; i < S.length; i += every) {
