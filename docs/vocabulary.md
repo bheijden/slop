@@ -5,9 +5,10 @@ is a pattern somebody wrote down. This one is a list of about a thousand
 ordinary English words, and a document that reaches for a lot of them at once is
 probably machine-written. The list is rebuilt from scratch every week.
 
-The method is not ours. It is
-[louisabraham/load-bearing](https://github.com/louisabraham/load-bearing),
-reproduced here, with one deliberate change described below. This page explains
+The method is not ours. It is Louis Abraham's
+[load-bearing](https://louisabraham.github.io/load-bearing/)
+([source](https://github.com/louisabraham/load-bearing)), reproduced here, with
+one deliberate change described below. This page explains
 how it works, what the one change is, and how we know it helps.
 
 ## Where the raw material comes from

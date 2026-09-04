@@ -101,6 +101,12 @@ produce all of these.
 Four of the five sets are patterns somebody wrote down. `pr-vocabulary` is
 measured, and it rebuilds itself.
 
+The method is [Louis Abraham's](https://louisabraham.github.io/load-bearing/),
+reproduced here with three changes. Where he picks the cluster to publish by
+watching it grow, this picks the one whose descriptions most often carry a
+tool's signature. His output is a word list; this is a rule with a threshold, so
+it runs over your own writing. And it re-derives itself every week.
+
 Every morning it samples a day of public pull request descriptions, with bots
 and non-English dropped and the tool's signature cut off before a single word is
 counted. Every Monday it clusters the whole archive, now **610 days and 274,567
