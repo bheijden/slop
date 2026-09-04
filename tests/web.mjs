@@ -889,6 +889,27 @@ async function main() {
       TM.whole === true, JSON.stringify(TM.whole));
     check('hovering a term shows its definition', TM.hovered === true, JSON.stringify(TM.hovered));
 
+    // The method is not ours, and that belongs in the claim rather than in a
+    // footnote under it: the first sentence names him and links his page.
+    const credit = await evaluate(`(async () => {
+      const a = document.querySelector('.say a[href*="louisabraham"]');
+      if (!a) return JSON.stringify({err: 'no attribution in the standing prose'});
+      const first = document.getElementById('say1');
+      a.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
+      await new Promise(r => setTimeout(r, 250));
+      const tip = document.getElementById('deftip');
+      return JSON.stringify({ inFirstClaim: first.contains(a), text: a.textContent,
+        href: a.getAttribute('href'),
+        // The hover has to say what we changed, not just who to thank.
+        saysWhatChanged: /signature/.test(tip.textContent) && /threshold/.test(tip.textContent),
+        visible: getComputedStyle(tip).opacity === '1' });
+    })()`);
+    const CR = JSON.parse(credit);
+    check('the method is credited in the claim itself',
+      CR.inFirstClaim && /Louis Abraham/.test(CR.text || '')
+      && /louisabraham/.test(CR.href || '') && CR.visible && CR.saysWhatChanged,
+      JSON.stringify(CR));
+
     // Paging is the whole point of the browse view: every cluster has to carry a
     // list of its own, not just the one that gets published.
     const paged = await evaluate(`(async () => {
@@ -1039,6 +1060,7 @@ async function main() {
     check('the example sets off enough to be worth reading',
       EX.findings >= 15 && EX.sets >= 4 && Number(String(EX.words).replace(/,/g, '')) >= 600,
       JSON.stringify(EX));
+
 
     // Nothing on this page may use a word invented in the making of it. A reader
     // arrives with no context and the copy has to work anyway.

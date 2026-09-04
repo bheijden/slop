@@ -81,8 +81,7 @@
     <div id="cta"></div>
     <div class="more">
       <a href="https://github.com/bheijden/slop/blob/main/docs/vocabulary.md">How this was done.</a>
-      <a href="https://louisabraham.github.io/load-bearing/"
-         data-tip="The clustering is his: ten groups of pull request descriptions, sorted by vocabulary alone. Three things differ here. He picks the group to publish by watching it grow; this picks the one whose descriptions most often carry a tool&#39;s signature. His output is a word list; this is a rule with a threshold measured against matched human and machine documents, so it can be run over your own writing. And it re-derives itself every week rather than once.">After louisabraham.</a>
+      <a href="./">Try it yourself.</a>
     </div>
   </div>
 
@@ -152,6 +151,7 @@ const DEF = {
         + 'together. A word everyone uses scores near 1, however fond of it this cluster is.',
   perMillion: 'How often the word is written, per million words, so weeks of very different sizes '
         + 'can be compared. The red line counts only signed pull requests.',
+  method: 'The clustering is his: pull request descriptions sorted into groups by vocabulary alone. Three things differ here. He picks the group to publish by watching it grow; this picks the one whose descriptions most often carry a tool\'s signature. His output is a word list; this is a rule with a threshold, so it runs over your own writing. And the sample is filtered harder before any of it: bots, stubs and non-English dropped, the signature cut off before a word is counted.',
   share: 'This cluster\'s share of all pull requests collected that week — how much of GitHub it '
         + 'accounts for, not how much of it is signed.',
   sampled: 'One more day of pull requests is collected every morning at 08:00 UTC and these three '
@@ -203,8 +203,10 @@ function render() {
   // what the list was derived from. Quoting the last week here and the window
   // in the strip below put two different "signed" percentages on one page.
   const ai = (DATA.browse.find((g) => g.published) || {}).stamped || 0;
-  $('say1').innerHTML = `We grouped GitHub pull requests since 2025 into <b>${f.k} clusters</b>
-    of vocabulary.`;
+  // Whose method this is belongs in the claim, not in a footnote under it.
+  $('say1').innerHTML = `We group GitHub pull requests into <b>${f.k} clusters</b> of vocabulary,
+    <a class="term" href="https://louisabraham.github.io/load-bearing/"
+    data-tip="${attr(DEF.method)}">after Louis Abraham</a>.`;
   // One claim, one verb carrying it, round numbers. The earlier version put
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
