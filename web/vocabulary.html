@@ -151,7 +151,8 @@ const DEF = {
         + 'together. A word everyone uses scores near 1, however fond of it this cluster is.',
   perMillion: 'How often the word is written, per million words, so weeks of very different sizes '
         + 'can be compared. The red line counts only signed pull requests.',
-  method: 'The clustering is his: pull request descriptions sorted into groups by vocabulary alone. Three things differ here. He picks the group to publish by watching it grow; this picks the one whose descriptions most often carry a tool\'s signature. His output is a word list; this is a rule with a threshold, so it runs over your own writing. And the sample is filtered harder before any of it: bots, stubs and non-English dropped, the signature cut off before a word is counted.',
+  loadBearing: 'It sorts public GitHub pull request descriptions into groups by vocabulary alone, then follows the one whose words mark out machine writing. Click through for his write-up.',
+  changes: 'Three. Which group to publish is chosen by how many of its descriptions carry a tool\'s signature, rather than by how fast the group grew. The sample is filtered harder first: bots, stubs and non-English dropped, and the signature cut off before a word is counted. And the words become a rule with a threshold, so they can be run over a document.',
   share: 'This cluster\'s share of all pull requests collected that week — how much of GitHub it '
         + 'accounts for, not how much of it is signed.',
   sampled: 'One more day of pull requests is collected every morning at 08:00 UTC and these three '
@@ -204,9 +205,10 @@ function render() {
   // in the strip below put two different "signed" percentages on one page.
   const ai = (DATA.browse.find((g) => g.published) || {}).stamped || 0;
   // Whose method this is belongs in the claim, not in a footnote under it.
-  $('say1').innerHTML = `We group GitHub pull requests into <b>${f.k} clusters</b> of vocabulary,
-    <a class="term" href="https://louisabraham.github.io/load-bearing/"
-    data-tip="${attr(DEF.method)}">after Louis Abraham</a>.`;
+  $('say1').innerHTML = `Following <a class="term" href="https://louisabraham.github.io/load-bearing/"
+    data-tip="${attr(DEF.loadBearing)}">Louis Abraham's load-bearing</a>, we group pull requests into
+    <b>${f.k} clusters</b> of vocabulary, <span class="term" tabindex="0"
+    data-tip="${attr(DEF.changes)}">with changes</span>.`;
   // One claim, one verb carrying it, round numbers. The earlier version put
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
@@ -214,8 +216,7 @@ function render() {
   $('say2').innerHTML = `One appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of pull
     requests this week. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five are
     <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span>.`;
-  $('say3').innerHTML = `Its most representative words should look familiar to anyone who uses coding
-    agents.`;
+  $('say3').innerHTML = 'Its words will look familiar.';
 
   $('t-cluster').dataset.tip = DEF.cluster;
   GROUP = Math.max(0, DATA.browse.findIndex((g) => g.published));
