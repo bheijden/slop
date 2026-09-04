@@ -80,9 +80,10 @@ Five sets ship on:
 | `ai-tells` | 78 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
 `pr-vocabulary` is derived rather than written. It samples public pull request
-descriptions every morning, sorts them into five piles by the words they use,
-and publishes the vocabulary of the pile that AI tools sign. [The page](https://bheijden.github.io/slop/web/vocabulary.html)
-shows all five piles and every word's history; [vocabulary.md](docs/vocabulary.md)
+descriptions every morning, sorts the whole archive into ten clusters by the
+words they use, and publishes the vocabulary of the cluster whose descriptions
+most often carry a tool's signature. [The page](https://bheijden.github.io/slop/web/vocabulary.html)
+shows all ten clusters and every word's history; [vocabulary.md](docs/vocabulary.md)
 explains how it is built.
 
 It overlaps `load-bearing` by about a third of its words and, on the 24-pair

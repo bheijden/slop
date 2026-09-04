@@ -4,9 +4,14 @@
 
 
 
-`web/index.html` is a static page. Paste text, or drop a file, several files, a
-folder or a `.zip` anywhere on it. Non-text files are counted and skipped rather
-than failing.
+`web/index.html` is a static page. It opens on an example already linted, so
+the first thing on screen is the thing working; **clear** empties it. Paste
+text, or drop a file, several files, a folder or a `.zip` anywhere on it.
+Non-text files are counted and skipped rather than failing.
+
+Three pages share one layout: **check** lints what you give it, **rule sets**
+runs a rule set against its own examples, and **PR vocabulary** shows where the
+derived word list comes from. The left column is the same on all three.
 
 Findings are highlighted in the document, and hovering one shows the rule and
 its fix. Read them over the extracted prose or over your original source. The
@@ -16,8 +21,9 @@ into an issue, a review or an agent's context.
 
 More than one file reads like a diff view. Every document renders in one
 continuous scroll, the findings pane runs through all of them grouped by file,
-and next/prev crosses file boundaries. A file list on the left shows which file
-you are in as you scroll and jumps you to any of them.
+and next/prev crosses file boundaries. A file list appears beside the text —
+only when there is more than one — showing which file you are in as you scroll
+and jumping you to any of them.
 
 The rules panel sits under the standing prose and lists every set that is
 loaded, each collapsible, with a checkbox on the set itself and one per rule.

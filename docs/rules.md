@@ -298,7 +298,7 @@ slop fudge                              # every built-in set, plus any
                                               # `ruleSets` in slop.json
 ```
 
-The web page runs the same checks under **test rules**, with failures sorted to
+The web page runs the same checks under **rule sets**, with failures sorted to
 the top, which is useful while you are still writing the pattern.
 
 ```

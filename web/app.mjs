@@ -339,9 +339,12 @@ function renderResults() {
     $('list').innerHTML = '';
     $('list-head').textContent = 'findings';
     $('nav').hidden = $('b-copy').hidden = true;
+    // Nothing to clear when there is nothing there.
+    $('b-clear').hidden = true;
     $('pane-doc').dataset.edit = 'on';
     return;
   }
+  $('b-clear').hidden = false;
 
   const results = S.results || [];
   const total = S.flat.length;
@@ -1098,7 +1101,11 @@ upstream defects in the same change was real, and we filed them instead.
 
 The punchline is that nobody noticed the loop for three years, and everybody
 noticed its absence in a day.`;
-$('b-example').onclick = () => loadDocs([{ name: 'example.md', kind: 'md', src: EXAMPLE }]);
+const loadExample = () => loadDocs([{ name: 'example.md', kind: 'md', src: EXAMPLE }]);
+$('b-example').onclick = loadExample;
+// Clearing is the way back to an empty page now that one does not start that
+// way. It empties the box and drops whatever was loaded, folder included.
+if (PAGE === 'check') $('b-clear').onclick = () => { $('input').value = ''; loadDocs([]); };
 $('b-file').onclick = () => {
   const i = Object.assign(document.createElement('input'), {
     type: 'file', multiple: true,
@@ -1159,5 +1166,16 @@ await loadBuiltins();
 // run() is debounced, so the panel would sit empty for a moment on first load.
 renderSay();
 await readHash();
-S.kind = $('kind').value = S.kind;
-grow(); run();
+// An empty page shows nothing of what this does. If the fragment carried no
+// text and no file was dropped, open with the example, so the first thing on
+// screen is the linter working on something. Anything that did arrive wins.
+// Not when something already failed: a link that could not be fetched has put
+// a message on screen, and opening the example would clear it and look as
+// though the link had simply been ignored.
+if (PAGE === 'check' && !$('input').value.trim() && !S.docs.length
+    && !$('score').querySelector('.err')) {
+  loadExample();
+} else {
+  S.kind = $('kind').value = S.kind;
+  grow(); run();
+}

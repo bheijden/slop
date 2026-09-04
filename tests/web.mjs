@@ -707,6 +707,34 @@ async function main() {
         JSON.stringify(V));
     }
 
+    // The page opens on the example: an empty box shows nothing of what this
+    // does. Clear is the way back to empty, and the example must not override
+    // anything that actually arrived.
+    await send('Page.navigate', { url: base });
+    await sleep(2600);
+    const opens = await evaluate(`(async () => {
+      const ta = document.getElementById('input'), clr = document.getElementById('b-clear');
+      const start = { chars: ta.value.length, findings: document.querySelectorAll('#list li').length,
+                      clear: !clr.hidden };
+      clr.click();
+      await new Promise(r => setTimeout(r, 1200));
+      const cleared = { chars: ta.value.length,
+                        findings: document.querySelectorAll('#list li').length,
+                        clear: !clr.hidden };
+      document.getElementById('b-example').click();
+      await new Promise(r => setTimeout(r, 1800));
+      return JSON.stringify({ start, cleared,
+        back: { chars: ta.value.length, clear: !clr.hidden } });
+    })()`);
+    const OP = JSON.parse(opens);
+    check('the page opens with the example already in it',
+      OP.start.chars > 3000 && OP.start.findings > 10 && OP.start.clear, JSON.stringify(OP.start));
+    check('clear empties it and takes its own button away',
+      OP.cleared.chars === 0 && OP.cleared.findings === 0 && !OP.cleared.clear,
+      JSON.stringify(OP.cleared));
+    check('and the example can be loaded again after clearing',
+      OP.back.chars > 3000 && OP.back.clear, JSON.stringify(OP.back));
+
     // An error has to be visible. note() wrote to #score, which existed only on
     // the rule sets page, so on check a bad URL or a worker timeout produced
     // nothing at all on screen.
@@ -733,8 +761,9 @@ async function main() {
       text: document.getElementById('input').value.trim(),
       findings: document.querySelectorAll('#list li').length })`);
     const SH = JSON.parse(opened);
-    check('a shared link opens the text it carries',
-      /important to note/.test(SH.text) && SH.findings > 0, JSON.stringify(SH));
+    check('a shared link opens the text it carries, over the example',
+      /important to note/.test(SH.text) && SH.findings > 0
+      && !/retry loop/.test(SH.text), JSON.stringify(SH));
     await send('Page.navigate', { url: base });
     await sleep(2000);
 

@@ -58,9 +58,9 @@ A rule that measures a rate reports the document instead of a phrase. It sets
 ```json
 { "file": "docs/intro.md", "docLevel": true,
   "rule": "load-bearing-vocabulary",
-  "measure": "48 in 862 words, 1.63 per root word >= 1.2",
-  "rate": { "value": 1.63, "per": "root", "unit": "words",
-            "op": ">=", "threshold": 1.2, "count": 48, "words": 862 },
+  "measure": "48 different words in 862, 0.76 length-adjusted >= 0.31",
+  "rate": { "value": 0.76, "per": null, "power": 0.7, "unit": "words",
+            "op": ">=", "threshold": 0.31, "count": 48, "words": 862 },
   "occurrences": [ { "line": 3, "col": 5, "match": "carrying", "context": "…" } ] }
 ```
 
