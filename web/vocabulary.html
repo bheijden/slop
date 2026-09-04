@@ -212,9 +212,14 @@ function render() {
   // One claim, one verb carrying it, round numbers. The earlier version put
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
-  const inFive = Math.round(ai * 5);
-  $('say2').innerHTML = `One of the <b>${f.k}</b> is <b>${Math.round(to * 100)}%</b> of them this
-    week; two in five are <span class="term" tabindex="0"
+  // Two numbers about two different things, so each says what it is counting.
+  // "Two in five" sat next to "one of the 10" and read as a ratio over
+  // clusters; it is the share of that one cluster's descriptions carrying a
+  // tool's footer. It was hardcoded, too, so it would not have moved if the
+  // share had. Same formatting as the list header below, which shows the same
+  // quantity.
+  $('say2').innerHTML = `One of the <b>${f.k}</b> is <b>${Math.round(to * 100)}%</b> of pull
+    requests; <b>${pc(ai)}</b> of that cluster is <span class="term" tabindex="0"
     data-tip="${attr(DEF.signed)}">signed</span> by AI.`;
   $('say3').innerHTML = 'Its words look familiar to anyone who writes with AI.';
 

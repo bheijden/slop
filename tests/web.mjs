@@ -889,6 +889,25 @@ async function main() {
       TM.whole === true, JSON.stringify(TM.whole));
     check('hovering a term shows its definition', TM.hovered === true, JSON.stringify(TM.hovered));
 
+    // Two numbers about two different things, each saying what it counts. The
+    // signed share is quoted twice on this page -- in the claim and over the
+    // word list -- and they are the same quantity, so they must read the same.
+    const shares = await evaluate(`(() => {
+      const claim = document.getElementById('say2').innerText;
+      const head = document.getElementById('about').innerText;
+      const inClaim = /([\\d.]+)% of that cluster/.exec(claim);
+      const inHead = /([\\d.]+)% signed/.exec(head);
+      return JSON.stringify({ claim, inClaim: inClaim && inClaim[1],
+        inHead: inHead && inHead[1],
+        // And the other figure in the claim says what it is a share of.
+        namesItsDenominator: /% of pull\\s+requests/.test(claim) });
+    })()`);
+    const SS = JSON.parse(shares);
+    check('the signed share reads the same wherever it appears',
+      !!SS.inClaim && SS.inClaim === SS.inHead, JSON.stringify(SS));
+    check('and each figure in the claim says what it counts',
+      SS.namesItsDenominator && /of that cluster/.test(SS.claim), SS.claim);
+
     // The method is not ours, and that belongs in the claim rather than in a
     // footnote under it: the first sentence names him and links his page.
     const credit = await evaluate(`(async () => {
