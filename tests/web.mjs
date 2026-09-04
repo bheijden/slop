@@ -899,27 +899,21 @@ async function main() {
       await new Promise(r => setTimeout(r, 250));
       const tip = document.getElementById('deftip');
       const what = tip.textContent;
-      a.dispatchEvent(new PointerEvent('pointerout', {bubbles: true, pointerType: 'mouse'}));
-      await new Promise(r => setTimeout(r, 200));
-      // A second term carries the changes, so neither hover has to do both jobs.
-      const ch = first.querySelector('span.term');
-      if (ch) {
-        ch.dispatchEvent(new PointerEvent('pointerover', {bubbles: true, pointerType: 'mouse'}));
-        await new Promise(r => setTimeout(r, 250));
-      }
       return JSON.stringify({ inFirstClaim: first.contains(a), text: a.textContent,
         href: a.getAttribute('href'),
         // His name is on the page, not only behind a hover.
         namesHim: /Louis Abraham/.test(first.innerText),
-        describesHis: /vocabulary alone/.test(what),
-        // And the changes are their own term, saying what they are.
-        saysWhatChanged: !!ch && /signature/.test(tip.textContent)
-                         && /threshold/.test(tip.textContent),
+        // The claim names the method, so a reader is not sent off the page to
+        // find out what was run.
+        namesMethod: /k-means/.test(first.innerText),
+        // And the hover explains his method and what differs here, both.
+        describesHis: /no labels go in/.test(what),
+        saysWhatChanged: /signature/.test(what) && /threshold/.test(what),
         visible: getComputedStyle(tip).opacity === '1' });
     })()`);
     const CR = JSON.parse(credit);
     check('the method is credited in the claim itself',
-      CR.inFirstClaim && CR.namesHim && /louisabraham/.test(CR.href || '')
+      CR.inFirstClaim && CR.namesHim && CR.namesMethod && /louisabraham/.test(CR.href || '')
       && CR.describesHis && CR.visible && CR.saysWhatChanged,
       JSON.stringify(CR));
 

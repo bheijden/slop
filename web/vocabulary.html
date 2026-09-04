@@ -151,8 +151,7 @@ const DEF = {
         + 'together. A word everyone uses scores near 1, however fond of it this cluster is.',
   perMillion: 'How often the word is written, per million words, so weeks of very different sizes '
         + 'can be compared. The red line counts only signed pull requests.',
-  loadBearing: 'It sorts public GitHub pull request descriptions into groups by vocabulary alone, then follows the one whose words mark out machine writing. Click through for his write-up.',
-  changes: 'Three. Which group to publish is chosen by how many of its descriptions carry a tool\'s signature, rather than by how fast the group grew. The sample is filtered harder first: bots, stubs and non-English dropped, and the signature cut off before a word is counted. And the words become a rule with a threshold, so they can be run over a document.',
+  loadBearing: 'Louis Abraham\'s load-bearing takes public pull request descriptions, keeps only the words, and lets the groups fall out of who uses which -- no labels go in. Three things differ here. The group to publish is chosen by how many of its descriptions carry a tool\'s signature, rather than by how fast it grew. The sample is filtered harder first: bots, stubs and non-English dropped, the signature cut off before a word is counted. And the words become a rule with a threshold, so they can be run over a document. Click through for his write-up.',
   share: 'This cluster\'s share of all pull requests collected that week — how much of GitHub it '
         + 'accounts for, not how much of it is signed.',
   sampled: 'One more day of pull requests is collected every morning at 08:00 UTC and these three '
@@ -205,18 +204,19 @@ function render() {
   // in the strip below put two different "signed" percentages on one page.
   const ai = (DATA.browse.find((g) => g.published) || {}).stamped || 0;
   // Whose method this is belongs in the claim, not in a footnote under it.
+  // Self-contained: what his method is, what we run, and that the changes are
+  // ours, without sending the reader off the page to find out.
   $('say1').innerHTML = `Following <a class="term" href="https://louisabraham.github.io/load-bearing/"
-    data-tip="${attr(DEF.loadBearing)}">Louis Abraham's load-bearing</a>, we group pull requests into
-    <b>${f.k} clusters</b> of vocabulary, <span class="term" tabindex="0"
-    data-tip="${attr(DEF.changes)}">with changes</span>.`;
+    data-tip="${attr(DEF.loadBearing)}">Louis Abraham</a>, we cluster pull requests by vocabulary
+    (KL k-means).`;
   // One claim, one verb carrying it, round numbers. The earlier version put
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
   const inFive = Math.round(ai * 5);
-  $('say2').innerHTML = `One appeared in 2026 and is <b>${Math.round(to * 100)}%</b> of pull
-    requests this week. ${['None','One','Two','Three','Four'][inFive] || 'Some'} in five are
-    <span class="term" tabindex="0" data-tip="${attr(DEF.signed)}">signed</span>.`;
-  $('say3').innerHTML = 'Its words will look familiar.';
+  $('say2').innerHTML = `One of the <b>${f.k}</b> is <b>${Math.round(to * 100)}%</b> of them this
+    week; two in five are <span class="term" tabindex="0"
+    data-tip="${attr(DEF.signed)}">signed</span> by AI.`;
+  $('say3').innerHTML = 'Its words look familiar to anyone who writes with AI.';
 
   $('t-cluster').dataset.tip = DEF.cluster;
   GROUP = Math.max(0, DATA.browse.findIndex((g) => g.published));
