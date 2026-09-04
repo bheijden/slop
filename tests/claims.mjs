@@ -55,6 +55,34 @@ if (m) {
 // A false-alarm rate above this is not a linter anyone would leave switched on.
 check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.length} human documents flagged`);
 
+// The README quotes the corpus it was built from and how the published cluster
+// separates from the next. Both move every Monday, and a figure written by hand
+// in a README is exactly the kind that goes stale unnoticed.
+{
+  const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
+  const fit = JSON.parse(readFileSync(join(ROOT, 'data/cluster.json'), 'utf8'));
+  const pub = fit.clusters.find((c) => c.published) || fit.clusters[0];
+  const next = fit.clusters.filter((c) => c !== pub)
+    .reduce((b, c) => (!b || c.stamped > b.stamped ? c : b), null);
+  const said = /\*\*(\d[\d,]*)\s+days and\s+([\d,]+)\s+descriptions\*\*/.exec(readme);
+  const pct = /is (\d+)% signed, against (\d+)% for the next/.exec(readme);
+  const n = (x) => Number(String(x).replace(/,/g, ''));
+  check('the README states the corpus it was built from', !!said && !!pct,
+    `${said ? 'sizes ok' : 'sizes missing'}, ${pct ? 'shares ok' : 'shares missing'}`);
+  if (said) {
+    // `days` in the fit is the list of dates sampled, not a count.
+    const days = Array.isArray(fit.days) ? fit.days.length : fit.days;
+    check('and the size is the size', n(said[1]) === days && n(said[2]) === fit.descriptions,
+      `README ${said[1]}/${said[2]}, data ${days}/${fit.descriptions}`);
+  }
+  if (pct && next) {
+    check('and the two shares are the two shares',
+      Number(pct[1]) === Math.round(pub.stamped * 100)
+      && Number(pct[2]) === Math.round(next.stamped * 100),
+      `README ${pct[1]}/${pct[2]}, data ${Math.round(pub.stamped * 100)}/${Math.round(next.stamped * 100)}`);
+  }
+}
+
 // `power` is the exponent a distinct count is divided by. It replaced
 // per: "root", which was the same thing named twice -- a root IS a power.
 // 50 matches in 100 words: at 0.5 that is 50/10 = 5, at 1.0 it is 50/100 = 0.5.

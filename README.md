@@ -79,13 +79,6 @@ Five sets ship on:
 | `load-bearing` | 1 | How far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), rebuilt from upstream daily |
 | `ai-tells` | 78 | Tells this project gathered itself, each recording where it came from and how it scored against a matched human/AI corpus |
 
-`pr-vocabulary` is derived rather than written. It samples public pull request
-descriptions every morning, sorts the whole archive into ten clusters by the
-words they use, and publishes the vocabulary of the cluster whose descriptions
-most often carry a tool's signature. [The page](https://bheijden.github.io/slop/web/vocabulary.html)
-shows all ten clusters and every word's history; [vocabulary.md](docs/vocabulary.md)
-explains how it is built.
-
 It overlaps `load-bearing` by about a third of its words and, on the 24-pair
 corpus, catches nothing that rule misses. Both ship on because the lists are
 derived differently and may separate on text unlike that corpus; run with
@@ -102,6 +95,45 @@ runs them, rewritten 27 ways), so adding one never means touching the linter.
 
 **A finding means a phrase is worn, not that a machine wrote it.** Human writers
 produce all of these.
+
+## The derived vocabulary
+
+Four of the five sets are patterns somebody wrote down. `pr-vocabulary` is
+measured, and it rebuilds itself.
+
+Every morning it samples a day of public pull request descriptions, with bots
+and non-English dropped and the tool's signature cut off before a single word is
+counted. Every Monday it clusters the whole archive, now **610 days and 274,567
+descriptions**, into ten groups by vocabulary alone. The clustering never sees
+which descriptions are signed.
+
+One of those ten is 41% signed, against 12% for the next. That is the machine
+register, found without being told where to look, and its most characteristic
+words are the list the rule ships:
+
+<!-- slop-ignore-start -->
+`nobody`, `quietly`, `plainly`, `genuinely`, `load-bearing`, `indistinguishable`
+<!-- slop-ignore-end -->
+
+[The page](https://bheijden.github.io/slop/web/vocabulary.html) shows all ten
+clusters, how each grew, and every word's rate over time, signed against all:
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/img/vocabulary-dark.png">
+    <img src="docs/img/vocabulary-light.png" alt="the vocabulary page: ten clusters of pull request descriptions stacked over two years, the machine-writing one growing from nothing to most of them, and the words that characterise it" width="900">
+  </picture>
+</p>
+
+Two things worth knowing before trusting it. The signature says a description
+was written by a machine; it does not say the unsigned ones were written by
+people, so it is used in exactly one place, choosing which cluster to publish,
+and never to rank the words. And the ranking contrasts that cluster against the
+rest of the corpus, which has to be mostly human to mean anything: it was 99.9%
+human in early 2025 and is about half machine now. Fitted on recent data alone
+the method collapses from 22 of 24 to 2. [k-and-window.md](research/k-and-window.md)
+has the measurements; [vocabulary.md](docs/vocabulary.md) explains how it is
+built.
 
 ## Documentation
 
