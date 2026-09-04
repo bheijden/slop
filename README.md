@@ -109,11 +109,11 @@ it runs over your own writing. And it re-derives itself every week.
 
 Every morning it samples a day of public pull request descriptions, with bots
 and non-English dropped and the tool's signature cut off before a single word is
-counted. Every Monday it clusters the whole archive, now **610 days and 274,567
-descriptions**, into ten groups by vocabulary alone. The clustering never sees
+counted. Every Monday it clusters the whole archive, by now **over 600 days and
+270,000 descriptions**, into ten groups by vocabulary alone. The clustering never sees
 which descriptions are signed.
 
-One of those ten is 41% signed, against 12% for the next. That is the machine
+One of those ten is around **40% signed**, against about 12% for the next. That is the machine
 register, found without being told where to look, and its most characteristic
 words are the list the rule ships:
 

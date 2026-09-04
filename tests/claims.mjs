@@ -64,22 +64,31 @@ check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.l
   const pub = fit.clusters.find((c) => c.published) || fit.clusters[0];
   const next = fit.clusters.filter((c) => c !== pub)
     .reduce((b, c) => (!b || c.stamped > b.stamped ? c : b), null);
-  const said = /\*\*(\d[\d,]*)\s+days and\s+([\d,]+)\s+descriptions\*\*/.exec(readme);
-  const pct = /is (\d+)% signed, against (\d+)% for the next/.exec(readme);
+  const said = /\*\*over ([\d,]+)\s+days and\s+([\d,]+)\s+descriptions\*\*/.exec(readme);
+  const pct = /around \*\*(\d+)% signed\*\*, against about (\d+)% for the next/.exec(readme);
   const n = (x) => Number(String(x).replace(/,/g, ''));
   check('the README states the corpus it was built from', !!said && !!pct,
     `${said ? 'sizes ok' : 'sizes missing'}, ${pct ? 'shares ok' : 'shares missing'}`);
   if (said) {
-    // `days` in the fit is the list of dates sampled, not a count.
+    // `days` in the fit is the list of dates sampled, not a count. The archive
+    // grows every Monday, so an exact figure here would go stale on a schedule
+    // and turn this red once a week. These are floors: they must still be true,
+    // and must not be so far under the truth that they mislead.
     const days = Array.isArray(fit.days) ? fit.days.length : fit.days;
-    check('and the size is the size', n(said[1]) === days && n(said[2]) === fit.descriptions,
-      `README ${said[1]}/${said[2]}, data ${days}/${fit.descriptions}`);
+    check('the stated floors are still true',
+      days >= n(said[1]) && fit.descriptions >= n(said[2]),
+      `README says over ${said[1]}/${said[2]}, data has ${days}/${fit.descriptions}`);
+    check('and are not so low they mislead',
+      days < n(said[1]) * 1.6 && fit.descriptions < n(said[2]) * 1.6,
+      `README says over ${said[1]}/${said[2]}, data has ${days}/${fit.descriptions} — raise them`);
   }
   if (pct && next) {
-    check('and the two shares are the two shares',
-      Number(pct[1]) === Math.round(pub.stamped * 100)
-      && Number(pct[2]) === Math.round(next.stamped * 100),
-      `README ${pct[1]}/${pct[2]}, data ${Math.round(pub.stamped * 100)}/${Math.round(next.stamped * 100)}`);
+    // "around 40%" has to stay around 40, and the gap to the next cluster is the
+    // whole claim, so that must not close.
+    const a = Math.round(pub.stamped * 100), b = Math.round(next.stamped * 100);
+    check('the two shares are still about what it says',
+      Math.abs(a - Number(pct[1])) <= 5 && Math.abs(b - Number(pct[2])) <= 5 && a > b + 10,
+      `README ~${pct[1]}/${pct[2]}, data ${a}/${b}`);
   }
 }
 
