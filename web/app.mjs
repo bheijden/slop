@@ -84,10 +84,11 @@ function renderSay() {
       + '<b>No X, no Y, no Z.</b>';
     $('say2').innerHTML = `You know the feeling. <b>${rules} patterns</b> in <b>${sets}</b> `
       + `${term('ruleSet', 'rule sets')} find AI slop.`;
-    // The difference from a detector: a score tells you something is wrong, a
-    // named tell tells an agent what to change.
-    $('say3').innerHTML = `Each ${term('finding', 'finding')} names the tell and the fix, so an `
-      + 'agent can correct its own draft.';
+    // The whole difference from a detector, so it leads the sentence. A score
+    // says a document is bad; a named tell says which words and what to write
+    // instead, which is the only form an agent can act on.
+    $('say3').innerHTML = `Each ${term('finding', 'finding')} says <b>why</b>: the tell, and `
+      + 'the fix. An agent corrects its own draft.';
   } else {
     const n = S.fudge && S.fudge.length ? S.fudge.length : 0;
     const ex = S.fudge ? S.fudge.reduce((a, r) => a + r.conform.ok + r.conform.fail, 0) : 0;
