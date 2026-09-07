@@ -1,0 +1,92 @@
+{
+  "generated": "2026-09-07",
+  "scanned": 19280,
+  "days": 21,
+  "note": "Proposed by tools/pr-markers.mjs. Move a real agent into markers.json confirmed, anything else into rejected. This file is rewritten every run.",
+  "proposals": [
+    {
+      "footer": "generated with devin",
+      "seen": 11,
+      "authors": 8,
+      "example": "Generated with [Devin](https://devin.ai)"
+    },
+    {
+      "footer": "domain_structure",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- DOMAIN_STRUCTURE -->"
+    },
+    {
+      "footer": "website_reachable",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_REACHABLE -->"
+    },
+    {
+      "footer": "software_related",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- SOFTWARE_RELATED -->"
+    },
+    {
+      "footer": "non_commercial",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- NON_COMMERCIAL -->"
+    },
+    {
+      "footer": "contact_info",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- CONTACT_INFO -->"
+    },
+    {
+      "footer": "website_link",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_LINK -->"
+    },
+    {
+      "footer": "website_preview_start",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_PREVIEW_START -->"
+    },
+    {
+      "footer": "website_preview_end",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_PREVIEW_END -->"
+    },
+    {
+      "footer": "website_purpose_start",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_PURPOSE_START -->"
+    },
+    {
+      "footer": "website_purpose_end",
+      "seen": 9,
+      "authors": 9,
+      "example": "<!-- WEBSITE_PURPOSE_END -->"
+    },
+    {
+      "footer": "🤖 prepared with codex",
+      "seen": 5,
+      "authors": 3,
+      "example": "🤖 Prepared with Codex"
+    },
+    {
+      "footer": "created with posthog desktop",
+      "seen": 4,
+      "authors": 3,
+      "example": "*Created with [PostHog Desktop](https://posthog.com/desktop?ref=pr)*"
+    },
+    {
+      "footer": "co-authored-by: warp",
+      "seen": 4,
+      "authors": 4,
+      "example": "Co-Authored-By: Warp <agent@warp.dev>"
+    }
+  ]
+}
