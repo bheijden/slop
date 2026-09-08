@@ -251,9 +251,14 @@ if (close.length > 1) {
 // k-means hands back arbitrary labels, and leaving them arbitrary meant the
 // chart's bottom band was "cluster 7" and cycling through the list walked the
 // highlight around the stack in no order at all.
-const stackOrder = [...clusters].sort((a, b) => b.stamped - a.stamped);
+// The published cluster first, then the rest by signed share. Those were the
+// same list while the share alone chose; with a tie-break they can differ, and
+// when they do this threw rather than publishing -- the one case the tie-break
+// exists for. Position 0 is the published cluster, and every position above it
+// still descends by share.
+const rest = clusters.filter((x) => x !== publish).sort((a, b) => b.stamped - a.stamped);
+const stackOrder = [publish, ...rest];
 stackOrder.forEach((x, i) => { x.stack = i; });
-if (stackOrder[0] !== publish) throw new Error('stack 0 must be the published cluster');
 
 console.log(`  c    size    start      end   arrived   stamped   most characteristic words`);
 for (const x of stackOrder) {
@@ -269,6 +274,14 @@ const grew = clusters.filter((x) => x.arrived);
 if (tie) console.log(tie);
 console.log(`\npublished cluster ${publish.stack} (k-means label ${publish.c}), ${(100 * publish.stamped).toFixed(1)}% signed` +
   ` (runner-up ${(100 * [...clusters].sort((a, b) => b.stamped - a.stamped)[1].stamped).toFixed(1)}%)`);
+// Upstream publishes the largest of recent weeks among those that arrived. Worth
+// printing beside ours: on 2026-09-07 the two disagreed and theirs was right.
+const theirs = grew.reduce((b, x) => (!b || x.end > b.end ? x : b), null);
+if (theirs) {
+  console.log(`  their rule would publish cluster ${theirs.stack} `
+    + `(${(100 * theirs.end).toFixed(1)}% of recent weeks, ${(100 * theirs.stamped).toFixed(1)}% signed)`
+    + `${theirs === publish ? ' — the same one' : ' — NOT the one chosen here'}`);
+}
 console.log(`their growth test would admit ${grew.length ? grew.map((x) => x.c).join(', ') : 'no cluster'}` +
   `${grew.length === 1 && grew[0].c === publish.c ? ' — the same one' : grew.length ? '' : ''}`);
 if (!settled) console.log(`NOTE: the fit did not settle in ${ITERS} iterations`);
@@ -296,6 +309,18 @@ for (let i = 0; i < N; i++) {
   }
 }
 
+const DUMP = arg('--dump', '');
+if (DUMP) {
+  writeFileSync(DUMP, JSON.stringify({
+    days: days.length, from: days[0], to: days[days.length - 1], descriptions: N, k: K,
+    clusters: stackOrder.map((x) => ({
+      stack: x.stack, label: x.c, size: x.size, share: x.share, stamped: x.stamped,
+      start: x.start, end: x.end, arrived: x.arrived,
+      words: x.words.slice(0, TOP).map((j) => vocab[j]),
+    })),
+  }) + '\n');
+  console.log(`wrote ${DUMP}`);
+}
 const built = new Date().toISOString().slice(0, 10);
 // --dry fits and reports without touching data/ or rules/, so a sweep over k
 // cannot leave the page reading a fit nobody chose.

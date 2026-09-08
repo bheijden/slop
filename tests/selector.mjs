@@ -69,5 +69,28 @@ console.log('\nwith no previous list:');
 check('it falls back to the highest share',
   pick([styling, register, airbyte], new Set()).name === 'front-end styling');
 
+// The choice is only half of it. pr-cluster then renumbers the clusters so that
+// position 0 is the published one, and that step asserted position 0 was also
+// the highest-signed -- true while the share alone chose, and false the moment
+// the tie-break overrides. It threw instead of publishing, in exactly the case
+// the tie-break exists for, and the checks above did not see it because they
+// stop at the choice.
+function renumber(clusters, publish) {
+  const rest = clusters.filter((x) => x !== publish).sort((a, b) => b.stamped - a.stamped);
+  return [publish, ...rest];
+}
+console.log('\nand the renumbering that follows it:');
+{
+  const cs = [styling, register, airbyte];
+  const chosen = pick(cs, shipped);
+  const order = renumber(cs, chosen);
+  check('position 0 is the cluster that was published', order[0] === chosen, order[0].name);
+  const tail = order.slice(1).map((x) => x.stamped);
+  check('and the rest still descend by signed share',
+    tail.every((v, i) => i === 0 || tail[i - 1] >= v), JSON.stringify(tail));
+  check('even though the published one is not the highest-signed here',
+    chosen.stamped < Math.max(...cs.map((x) => x.stamped)));
+}
+
 console.log(failed ? `\ncluster selector: ${failed} failed` : '\ncluster selector: all hold');
 process.exit(failed ? 1 : 0);

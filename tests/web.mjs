@@ -995,7 +995,12 @@ async function main() {
     const ord = await evaluate(`(async () => {
       const d = await fetch('vocabulary-data.json').then(r => r.json());
       const c = d.browse.map(x => x.stamped);
-      return JSON.stringify({stamped: c, sorted: c.every((v,i) => i === 0 || c[i-1] >= v),
+      // Position 0 is the published cluster, and the rest descend by signed
+      // share. Those were one rule until the selector gained a tie-break; when
+      // it fires, the published cluster is not the highest-signed and only the
+      // tail is ordered.
+      const tail = c.slice(1);
+      return JSON.stringify({stamped: c, sorted: tail.every((v,i) => i === 0 || tail[i-1] >= v),
         ids: d.browse.map(x => x.id).join(','),
         publishedIsZero: d.browse.findIndex(x => x.published) === 0});
     })()`);
