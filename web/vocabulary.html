@@ -154,12 +154,13 @@ const DEF = {
   loadBearing: 'Louis Abraham\'s load-bearing takes public pull request descriptions, keeps only the words, and lets the groups fall out of who uses which -- no labels go in. Three things differ here. The group to publish is chosen by how many of its descriptions carry a tool\'s signature, rather than by how fast it grew. The sample is filtered harder first: bots, stubs and non-English dropped, the signature cut off before a word is counted. And the words become a rule with a threshold, so they can be run over a document. Click through for his write-up.',
   share: 'This cluster\'s share of all pull requests collected that week — how much of GitHub it '
         + 'accounts for, not how much of it is signed.',
-  sampled: 'One more day of pull requests is collected every morning at 08:00 UTC and these three '
+  sampled: 'One more day of pull requests is collected every morning at 09:00 UTC and these three '
         + 'numbers move with it. The archive only ever reaches yesterday, so the newest day here is '
         + '{to}.',
-  built: 'The clustering and the word list are redone weekly, on Mondays, because that pass reads '
-        + 'the whole archive and takes minutes rather than seconds. Between Mondays the counts above '
-        + 'keep moving while the words below stay put.',
+  built: 'The clustering and the word list are redone every morning, after the day\'s sample lands. '
+        + 'The archive is cut several ways -- 8, 9, 10, 11 and 12 clusters -- and a cut is only '
+        + 'published when the signed share and the growth rate name the same cluster. On a morning '
+        + 'where none of them agree, nothing is published and the words below stay as they are.',
 };
 
 let DATA = null, SELECTED = null, GROUP = 0;
@@ -206,9 +207,14 @@ function render() {
   // Whose method this is belongs in the claim, not in a footnote under it.
   // Self-contained: what his method is, what we run, and that the changes are
   // ours, without sending the reader off the page to find out.
+  // The count belongs here, where the clusters are first mentioned. It used to
+  // appear first in the next line, as "one of the 10", which read as a bare
+  // number with nothing to attach to -- and now that the count is swept rather
+  // than fixed, "the 10" would have been "the 9" some mornings and "the 12" on
+  // others with no explanation on the page for either.
   $('say1').innerHTML = `Following <a class="term" href="https://louisabraham.github.io/load-bearing/"
-    data-tip="${attr(DEF.loadBearing)}">Louis Abraham</a>, we cluster pull requests by vocabulary
-    (KL k-means).`;
+    data-tip="${attr(DEF.loadBearing)}">Louis Abraham</a>, we group every pull request since 2025
+    into <b>${f.k}</b> clusters of shared vocabulary (KL k-means).`;
   // One claim, one verb carrying it, round numbers. The earlier version put
   // three decimals and a note about signatures where the headline should be,
   // and read like a page of notes rather than a thing worth knowing.
@@ -218,7 +224,7 @@ function render() {
   // tool's footer. It was hardcoded, too, so it would not have moved if the
   // share had. Same formatting as the list header below, which shows the same
   // quantity.
-  $('say2').innerHTML = `One of the <b>${f.k}</b> is <b>${Math.round(to * 100)}%</b> of pull
+  $('say2').innerHTML = `One of them is <b>${Math.round(to * 100)}%</b> of pull
     requests; <b>${pc(ai)}</b> of that cluster is <span class="term" tabindex="0"
     data-tip="${attr(DEF.signed)}">signed</span> by AI.`;
   $('say3').innerHTML = 'Its words look familiar to anyone who writes with AI.';
@@ -294,9 +300,16 @@ function drawArrive() {
   // one thing the whole way up: nought is the most signed group, which is the one
   // the slop rule is built from, and it sits on the axis. So drawing them in order
   // is the whole of the layout, and cycling walks the highlight straight up.
-  const steps = [0.46, 0.38, 0.31, 0.25, 0.20, 0.16, 0.13, 0.10, 0.08, 0.06];
-  order.forEach((c, i) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
-                               c === reg ? 0.85 : steps[i % steps.length]));
+  // Shading spread evenly across whichever bands are not the highlighted one.
+  // This was ten fixed steps indexed modulo their length, which was fine while
+  // the fit was always cut ten ways and would have given two bands the same
+  // shade the morning the sweep first chose eleven or twelve.
+  const HI = 0.46, LO = 0.06;
+  const rest = order.filter((c) => c !== reg);
+  const shade = (c) => (rest.length < 2 ? HI
+    : HI - (HI - LO) * (rest.indexOf(c) / (rest.length - 1)));
+  order.forEach((c) => band(c, c === reg ? 'var(--flag)' : 'var(--muted)',
+                            c === reg ? 0.85 : shade(c)));
   let last = null;
   const every = Math.max(1, Math.round(S.length / (W < 560 ? 4 : 8)));
   for (let i = 0; i < S.length; i += every) {

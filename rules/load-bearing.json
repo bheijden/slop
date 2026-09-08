@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "slop": "0.1.0",
   "title": "Load-bearing vocabulary (louisabraham)",
-  "description": "One rule, measuring how far a document's vocabulary spreads across the words that mark out AI writing. The list comes from github.com/louisabraham/load-bearing, which sorts GitHub pull request descriptions into ten groups by vocabulary alone; one group grew from under 1 per cent of them in January 2025 to 37 per cent by August 2026.\n\nThis is the only set here that updates itself: tools/load-bearing.mjs rebuilds it from upstream daily. Nothing upstream is labelled, though. There are no human and AI classes in it, only ten clusters and the timing of one, and its authors say the group is mostly Claude with no guarantee. Every human and AI number on the rule is this repo's own audit corpus, not theirs.",
+  "description": "One rule, measuring how far a document's vocabulary spreads across the words that mark out AI writing. The list comes from github.com/louisabraham/load-bearing, which sorts GitHub pull request descriptions into ten groups by vocabulary alone; one group grew from under 1 per cent of them in January 2025 to 37 per cent by August 2026.\n\nIt updates itself: tools/load-bearing.mjs rebuilds it from upstream daily. (pr-vocabulary re-derives its own list from the same raw material, by a related method.) Nothing upstream is labelled, though. There are no human and AI classes in it, only ten clusters and the timing of one, and its authors say the group is mostly Claude with no guarantee. Every human and AI number on the rule is this repo's own audit corpus, not theirs.",
   "source": "https://github.com/louisabraham/load-bearing",
   "license": "MIT",
   "rules": [

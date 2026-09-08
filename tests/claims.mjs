@@ -9,7 +9,7 @@
 // 200 words at 0.31. The shipped rule uses all 250 at 0.40. Two different
 // configurations, one number, and the doc quoted the wrong one.
 //
-// The list re-derives every Monday, so any figure written by hand here goes
+// The list re-derives every morning, so any figure written by hand here goes
 // stale on its own. This makes that a failing test rather than a thing someone
 // notices a month later.
 
@@ -56,7 +56,7 @@ if (m) {
 check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.length} human documents flagged`);
 
 // The README quotes the corpus it was built from and how the published cluster
-// separates from the next. Both move every Monday, and a figure written by hand
+// separates from the next. Both move every morning, and a figure written by hand
 // in a README is exactly the kind that goes stale unnoticed.
 {
   const readme = readFileSync(join(ROOT, 'README.md'), 'utf8');
@@ -65,13 +65,16 @@ check('the rule stays inside its false-alarm budget', H <= 1, `${H} of ${human.l
   const next = fit.clusters.filter((c) => c !== pub)
     .reduce((b, c) => (!b || c.stamped > b.stamped ? c : b), null);
   const said = /\*\*over ([\d,]+)\s+days and\s+([\d,]+)\s+descriptions\*\*/.exec(readme);
-  const pct = /around \*\*(\d+)% signed\*\*, against about (\d+)% for the next/.exec(readme);
+  // Whitespace-tolerant: the README is hard-wrapped, so a reworded sentence
+  // moves the line break and a regex with a literal space here fails on prose
+  // that is perfectly correct.
+  const pct = /around\s+\*\*(\d+)% signed\*\*,\s+against\s+about\s+(\d+)%\s+for\s+the\s+next/.exec(readme);
   const n = (x) => Number(String(x).replace(/,/g, ''));
   check('the README states the corpus it was built from', !!said && !!pct,
     `${said ? 'sizes ok' : 'sizes missing'}, ${pct ? 'shares ok' : 'shares missing'}`);
   if (said) {
     // `days` in the fit is the list of dates sampled, not a count. The archive
-    // grows every Monday, so an exact figure here would go stale on a schedule
+    // grows every morning, so an exact figure here would go stale on a schedule
     // and turn this red once a week. These are floors: they must still be true,
     // and must not be so far under the truth that they mislead.
     const days = Array.isArray(fit.days) ? fit.days.length : fit.days;
@@ -123,7 +126,7 @@ for (const dir of ['rules', 'candidates']) {
 check('no shipped rule still says per: "root"', stale.length === 0, stale.join(' '));
 
 // The exponent is a measured choice, not a default. pr-cluster rewrites this
-// rule's pattern every Monday and must leave its arithmetic alone.
+// rule's pattern every morning and must leave its arithmetic alone.
 const shipped = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf8'));
 const n = shipped.rules[0].notable;
 check('the derived rule keeps the exponent research/length.md chose',

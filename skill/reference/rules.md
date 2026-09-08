@@ -91,7 +91,7 @@ Every tell this project mined itself, in one set, on by default. The two shipped
 
 ## Load-bearing vocabulary (louisabraham): `load-bearing`
 
-One rule, measuring how far a document's vocabulary spreads across the words that mark out AI writing. The list comes from github.com/louisabraham/load-bearing, which sorts GitHub pull request descriptions into ten groups by vocabulary alone; one group grew from under 1 per cent of them in January 2025 to 37 per cent by August 2026. This is the only set here that updates itself: tools/load-bearing
+One rule, measuring how far a document's vocabulary spreads across the words that mark out AI writing. The list comes from github.com/louisabraham/load-bearing, which sorts GitHub pull request descriptions into ten groups by vocabulary alone; one group grew from under 1 per cent of them in January 2025 to 37 per cent by August 2026. It updates itself: tools/load-bearing.mjs rebuilds it from upstre
 
 | rule | flags | fix |
 |---|---|---|

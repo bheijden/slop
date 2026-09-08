@@ -57,7 +57,7 @@ const DEF = {
          + 'examples it must catch and must not. Every set here is one file, and you can load '
          + 'your own from a URL or off disk.',
   derived: 'This set is not written by hand. It is a word list measured from public GitHub pull '
-         + 'request descriptions, re-derived every Monday, so it follows how machine writing '
+         + 'request descriptions, re-derived every morning, so it follows how machine writing '
          + 'actually moves rather than how anyone remembers it. The date is that last rebuild. '
          + 'Open the PR vocabulary page to see where the words came from.',
   variants: 'The same example marked up twenty-two different ways — bold in the middle of a word, '

@@ -73,7 +73,7 @@ Five sets ship on:
 
 | set | rules | |
 |---|---|---|
-| `pr-vocabulary` | 1 | A list of ordinary words derived from public GitHub pull requests and rebuilt weekly. See [vocabulary.md](docs/vocabulary.md) |
+| `pr-vocabulary` | 1 | A list of ordinary words derived from public GitHub pull requests and rebuilt every morning. See [vocabulary.md](docs/vocabulary.md) |
 | `simonwillison` | 27 | Stock phrasings, from Simon Willison's [LLM cliché highlighter](https://tools.simonwillison.net/llm-cliche-highlighter) |
 | `wikipedia-ai` | 11 | Wikipedia's [Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) |
 | `load-bearing` | 1 | How far a document's vocabulary spreads across the group that arrived in [louisabraham/load-bearing](https://github.com/louisabraham/load-bearing), rebuilt from upstream daily |
@@ -102,32 +102,42 @@ Four of the five sets are patterns somebody wrote down. `pr-vocabulary` is
 measured, and it rebuilds itself.
 
 The method is [Louis Abraham's](https://louisabraham.github.io/load-bearing/),
-reproduced here with three changes. Where he picks the cluster to publish by
-watching it grow, this picks the one whose descriptions most often carry a
-tool's signature. His output is a word list; this is a rule with a threshold, so
-it runs over your own writing. And it re-derives itself every week.
+reproduced here with three changes. He publishes the cluster that grew fastest;
+this one has to be the fastest-growing *and* the one whose descriptions most
+often carry a tool's signature, or nothing is published at all. His output is a
+word list; this is a rule with a threshold, so it runs over your own writing.
+And it re-derives itself every morning rather than once.
 
 Every morning it samples a day of public pull request descriptions, with bots
 and non-English dropped and the tool's signature cut off before a single word is
-counted. Every Monday it clusters the whole archive, by now **over 600 days and
-270,000 descriptions**, into ten groups by vocabulary alone. The clustering never sees
-which descriptions are signed.
+counted. Then it clusters the whole archive, by now **over 600 days and 270,000
+descriptions**, into groups by vocabulary alone — several times over, cutting it
+8, 9, 10, 11 and 12 ways. The clustering never sees which descriptions are
+signed.
 
-One of those ten is around **40% signed**, against about 12% for the next. That is the machine
-register, found without being told where to look, and its most characteristic
-words are the list the rule ships:
+The two tests are then applied to each of those fits, and only a fit where they
+name the same cluster can be published. They fail for unrelated reasons —
+growth is fooled by anything that arrived recently, signature by work that is
+agent-assisted without being agent-written — so agreement rules out both. On the
+day this was written they agreed at four cuts out of five and disagreed at
+eleven, where the signature test alone would have published a list of front-end
+styling words.
+
+The cluster that survives all of that is around **40% signed**, against about
+12% for the next. That is the machine register, found without being told where
+to look, and its most characteristic words are the list the rule ships:
 
 <!-- slop-ignore-start -->
 `nobody`, `quietly`, `plainly`, `genuinely`, `load-bearing`, `indistinguishable`
 <!-- slop-ignore-end -->
 
-[The page](https://bheijden.github.io/slop/web/vocabulary.html) shows all ten
-clusters, how each grew, and every word's rate over time, signed against all:
+[The page](https://bheijden.github.io/slop/web/vocabulary.html) shows every
+cluster, how each grew, and every word's rate over time, signed against all:
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/img/vocabulary-dark.png">
-    <img src="docs/img/vocabulary-light.png" alt="the vocabulary page: ten clusters of pull request descriptions stacked over two years, the machine-writing one growing from nothing to most of them, and the words that characterise it" width="900">
+    <img src="docs/img/vocabulary-light.png" alt="the vocabulary page: clusters of pull request descriptions stacked over two years, the machine-writing one growing from nothing to most of them, and the words that characterise it" width="900">
   </picture>
 </p>
 

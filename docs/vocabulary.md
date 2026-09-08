@@ -3,13 +3,13 @@
 slop ships one rule that works differently from all the others. Every other rule
 is a pattern somebody wrote down. This one is a list of about a thousand
 ordinary English words, and a document that reaches for a lot of them at once is
-probably machine-written. The list is rebuilt from scratch every week.
+probably machine-written. The list is rebuilt from scratch every morning.
 
 The method is not ours. It is Louis Abraham's
 [load-bearing](https://louisabraham.github.io/load-bearing/)
 ([source](https://github.com/louisabraham/load-bearing)), reproduced here, with
-one deliberate change described below. This page explains
-how it works, what the one change is, and how we know it helps.
+one deliberate change described below: how the pile to publish gets chosen. This
+page explains how it works, what the change is, and how we know it helps.
 
 ## Where the raw material comes from
 
@@ -79,12 +79,17 @@ close to useless.
 Stop comparing stamped against unstamped. Compare one kind of writing against
 every other kind.
 
-### Step 1. Sort every description ever collected into ten piles
+### Step 1. Sort every description ever collected into piles
 
 All 609 days at once, not a recent window. Descriptions that reach for similar
 vocabulary end up in the same pile. The sorting never sees the stamps.
 
-The ten piles look like this, most-stamped first. `start` and `end` are each
+How many piles is not fixed: the archive is sorted five times over, into 8, 9,
+10, 11 and 12, and [the selection rule](#deciding-which-pile-to-publish) picks
+between those fits. The worked example below is the ten-pile fit, which is where this
+started and is still the easiest one to read.
+
+The piles look like this, most-stamped first. `start` and `end` are each
 pile's share of all pull requests in the first and last month of the archive:
 
 | pile | start | end | stamped | most characteristic words |
@@ -100,7 +105,7 @@ pile's share of all pull requests in the first and last month of the archive:
 | 5 | 8.4% | 0.0% | 0.1% | remediationstrategy, yarn/cache, zero-installs |
 | 2 | 3.3% | 0.1% | 0.1% | hasfixes, ismajorupgrade, publisheddate |
 
-Nine of the ten are recognisably about *subjects*: one project's build tooling,
+All but one are recognisably about *subjects*: one project's build tooling,
 front-end work, dependency bots, Nix packaging. Pile 7 is not about a subject at
 all. Its characteristic words are the connective tissue of English prose, four
 in ten of its descriptions carry a stamp, and it went from nothing to more than
@@ -129,8 +134,9 @@ handed  refused  precisely  somebody  plainly  outright  worse  asserted  ruling
 Everything above is theirs. Here is the change.
 
 **They pick the pile by watching it grow.** Their published pile is the one that
-went from under 2% of pull requests to over 20%. **We pick it by the share of
-its descriptions that carry a stamp.**
+went from under 2% of pull requests to over 20%. We started by picking it a
+second way, **by the share of its descriptions that carry a stamp**, and now
+require the two to agree.
 
 Measured over four fits of the archive at different settings:
 
@@ -149,6 +155,39 @@ runner-up is 10.5%.
 There is a second reason to prefer it. Growth only identifies machine writing
 while machine writing is still arriving. When the share stops climbing, the test
 stops working. A stamp has no such expiry.
+
+### Deciding which pile to publish
+
+The stamp test is not enough on its own either, and it took a bad run to show
+it. On 2026-09-07 it published a pile of front-end styling words — `pill`,
+`inset`, `tapping`, `painted` — at 39.0% stamped, ahead of the register at
+34.7%. Front-end work is heavily agent-assisted, so its descriptions carry
+stamps in quantity without being a *way of writing*. The list that morning was
+wrong, and the only thing that caught it was the rule failing its own worked
+example, which stopped the commit.
+
+So neither test decides alone. The two fail for unrelated reasons — growth is
+fooled by anything that arrived recently, the stamp test by work that is
+agent-assisted rather than agent-written — and a pile that leads on both is one
+where neither excuse applies.
+
+That is the whole rule:
+
+1. Sort the archive five times over, into 8, 9, 10, 11 and 12 piles.
+2. In each fit, ask both tests which pile they would publish.
+3. Throw away every fit where they name different piles.
+4. Of what survives, take the fit whose winner is furthest clear of its
+   runner-up on stamp share, and publish that pile.
+5. If no fit survives, publish nothing and keep yesterday's list.
+
+On the archive as this was written, four of the five fits agreed. The eleven-pile
+fit did not: its stamp test pointed at the styling words again, and that fit was
+dropped. Scored against [the corpus](../data/corpus/README.md), the pile the
+stamp test wanted there catches 4 of 24 — the four surviving fits catch 22, 22,
+22 and 23.
+
+Publishing nothing costs a day of drift. Publishing the wrong pile costs the
+rule.
 
 ## Three reasons to believe the result
 
@@ -221,8 +260,9 @@ of the twenty-four documents.
 ```sh
 node tools/pr-sample.mjs 2026-09-01              # collect one day
 node tools/pr-sample.mjs --backfill 5            # fill the five oldest gaps
-node tools/pr-cluster.mjs                        # rebuild the list, and report
-node tools/pr-cluster.mjs --write                # and write it into the rule
+node tools/pr-cluster.mjs                        # one fit at one k, and report
+node tools/pr-fit.mjs                            # sweep 8-12, report which fits agree
+node tools/pr-fit.mjs --write                    # and write the winner into the rule
 node tools/pr-page-data.mjs                      # rebuild what the web page reads
 node tools/score-list.mjs                        # score every word list on the 24 pairs
 node tools/audit.mjs                             # score every rule on the 24 pairs
@@ -232,8 +272,9 @@ Every number the method uses is a constant near the top of
 `tools/pr-cluster.mjs`, each with a comment explaining the choice. Most of them
 are theirs. The two worth knowing:
 
-- **Ten piles, over the whole archive.** Both matter, and the archive matters
-  more. A forty-day window instead costs six of the twenty-four documents.
+- **The whole archive, not a window.** A forty-day window instead costs six of
+  the twenty-four documents. How many piles matters less, which is why it is
+  swept rather than fixed.
 - **A word must appear in 50 descriptions** before it is considered at all.
   Below that, one prolific author can invent a word single-handed.
 
@@ -242,11 +283,11 @@ keep appearing and each stamps its work differently. `tools/pr-markers.mjs`
 watches for unfamiliar stamps and opens a pull request proposing them. Nothing
 is added automatically.
 
-Collection runs every morning and the list is rebuilt every Monday, both by
+Collection and the rebuild both run every morning, by
 [GitHub Actions](https://github.com/bheijden/slop/blob/main/.github/workflows/pr-vocabulary.yml).
 [The web page](https://bheijden.github.io/slop/web/vocabulary.html) shows the
-current state: all ten piles, the words in each, and how often each word has
-been written every week since January 2025.
+current state: every pile in the published fit, the words in each, and how
+often each word has been written every week since January 2025.
 
 ## A note on this page
 

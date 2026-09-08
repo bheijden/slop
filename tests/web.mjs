@@ -908,6 +908,31 @@ async function main() {
     check('and each figure in the claim says what it counts',
       SS.namesItsDenominator && /of that cluster/.test(SS.claim), SS.claim);
 
+    // How many clusters the archive was cut into is chosen per run now -- the
+    // sweep picks between 8, 9, 10, 11 and 12 -- so nothing on the page may
+    // assume ten. The prose, the pager and the chart all have to agree with
+    // whatever the data says, and the chart's shading has to stay distinguishable
+    // band to band at any of them.
+    const kk = await evaluate(`(async () => {
+      const d = await (await fetch('vocabulary-data.json', {cache:'no-cache'})).json();
+      const k = d.fit.k;
+      const said = /into\\s+(\\d+)\\s+clusters/.exec(document.getElementById('say1').innerText);
+      const pager = /\\/\\s*0*(\\d+)/.exec(document.getElementById('which').textContent);
+      const ops = [...document.querySelectorAll('#arrive path[fill-opacity]')]
+        .map(e => +e.getAttribute('fill-opacity'));
+      return JSON.stringify({ k, said: said && +said[1], pager: pager && +pager[1],
+        groups: d.browse.length, bands: ops.length,
+        distinct: new Set(ops.map(x => x.toFixed(3))).size,
+        inRange: ops.every(x => x > 0 && x <= 0.85) });
+    })()`);
+    const K = JSON.parse(kk);
+    check('the prose states the cluster count the data was fit at',
+      K.said === K.k, JSON.stringify(K));
+    check('the pager counts every cluster in the fit',
+      K.pager === K.groups && K.groups === K.k, JSON.stringify(K));
+    check('the chart draws one band per cluster, each its own shade',
+      K.bands === K.k && K.distinct === K.bands && K.inRange, JSON.stringify(K));
+
     // The method is not ours, and that belongs in the claim rather than in a
     // footnote under it: the first sentence names him and links his page.
     const credit = await evaluate(`(async () => {
@@ -1008,7 +1033,7 @@ async function main() {
     check('the stack is ordered by one number, and the rule comes from the top of it',
       O.sorted && O.publishedIsZero, JSON.stringify(O));
 
-    // Two clocks run behind this page -- a daily sample and a weekly fit -- and
+    // Two clocks run behind this page -- the sample and the fit -- and
     // which one last moved was only answerable by reading the workflow file.
     const fresh = await evaluate(`(async () => {
       const d = await fetch('vocabulary-data.json').then(r => r.json());
