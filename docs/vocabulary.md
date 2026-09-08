@@ -159,19 +159,19 @@ stops working. A stamp has no such expiry.
 ### Deciding which pile to publish
 
 The stamp test is not enough on its own either, and it took a bad run to show
-it. On 2026-09-07 it published a pile of front-end styling words — `pill`,
-`inset`, `tapping`, `painted` — at 39.0% stamped, ahead of the register at
+it. On 2026-09-07 it published a pile of front-end styling words (`pill`,
+`inset`, `tapping`, `painted`) at 39.0% stamped, ahead of the register at
 34.7%. Front-end work is heavily agent-assisted, so its descriptions carry
 stamps in quantity without being a *way of writing*. The list that morning was
 wrong, and the only thing that caught it was the rule failing its own worked
 example, which stopped the commit.
 
-So neither test decides alone. The two fail for unrelated reasons — growth is
-fooled by anything that arrived recently, the stamp test by work that is
-agent-assisted rather than agent-written — and a pile that leads on both is one
-where neither excuse applies.
+So neither test decides alone. Each fails in its own way: growth is fooled by
+anything that arrived recently, the stamp test by work that is agent-assisted
+without being agent-written. A pile that leads on both is one where neither
+excuse applies.
 
-That is the whole rule:
+The rule, in full:
 
 1. Sort the archive five times over, into 8, 9, 10, 11 and 12 piles.
 2. In each fit, ask both tests which pile they would publish.
@@ -183,7 +183,7 @@ That is the whole rule:
 On the archive as this was written, four of the five fits agreed. The eleven-pile
 fit did not: its stamp test pointed at the styling words again, and that fit was
 dropped. Scored against [the corpus](../data/corpus/README.md), the pile the
-stamp test wanted there catches 4 of 24 — the four surviving fits catch 22, 22,
+stamp test wanted there catches 4 of 24. The four surviving fits catch 22, 22,
 22 and 23.
 
 Publishing nothing costs a day of drift. Publishing the wrong pile costs the

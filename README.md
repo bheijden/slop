@@ -111,14 +111,14 @@ And it re-derives itself every morning rather than once.
 Every morning it samples a day of public pull request descriptions, with bots
 and non-English dropped and the tool's signature cut off before a single word is
 counted. Then it clusters the whole archive, by now **over 600 days and 270,000
-descriptions**, into groups by vocabulary alone — several times over, cutting it
-8, 9, 10, 11 and 12 ways. The clustering never sees which descriptions are
-signed.
+descriptions**, into groups by vocabulary alone. It does this five times over,
+cutting the same archive 8, 9, 10, 11 and 12 ways. The clustering never sees
+which descriptions are signed.
 
 The two tests are then applied to each of those fits, and only a fit where they
-name the same cluster can be published. They fail for unrelated reasons —
-growth is fooled by anything that arrived recently, signature by work that is
-agent-assisted without being agent-written — so agreement rules out both. On the
+name the same cluster can be published. Each fails in its own way. Growth is
+fooled by anything that arrived recently; signature is fooled by work that is
+agent-assisted without being agent-written. Agreement rules out both. On the
 day this was written they agreed at four cuts out of five and disagreed at
 eleven, where the signature test alone would have published a list of front-end
 styling words.
