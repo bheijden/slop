@@ -1,28 +1,32 @@
 #!/usr/bin/env node
 // Derives the machine-writing vocabulary from public pull request descriptions.
 //
-// The method is a reproduction of louisabraham/load-bearing with one deliberate
-// change. Read the change first; everything else here is theirs and works.
+// The method is a reproduction of louisabraham/load-bearing. This file fits one
+// k and reports what both selectors would publish; tools/pr-fit.mjs is what CI
+// runs, and it sweeps k and publishes only where the two agree.
 //
-//   THEY choose which cluster to publish by watching it grow: the published one
-//   went from under 2% of all pull requests to over 20%.
-//   WE choose it by the share of its descriptions carrying a tool's signature.
+//   THEIR selector: the largest of recent weeks among clusters that rose from
+//   under 2% of all pull requests to over 20%.
+//   OURS: the largest share of descriptions carrying a tool's signature.
 //
-// Over four fits of the whole archive their growth test admitted two candidate
-// clusters every time, and taking the larger picked wrong in three of the four.
-// The signature picked the best available cluster in all four, and not narrowly:
-// in the published fit it is 41% signed against 10.5% for the runner-up. It is
-// also the more durable test, because growth identifies machine writing only for
-// as long as machine writing is still arriving.
+// Each is wrong on its own, for unrelated reasons. Over four early fits theirs
+// admitted two candidates every time and picked wrong in three. Ours ran for
+// months and then, on 2026-09-07, published a front-end styling cluster at 39.0%
+// signed over the register's 34.7%, because front-end work is heavily
+// agent-assisted: signature-rich without being a way of writing. Because they
+// fail for different reasons, a fit where they agree is one where neither excuse
+// applies -- which is the rule pr-fit applies.
 //
-// Theirs, and not to be quietly changed: cluster the WHOLE archive at once, k=10, and
+// Theirs, and not to be quietly changed: cluster the WHOLE archive at once, and
 // score a word by its rate inside the published cluster over its rate in every
 // other description. Fitting a recent window instead costs six of the
-// twenty-four documents in data/corpus; five clusters instead of ten costs more.
-// See research/method.md for what else was tried and what each mistake cost.
+// twenty-four documents in data/corpus. See research/method.md for what else was
+// tried and what each mistake cost.
 //
-//   node tools/pr-cluster.mjs                 report
-//   node tools/pr-cluster.mjs --write         and rebuild the rule
+//   node tools/pr-cluster.mjs                 report on one fit at the default k
+//   node tools/pr-cluster.mjs --write         and rebuild the rule from it
+//   node tools/pr-fit.mjs --write             what CI runs: sweep k, require
+//                                             both selectors to agree
 //
 // Reads data/docs, written by tools/pr-sample.mjs. No prose is involved at any
 // point: the sampler kept bags of words and threw the text away.
@@ -198,64 +202,24 @@ const window4 = (c, from, to) => {
 const start = (c) => window4(c, 0, Math.min(4, weeks.length));
 const end = (c) => window4(c, Math.max(0, weeks.length - 4), weeks.length);
 
-// The words the shipped rule currently carries, so a tie can be broken by
-// continuity. Absent on a first run, which is why the caller checks.
-function lastPublished() {
-  try {
-    const set = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf8'));
-    return set.rules[0].match.pattern
-      .replace(/^\\b\(\?:/, '').replace(/\)\\b$/, '')
-      .split('|').map((w) => w.replace(/\\/g, ''));
-  } catch { return []; }
-}
-
 const clusters = Array.from({ length: K }, (_, c) => ({
   c, size: size[c], signed: signed[c], share: share(c), stamped: stamped(c),
   start: start(c), end: end(c), arrived: start(c) < 0.02 && end(c) >= 0.20,
   words: rankOf(scoreOf(c)),
 }));
-// Signature share alone stopped being enough. On 2026-09-07 a front-end styling
-// cluster came out 39.0% signed against 34.7% for the register, and the
-// derivation published "pill inset tapping painted tall wordmark" -- caught only
-// by the rule then failing its own example. Front-end work is heavily
-// agent-assisted, so its descriptions carry signatures without being the
-// register: the failure recorded in research/load-bearing-labels.md for WebKit's
-// build tooling at 53% signed, now close enough to the top to win.
-//
-// So the share still chooses, but only when it chooses clearly. Two clusters
-// within NEAR of each other are a tie, and the tie goes to whichever still looks
-// like last week's list. A register does not turn over in a week; a subject
-// cluster that has edged ahead on signatures shares almost nothing with it.
-const NEAR = Number(arg('--near', 0.10));
-const best = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
-const close = clusters.filter((x) => best.stamped - x.stamped <= NEAR);
-let publish = best;
-let tie = '';
-if (close.length > 1) {
-  const previous = new Set(lastPublished());
-  if (previous.size) {
-    const kept = (x) => x.words.slice(0, TOP).filter((j) => previous.has(vocab[j])).length;
-    publish = close.reduce((b, x) => (kept(x) > kept(b) ? x : b), close[0]);
-    tie = `  ${close.length} clusters within ${(NEAR * 100).toFixed(0)} points of the top; `
-        + `kept the one sharing ${kept(publish)} of ${TOP} words with the published list`;
-  } else {
-    tie = `  ${close.length} clusters within ${(NEAR * 100).toFixed(0)} points and no list to `
-        + 'compare against; took the highest share';
-  }
-}
+// The cluster with the largest share of signed descriptions. That alone chose
+// wrong on 2026-09-07 -- a front-end styling cluster at 39.0% against the
+// register's 34.7% -- so it is no longer the whole rule: tools/pr-fit.mjs sweeps
+// k and publishes only from a fit where this and the growth test agree. This
+// stays the plain measure so that what pr-fit judges is what pr-cluster then
+// writes.
+const publish = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
 
-// Renumber so the index means the position in the stack the page draws, and so
-// that one metric explains the whole ordering: signed share, descending. Zero is
-// therefore the published cluster -- the selector on the line above is that same
-// metric's maximum -- and walking up the stack walks down the signed share.
-// k-means hands back arbitrary labels, and leaving them arbitrary meant the
-// chart's bottom band was "cluster 7" and cycling through the list walked the
-// highlight around the stack in no order at all.
-// The published cluster first, then the rest by signed share. Those were the
-// same list while the share alone chose; with a tie-break they can differ, and
-// when they do this threw rather than publishing -- the one case the tie-break
-// exists for. Position 0 is the published cluster, and every position above it
-// still descends by share.
+// The published cluster first, then the rest by signed share. While the share
+// alone chooses these are the same list, and this is written the long way round
+// so that stays true if the selection ever stops agreeing with the ranking: a
+// version that asserted position 0 was also the highest-signed threw instead of
+// publishing the moment the two came apart.
 const rest = clusters.filter((x) => x !== publish).sort((a, b) => b.stamped - a.stamped);
 const stackOrder = [publish, ...rest];
 stackOrder.forEach((x, i) => { x.stack = i; });
@@ -271,7 +235,6 @@ for (const x of stackOrder) {
 // is worth knowing rather than hiding: it means the growth signal has gone
 // ambiguous, which is exactly the failure this method was changed to avoid.
 const grew = clusters.filter((x) => x.arrived);
-if (tie) console.log(tie);
 console.log(`\npublished cluster ${publish.stack} (k-means label ${publish.c}), ${(100 * publish.stamped).toFixed(1)}% signed` +
   ` (runner-up ${(100 * [...clusters].sort((a, b) => b.stamped - a.stamped)[1].stamped).toFixed(1)}%)`);
 // Upstream publishes the largest of recent weeks among those that arrived. Worth

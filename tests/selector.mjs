@@ -13,7 +13,7 @@
 // research/load-bearing-labels.md for WebKit's build tooling at 53% signed,
 // now close enough to the top to win.
 //
-// This runs the tie-break in isolation, on those numbers.
+// This runs the selection rule in isolation, on those numbers.
 
 let failed = 0;
 const check = (name, ok, detail = '') => {
@@ -21,76 +21,55 @@ const check = (name, ok, detail = '') => {
   if (!ok) failed++;
 };
 
-const NEAR = 0.10;
+// The rule as tools/pr-fit.mjs applies it: sweep k, keep the fits where the
+// signature and growth selectors land on the same cluster, and take the one
+// whose signature share is furthest clear of its runner-up.
+const judge = (cs) => {
+  const signature = cs.reduce((b, x) => (x.stamped > b.stamped ? x : b));
+  const runnerUp = cs.filter((x) => x !== signature)
+    .reduce((b, x) => (!b || x.stamped > b.stamped ? x : b), null);
+  const grew = cs.filter((x) => x.arrived);
+  const growth = grew.length ? grew.reduce((b, x) => (x.end > b.end ? x : b)) : null;
+  return { signature, growth, agree: !!growth && growth.name === signature.name,
+           gap: runnerUp ? signature.stamped - runnerUp.stamped : 1 };
+};
+const choose = (fits) => {
+  const agreed = fits.map((f) => ({ ...judge(f.clusters), k: f.k })).filter((j) => j.agree);
+  return agreed.length ? agreed.reduce((b, j) => (j.gap > b.gap ? j : b)) : null;
+};
 
-// The selector as pr-cluster.mjs runs it, over plain word lists.
-function pick(clusters, previous) {
-  const best = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
-  const close = clusters.filter((x) => best.stamped - x.stamped <= NEAR);
-  if (close.length <= 1 || !previous.size) return best;
-  const kept = (x) => x.words.filter((w) => previous.has(w)).length;
-  return close.reduce((b, x) => (kept(x) > kept(b) ? x : b), close[0]);
-}
+// 2026-09-07, k=10, from the run that failed. The styling cluster leads on
+// signature; the register is the largest of recent weeks. `end` values are the
+// share of recent weeks the run reported.
+const styling = { name: 'front-end styling', stamped: 0.390, end: 0.205, arrived: true };
+const register = { name: 'the register', stamped: 0.347, end: 0.423, arrived: true };
+const airbyte = { name: 'airbyte', stamped: 0.114, end: 0.245, arrived: true };
+const monday = { k: 10, clusters: [styling, register, airbyte] };
 
-// The words the rule carried that week, abbreviated to the ones that matter.
-const shipped = new Set(['nobody', 'quietly', 'nowhere', 'halves', 'survived', 'rung', 'arms',
-  'handed', 'load-bearing', 'somebody', 'refused', 'precisely', 'worse', 'refusal',
-  'indistinguishable', 'plainly', 'decides', 'asserted', 'outright', 'ruling', 'vacuous',
-  'pullrequest']);
+console.log('the fit that broke it, 2026-09-07 at k=10:');
+const j = judge(monday.clusters);
+check('signature alone picks the styling cluster', j.signature.name === 'front-end styling');
+check('the growth test picks the register', j.growth.name === 'the register');
+check('so they disagree, and that fit publishes nothing', !j.agree);
 
-const styling = { name: 'front-end styling', stamped: 0.390,
-  words: ['pill', 'inset', 'tapping', 'painted', 'tall', 'wordmark', 'taller', 'chip', 'glyph',
-          'scrolled', 'paints', 'centred', 'rail', 'colour', 'glyphs', 'popover'] };
-const register = { name: 'the register', stamped: 0.347,
-  words: ['pullrequest', 'refusal', 'ruling', 'refused', 'vacuous', 'arms', 'nobody', 'plainly',
-          'outright', 'quietly', 'somebody', 'halves'] };
-const airbyte = { name: 'airbyte', stamped: 0.114,
-  words: ['airbyte', '--pull', 'up_to_date', 'airbyte-ci', 'syft'] };
+console.log('\nsweeping, with one fit that agrees:');
+// k=8 on the same archive: one cluster leads on both, clear of its runner-up.
+const good = { k: 8, clusters: [
+  { name: 'the register', stamped: 0.364, end: 0.521, arrived: true },
+  { name: 'other', stamped: 0.090, end: 0.120, arrived: false }] };
+const won = choose([monday, good]);
+check('the disagreeing fit is skipped and the agreeing one wins',
+  won && won.k === 8 && won.signature.name === 'the register', JSON.stringify(won && won.k));
 
-console.log('the fit that broke it, 2026-09-07:');
-check('signature share alone picks the styling cluster',
-  [styling, register, airbyte].reduce((b, x) => (x.stamped > b.stamped ? x : b)).name
-    === 'front-end styling');
-check('and the tie-break picks the register instead',
-  pick([styling, register, airbyte], shipped).name === 'the register',
-  pick([styling, register, airbyte], shipped).name);
+console.log('\nand when several agree, the widest gap wins:');
+const narrow = { k: 9, clusters: [
+  { name: 'the register', stamped: 0.40, end: 0.50, arrived: true },
+  { name: 'close', stamped: 0.37, end: 0.20, arrived: false }] };
+check('the fit whose lead is clearest is taken',
+  choose([narrow, good]).k === 8, String(choose([narrow, good]).k));
 
-console.log('\na week where the share chooses clearly:');
-const clear = [{ name: 'the register', stamped: 0.408, words: [...shipped] },
-               { name: 'other', stamped: 0.187, words: ['airbyte', 'syft'] }];
-check('the tie-break does not fire, and the top share wins',
-  pick(clear, shipped).name === 'the register');
-// The anchor must not be able to hold a cluster that has genuinely fallen away.
-check('a distant cluster cannot win on overlap alone',
-  pick([{ name: 'far', stamped: 0.10, words: [...shipped] },
-        { name: 'near', stamped: 0.40, words: ['x', 'y'] }], shipped).name === 'near');
-
-console.log('\nwith no previous list:');
-check('it falls back to the highest share',
-  pick([styling, register, airbyte], new Set()).name === 'front-end styling');
-
-// The choice is only half of it. pr-cluster then renumbers the clusters so that
-// position 0 is the published one, and that step asserted position 0 was also
-// the highest-signed -- true while the share alone chose, and false the moment
-// the tie-break overrides. It threw instead of publishing, in exactly the case
-// the tie-break exists for, and the checks above did not see it because they
-// stop at the choice.
-function renumber(clusters, publish) {
-  const rest = clusters.filter((x) => x !== publish).sort((a, b) => b.stamped - a.stamped);
-  return [publish, ...rest];
-}
-console.log('\nand the renumbering that follows it:');
-{
-  const cs = [styling, register, airbyte];
-  const chosen = pick(cs, shipped);
-  const order = renumber(cs, chosen);
-  check('position 0 is the cluster that was published', order[0] === chosen, order[0].name);
-  const tail = order.slice(1).map((x) => x.stamped);
-  check('and the rest still descend by signed share',
-    tail.every((v, i) => i === 0 || tail[i - 1] >= v), JSON.stringify(tail));
-  check('even though the published one is not the highest-signed here',
-    chosen.stamped < Math.max(...cs.map((x) => x.stamped)));
-}
+console.log('\nand if nothing agrees:');
+check('nothing is chosen, so nothing is published', choose([monday]) === null);
 
 console.log(failed ? `\ncluster selector: ${failed} failed` : '\ncluster selector: all hold');
 process.exit(failed ? 1 : 0);

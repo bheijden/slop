@@ -65,20 +65,21 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: node tools/pr-sample.mjs --backfill 10
 
-      - name: Is this a fit day?
-        id: when
-        run: |
-          if [ "${{ github.event.inputs.fit }}" = "true" ] || [ "$(date -u +%u)" = "1" ]; then
-            echo "fit=yes" >> "$GITHUB_OUTPUT"
-          else
-            echo "fit=no" >> "$GITHUB_OUTPUT"
-          fi
-
-      # The whole archive, ten ways. About four minutes on a CI box, which is
-      # why it runs weekly rather than daily; the sample below is the daily part.
+      # Every day, not weekly. The comment this replaces said a fit took about
+      # four minutes and that was why it ran on Mondays only; measured on CI it
+      # takes 24 seconds, so the sweep below is about two minutes. Weekly bought
+      # nothing and cost six days of drift, and it left a bad fit in place for a
+      # week.
+      #
+      # pr-fit sweeps k = 8..12 and publishes only from a fit where the two
+      # selectors agree -- see the header of tools/pr-fit.mjs. If none agree it
+      # exits 3 having written nothing and the list already shipped stays. That
+      # is a day without a refresh rather than a failure, so the run carries on
+      # and still commits the sample.
       - name: Re-derive the list
-        if: steps.when.outputs.fit == 'yes'
-        run: node --max-old-space-size=6000 tools/pr-cluster.mjs --write
+        id: fit
+        continue-on-error: true
+        run: node tools/pr-fit.mjs --write
 
       # Every day, not only on fit days. The page shows the daily sample as well
       # as the weekly fit, so a day that only samples still changes what it says.
@@ -91,12 +92,29 @@ jobs:
       # nothing is committed. A vocabulary that fails its fixtures is a signal,
       # not something to publish.
       - name: The rule still has to hold up
-        if: steps.when.outputs.fit == 'yes'
+        id: check
+        if: steps.fit.outcome == 'success'
+        continue-on-error: true
         run: |
           node js/cli.mjs test-rules rules/pr-vocabulary.json
           node tests/run.mjs
           node js/cli.mjs check -r .
 
+      # The sample and the derivation arrive in the same run and are not the
+      # same work. A derivation that cannot pass the rule's own examples is
+      # thrown away; the day's sampling is kept. Before this the whole run
+      # aborted, so the failed fit on 2026-09-07 also discarded that day's
+      # sample and it had to be collected again a day later, differently.
+      - name: Keep the sample, drop the derivation
+        if: steps.check.outcome == 'failure'
+        run: |
+          git checkout -- rules/pr-vocabulary.json data/cluster.json \
+                          data/cluster-series.json data/cluster-history.json
+          node tools/pr-page-data.mjs
+          echo "::warning::derivation discarded, sample kept, shipped list unchanged"
+
+      # After the commit, so a discarded derivation still turns the run red
+      # without costing the day's data.
       - name: Commit
         run: |
           git config user.name  "github-actions[bot]"
@@ -119,3 +137,10 @@ jobs:
             git pull --rebase --autostash -q origin main
             git push origin HEAD:main
           fi
+
+      - name: Say if the derivation was discarded
+        if: steps.check.outcome == 'failure'
+        run: |
+          echo "the sample was committed; the derivation was not."
+          echo "the list on main is the one that was already there."
+          exit 1
