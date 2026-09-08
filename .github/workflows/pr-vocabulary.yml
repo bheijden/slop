@@ -1,12 +1,15 @@
 # Samples one more day of pull request descriptions, and re-derives the word
-# list from the last forty days of them.
+# list from the whole archive of them.
 #
-# Two things happen on different clocks. The sample runs every morning and is
+# Both run every morning, and they are still separate steps. The sample is
 # cheap: ten five-minute windows, about a thousand descriptions, kept as bags
-# of words with the prose thrown away. The fit runs on Mondays and is not: it
-# clusters forty days of descriptions into topics and scores the vocabulary
-# inside each one. Splitting them means a missed fit costs a week and a missed
-# sample costs a day, and neither can lose the other's work.
+# of words with the prose thrown away. The fit is not: it clusters every day
+# collected since 2025-01-01 five times over and scores the vocabulary inside
+# each cluster, about two minutes in total. Keeping them apart means a fit
+# that has to be thrown away does not take the day's sampling with it.
+#
+# The window matters and is not a detail: fitted on recent data alone the
+# method scores 2 of 24 instead of 22. See research/k-and-window.md.
 #
 # Any day the sampler has not reached yet is filled in from the back on every
 # run, so history accumulates without anyone scheduling it.
@@ -23,10 +26,6 @@ on:
       days:
         description: "date or range to sample, default yesterday"
         default: ""
-      fit:
-        description: "re-derive the list even if it is not Monday"
-        type: boolean
-        default: false
       dry_run:
         description: "rehearse: do every step, then report the push instead of making it"
         type: boolean
@@ -81,10 +80,9 @@ jobs:
         continue-on-error: true
         run: node tools/pr-fit.mjs --write
 
-      # Every day, not only on fit days. The page shows the daily sample as well
-      # as the weekly fit, so a day that only samples still changes what it says.
-      # Leaving this to fit days let the published page fall a week behind its
-      # own inputs, and a CI check now fails when the two disagree.
+      # Runs even when the fit above was discarded: the page shows the sample
+      # as well as the derivation, so a day that only samples still changes
+      # what it says. A CI check fails when the page and its inputs disagree.
       - name: Rebuild what the page reads
         run: node tools/pr-page-data.mjs
 
@@ -123,10 +121,18 @@ jobs:
                   data/cluster-history.json rules/pr-vocabulary.json \
                   web/vocabulary-data.json
           git diff --cached --quiet && { echo "nothing new"; exit 0; }
-          if [ "${{ steps.when.outputs.fit }}" = "yes" ]; then
-            git commit -m "pr-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d), re-derive the list"
+          # This used to read steps.when.outputs.fit, from a step that decided
+          # whether it was Monday. That step went when the fit went daily, so
+          # the condition was always empty and every commit said "sample" --
+          # including the ones that had just republished the word list. Ask the
+          # staged diff instead, which cannot go stale: the list was re-derived
+          # exactly when the rule file changed.
+          DAY="${{ github.event.inputs.days }}"
+          [ -n "$DAY" ] || DAY=$(date -u -d yesterday +%Y-%m-%d)
+          if git diff --cached --quiet -- rules/pr-vocabulary.json; then
+            git commit -m "pr-vocabulary: sample $DAY"
           else
-            git commit -m "pr-vocabulary: sample $(date -u -d yesterday +%Y-%m-%d)"
+            git commit -m "pr-vocabulary: sample $DAY, re-derive the list"
           fi
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             echo "REHEARSAL — everything above ran for real. The push is what is skipped:"
