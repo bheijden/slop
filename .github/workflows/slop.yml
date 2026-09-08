@@ -22,6 +22,7 @@ jobs:
       # never runs here -- which is exactly what happened to this one.
       # The cluster selector, against the fit that broke it on 2026-09-07.
       - run: node tests/selector.mjs
+      - run: node tests/mckinsey-spirit.mjs
       - run: node tests/claims.mjs
       # The catalogue is generated. It listed 38 of the 117 rules that ship for
       # a while, because it was built by the tool that ports two vendor sets.

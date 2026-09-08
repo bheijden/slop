@@ -20,7 +20,7 @@ checked.
 | [`style-economist`](style-economist.json) | 9 | Economist house style |
 | [`style-newsroom`](style-newsroom.json) | 6 | Newsroom wire-service style |
 | [`style-plain`](style-plain.json) | 10 | Plain English |
-| [`mckinsey`](mckinsey.json) | 23 | A consultant's house writing standard. Unlike the rest of this directory it *is* evaluated on real prose: every threshold is set from 88 documents and 431,000 words of McKinsey, BCG and Bain writing. Built by `tools/build-mckinsey.mjs`. |
+| [`mckinsey`](mckinsey.json) | 24 | A consultant's house writing standard. Unlike the rest of this directory it *is* evaluated on real prose: every threshold is set from 88 documents and 431,000 words of McKinsey, BCG and Bain writing. Built by `tools/build-mckinsey.mjs`. |
 | [`measured-backwards`](measured-backwards.json) | 5 | Other linters' tells that measured backwards here |
 
 The tells this project mined are not here: they graduated into

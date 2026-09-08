@@ -617,7 +617,7 @@ const TIGHT = [
         '\\b(?:it|this)\\s+(?:could|may|might)\\s+be\\s+(?:argued|said|suggested|posited|contended)\\b',
         '\\b(?:somewhat|fairly|relatively|rather)\\s+(?:likely|possible|unclear|uncertain|limited)\\b',
         '\\b(?:appears?|seems?)\\s+to\\s+(?:potentially|possibly)\\b',
-        '\\bsuggests?\\s+that\\s+.{0,30}?\\bmay\\s+(?:be|have|need)\\b',
+        '\\bsuggests?\\b[^.!?]{0,40}?\\bmay (?:be|have|need|require)\\b',
       ),
       flags: 'gi',
     },
@@ -698,6 +698,11 @@ const TIGHT = [
         '\\bis (?:reflective|indicative|supportive|suggestive) of\\b',
         '\\btakes? into (?:consideration|account) the\\b',
         '\\bhas an? (?:impact|effect|influence) on\\b',
+        '\\bthe (?:deterioration|degradation|improvement|expansion|reduction|adjustment|'
+          + 'implementation|utili[sz]ation|optimi[sz]ation|reassessment|acceleration|'
+          + 'simplification) (?:in|of)\\b',
+        '\\b(?:has|have|had|is|are) creat(?:ed|ing|es)? an? need (?:to|for)\\b',
+        '\\bthere (?:is|was) an? need (?:to|for)\\b',
       ),
       flags: 'gi',
     },
@@ -738,7 +743,7 @@ const TIGHT = [
         + 'insights?|understanding|shift|journey|platform|ecosystem|partnership)\\b',
       flags: 'gi',
     },
-    notable: { '>=': 0.6, per: 1000 },
+    notable: { '>': 0 },
     description:
       'The guide bans "innovative", "comprehensive" and "nuanced" as empty modifiers and asks in '
       + 'section 1 for facts rather than adjectives — "the addressable market is $14 billion and '
@@ -747,7 +752,11 @@ const TIGHT = [
       + 'are doing no work. It will not fire on "significant at the 5% level", "a significant '
       + 'increase in revenue" or "substantial evidence", where the adjective is measuring '
       + 'something real. If a finding here has a number attached to it somewhere nearby, the '
-      + 'adjective may be earning its place and this is a false fire.',
+      + 'adjective may be earning its place and this is a false fire. Reported per '
+      + 'occurrence rather than as a rate, because the guide\'s own example of the fault '
+      + '— "The company has a significant market opportunity" — is seven words long, and a '
+      + 'rate rule cannot see it. The narrow pattern is what makes that affordable: 97 '
+      + 'hits across 431,000 words of real consulting writing, in 38 of 88 documents.',
     suggest: 'Replace the adjective with the number, or delete it.',
     tests: {
       hit: [
@@ -878,6 +887,45 @@ const TIGHT = [
           + 'model in March and circulated the findings to the board. Finance paused the '
           + 'programme during the review and reset the baseline. The workshop challenged our '
           + 'assumptions, and the board asked for a revised plan in September.',
+      ],
+    },
+  },
+
+  {
+    id: 'tight-agentless-passive',
+    name: 'Passive with the actor removed',
+    severity: 'warn',
+    match: {
+      kind: 'regex',
+      // Reporting verbs in the passive with no "by" phrase: the actor has not
+      // been demoted, it has been deleted. This is the guide's own example.
+      pattern: '\\b(?:was|were|is|are|be|been|being) (?:observed|noted|identified|determined|'
+        + 'decided|conducted|performed|undertaken|carried out|reported|found|assessed|'
+        + 'estimated|recommended|concluded)\\b(?! by\\b)',
+      flags: 'gi',
+    },
+    notable: { '>': 0 },
+    description:
+      'The guide\'s example of the passive is "A 15% decline in revenue was observed" against '
+      + '"Revenue declined 15%" — and that example is seven words long, so the rate-based '
+      + 'tight-passive rule can never reach it. This one reports per occurrence, which is only '
+      + 'affordable because it is narrow: a reporting verb in the passive with no "by" phrase '
+      + 'after it, where the actor has not been demoted but deleted. Someone observed the '
+      + 'decline; the sentence will not say who. 45 hits across 431,000 words of consulting '
+      + 'writing, in 23 of 88 documents. "It was decided by the committee" does not fire, '
+      + 'because the actor is there.',
+    suggest: 'Name who did it. "A decline was observed" becomes "we observed a decline", or '
+      + 'better, "revenue declined 15%".',
+    tests: {
+      hit: [
+        'A 15% decline in revenue was observed.',
+        'It was decided that the review would slip a month.',
+        'Three risks were identified during the diligence.',
+      ],
+      miss: [
+        'Revenue declined 15%.',
+        'It was decided by the steering committee that the review would slip.',
+        'The team observed a 15% decline and identified three risks.',
       ],
     },
   },
