@@ -285,6 +285,7 @@ const CONSULTANT = [
           'leverag(?:e|es|ed|ing)',
           'boil the ocean',
           'low[- ]hanging fruit',
+          'deep[- ]div(?:e|es|ing)',
         )
         + ')\\b',
       flags: 'gi',
@@ -474,6 +475,8 @@ const AISLOP = [
         '\\bstands? as a testament\\b',
         '\\bplays? a (?:vital|crucial|pivotal|key) role\\b',
         '\\bthe question is not (?:whether|if) .{1,60}? but when\\b',
+        '\\bthe interplay between\\b',
+        '\\bgame[- ]chang(?:er|ers|ing)\\b',
         '\\bit(?:\'s| is) not (?:just|merely|only) .{1,50}?[,;] (?:it|but)\\b',
       ),
       flags: 'gi',
@@ -793,6 +796,203 @@ const TIGHT = [
   },
 
   {
+    id: 'tight-long-sentences',
+    name: 'Sentences that run long',
+    severity: 'warn',
+    // Counts sentence ends, so a LOW rate means long sentences. 13 ends per
+    // 1000 words is one sentence per 77 words.
+    match: { kind: 'regex', pattern: '[.!?](?=\\s|$)', flags: 'g' },
+    notable: { '<=': 13, per: 1000, needs: { words: 150, sentences: 2 } },
+    description:
+      'Section 5 asks for short sentences and says to split one that becomes hard to follow. '
+      + 'This counts sentence endings rather than words, so a LOW rate is the finding: 13 per '
+      + 'thousand words is one sentence every 77 words. The threshold comes from the corpus, '
+      + 'where the median consulting document runs at 39.8 sentence ends per thousand words and '
+      + 'the 10th percentile at 13.2 — so this fires on roughly the longest-winded tenth of real '
+      + 'consulting writing. The obvious false fire is a document with few full stops for a '
+      + 'reason: a bulleted deck, a table of figures, a list of names. Check what the document '
+      + 'is before acting on this one.',
+    suggest: 'Split the longest sentences. If a sentence has three clauses, it is usually two '
+      + 'sentences.',
+    tests: {
+      hit: [
+        'The deterioration in underlying demand dynamics across our regional markets has created '
+          + 'a pressing need to reassess the existing pricing architecture, which in turn '
+          + 'requires a coordinated response from the commercial teams who own those customer '
+          + 'relationships today and who have, for the last three planning cycles, been operating '
+          + 'against a set of targets that were agreed before the category began to contract in '
+          + 'the way that it has since the middle of last year, meaning that any adjustment now '
+          + 'has to be made against a baseline nobody in the room actually believes is still the '
+          + 'right one to be working from at this point in the cycle. What that means in '
+          + 'practice is that the commercial leadership will have to take a view on whether the '
+          + 'baseline is worth defending at all, or whether the more honest course is to reset '
+          + 'it entirely and accept that the first half of the year will read as a miss against '
+          + 'a number that was never achievable once the category turned, which is a '
+          + 'conversation nobody has yet been willing to open with the board.',
+      ],
+      miss: [
+        'Demand has weakened faster than expected. Current prices are hard to sustain. We should '
+          + 'cut them before volume falls further. Category demand fell 9% against a forecast of '
+          + 'flat. Two competitors cut list prices in the same period. Our realised prices have '
+          + 'already fallen 4%. The sales team has been discounting off-list to hold volume. '
+          + 'Waiting until September costs another two quarters of share.',
+      ],
+    },
+  },
+
+  {
+    id: 'tight-passive',
+    name: 'Passive voice',
+    severity: 'warn',
+    match: {
+      kind: 'regex',
+      // Only the passive that hides an actor: a participle followed by a "by"
+      // phrase or a clause boundary. "is based on" and "was tired" do not fire.
+      pattern: '\\b(?:is|are|was|were|be|been|being)\\s+(?:\\w+ly\\s+)?\\w+(?:ed|en)\\b'
+        + '(?=\\s+(?:by|in|on|at|for|with|to|from|during|through)\\b|[.,;])',
+      flags: 'gi',
+    },
+    notable: { '>=': 6.3, per: 1000 },
+    description:
+      'Section 5 prefers "Revenue declined 15%" to "A 15% decline in revenue was observed", and '
+      + 'allows the passive where the actor does not matter. Whether the actor matters is not '
+      + 'decidable by a pattern, so this reports a rate: 6.3 per thousand words, which is the '
+      + '90th percentile across the corpus, where the median consulting document sits at 3.2. '
+      + 'The pattern only matches a participle followed by a "by" phrase or a clause boundary, '
+      + 'which is where an actor has usually gone missing; "is based on" and "was tired" are not '
+      + 'matched. Methods sections and regulatory writing are legitimately passive and will fire '
+      + 'here — that is a false fire in intent even when the count is correct.',
+    suggest: 'Name the actor. "A decline was observed" becomes "revenue declined".',
+    tests: {
+      hit: [
+        'A 15% decline in revenue was observed by the team. The targets were agreed by the '
+          + 'steering group. The pricing model was revised in March. The findings were '
+          + 'circulated to the board. The programme was paused during the review, and the '
+          + 'baseline was reset by finance. The assumptions were challenged at the workshop, and '
+          + 'a revised plan was requested for September. The scope was agreed in April, the '
+          + 'timeline was extended in June, and the whole programme was reviewed by the audit '
+          + 'committee before any of it was communicated to the wider organisation.',
+      ],
+      miss: [
+        'Revenue declined 15%. The steering group agreed the targets. We revised the pricing '
+          + 'model in March and circulated the findings to the board. Finance paused the '
+          + 'programme during the review and reset the baseline. The workshop challenged our '
+          + 'assumptions, and the board asked for a revised plan in September.',
+      ],
+    },
+  },
+
+  {
+    id: 'tight-repeated-frame',
+    name: 'Sentences built to the same template',
+    severity: 'warn',
+    match: { kind: 'frame', gram: 8, minRun: 3, anchors: 2 },
+    notable: { '>': 0 },
+    description:
+      'Section 6 asks for prose that is not artificially polished, and names repeated sentence '
+      + 'patterns and grammatically identical bullets. This finds three or more consecutive '
+      + 'sentences sharing a syntactic skeleton — the same function words in the same order with '
+      + 'different content poured in. One real limit: the matcher needs a sentence of at least 13 '
+      + 'letters carrying two closed-class anchors, so the terse parallel bullets of a slide '
+      + '("Improved margins", "Reduced cost", "Faster delivery") are invisible to it. That is '
+      + 'precisely the case the guide has in mind, and this rule does not reach it.',
+    suggest: 'Rewrite one of them. Parallel structure is a choice; three in a row is a template.',
+    tests: {
+      hit: [
+        'The platform improves the speed of the process. The platform reduces the cost of the '
+          + 'service. The platform increases the quality of the output.',
+      ],
+      miss: [
+        'The platform is faster. Cost per transaction fell by a third once it went live, and the '
+          + 'error rate halved. None of that was in the business case.',
+      ],
+    },
+  },
+
+  {
+    id: 'tight-summary-loop',
+    name: 'Signposted recap',
+    severity: 'warn',
+    match: {
+      kind: 'regex',
+      pattern: '(?:^|[.!?]["\')\\]]?\\s+|\\n)\\s*(?:'
+        + 'In conclusion|To conclude|In summary|To summari[sz]e|To sum up|To recap|'
+        + 'As (?:mentioned|noted|stated|discussed|outlined) (?:above|earlier|previously)|'
+        + 'To reiterate|As we have seen|Having (?:established|shown)'
+        + ')\\b',
+      flags: 'gi',
+    },
+    notable: { '>': 0 },
+    description:
+      'Section 9 bans summary loops, and section 1 says not to recap what you just said. Only '
+      + 'the signposted form is catchable: a paragraph that quietly restates its own opening is '
+      + 'a semantic judgement no pattern reaches, so this rule covers the half that announces '
+      + 'itself — "In conclusion", "To recap", "As mentioned above". Those phrases appear zero '
+      + 'times in 431,000 words of McKinsey, BCG and Bain writing, so a hit is unusual for the '
+      + 'register as well as against the guide. The unsignposted loop remains uncovered, and no '
+      + 'rule in this set will find it.',
+    suggest: 'Delete the sentence. If the point needs restating, the first statement was unclear.',
+    tests: {
+      hit: [
+        'In conclusion, the analysis shows margin fell.',
+        'As mentioned above, the pipeline thinned in every region.',
+        'To recap, we cut prices and volume held.',
+      ],
+      miss: [
+        'Margin fell nine points, and the pipeline thinned in every region except the Nordics.',
+        'The conclusion of the study was published in March.',
+      ],
+    },
+  },
+
+  {
+    id: 'tight-rhetorical-question',
+    name: 'Questions asked in order to answer them',
+    severity: 'warn',
+    match: {
+      kind: 'regex',
+      pattern: '(?:'
+        // A question the writer answers in the next breath.
+        + '\\?\\s+(?:No|Yes|Not (?:really|quite|exactly)|Absolutely|Probably not|It (?:is|was)|'
+        + 'It\'s|The answer is|Because|Simply put|In short)\\b'
+        + '|'
+        // The "So what does this mean?" family, which is nearly always rhetorical.
+        + '(?:^|[.!?]["\')\\]]?\\s+|\\n)\\s*(?:So )?(?:[Ww]hat|[Ww]hy|[Hh]ow) '
+        + '(?:does|do|did|is|are|was|were|should|can|could|might) '
+        + '(?:this|that|it|we|they|the [a-z]+) [^?\\n]{0,50}\\?'
+        + ')',
+      flags: 'g',
+    },
+    notable: { '>=': 0.5, per: 1000 },
+    description:
+      'Section 9 bans rhetorical questions used only for emphasis. "Only for emphasis" is not '
+      + 'decidable, so this catches the two shapes where the emphasis is visible: a question the '
+      + 'writer answers immediately ("Is it perfect? No."), and the "So what does this mean?" '
+      + 'family that exists to introduce the answer. A genuine question put to the reader and '
+      + 'left open will not fire, and should not. Reported as a rate because one framing question '
+      + 'in a long report is a legitimate device — it is the habit that the guide objects to.',
+    suggest: 'Delete the question and state the answer. The emphasis survives; the throat-clearing '
+      + 'does not.',
+    tests: {
+      hit: [
+        'So what does this mean for the business? It means we cut price in the second half, '
+          + 'before volume falls any further. Why does that matter now? Because two competitors '
+          + 'have already moved and the share we lose this year is harder to buy back than to '
+          + 'keep. Is the case airtight? No. But it is the best read we have, and waiting for a '
+          + 'better one costs another quarter of share, which is the whole argument in a '
+          + 'sentence and the reason the paper is short.',
+      ],
+      miss: [
+        'The board asked what the pricing decision would cost in margin this year, and we have '
+          + 'not answered it yet because the elasticity work is still running in two of the four '
+          + 'regions. Volume held through June at the old list price, so the question is live '
+          + 'rather than settled, and the September paper will have to carry a range instead of '
+          + 'a single number for the first time in three years of this programme.',
+      ],
+    },
+  },
+
+  {
     id: 'tight-triplet',
     name: 'Lists of three by default',
     severity: 'warn',
@@ -861,7 +1061,9 @@ for (const r of rules) {
 // Those percentiles are quoted in each description and can be re-measured.
 const SHORT_FORM = { words: 80, sentences: 3, matches: 2 };
 for (const r of rules) {
-  if (r.notable.per) r.notable.needs = SHORT_FORM;
+  // A rule that fires on an ABSENCE cannot carry a match floor -- the whole
+  // point of tight-long-sentences is that there are too FEW sentence endings.
+  if (r.notable.per && r.notable['<='] === undefined) r.notable.needs = SHORT_FORM;
 }
 
 const set = {
