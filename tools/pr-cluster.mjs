@@ -198,12 +198,51 @@ const window4 = (c, from, to) => {
 const start = (c) => window4(c, 0, Math.min(4, weeks.length));
 const end = (c) => window4(c, Math.max(0, weeks.length - 4), weeks.length);
 
+// The words the shipped rule currently carries, so a tie can be broken by
+// continuity. Absent on a first run, which is why the caller checks.
+function lastPublished() {
+  try {
+    const set = JSON.parse(readFileSync(join(ROOT, 'rules/pr-vocabulary.json'), 'utf8'));
+    return set.rules[0].match.pattern
+      .replace(/^\\b\(\?:/, '').replace(/\)\\b$/, '')
+      .split('|').map((w) => w.replace(/\\/g, ''));
+  } catch { return []; }
+}
+
 const clusters = Array.from({ length: K }, (_, c) => ({
   c, size: size[c], signed: signed[c], share: share(c), stamped: stamped(c),
   start: start(c), end: end(c), arrived: start(c) < 0.02 && end(c) >= 0.20,
   words: rankOf(scoreOf(c)),
 }));
-const publish = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
+// Signature share alone stopped being enough. On 2026-09-07 a front-end styling
+// cluster came out 39.0% signed against 34.7% for the register, and the
+// derivation published "pill inset tapping painted tall wordmark" -- caught only
+// by the rule then failing its own example. Front-end work is heavily
+// agent-assisted, so its descriptions carry signatures without being the
+// register: the failure recorded in research/load-bearing-labels.md for WebKit's
+// build tooling at 53% signed, now close enough to the top to win.
+//
+// So the share still chooses, but only when it chooses clearly. Two clusters
+// within NEAR of each other are a tie, and the tie goes to whichever still looks
+// like last week's list. A register does not turn over in a week; a subject
+// cluster that has edged ahead on signatures shares almost nothing with it.
+const NEAR = Number(arg('--near', 0.10));
+const best = clusters.reduce((b, x) => (!b || x.stamped > b.stamped ? x : b));
+const close = clusters.filter((x) => best.stamped - x.stamped <= NEAR);
+let publish = best;
+let tie = '';
+if (close.length > 1) {
+  const previous = new Set(lastPublished());
+  if (previous.size) {
+    const kept = (x) => x.words.slice(0, TOP).filter((j) => previous.has(vocab[j])).length;
+    publish = close.reduce((b, x) => (kept(x) > kept(b) ? x : b), close[0]);
+    tie = `  ${close.length} clusters within ${(NEAR * 100).toFixed(0)} points of the top; `
+        + `kept the one sharing ${kept(publish)} of ${TOP} words with the published list`;
+  } else {
+    tie = `  ${close.length} clusters within ${(NEAR * 100).toFixed(0)} points and no list to `
+        + 'compare against; took the highest share';
+  }
+}
 
 // Renumber so the index means the position in the stack the page draws, and so
 // that one metric explains the whole ordering: signed share, descending. Zero is
@@ -227,6 +266,7 @@ for (const x of stackOrder) {
 // is worth knowing rather than hiding: it means the growth signal has gone
 // ambiguous, which is exactly the failure this method was changed to avoid.
 const grew = clusters.filter((x) => x.arrived);
+if (tie) console.log(tie);
 console.log(`\npublished cluster ${publish.stack} (k-means label ${publish.c}), ${(100 * publish.stamped).toFixed(1)}% signed` +
   ` (runner-up ${(100 * [...clusters].sort((a, b) => b.stamped - a.stamped)[1].stamped).toFixed(1)}%)`);
 console.log(`their growth test would admit ${grew.length ? grew.map((x) => x.c).join(', ') : 'no cluster'}` +
