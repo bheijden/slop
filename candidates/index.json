@@ -6,6 +6,7 @@
     "style-economist.json",
     "style-newsroom.json",
     "style-plain.json",
-    "measured-backwards.json"
+    "measured-backwards.json",
+    "mckinsey.json"
   ]
 }

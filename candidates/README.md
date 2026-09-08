@@ -1,8 +1,10 @@
 # Candidate rule sets
 
 Rules mined from published sources, one set per source, kept out of `rules/` so
-they never load by default. They are candidates: unevaluated on real prose, and
-some will turn out to be noisy or wrong.
+they never load by default. Most are candidates in the strict sense: unevaluated
+on real prose, and some will turn out to be noisy or wrong. `mckinsey` is the
+exception — it is calibrated, and it is here because one firm's house style has
+no business loading for everybody, not because it is untested.
 
 Each set records where it came from in `source`, and carries the same
 `tests.hit` / `tests.miss` examples every rule in this project carries, so
@@ -18,6 +20,7 @@ checked.
 | [`style-economist`](style-economist.json) | 9 | Economist house style |
 | [`style-newsroom`](style-newsroom.json) | 6 | Newsroom wire-service style |
 | [`style-plain`](style-plain.json) | 10 | Plain English |
+| [`mckinsey`](mckinsey.json) | 18 | A consultant's house writing standard. Unlike the rest of this directory it *is* evaluated on real prose: every threshold is set from 88 documents and 431,000 words of McKinsey, BCG and Bain writing. Built by `tools/build-mckinsey.mjs`. |
 | [`measured-backwards`](measured-backwards.json) | 5 | Other linters' tells that measured backwards here |
 
 The tells this project mined are not here: they graduated into
