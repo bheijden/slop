@@ -206,10 +206,19 @@ async function loadBuiltins() {
     S.setFile[set.name] = '../rules/' + f;
     addSet(set);
   }
-  // candidates/ holds work in progress: style profiles nobody asked for, and a
-  // record of patterns that measured backwards. They are worth keeping in the
-  // repository and not worth putting in front of a visitor, who has no way to
-  // tell them apart from the sets that ship.
+  // Most of candidates/ stays off this page: style profiles nobody asked for,
+  // and a record of patterns that measured backwards. They are worth keeping in
+  // the repository and not worth putting in front of a visitor, who has no way
+  // to tell them apart from the sets that ship.
+  //
+  // `consultant` is the exception and is offered here unchecked. It is not work
+  // in progress -- every threshold in it is measured against 431,000 words of
+  // McKinsey, BCG and Bain writing -- but it encodes one firm's house taste
+  // rather than anything general, so it has no business being on by default.
+  // Someone who wants it can tick it; nobody else pays for it.
+  const c = await (await fetch('../candidates/consultant.json')).json();
+  S.setFile[c.name] = '../candidates/consultant.json';
+  addSet(c, false);
 }
 
 /* worker — kept alive, so the timeout measures rule execution, not module load */

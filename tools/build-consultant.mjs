@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds rules/mckinsey.json from the style guide a McKinsey consultant wrote.
+// Builds candidates/consultant.json from a style guide a McKinsey consultant wrote.
 //
 // The guide is three things at once and the rule ids say which is which, because
 // "leverage" and "delve" are flagged for completely different reasons and a
@@ -19,8 +19,8 @@
 // seconds whether the linter has understood the sentence or not. The `miss`
 // tests are the executable half of that promise.
 //
-//   node tools/build-mckinsey.mjs            write rules/mckinsey.json
-//   node tools/build-mckinsey.mjs --check    build it and run its own tests
+//   node tools/build-consultant.mjs            write candidates/consultant.json
+//   node tools/build-consultant.mjs --check    build it and run its own tests
 
 import { writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -1169,8 +1169,8 @@ for (const r of rules) {
 }
 
 const set = {
-  name: 'mckinsey',
-  title: 'McKinsey writing style',
+  name: 'consultant',
+  title: 'Consultant house style',
   version: '0.1.0',
   slop: '0.1.0',
   description:
@@ -1192,7 +1192,7 @@ const set = {
   rules,
 };
 
-const out = join(ROOT, 'candidates/mckinsey.json');
+const out = join(ROOT, 'candidates/consultant.json');
 writeFileSync(out, JSON.stringify(set, null, 2) + '\n');
 console.log(`wrote ${out}: ${rules.length} rules`);
 for (const g of ['housestyle', 'consultant', 'aislop', 'tight']) {

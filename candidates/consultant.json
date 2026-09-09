@@ -1,6 +1,6 @@
 {
-  "name": "mckinsey",
-  "title": "McKinsey writing style",
+  "name": "consultant",
+  "title": "Consultant house style",
   "version": "0.1.0",
   "slop": "0.1.0",
   "description": "A consultant's house writing standard, turned into rules. The guide it comes from is three things mixed together — personal taste, consulting jargon, and machine writing — and the rule ids say which is which so a finding can be argued with:\n\n  housestyle-   his preference. Not a claim that the writing is bad or machine-made.\n  consultant-   consulting-register jargon, written by people and disliked anyway.\n  aislop-       reads as machine-written.\n  tight-        padding, hedging and structure the point did not need.\n\nSeveral rules cover words with an ordinary sense as well as a jargon one — a cryptographic key, a camera's focus, a disk drive, a marine ecosystem, a robust standard error. Those senses are carved out of the patterns and named in each description, and the `miss` tests hold the carve-outs in place. Frequencies quoted in the descriptions are measured on 88 documents and 431,000 words of published and internal McKinsey, BCG and Bain writing.\n\nThe guide's three modes are not rules and are not here: Tight, Developed and Structured are decisions a writer makes before writing, and the rate-based rules in this set cannot judge a document under 250 words at all.",

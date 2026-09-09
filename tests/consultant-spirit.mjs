@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Does candidates/mckinsey.json behave the way the guide it came from intends?
+// Does candidates/consultant.json behave the way the guide it came from intends?
 //
 // Every other check on that set is circular. Its hit/miss examples were written
 // by whoever wrote the rules; so was the "deliberately awful memo" it scores
@@ -29,8 +29,8 @@ import { analyze, compileRule } from '../js/engine.mjs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const set = JSON.parse(readFileSync(join(ROOT, 'candidates/mckinsey.json'), 'utf8'));
-const rules = set.rules.map((r) => compileRule(r, 'mckinsey'));
+const set = JSON.parse(readFileSync(join(ROOT, 'candidates/consultant.json'), 'utf8'));
+const rules = set.rules.map((r) => compileRule(r, 'consultant'));
 const fire = (t) => { const out = []; for (const r of rules) { try { if (analyze(t, [r]).length) out.push(r.id); } catch {} } return out; };
 
 // [guide line, verdict the AUTHOR gave it, text]
@@ -94,5 +94,5 @@ const FLOOR_CAUGHT = 9, FLOOR_QUIET = 15;
 let bad_ = 0;
 if (caught < FLOOR_CAUGHT) { console.log(`\nFAIL: caught ${caught}, expected at least ${FLOOR_CAUGHT}`); bad_++; }
 if (quiet < FLOOR_QUIET) { console.log(`\nFAIL: ${good - quiet} of the author's good examples fired`); bad_++; }
-console.log(bad_ ? '\nmckinsey spirit: FAILED' : "\nmckinsey spirit: holds (9/11 bad caught, 15/15 good silent; the 2 misses are action titles)");
+console.log(bad_ ? '\nconsultant spirit: FAILED' : "\nconsultant spirit: holds (9/11 bad caught, 15/15 good silent; the 2 misses are action titles)");
 process.exit(bad_ ? 1 : 0);

@@ -162,13 +162,27 @@ async function main() {
     })()`);
     const D = JSON.parse(defaults.replace(/^"|"$/g, '').replace(/\\"/g, '"'));
     check('every set has a set-level toggle', D.total >= 5, String(D.total));
-    // Only what ships is offered. candidates/ is repository furniture: style
-    // profiles, and a record of patterns that measured backwards. A visitor has
-    // no way to tell those apart from a rule that earned its place.
-    check('every offered set runs, and nothing else is offered',
+    // The five shipped sets run. Most of candidates/ is repository furniture --
+    // style profiles, and a record of patterns that measured backwards -- and a
+    // visitor has no way to tell those apart from a rule that earned its place,
+    // so they are not offered at all.
+    check('exactly the shipped sets are on by default',
       JSON.stringify([...D.on].sort()) === JSON.stringify(['ai-tells', 'load-bearing',
                                                 'pr-vocabulary', 'simonwillison', 'wikipedia-ai']),
       D.on.join(','));
+    // `consultant` is the one exception: offered, so a visitor can tick it, and
+    // off, because it encodes one firm's house taste rather than anything
+    // general. Both halves of that matter, so both are asserted.
+    const cons = await evaluate(`(() => {
+      const b = document.querySelector('#rules input[data-toggle="consultant"]');
+      return JSON.stringify({ offered: !!b, on: b ? b.checked : null,
+        rules: [...document.querySelectorAll('#rules input[data-rule]')]
+          .filter(x => /^(housestyle|consultant|aislop|tight)-/.test(x.dataset.rule)).length });
+    })()`);
+    const C = JSON.parse(cons);
+    check('the consultant set is offered on the page', C.offered === true, cons);
+    check('and it is off until someone ticks it', C.offered && C.on === false, cons);
+    check('with its rules listed under it', C.rules >= 20, cons);
     // Two vocabulary rules ship on and they overlap by about a third of their
     // words, so a reader has to be able to see and separate them.
     const offered = await evaluate(`JSON.stringify([...document.querySelectorAll('#rules input[data-toggle]')]
