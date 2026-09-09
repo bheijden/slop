@@ -129,7 +129,7 @@
       "notable": {
         ">": 0
       },
-      "description": "Section 7 bans \"drive\" when it means cause — \"drive growth\", \"driving adoption\", \"driven by margin improvement\". The pattern only fires when an abstract business noun follows, from a closed list, so the vehicle and storage senses are untouched: \"hard drive\", \"test drive\", \"drive to the site\", \"drive home the point\" do not fire. That closed list is also the rule's limit — \"drive better conversations\" has no listed noun after it and will be missed. It under-reports on purpose; a hit should always be a real one.",
+      "description": "Section 7 bans \"drive\" when it means cause — \"drive growth\", \"driving adoption\", \"driven by margin improvement\". The pattern only fires when an abstract business noun follows, from a closed list, so the vehicle and storage senses are untouched: \"hard drive\", \"test drive\", \"drive to the site\", \"drive home the point\" do not fire. That closed list is also the rule's limit — \"drive better conversations\" has no listed noun after it and will be missed. It under-reports on purpose. One false fire is known and worth recognising: in a transport document, \"a 3% increase in driving demand\" means demand for driving, and \"driving\" there is a noun rather than a verb. If the surrounding text is about vehicles rather than business outcomes, that is what has happened.",
       "suggest": "Say what actually causes it. \"Pricing drove growth\" becomes \"growth came from the price cut\" or \"we grew because prices fell\".",
       "tests": {
         "hit": [
@@ -151,7 +151,7 @@
       "match": {
         "kind": "regex",
         "distinct": true,
-        "pattern": "\\b(?:synerg(?:y|ies|istic)|holistic(?:ally)?|best[-\\s+]in[-\\s+]class|world[-\\s+]class|end[-\\s+]to[-\\s+]end|stakeholder\\s+alignment|operational(?:i[sz]e|i[sz]ed|i[sz]ing|i[sz]ation)|value\\s+proposition|go[-\\s+]forward\\s+basis|net[-\\s+]net|at\\s+the\\s+end\\s+of\\s+the\\s+day|mov(?:e|es|ed|ing)\\s+the\\s+needle|double[-\\s+]click(?:ing)?\\s+on|lean(?:ing)?\\s+in(?:to)?\\s+(?:the|this|that|it)|leverag(?:e|es|ed|ing)|boil\\s+the\\s+ocean|low[-\\s+]hanging\\s+fruit|deep[-\\s+]div(?:e|es|ing))\\b",
+        "pattern": "\\b(?:synerg(?:y|ies|istic)|holistic(?:ally)?|best[- ]in[- ]class|world[- ]class|end[- ]to[- ]end|stakeholder\\s+alignment|operational(?:i[sz]e|i[sz]ed|i[sz]ing|i[sz]ation)|value\\s+proposition|go[- ]forward\\s+basis|net[- ]net|at\\s+the\\s+end\\s+of\\s+the\\s+day|mov(?:e|es|ed|ing)\\s+the\\s+needle|double[- ]click(?:ing)?\\s+on|lean(?:ing)?\\s+in(?:to)?\\s+(?:the|this|that|it)|(?<!(?:debt|financial|net|over|under|high|low)[-\\s])leverag(?:e|es|ed|ing)(?!\\s+(?:ratio|ratios|multiple|multiples|level|levels|buyout|buyouts|loan|loans|finance|financing|credit|private\\s+equity))|boil\\s+the\\s+ocean|low[- ]hanging\\s+fruit|deep[- ]div(?:e|es|ing))\\b",
         "flags": "gi"
       },
       "notable": {
@@ -203,13 +203,13 @@
       "severity": "warn",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:in|throughout)\\s+this\\s+(?:section|article|report|paper|chapter|analysis|piece)\\b(?!\\s+of\\s+the\\b)|\\bwe(?:'ll|\\s+will|\\s+shall)\\s+(?:explore|examine|discuss|delve|dive|look\\s+at|consider|unpack|walk\\s+through)\\b|\\blet(?:'s|\\s+us)\\s+(?:explore|examine|discuss|delve|dive|look\\s+at|unpack|walk\\s+through)\\b|\\bthe\\s+following\\s+(?:analysis|section|discussion|framework|considerations)\\b|\\bthere\\s+are\\s+(?:several|a\\s+number\\s+of|multiple|various)\\s+(?:factors|considerations|reasons|things|aspects|elements|points)\\s+to\\s+consider\\b|\\bthis\\s+(?:highlights|underscores|demonstrates|illustrates|reflects)\\s+the\\s+importance\\s+of\\b|\\bit(?:'s|\\s+is)\\s+(?:important|worth)\\s+(?:to\\s+note|noting|mentioning)\\s+that\\b",
+        "pattern": "(?:^|[.!?][\"')\\]]?\\s+|\\n)\\s*(?:In|Throughout)\\s+this\\s+(?:section|article|report|paper|chapter|analysis|piece|webinar)\\b(?!\\s+of\\s+the\\b)|\\bwe(?:'ll|\\s+will|\\s+shall)\\s+(?:explore|examine|delve|dive\\s+into|unpack|walk\\s+through)\\b|\\blet(?:'s|\\s+us)\\s+(?:explore|examine|delve|dive\\s+into|unpack|walk\\s+through)\\b|\\bthe\\s+following\\s+(?:analysis|section|discussion|framework|considerations)\\b|\\bthere\\s+are\\s+(?:several|a\\s+number\\s+of|multiple|various)\\s+(?:factors|considerations|reasons|things|aspects|elements|points)\\s+to\\s+consider\\b|\\bthis\\s+(?:highlights|underscores|demonstrates|illustrates|reflects)\\s+the\\s+importance\\s+of\\b|\\bit(?:'s|\\s+is)\\s+(?:important|worth)\\s+(?:to\\s+note|noting|mentioning)\\s+that\\b",
         "flags": "gi"
       },
       "notable": {
         ">": 0
       },
-      "description": "Section 6 of the guide: \"Never write 'In this section…', 'We will explore…', 'The following analysis…'\". These announce writing instead of doing it, and a reader who has reached the sentence does not need to be told what it is about to do. Every occurrence is reported because there is no honest use of them in the registers this set covers. One deliberate exclusion: \"in this section of the pipeline\" and similar are skipped, because \"section\" there is a physical thing rather than a part of the document.",
+      "description": "Section 6 of the guide: \"Never write 'In this section…', 'We will explore…', 'The following analysis…'\". These announce writing instead of doing it, and a reader who has reached the sentence does not need to be told what it is about to do. Every occurrence is reported because there is no honest use of them in the registers this set covers. Two exclusions, both found by auditing this rule's own findings on 431,000 words of consulting writing. The \"in this report\" family only fires at the start of a sentence: mid-sentence it is a cross-reference, and \"the figures in this report are as of April 15\" is a good sentence that an earlier version flagged. And \"discuss\" is not on the guide's list — it banned \"let's delve into\", \"let's explore\" and \"let's dive into\" — because in an email \"let's discuss tomorrow\" is someone asking for a meeting. \"In this section of the pipeline\" is skipped too, where \"section\" is a physical thing.",
       "suggest": "Delete the sentence and start with the substance it was introducing.",
       "tests": {
         "hit": [
@@ -220,7 +220,10 @@
         ],
         "miss": [
           "In this section of the pipeline, pressure drops by 4 bar.",
-          "We cut prices in March. Volume held through June."
+          "We cut prices in March. Volume held through June.",
+          "Year-to-date figures in this article are those reported as of April 15.",
+          "Methodology and data sources used in this analysis are in the appendix.",
+          "Thanks - let's discuss tomorrow and decide whether we send it to Mark."
         ]
       }
     },
@@ -231,7 +234,7 @@
       "match": {
         "kind": "regex",
         "distinct": true,
-        "pattern": "\\b(?:delv(?:e|es|ed|ing)|tapestr(?:y|ies)|realms?|beacons?|bolster(?:s|ed|ing)?|embark(?:s|ed|ing)?\\s+(?:on|upon)|foster(?:s|ed|ing)?|furthermore|moreover|notably|crucially|undeniably|remarkably|pivotal|seamless(?:ly)?|multifaceted|streamlin(?:e|es|ed|ing)|cutting[-\\s+]edge|spearhead(?:s|ed|ing)?|underscor(?:e|es|ed|ing)|unveil(?:s|ed|ing)?|unwavering|vibrant|meticulous(?:ly)?|intricate(?:ly)?|intricacies|paramount|testament\\s+to)\\b",
+        "pattern": "\\b(?:delv(?:e|es|ed|ing)|tapestr(?:y|ies)|realms?|beacons?|bolster(?:s|ed|ing)?|embark(?:s|ed|ing)?\\s+(?:on|upon)|foster(?:s|ed|ing)?|furthermore|moreover|notably|crucially|undeniably|remarkably|pivotal|seamless(?:ly)?|multifaceted|streamlin(?:e|es|ed|ing)|cutting[- ]edge|spearhead(?:s|ed|ing)?|underscor(?:e|es|ed|ing)|unveil(?:s|ed|ing)?|unwavering|vibrant|meticulous(?:ly)?|intricate(?:ly)?|intricacies|paramount|testament\\s+to)\\b",
         "flags": "gi"
       },
       "notable": {
@@ -255,7 +258,7 @@
       "severity": "warn",
       "match": {
         "kind": "regex",
-        "pattern": "\\bin\\s+today's\\s+(?:rapidly\\s+evolving|fast[-\\s+]paced|ever[-\\s+]changing|increasingly\\s+complex)\\b|\\bin\\s+the\\s+(?:ever|rapidly)[-\\s+]evolving\\s+(?:landscape|world|environment)\\b|\\bat\\s+its\\s+core\\b|\\bsheds?\\s+light\\s+on\\b|\\bserv(?:e|es|ed|ing)\\s+as\\s+a\\s+catalyst\\b|\\bpav(?:e|es|ed|ing)\\s+the\\s+way\\s+for\\b|\\bparadigm\\s+shift\\b|\\bstands?\\s+as\\s+a\\s+testament\\b|\\bplays?\\s+a\\s+(?:vital|crucial|pivotal|key)\\s+role\\b|\\bthe\\s+question\\s+is\\s+not\\s+(?:whether|if)\\s+.{1,60}?\\s+but\\s+when\\b|\\bthe\\s+interplay\\s+between\\b|\\bgame[-\\s+]chang(?:er|ers|ing)\\b|\\bit(?:'s|\\s+is)\\s+not\\s+(?:just|merely|only)\\s+.{1,50}?[,;]\\s+(?:it|but)\\b",
+        "pattern": "\\bin\\s+today's\\s+(?:rapidly\\s+evolving|fast[- ]paced|ever[- ]changing|increasingly\\s+complex)\\b|\\bin\\s+the\\s+(?:ever|rapidly)[- ]evolving\\s+(?:landscape|world|environment)\\b|\\bat\\s+its\\s+core\\b|\\bsheds?\\s+light\\s+on\\b|\\bserv(?:e|es|ed|ing)\\s+as\\s+a\\s+catalyst\\b|\\bpav(?:e|es|ed|ing)\\s+the\\s+way\\s+for\\b|\\bparadigm\\s+shift\\b|\\bstands?\\s+as\\s+a\\s+testament\\b|\\bplays?\\s+a\\s+(?:vital|crucial|pivotal|key)\\s+role\\b|\\bthe\\s+question\\s+is\\s+not\\s+(?:whether|if)\\s+.{1,60}?\\s+but\\s+when\\b|\\bthe\\s+interplay\\s+between\\b|\\bgame[- ]chang(?:er|ers|ing)\\b|\\bit(?:'s|\\s+is)\\s+not\\s+(?:just|merely|only)\\s+.{1,50}?[,;]\\s+(?:it|but)\\b",
         "flags": "gi"
       },
       "notable": {
@@ -416,7 +419,7 @@
       "severity": "warn",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:comprehensive|innovative|nuanced|transformative|significant|substantial|considerable|meaningful|compelling|powerful|exciting|strategic)\\s+(?:[a-z]+\\s+)?(?:approach|solution|framework|opportunit(?:y|ies)|capabilit(?:y|ies)|view|analysis|strategy|programme|program|initiative|transformation|change|impact|value|benefits?|insights?|understanding|shift|journey|platform|ecosystem|partnership)\\b",
+        "pattern": "\\b(?:comprehensive|innovative|nuanced|transformative|significant|substantial|considerable|meaningful|compelling|powerful|exciting|strategic)\\s+(?!(?:deal|deals|buyer|buyers|acquirer|acquirers|investor|investors|rationale)\\b)(?:[a-z]+\\s+)?(?:approach|solution|framework|opportunit(?:y|ies)|capabilit(?:y|ies)|view|analysis|strategy|programme|program|initiative|transformation|change|impact|value|benefits?|insights?|understanding|shift|journey|platform|ecosystem|partnership)\\b",
         "flags": "gi"
       },
       "notable": {
@@ -520,24 +523,26 @@
       "severity": "warn",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:was|were|is|are|be|been|being)\\s+(?:observed|noted|identified|determined|decided|conducted|performed|undertaken|carried\\s+out|reported|found|assessed|estimated|recommended|concluded)\\b(?!\\s+by\\b)",
+        "pattern": "\\b(?:an?|the)\\s+(?:[\\w%-]+\\s+){0,3}(?:decline|increase|decrease|reduction|improvement|growth|shift|change|impact|effect|trend|gain|loss|deterioration|rise|fall|uptick|variance|discrepancy)\\b[^.!?]{0,40}?\\b(?:was|were|is|are|has\\s+been|have\\s+been)\\s+(?:observed|noted|identified|determined|reported|found|assessed|estimated|recorded|seen|measured)\\b(?!\\s+by\\b)",
         "flags": "gi"
       },
       "notable": {
         ">": 0
       },
-      "description": "The guide's example of the passive is \"A 15% decline in revenue was observed\" against \"Revenue declined 15%\" — and that example is seven words long, so the rate-based tight-passive rule can never reach it. This one reports per occurrence, which is only affordable because it is narrow: a reporting verb in the passive with no \"by\" phrase after it, where the actor has not been demoted but deleted. Someone observed the decline; the sentence will not say who. 45 hits across 431,000 words of consulting writing, in 23 of 88 documents. \"It was decided by the committee\" does not fire, because the actor is there.",
+      "description": "The guide's example of the passive is \"A 15% decline in revenue was observed\" against \"Revenue declined 15%\" — and that example is seven words long, so the rate-based tight-passive rule can never reach it. This one reports per occurrence, which is only affordable because it is narrow: a reporting verb in the passive with no \"by\" phrase after it, where the actor has not been demoted but deleted. Someone observed the decline; the sentence will not say who. 45 hits across 431,000 words of consulting writing. An audit of its findings on that corpus is why it looks like this: an earlier version matched any reporting verb in the passive and fired 67 times, almost all of them on sentences where the actor genuinely does not matter — \"methodology can be found in the appendix\", \"activities that can be performed remotely\", \"winning suppliers are being determined today\". The guide explicitly ALLOWS the passive in exactly those cases, so the rule was contradicting its own source. Requiring a nominalised subject as well fixes that and costs almost all the recall: this now fires about once in 431,000 words of real consulting prose, which says the shape the guide warns about is rarer in practice than the guide implies. \"It was decided by the committee\" does not fire either, because the actor is there. The habit, as opposed to this specific shape, is tight-passive.",
       "suggest": "Name who did it. \"A decline was observed\" becomes \"we observed a decline\", or better, \"revenue declined 15%\".",
       "tests": {
         "hit": [
           "A 15% decline in revenue was observed.",
-          "It was decided that the review would slip a month.",
-          "Three risks were identified during the diligence."
+          "The improvement in margin was noted during the review.",
+          "An increase in churn was identified across two regions."
         ],
         "miss": [
           "Revenue declined 15%.",
           "It was decided by the steering committee that the review would slip.",
-          "The team observed a 15% decline and identified three risks."
+          "The team observed a 15% decline and identified three risks.",
+          "Methodology and data sources can be found in the appendix.",
+          "All activities that can be performed remotely are counted here."
         ]
       }
     },

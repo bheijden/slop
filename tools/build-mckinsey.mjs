@@ -242,7 +242,10 @@ const CONSULTANT = [
       + 'from a closed list, so the vehicle and storage senses are untouched: "hard drive", "test '
       + 'drive", "drive to the site", "drive home the point" do not fire. That closed list is '
       + 'also the rule\'s limit — "drive better conversations" has no listed noun after it and '
-      + 'will be missed. It under-reports on purpose; a hit should always be a real one.',
+      + 'will be missed. It under-reports on purpose. One false fire is known and worth '
+      + 'recognising: in a transport document, "a 3% increase in driving demand" means demand '
+      + 'for driving, and "driving" there is a noun rather than a verb. If the surrounding '
+      + 'text is about vehicles rather than business outcomes, that is what has happened.',
     suggest: 'Say what actually causes it. "Pricing drove growth" becomes "growth came from the '
       + 'price cut" or "we grew because prices fell".',
     tests: {
@@ -282,7 +285,10 @@ const CONSULTANT = [
           'mov(?:e|es|ed|ing) the needle',
           'double[- ]click(?:ing)? on',
           'lean(?:ing)? in(?:to)? (?:the|this|that|it)',
-          'leverag(?:e|es|ed|ing)',
+          '(?<!(?:debt|financial|net|over|under|high|low)[-\\s])'
+            + 'leverag(?:e|es|ed|ing)'
+            + '(?! (?:ratio|ratios|multiple|multiples|level|levels|buyout|buyouts|loan|loans|'
+            + 'finance|financing|credit|private equity))',
           'boil the ocean',
           'low[- ]hanging fruit',
           'deep[- ]div(?:e|es|ing)',
@@ -383,9 +389,15 @@ const AISLOP = [
     match: {
       kind: 'regex',
       pattern: or(
-        '\\b(?:in|throughout) this (?:section|article|report|paper|chapter|analysis|piece)\\b(?!\\s+of\\s+the\\b)',
-        "\\bwe(?:'ll| will| shall) (?:explore|examine|discuss|delve|dive|look at|consider|unpack|walk through)\\b",
-        "\\blet(?:'s| us) (?:explore|examine|discuss|delve|dive|look at|unpack|walk through)\\b",
+        // Anchored to a sentence opening. Mid-sentence, "the figures in this
+        // report" is a cross-reference to the document, not a preamble about
+        // what the document is about to do.
+        '(?:^|[.!?]["\')\\]]?\\s+|\\n)\\s*(?:In|Throughout) this '
+          + '(?:section|article|report|paper|chapter|analysis|piece|webinar)\\b(?!\\s+of\\s+the\\b)',
+        // "discuss" is not on the guide's list and does not belong here: in an
+        // email "let's discuss tomorrow" is someone asking for a meeting.
+        "\\bwe(?:'ll| will| shall) (?:explore|examine|delve|dive into|unpack|walk through)\\b",
+        "\\blet(?:'s| us) (?:explore|examine|delve|dive into|unpack|walk through)\\b",
         '\\bthe following (?:analysis|section|discussion|framework|considerations)\\b',
         '\\bthere are (?:several|a number of|multiple|various) (?:factors|considerations|reasons|things|aspects|elements|points) to consider\\b',
         '\\bthis (?:highlights|underscores|demonstrates|illustrates|reflects) the importance of\\b',
@@ -399,8 +411,14 @@ const AISLOP = [
       + 'following analysis…\'". These announce writing instead of doing it, and a reader who has '
       + 'reached the sentence does not need to be told what it is about to do. Every occurrence '
       + 'is reported because there is no honest use of them in the registers this set covers. '
-      + 'One deliberate exclusion: "in this section of the pipeline" and similar are skipped, '
-      + 'because "section" there is a physical thing rather than a part of the document.',
+      + 'Two exclusions, both found by auditing this rule\'s own findings on 431,000 words of '
+      + 'consulting writing. The "in this report" family only fires at the start of a '
+      + 'sentence: mid-sentence it is a cross-reference, and "the figures in this report are '
+      + 'as of April 15" is a good sentence that an earlier version flagged. And "discuss" is '
+      + 'not on the guide\'s list — it banned "let\'s delve into", "let\'s explore" and "let\'s '
+      + 'dive into" — because in an email "let\'s discuss tomorrow" is someone asking for a '
+      + 'meeting. "In this section of the pipeline" is skipped too, where "section" is a '
+      + 'physical thing.',
     suggest: 'Delete the sentence and start with the substance it was introducing.',
     tests: {
       hit: [
@@ -412,6 +430,9 @@ const AISLOP = [
       miss: [
         'In this section of the pipeline, pressure drops by 4 bar.',
         'We cut prices in March. Volume held through June.',
+        'Year-to-date figures in this article are those reported as of April 15.',
+        'Methodology and data sources used in this analysis are in the appendix.',
+        "Thanks - let's discuss tomorrow and decide whether we send it to Mark.",
       ],
     },
   },
@@ -735,8 +756,11 @@ const TIGHT = [
     severity: 'warn',
     match: {
       kind: 'regex',
+      // "strategic deal value" and "strategic buyer" are M&A classifications, where
+      // "strategic" contrasts with "financial" and carries real meaning.
       pattern: '\\b(?:comprehensive|innovative|nuanced|transformative|significant|substantial|'
         + 'considerable|meaningful|compelling|powerful|exciting|strategic)\\s+'
+        + '(?!(?:deal|deals|buyer|buyers|acquirer|acquirers|investor|investors|rationale)\\b)'
         + '(?:[a-z]+\\s+)?'
         + '(?:approach|solution|framework|opportunit(?:y|ies)|capabilit(?:y|ies)|view|analysis|'
         + 'strategy|programme|program|initiative|transformation|change|impact|value|benefits?|'
@@ -899,9 +923,15 @@ const TIGHT = [
       kind: 'regex',
       // Reporting verbs in the passive with no "by" phrase: the actor has not
       // been demoted, it has been deleted. This is the guide's own example.
-      pattern: '\\b(?:was|were|is|are|be|been|being) (?:observed|noted|identified|determined|'
-        + 'decided|conducted|performed|undertaken|carried out|reported|found|assessed|'
-        + 'estimated|recommended|concluded)\\b(?! by\\b)',
+      // The subject has to be a nominalisation as well: "a 15% decline ... was
+      // observed" hides who observed it, while "the data can be found in the
+      // appendix" hides nobody and is the case the guide allows.
+      pattern: '\\b(?:an?|the) (?:[\\w%-]+ ){0,3}'
+        + '(?:decline|increase|decrease|reduction|improvement|growth|shift|change|impact|'
+        + 'effect|trend|gain|loss|deterioration|rise|fall|uptick|variance|discrepancy)\\b'
+        + '[^.!?]{0,40}?'
+        + '\\b(?:was|were|is|are|has been|have been) (?:observed|noted|identified|determined|'
+        + 'reported|found|assessed|estimated|recorded|seen|measured)\\b(?! by\\b)',
       flags: 'gi',
     },
     notable: { '>': 0 },
@@ -912,20 +942,31 @@ const TIGHT = [
       + 'affordable because it is narrow: a reporting verb in the passive with no "by" phrase '
       + 'after it, where the actor has not been demoted but deleted. Someone observed the '
       + 'decline; the sentence will not say who. 45 hits across 431,000 words of consulting '
-      + 'writing, in 23 of 88 documents. "It was decided by the committee" does not fire, '
-      + 'because the actor is there.',
+      + 'writing. An audit of its findings on that corpus is why it looks like this: an '
+      + 'earlier version matched any reporting verb in the passive and fired 67 times, '
+      + 'almost all of them on sentences where the actor genuinely does not matter — '
+      + '"methodology can be found in the appendix", "activities that can be performed '
+      + 'remotely", "winning suppliers are being determined today". The guide explicitly '
+      + 'ALLOWS the passive in exactly those cases, so the rule was contradicting its own '
+      + 'source. Requiring a nominalised subject as well fixes that and costs almost all '
+      + 'the recall: this now fires about once in 431,000 words of real consulting prose, '
+      + 'which says the shape the guide warns about is rarer in practice than the guide '
+      + 'implies. "It was decided by the committee" does not fire either, because the '
+      + 'actor is there. The habit, as opposed to this specific shape, is tight-passive.',
     suggest: 'Name who did it. "A decline was observed" becomes "we observed a decline", or '
       + 'better, "revenue declined 15%".',
     tests: {
       hit: [
         'A 15% decline in revenue was observed.',
-        'It was decided that the review would slip a month.',
-        'Three risks were identified during the diligence.',
+        'The improvement in margin was noted during the review.',
+        'An increase in churn was identified across two regions.',
       ],
       miss: [
         'Revenue declined 15%.',
         'It was decided by the steering committee that the review would slip.',
         'The team observed a 15% decline and identified three risks.',
+        'Methodology and data sources can be found in the appendix.',
+        'All activities that can be performed remotely are counted here.',
       ],
     },
   },
@@ -1092,7 +1133,20 @@ const rules = [...HOUSESTYLE, ...CONSULTANT, ...AISLOP, ...TIGHT];
 // space or a soft-wrapped double space, which the fudger checks for and which is
 // how "in this section" silently stopped matching real HTML.
 for (const r of rules) {
-  if (r.match.kind === 'regex') r.match.pattern = r.match.pattern.replace(/ /g, '\\s+');
+  if (r.match.kind !== 'regex') continue;
+  // Not a blanket replace: a literal space inside a character class must stay a
+  // literal space. `[- ]` became `[-\s+]` under the naive version, which is a
+  // class of hyphen, whitespace and a plus sign -- harmless there by luck, and
+  // not something to leave lying around.
+  let out = '', inClass = false;
+  for (let i = 0; i < r.match.pattern.length; i++) {
+    const c = r.match.pattern[i];
+    if (c === '\\') { out += c + (r.match.pattern[i + 1] || ''); i++; continue; }
+    if (c === '[') inClass = true;
+    else if (c === ']') inClass = false;
+    out += (c === ' ' && !inClass) ? '\\s+' : c;
+  }
+  r.match.pattern = out;
 }
 
 // The engine defaults a rate rule to 250 words and 5 sentences, on the sound
