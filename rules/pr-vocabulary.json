@@ -1,6 +1,6 @@
 {
   "name": "pr-vocabulary",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "slop": "0.1.0",
   "title": "PR vocabulary",
   "description": "AI writing draws on a recognisable vocabulary. This set holds one rule that measures how much of it a document uses.\n\nA register is a way of writing rather than a thing written about — academic, tabloid, legal, chatty are registers, and so is the way a machine writes a pull request description. A word list is only about the writing if the subject is held still, and holding it still is what the derivation below spends its effort on.\n\nThe words are derived here rather than taken from anyone. Some public pull request descriptions sign themselves — a trailing attribution line, or a shouted HTML comment. That signature says one thing reliably: this description was written by a machine. It does not say the unsigned ones were written by people, and it does not say a group holding more signatures is more machine-sounding, so it is used in exactly one place.\n\ntools/pr-sample.mjs samples a day of descriptions each morning and keeps each as a bag of words. tools/pr-cluster.mjs then does three things. It clusters coarsely and takes the group with the largest signed share, which is the register — that is the one use of the signature. It ranks that group's vocabulary by how much more the group uses each word than the whole rest of the corpus does. And it clusters again finely, dropping any word common enough to measure inside a single stratum and nowhere else, because such a word belongs to one part of the register rather than to the register.\n\nThe middle step is what makes the list usable. Ranking by how much more the signed half uses a word finds the work rather than the writing — agents get pointed at typecheck failures, so that vocabulary comes back, with a tool's own name at the top — and it has no term for rarity, so ordinary words outrank distinctive ones. Contrasting the register against the whole corpus supplies both. Measured on data/corpus, ranking by the signature alone catches 9 of 24 machine-written documents; ranking by the contrast catches 20.\n\nIt rebuilds itself: the sample runs daily, the derivation weekly. The agent signatures it splits on are groomed by hand through a pull request, because which tools exist is the one part that goes out of date on its own.",
@@ -11,7 +11,7 @@
       "name": "Pull request vocabulary",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:nobody|somebody|quietly|plainly|rung|halves|nowhere|ruling|precisely|answered|survived|decides|mutant|handed|worse|refused|arms|rests|disagreed|says|argued|remedy|ours|beside|indistinguishable|buys|mutation-checked|refusal|eleven|drew|pays|whoever|opposite|walked|twelve|drawn|judgement|disagree|re-derived|judged|arrived|told|settles|asserted|armed|saying|answering|vacuous|hole|offered|rides|parked|stands|fourth|half|band|premise|settled|arriving|apart|sat|measured|seat|mutation-tested|outright|asked|refusals|nothing|worst|knowing|re-measured|spelled|hazard|sitting|declined|priced|holds|draws|refusing|merely|owed|defect|ladder|restated|carrying|fifth|consequence|spends|stood|charged|mattered|agrees|swept|honoured|neighbours|standing|died|tally|hands|census|ruled|theirs|ceiling|lie|spellings|beats|walk|carries|leg|whichever|stall|carried|sides|asks|genuinely|ten|alike|earns|gained|declines|vacuously|beat|refuses|accident|vanished|differing|admits|alone|settle|widening|hundred|sits|exemption|puts|bit-identical|reds|load-bearing|counted|legitimately|loses|reddens|readings|holding|held|asymmetry|arrival|bought|fourteen|park|handing|fold|said|holder|refuted|disagreement|bite|door|underneath|survives|measuring|surviving|colours|twenty|worth|afterwards|mine|thirteen|whose|sit|filed|travels|stating|grew|withdrawn|defects|gib|cheaper|sixteen|came|discards|probed|loud|blind|widened|governs|deciding|dies|parks|trap|directions|minted|twin|sweep|bites|burst|stranded|deliberately|unrecognised|traps|earned|lever|citing|promised|neighbouring|thirty|sep|modelled|outranks|forever|scored|stamp|fraction|provably|faults|stamped|guessed|fed|outage|re-reads|invented|kills|refuse|roughly|arrives|ties|weaker|criterion|operand|mutants|painted|contradicted|legs|cites|arm|nine|folded|watched|reasoned|answers|silence|grounds|drill|shelf|ever|clamps|quiet|stamps|unreadable|verdicts|stand)\\b",
+        "pattern": "\\b(?:nobody|quietly|somebody|rung|halves|plainly|precisely|ruling|nowhere|answered|refused|survived|worse|decides|told|handed|mutant|refusal|vacuous|remedy|says|whoever|outright|asserted|judgement|indistinguishable|mutation-checked|hole|died|re-derived|refusing|argued|rests|hazard|saying|ours|judged|answering|buys|eleven|parked|stands|arms|half|fourth|refuses|settles|arrived|apart|nothing|armed|opposite|knowing|walked|disagree|pays|declined|mattered|carrying|asked|holds|defect|offered|rides|minted|restated|leg|stall|disagreed|twelve|load-bearing|mutation-tested|loud|arriving|sitting|fifth|dies|re-measured|premise|worst|settled|carries|beside|exemption|refusals|consequence|vacuously|merely|genuinely|seat|probed|spellings|asks|ceiling|priced|carried|spelled|honoured|owed|ladder|asymmetry|spends|ten|lie|legitimately|standing|declines|admits|stamped|filed|whichever|stood|hands|alone|outage|measured|theirs|lever|agrees|swept|disagreement|thirteen|loses|charged|sides|census|ruled|said|bought|surviving|walk|blind|held|earns|accident|holding|vanished|drawn|worth|stating|hundred|tally|refuse|reds|handing|widening|gained|neighbours|unrecognised|twin|bite|alike|legs|forever|ever|mine|deliberately|planted|drew|defects|park|afterwards|beats|differing|sat|reddens|whose|parks|trap|bites|re-read|pre-fix|provably|weaker|puts|governs|symptom|measuring|cheaper|survives|wedged|sweep|sep|promised|withdrawn|counted|holder|fourteen|dial|mutants|came|stamps|refuted|unguarded|stamp|settle|discards|widened|arrival|deciding|deliberate|re-reads|reaches|drained|cites|mints|honest|silence|travels|ungated|sixteen|verdict|stranger|unparseable|grew|deserves|contradicted|genuine|citing|thirty|fired|criterion|verdicts|precedent|knew|consults|guessed|cheap|twenty|modelled|predates|neither|outranks|floor|disagrees|withheld|draws|folded|flagging|watched|scored|answers|door|fifteen|watching|falsified|arrives|carry|reasoned|kills)\\b",
         "flags": "gi",
         "distinct": true
       },
@@ -42,13 +42,13 @@
     }
   ],
   "corpus": {
-    "built": "2026-09-19",
-    "days": 626,
+    "built": "2026-09-20",
+    "days": 627,
     "from": "2025-01-01",
-    "to": "2026-09-18",
-    "descriptions": 287726,
-    "cluster": 7,
-    "stamped": "41.5%",
+    "to": "2026-09-19",
+    "descriptions": 288508,
+    "cluster": 8,
+    "stamped": "42.1%",
     "words": 250
   },
   "aliases": [
