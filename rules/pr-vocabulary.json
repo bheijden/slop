@@ -1,6 +1,6 @@
 {
   "name": "pr-vocabulary",
-  "version": "0.1.58",
+  "version": "0.1.59",
   "slop": "0.1.0",
   "title": "PR vocabulary",
   "description": "AI writing draws on a recognisable vocabulary. This set holds one rule that measures how much of it a document uses.\n\nA register is a way of writing rather than a thing written about — academic, tabloid, legal, chatty are registers, and so is the way a machine writes a pull request description. A word list is only about the writing if the subject is held still, and holding it still is what the derivation below spends its effort on.\n\nThe words are derived here rather than taken from anyone. Some public pull request descriptions sign themselves — a trailing attribution line, or a shouted HTML comment. That signature says one thing reliably: this description was written by a machine. It does not say the unsigned ones were written by people, and it does not say a group holding more signatures is more machine-sounding, so it is used in exactly one place.\n\ntools/pr-sample.mjs samples a day of descriptions each morning and keeps each as a bag of words. tools/pr-cluster.mjs then does three things. It clusters coarsely and takes the group with the largest signed share, which is the register — that is the one use of the signature. It ranks that group's vocabulary by how much more the group uses each word than the whole rest of the corpus does. And it clusters again finely, dropping any word common enough to measure inside a single stratum and nowhere else, because such a word belongs to one part of the register rather than to the register.\n\nThe middle step is what makes the list usable. Ranking by how much more the signed half uses a word finds the work rather than the writing — agents get pointed at typecheck failures, so that vocabulary comes back, with a tool's own name at the top — and it has no term for rarity, so ordinary words outrank distinctive ones. Contrasting the register against the whole corpus supplies both. Measured on data/corpus, ranking by the signature alone catches 9 of 24 machine-written documents; ranking by the contrast catches 20.\n\nIt rebuilds itself: the sample runs daily, the derivation weekly. The agent signatures it splits on are groomed by hand through a pull request, because which tools exist is the one part that goes out of date on its own.",
@@ -11,7 +11,7 @@
       "name": "Pull request vocabulary",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:remedy|vacuous|bit-identical|died|refusing|tok/s|mutants|precisely|mutant|refusal|argued|rung|probed|arms|operand|leg|callee|re-derived|restated|refused|judged|refusals|wedged|inf|indistinguishable|quietly|drained|load-bearing|gib|survived|killed|ruling|declines|halves|minted|re-measured|seq|admits|premise|exemption|worse|stall|sigterm|vacuously|verdicts|planted|dies|refuses|drain|outright|loud|holder|asymmetry|handed|believed|spellings|defect|mutation-checked|plainly|consults|census|disagreement|ceiling|reds|judgement|mutation-tested|freed|refuted|parked|caller|asserted|answered|decides|ours|arm|hazard|frees|outage|residue|undeclared|legitimately|provably|carrying|relayed|assertionerror|pays|unguarded|verdict|disagreed|spelled|nobody|pre-fix|lever|consequence|stating|declined|rests|owed|withheld|blind|consulted|zeroed|handing|loudly|unparseable|precondition|whoever|predicate|embedder|filed|parks|cites|mattered|heredoc|reddens|unrecognised|unresolvable|refuse|backstop|pooled|float64|judges|restating|ungated|verb|operands|twin|arity|unnoticed|corpus|sweep|answering|merely|widening|narrowing|drains|citing|defence|keying|judge|precedent|legs|aborts|falsified|hole|panicked|predicted|told|agrees|alike|sabotage|selftest|nowhere|stamp|opposite|shortfall|criterion|armed|honoured|accumulator|holds|int32|buys|reaper|forbids|tripwire|whose|discards|subquery|sleeps|genuinely|fence|clause|loser|fused|outlive|weaker|spill|unreadable|divergence|fault|behavioural|evicted|ratchet|amendment|survivors|forever|swept|allocates|naive|retried|unfixed|kills|carve-out|coincidence|int64|bond|goldens|per-call|mtime|cited|carried|re-read|halt|re-derives|raises|reconciler|offending|somebody|carries|knob|idx|outlives|holding|saying|nan|dials|terminator|magnitude|worst|counted|reasoned|surviving|absorbed|interleaved|half|waited|re-check|writer|mints|stamped|artefact|destroys|graded|byte-identical|sink|contradicted|enclosing|converges|contradicts|contradicting|non-ascii|echoes|mib|locals|wall-clock|decodes|nothing|unterminated|asserts)\\b",
+        "pattern": "\\b(?:remedy|vacuous|bit-identical|tok/s|died|refusing|mutants|refusal|precisely|mutant|callee|wedged|operand|strictmode|d4ea75|drained|restated|refused|argued|re-derived|sigterm|arms|refusals|probed|load-bearing|indistinguishable|minted|gib|survived|inf|premise|killed|ruling|quietly|seq|drain|vacuously|rung|judged|stall|admits|dies|planted|exemption|mutation-tested|re-measured|consults|mutation-checked|loud|leg|halves|residue|refuses|spellings|lever|outage|holder|reds|caller|undeclared|outright|defect|declines|assertionerror|verdicts|parked|pre-fix|ceiling|asymmetry|test-utils|refuted|census|disagreement|asserted|plainly|hazard|unguarded|handed|backstop|judgement|provably|loudly|arm|believed|unresolvable|embedder|carrying|heredoc|reddens|verdict|legitimately|stating|decides|withheld|predicate|answered|owed|float64|tripwire|filed|frees|unrecognised|spelled|rests|precondition|operands|handing|zeroed|disagreed|worse|unparseable|consulted|mattered|cites|falsified|keying|aborts|sweep|parks|precedent|freed|restating|narrowing|blind|arity|nobody|refuse|panicked|sabotage|int32|relayed|consequence|judges|pays|subquery|unterminated|drains|twin|ungated|ours|unnoticed|judge|declined|widening|reaper|corpus|verb|whoever|answering|accumulator|criterion|citing|merely|retried|predicted|spill|ratchet|fault|int64|fence|loser|unreadable|behavioural|halt|forbids|forever|allocates|carve-out|pooled|evicted|sigkill|sleeps|genuinely|opposite|holds|whose|reconciler|raises|stamp|mtime|dials|terminator|non-ascii|agrees|armed|buys|amendment|selftest|weaker|discards|interleaved|unfixed|replica|offending|sink|divergence|writer|outlives|hole|told|artefact|outlive|destroys|knob|pid|stderr|swept|mib|re-derives|disagrees|process-wide|salt|honoured|proc|mints|charter|goldens|naive|echoes|enclosing|aborted|clause|goroutine|unbounded|luck|shortfall|carries|waited|kills|per-call|xfailed|carried|re-check|nowhere|asserts|re-read|reaped|assumed|staleness|decodes|stamped|wall-clock|absorbed|byte-identical|governs|wal|filing|declares|failover|saying)\\b",
         "flags": "gi",
         "distinct": true
       },
@@ -42,13 +42,13 @@
     }
   ],
   "corpus": {
-    "built": "2026-10-16",
-    "days": 653,
+    "built": "2026-10-17",
+    "days": 654,
     "from": "2025-01-01",
-    "to": "2026-10-15",
-    "descriptions": 311077,
+    "to": "2026-10-16",
+    "descriptions": 311964,
     "cluster": 4,
-    "stamped": "38.3%",
+    "stamped": "38.2%",
     "words": 250
   },
   "aliases": [
