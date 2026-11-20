@@ -1,6 +1,6 @@
 {
   "name": "pr-vocabulary",
-  "version": "0.1.77",
+  "version": "0.1.78",
   "slop": "0.1.0",
   "title": "PR vocabulary",
   "description": "AI writing draws on a recognisable vocabulary. This set holds one rule that measures how much of it a document uses.\n\nA register is a way of writing rather than a thing written about — academic, tabloid, legal, chatty are registers, and so is the way a machine writes a pull request description. A word list is only about the writing if the subject is held still, and holding it still is what the derivation below spends its effort on.\n\nThe words are derived here rather than taken from anyone. Some public pull request descriptions sign themselves — a trailing attribution line, or a shouted HTML comment. That signature says one thing reliably: this description was written by a machine. It does not say the unsigned ones were written by people, and it does not say a group holding more signatures is more machine-sounding, so it is used in exactly one place.\n\ntools/pr-sample.mjs samples a day of descriptions each morning and keeps each as a bag of words. tools/pr-cluster.mjs then does three things. It clusters coarsely and takes the group with the largest signed share, which is the register — that is the one use of the signature. It ranks that group's vocabulary by how much more the group uses each word than the whole rest of the corpus does. And it clusters again finely, dropping any word common enough to measure inside a single stratum and nowhere else, because such a word belongs to one part of the register rather than to the register.\n\nThe middle step is what makes the list usable. Ranking by how much more the signed half uses a word finds the work rather than the writing — agents get pointed at typecheck failures, so that vocabulary comes back, with a tool's own name at the top — and it has no term for rarity, so ordinary words outrank distinctive ones. Contrasting the register against the whole corpus supplies both. Measured on data/corpus, ranking by the signature alone catches 9 of 24 machine-written documents; ranking by the contrast catches 20.\n\nIt rebuilds itself: the sample runs daily, the derivation weekly. The agent signatures it splits on are groomed by hand through a pull request, because which tools exist is the one part that goes out of date on its own.",
@@ -11,7 +11,7 @@
       "name": "Pull request vocabulary",
       "match": {
         "kind": "regex",
-        "pattern": "\\b(?:bit-identical|seq|argued|frees|mutant|refused|judged|tok/s|mutation-checked|somebody|ruling|answered|halves|mutants|pays|quietly|handed|nobody|refusing|died|drained|charged|arms|owed|precisely|wedged|killed|declines|rung|refusal|inf|sigterm|int32|freed|priced|reddens|callee|mhz|worse|buys|d4ea75|conv|refusals|survived|answering|spellings|indistinguishable|remedy|parks|stall|judgement|dies|strictmode|evicted|whoever|minted|swarm|nowhere|parked|told|probed|vacuous|zeroed|relayed|plainly|withdrawn|int8|holder|declined|planted|decides|operand|refuses|gib|subquery|mid-turn|counted|spends|outlives|disagreed|spelled|restated|interleaved|divides|leg|re-measured|re-derived|reaper|waited|reds|vacuously|armed|outage|kills|disagreement|handing|bond|re-read|nan|holds|refuse|premise|faults|allocates|thousand|drain|lever|agrees|hundred|replica|meanwhile|walked|drains|honoured|tenth|stranger|ours|judges|re-reads|arriving|locals|mib|refuted|test-utils|unrecognised|damaged|agreeing|float64|cheaper|million|tally|worst|catch-up|lie|sabotage|judge|loser|evicts|panicked|fused|alike|held|swept|nit|lowers|float32|opposite|outlive|heard|settles|believed|park|thirty|saying|walk|answers|arrived|dials|twin|wedge|arm|rig|stride|interrupt|retried|consults|standby|rests|veto|hazard|hole|rulings|silence|ceiling|assertionerror|withheld|fraction|owes|asserted|summed|unanswered|disagree|settled|spill|costs|ruled|burst|stamped|sleeps|survivors|int64|rewind|pooled|outright|half|refunded|holding|carrying|stands|ctrl-c|admits|decodes|whose|verdicts|sweep|stating|defence|stalls|shortfall|unreadable|blackhole|forgets|defect|asked|destroys|refund|mid-run|peak|filed|consequence|settle|ladder|salt|answer|ended|interrupts|asymmetry|stamp|knew|fourth|start-up|seat|sigint|normalised|hands|run-to-run|pump|tie|accumulator|forever|orphans|says|failover|wakes|modelled|splice|county|round-3|cores|flushed)\\b",
+        "pattern": "\\b(?:somebody|heard|drawn|drew|answered|her|nobody|rung|pays|draws|stood|bought|spends|handed|pictures|charged|neighbours|she|stands|owed|bit-identical|frees|county|mhz|ruling|seat|rests|argued|car|neighbour|faces|priced|judged|resting|answering|undone|lies|park|mutant|halves|arrived|seq|told|plays|buys|arriving|meanwhile|nowhere|says|road|whoever|refused|degrees|quietly|pump|hundred|quarter|town|booked|armed|leo|pad|owes|hears|settles|hands|cone|asked|plate|re-measured|chord|rig|counted|held|fitted|fraction|walked|freed|lie|stand|alike|waited|worst|offered|cable|finger|holds|tok/s|decides|mutants|spare|stills|shot|disc|stranger|beside|nov|foot|stall|centre|ball|parks|walls|tally|worse|band|ends|spoken|him|crew|walk|reddens|readings|million|beat|steady|ruled|theirs|saying|upright|oct|slope|answers|khz|hand-off|burst|played|cheaper|pace|morning|withdrawn|empties|apart|longest|declines|lasts|rise|arrives|seats|rulings|street|tie|warm-up|sep|sixth|answer|pile|night|asleep|laid|door|divides|asks|settled|faults|stand-in|arms|thousand|fold|twin|mutation-checked|clock|sky|plainly|forgets|spelled|busy|fourth|rises|thirty|desk|killed|clip|parked|half|pads|interleaved|measuring|conv|holding|emptied|shots|declined|damaged|agrees|start-up|puts|ended|greyed|mine|settle|fifth|ramp|ladder|west|refunded|holder|mic|said|ours|gave|refusals|painted|judgement|slab|costs|came|flight|hole|swarm|frame|rider|remembered|summed|holes|redraws|tenth|sentence|re-read|meshes|made-up|arrival|opposite|acted|evening|paying|planted|neighbouring|standby|subquery|dial|nothing|refusal|picture|unanswered|survived|shelf|slowest|sleeping|restated|judges|re-reads|billed|east|wall|leader|refusing|person|wi-fi|birth)\\b",
         "flags": "gi",
         "distinct": true
       },
@@ -42,13 +42,13 @@
     }
   ],
   "corpus": {
-    "built": "2026-11-17",
-    "days": 685,
+    "built": "2026-11-20",
+    "days": 688,
     "from": "2025-01-01",
-    "to": "2026-11-16",
-    "descriptions": 338375,
+    "to": "2026-11-19",
+    "descriptions": 341098,
     "cluster": 4,
-    "stamped": "39.3%",
+    "stamped": "40.9%",
     "words": 250
   },
   "aliases": [
