@@ -1,0 +1,14 @@
+{
+  "generated": "2026-11-23",
+  "scanned": 19688,
+  "days": 21,
+  "note": "Proposed by tools/pr-markers.mjs. Move a real agent into markers.json confirmed, anything else into rejected. This file is rewritten every run.",
+  "proposals": [
+    {
+      "footer": "generated with devin",
+      "seen": 10,
+      "authors": 10,
+      "example": "Generated with [Devin](https://devin.ai)"
+    }
+  ]
+}
